@@ -1,0 +1,10 @@
+<RCC>
+    <qresource prefix="/banners">
+        <file alias="jianji">res/jianji.png</file>
+        <file alias="logo_int">res/logo_int.png</file>
+        <file alias="logo_deDE">res/logo_deDE.png</file>
+    </qresource>
+    <qresource prefix="/locales">
+        <file alias="crosstalk_de_DE">res/crosstalk_de_DE.qm</file>
+    </qresource>
+</RCC>

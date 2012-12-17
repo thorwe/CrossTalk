@@ -1,7 +1,7 @@
 # CrossTalk
 [![Pledgie](https://www.pledgie.com/campaigns/18898.png "Click here to lend your support to CrossTalk and make a donation!")][pledgie]
 
-Desc
+A Teamspeak 3 plugin that enhances the general audio experience and provides advanced features for commanders.
 
 [pledgie]: http://www.pledgie.com/campaigns/18898
 
