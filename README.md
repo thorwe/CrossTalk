@@ -14,7 +14,7 @@ Ready to go live!
 * Stereo Position Spread  
 ![Stereo Position Spread](https://github.com/thorwe/CrossTalk/raw/master/misc/sps.png "Stereo Position Spread")
 * Channel Ducking  
-![Channel Ducking](https://github.com/thorwe/CrossTalk/raw/master/misc/sps.png "Channel Ducking")
+![Channel Ducking](https://github.com/thorwe/CrossTalk/raw/master/misc/duck.png "Channel Ducking")
 * Cross-Server Push-to-Talk & Whispering
 
 ## Installation
