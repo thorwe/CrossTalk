@@ -126,15 +126,101 @@ void SnT::ParseCommand(char* cmd, char* arg)
         if ((error = ts->GetServerHandler(arg,&targetServer)) != ERROR_ok)
             ts->Error(scHandlerID,error,"Could not get target server.");
 
-        if (scHandlerID == targetServer)
+        if(status != STATUS_DISCONNECTED)
+            ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
+
+        if (scHandlerID != targetServer)
+        {
+            m_shallActivatePtt=true;
+            m_returnToSCHandler=scHandlerID;
+            ts->SetActiveServer(targetServer);
+        }
+        else
+            ts->SetPushToTalk(scHandlerID,true);
+
+    }
+    else if (!strcmp(cmd, "TS3_SWITCH_TAB_AND_WHISPER_START"))
+    {
+        QString arg_qs;
+        arg_qs = arg;
+        QStringList args_qs = arg_qs.split(" ",QString::SkipEmptyParts);
+        if (args_qs.count() < 3)
+        {
+            ts->Error(scHandlerID,NULL,"Too few arguments.");
             return;
+        }
+
+        arg_qs = args_qs.at(0);
+        uint64 targetServer;
+        if ((error = ts->GetServerHandler(arg,&targetServer)) != ERROR_ok)
+            ts->Error(scHandlerID,error,"Could not get target server.");
+
+        anyID myID;
+        if((error = ts->GetClientId(targetServer,&myID)) != ERROR_ok)
+        {
+            ts->Error(scHandlerID,error, "Could not get my id on the target server: ");
+            return;
+        }
+
+        arg_qs = args_qs.at(1);
+        GroupWhisperType groupWhisperType = GROUPWHISPERTYPE_ENDMARKER;
+        if (arg_qs.contains("COMMANDER",Qt::CaseInsensitive))
+                groupWhisperType = GROUPWHISPERTYPE_CHANNELCOMMANDER;
+        else if (arg_qs.contains("ALLC",Qt::CaseInsensitive))
+                groupWhisperType = GROUPWHISPERTYPE_ALLCLIENTS;
+
+        if (groupWhisperType == GROUPWHISPERTYPE_ENDMARKER)
+        {
+            ts->Error(scHandlerID,NULL,"Unsupported group whisper type.");
+            return;
+        }
+
+        arg_qs = args_qs.at(2);
+        GroupWhisperTargetMode groupWhisperTargetMode  = GROUPWHISPERTARGETMODE_ENDMARKER;
+        if (arg_qs.contains("ALLPARENT"))
+            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALLPARENTCHANNELS;
+        else if (arg_qs.contains("PARENT"))
+            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_PARENTCHANNEL;
+        else if (arg_qs.contains("CURRENT"))
+            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CURRENTCHANNEL;
+        else if (arg_qs.contains("SUB"))
+            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_SUBCHANNELS;
+        else if (arg_qs.contains("ANCESTORCHANNELFAMILY"))
+            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ANCESTORCHANNELFAMILY;
+        else if (arg_qs.contains("FAMILY"))
+            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CHANNELFAMILY;
+        else if (arg_qs.contains("ALL"))
+            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALL;
+
+        if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ENDMARKER)
+        {
+            ts->Error(scHandlerID,NULL,"Could not recognize group whisper target mode.");
+            return;
+        }
+        else if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ANCESTORCHANNELFAMILY)
+        {
+            ts->Error(scHandlerID,NULL,"The group whisper target mode ANCESTORCHANNELFAMILY is not supported.");
+            return;
+        }
+
+        if ((error = ts->SetWhisperList(targetServer,groupWhisperType,groupWhisperTargetMode)) != ERROR_ok)
+        {
+            ts->Error(scHandlerID,error, "Could not set whisperlist: ");
+            return;
+        }
 
         if(status != STATUS_DISCONNECTED)
             ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
 
-        m_shallActivatePtt=true;
-        m_returnToSCHandler=scHandlerID;
-        ts->SetActiveServer(targetServer);
+        m_shallClearWhisper = true;
+        if (scHandlerID != targetServer)
+        {
+            m_shallActivatePtt=true;
+            m_returnToSCHandler=scHandlerID;
+            ts->SetActiveServer(targetServer);
+        }
+        else
+            ts->SetPushToTalk(scHandlerID,true);
     }
     else if (!strcmp(cmd, "TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START"))
     {

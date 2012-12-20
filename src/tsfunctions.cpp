@@ -310,7 +310,7 @@ uint64 TSFunctions::GetServerHandler(QString name,uint64* result)
     char* s_name;
     for(server = servers; *server != (uint64)NULL; ++server)
     {
-        if ((error = ts3Functions.getServerVariableAsString(*server, flag, s_name)) != Error_ok)
+        if ((error = ts3Functions.getServerVariableAsString(*server, VIRTUALSERVER_NAME, &s_name)) != ERROR_ok)
             break;
 
         if(name==s_name)
@@ -319,7 +319,7 @@ uint64 TSFunctions::GetServerHandler(QString name,uint64* result)
             break;
         }
     }
-    delete s_name;
+    ts3Functions.freeMemory(s_name);
     ts3Functions.freeMemory(servers);
     return error;
 }

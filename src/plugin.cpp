@@ -347,11 +347,12 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 	/* Register hotkeys giving a keyword and a description.
 	 * The keyword will be later passed to ts3plugin_onHotkeyEvent to identify which hotkey was triggered.
 	 * The description is shown in the clients hotkey dialog. */
-    BEGIN_CREATE_HOTKEYS(4);  /* Create 2 hotkeys. Size must be correct for allocating memory. */
+    BEGIN_CREATE_HOTKEYS(5);  /* Create 2 hotkeys. Size must be correct for allocating memory. */
     CREATE_HOTKEY("TS3_NEXT_TAB_AND_TALK_END", "Next Tab and Talk Stop");
 	CREATE_HOTKEY("TS3_NEXT_TAB_AND_TALK_START", "Next Tab and Talk Start");
     CREATE_HOTKEY("TS3_NEXT_TAB_AND_WHISPER_END", "Next Tab and Whisper Stop");
     CREATE_HOTKEY("TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START", "Next Tab and Whisper all Channel Commanders Start");
+    CREATE_HOTKEY("TS3_SWITCH_N_TALK_END", "SnT Stop");
 	END_CREATE_HOTKEYS;
 
 	/* The client will call ts3plugin_freeMemory to release all allocated memory */
