@@ -103,6 +103,39 @@ void SnT::ParseCommand(char* cmd, char* arg)
             ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
         ts->SetPrevActiveServer(scHandlerID);
     }
+    else if(!strcmp(cmd, "TS3_SWITCH_N_TALK_END"))
+    {
+        if(status != STATUS_DISCONNECTED)
+        {
+            ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
+            if (m_shallClearWhisper)
+            {
+                if ((error = ts3Functions.requestClientSetWhisperList(scHandlerID,NULL,NULL,NULL,NULL)) != ERROR_ok)
+                    ts->Error(scHandlerID,error, "Could not release whisperlist.");
+            }
+        }
+        if(m_returnToSCHandler != (uint64)NULL)
+        {
+            ts->SetActiveServer(m_returnToSCHandler);
+            m_returnToSCHandler = (uint64)NULL;
+        }
+    }
+    else if(!strcmp(cmd, "TS3_SWITCH_TAB_AND_TALK_START"))
+    {
+        uint64 targetServer;
+        if ((error = ts->GetServerHandler(arg,&targetServer)) != ERROR_ok)
+            ts->Error(scHandlerID,error,"Could not get target server.");
+
+        if (scHandlerID == targetServer)
+            return;
+
+        if(status != STATUS_DISCONNECTED)
+            ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
+
+        m_shallActivatePtt=true;
+        m_returnToSCHandler=scHandlerID;
+        ts->SetActiveServer(targetServer);
+    }
     else if (!strcmp(cmd, "TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START"))
     {
         uint64 nextServer;

@@ -296,6 +296,34 @@ uint64 TSFunctions::GetActiveServerConnectionHandlerID()
     return handle;
 }
 
+uint64 TSFunctions::GetServerHandler(QString name,uint64* result)
+{
+    unsigned int error;
+    uint64* servers;
+    uint64* server;
+
+    // Get server list
+    if((error = ts3Functions.getServerConnectionHandlerList(&servers)) != ERROR_ok)
+        return error;
+
+    // Find server in the list
+    char* s_name;
+    for(server = servers; *server != (uint64)NULL; ++server)
+    {
+        if ((error = ts3Functions.getServerVariableAsString(*server, flag, s_name)) != Error_ok)
+            break;
+
+        if(name==s_name)
+        {
+            *result = *server;
+            break;
+        }
+    }
+    delete s_name;
+    ts3Functions.freeMemory(servers);
+    return error;
+}
+
 // Server interaction
 int TSFunctions::SetActiveServer(uint64 serverConnectionHandlerID)
 {

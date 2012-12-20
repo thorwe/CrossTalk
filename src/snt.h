@@ -23,6 +23,9 @@ private:
     TSFunctions *ts;
 
     bool m_shallActivatePtt;
+
+    uint64 m_returnToSCHandler;
+    bool m_shallClearWhisper;
 };
 
 #endif // SNT_H

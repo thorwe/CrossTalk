@@ -106,6 +106,7 @@ public:
     void ShutdownLocalization();
     QTranslator* translator;
 
+    uint64 GetServerHandler(QString name, uint64 *result);
 signals:
     void Command(char *cmd, char *arg);
     void PttDelayFinished();
