@@ -76,6 +76,49 @@ bool TSSettings::GetPreProcessorData(QString profile, QString &result)
     return true;
 }
 
+//! Get all bookmarks
+/*!
+ * \brief TSSettings::GetBookmarks
+ * \param result the result will be put in here
+ * \return true on success, false when an error has occurred
+ */
+bool TSSettings::GetBookmarks(QStringList &result)
+{
+    QString query("SELECT value FROM Bookmarks");
+    if (!(GetValuesFromQuery(query, result)))
+    {
+        error_qsql.setDriverText(error_qsql.driverText().prepend("(GetBookmarks) "));
+        return false;
+    }
+    return true;
+}
+
+//! Find a bookmark by server uid
+/*!
+ * \brief TSSettings::GetBookmarkByServerUID Find a bookmark by server uid
+ * \param sUID the server uid
+ * \param result a QMap
+ * \return true on success, false when an error has occurred; note that not found is a non-error -> success; just check if the QMap is empty for that
+ */
+bool TSSettings::GetBookmarkByServerUID(QString sUID, QMap<QString, QString> &result)
+{
+    QStringList bookmarks;
+    if (!GetBookmarks(bookmarks))
+        return false;
+
+    sUID.prepend("ServerUID=");
+    for (int i = 0;i<bookmarks.count();++i)
+    {
+        QString bookmark = bookmarks.at(i);
+        if (bookmark.contains(sUID))
+        {
+            result = GetMapFromValue(bookmark);
+            break;
+        }
+    }
+    return true;
+}
+
 //! Get all contacts
 /*!
  * \brief TSSettings::GetContacts
@@ -87,7 +130,7 @@ bool TSSettings::GetContacts(QStringList &result)
     QString query("SELECT value FROM Contacts");
     if (!(GetValuesFromQuery(query, result)))
     {
-        error_qsql.setDriverText(error_qsql.driverText().prepend("(GetPreProcessorData) "));
+        error_qsql.setDriverText(error_qsql.driverText().prepend("(GetContacts) "));
         return false;
     }
     return true;
@@ -135,6 +178,26 @@ QSqlError TSSettings::GetLastError()
 }
 
 // Private
+
+//! Convert the value QString to a QMap
+/*!
+ * \brief TSSettings::GetMapFromValue Convert the value QString to a QMap
+ * \param value the value
+ * \return a QMap
+ */
+QMap<QString, QString> TSSettings::GetMapFromValue(QString value)
+{
+    QMap<QString,QString> result;
+    QStringList qstrl_value = value.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+    for (int i = 1;i<qstrl_value.count();++i)
+    {
+        QString qs_val = qstrl_value.at(i);
+        QStringList line = qs_val.split("=",QString::SkipEmptyParts);
+        if (line.count() == 2)
+            result.insert(line.at(0),line.at(1));
+    }
+    return result;
+}
 
 //! Get a single value from the TS Database
 /*!

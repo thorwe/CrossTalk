@@ -19,6 +19,8 @@ public:
     bool GetDefaultCaptureProfile(QString& result);
     bool GetPreProcessorData(QString profile, QString& result);
 
+    bool GetBookmarks(QStringList &result);
+    bool GetBookmarkByServerUID(QString sUID, QMap<QString,QString> &result);
     bool GetContacts(QStringList &result);
 //    bool GetContactFromUniqueId(const char *clientUniqueID, QMap<QString, QString> result); //TODO
 
@@ -27,6 +29,7 @@ public:
     QSqlError GetLastError();
 
 private:
+    QMap<QString,QString> GetMapFromValue(QString value);
     bool GetValueFromQuery(QString query, QString &result, bool isEmptyValid);
     bool GetValuesFromQuery(QString query, QStringList &result);
     void SetError(QString in);   //create Custom SQL Error Helper
