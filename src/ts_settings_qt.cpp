@@ -192,9 +192,7 @@ QMap<QString, QString> TSSettings::GetMapFromValue(QString value)
     for (int i = 0;i<qstrl_value.count();++i)
     {
         QString qs_val = qstrl_value.at(i);
-        QStringList line = qs_val.split("=",QString::SkipEmptyParts);
-        if (line.count() == 2)
-            result.insert(line.at(0),line.at(1));
+        result.insert(qs_val.section("=",0,0),qs_val.section("=",1));
     }
     return result;
 }
