@@ -189,7 +189,7 @@ QMap<QString, QString> TSSettings::GetMapFromValue(QString value)
 {
     QMap<QString,QString> result;
     QStringList qstrl_value = value.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
-    for (int i = 1;i<qstrl_value.count();++i)
+    for (int i = 0;i<qstrl_value.count();++i)
     {
         QString qs_val = qstrl_value.at(i);
         QStringList line = qs_val.split("=",QString::SkipEmptyParts);
