@@ -17,7 +17,6 @@ CT_VolumeSuppression::CT_VolumeSuppression(QObject *parent) :
 {
     ts = TSFunctions::instance();
     talkers = Talkers::instance();
-    //ChannelVolumes = new QMap<anyID,SimpleVolume*>;
     ServerChannelVolumes = new QMap<uint64, QMap<anyID,SimpleVolume*>* >;
 }
 
@@ -56,7 +55,6 @@ void CT_VolumeSuppression::setEnabled(bool value)
         if (isActive())
             setActive(false);
 
-        //ClearChannelVolumes();
         ClearServerChannelVolumes();
     }
     ts->Log(QString("Ducker:enabled: %1").arg((m_enabled)?"true":"false"));
@@ -84,11 +82,15 @@ void CT_VolumeSuppression::setDuckingReverse(bool val)
     ts->Log(QString("Ducker:isReverse: %1").arg((m_isReverse)?"true":"false"));
 }
 
-//! When disconnecting from the current server tab, clear channel volumes
+//! When disconnecting from a server tab, clear channel volumes
+/*!
+ * \brief CT_VolumeSuppression::onConnectStatusChanged TS Event
+ * \param serverConnectionHandlerID the connection id of the server
+ * \param newStatus used:STATUS_DISCONNECTED
+ * \param errorNumber unused
+ */
 void CT_VolumeSuppression::onConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber)
 {
-//    if ((newStatus==STATUS_DISCONNECTED) && (serverConnectionHandlerID==m_homeId))
-//        ClearChannelVolumes();
     if (newStatus==STATUS_DISCONNECTED)
         ClearServerChannelVolumes(serverConnectionHandlerID);
 }
@@ -130,7 +132,6 @@ void CT_VolumeSuppression::setActive(bool value)
 
 void CT_VolumeSuppression::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility)
 {
-    //printf("onClientMoveEvent:%hu\n",clientID);
     // Get My Id on this handler
     anyID myID;
     if(ts->GetClientId(serverConnectionHandlerID,&myID) != ERROR_ok)
@@ -138,14 +139,12 @@ void CT_VolumeSuppression::onClientMoveEvent(uint64 serverConnectionHandlerID, a
 
     if (clientID == myID)                   // I have switched channels
     {
-        //if ((serverConnectionHandlerID != m_homeId) || (newChannelID == 0))
         if (newChannelID == 0)
             return;
 
         if (((!m_isReverse) && (serverConnectionHandlerID != m_homeId)) || ((m_isReverse) && (serverConnectionHandlerID == m_homeId)))
             return;
 
-        //ClearChannelVolumes();
         ClearServerChannelVolumes(serverConnectionHandlerID);
 
         // Get Channel Client List
@@ -158,7 +157,6 @@ void CT_VolumeSuppression::onClientMoveEvent(uint64 serverConnectionHandlerID, a
             if (clients[i] == myID)
                 continue;
 
-            //AddToChannelVolumes(serverConnectionHandlerID,clients[i]);
             AddVolume(serverConnectionHandlerID,clients[i]);
         }
     }
@@ -175,12 +173,10 @@ void CT_VolumeSuppression::onClientMoveEvent(uint64 serverConnectionHandlerID, a
         {
             if (channelID == oldChannelID)      // left
             {
-                //RemoveFromChannelVolumes(clientID);
                 RemoveVolume(serverConnectionHandlerID,clientID);
             }
             else if (channelID == newChannelID) // joined
             {
-                //AddToChannelVolumes(serverConnectionHandlerID,clientID);
                 AddVolume(serverConnectionHandlerID,clientID);
             }
         }
@@ -287,7 +283,6 @@ void CT_VolumeSuppression::onTalkStatusChanged(uint64 serverConnectionHandlerID,
         }*/
         if (!(stayActive))
             setActive(false);
-
     }
 
     if (((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING)) && (ServerChannelVolumes->contains(serverConnectionHandlerID)))
@@ -300,12 +295,6 @@ void CT_VolumeSuppression::onTalkStatusChanged(uint64 serverConnectionHandlerID,
             vol->setProcessing(status==STATUS_TALKING);
         }
     }
-//    if ((serverConnectionHandlerID == m_homeId) && ChannelVolumes->contains(clientID) && ((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING)))
-//    {
-//        SimpleVolume* vol = ChannelVolumes->value(clientID);
-//        vol->setDuckBlocked((isReceivedWhisper) && (status==STATUS_TALKING));
-//        vol->setProcessing(status==STATUS_TALKING);
-//    }
 }
 
 //! Routes the arguments of the event to the corresponding volume object
@@ -335,12 +324,6 @@ void CT_VolumeSuppression::onEditPlaybackVoiceDataEvent(uint64 serverConnectionH
 
     SimpleVolume* vol = ChanVolumes->value(clientID);
     vol->process(samples,sampleCount);
-
-//    if (ChannelVolumes->contains(clientID))
-//    {
-//        SimpleVolume* vol = ChannelVolumes->value(clientID);
-//        vol->process(samples,sampleCount);
-//    }
 }
 
 //
