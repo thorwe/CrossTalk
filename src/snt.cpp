@@ -46,12 +46,13 @@ void SnT::onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int 
 //! Parse Plugin Commands for this module
 /*!
  * \brief SnT::ParseCommand Qt Slot
+ * \param serverConnectionHandlerID the connection handler forwarded from the API
  * \param cmd the command
  * \param arg arguments (if any)
  */
-void SnT::ParseCommand(char* cmd, char* arg)
+void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
 {
-    unsigned int error;
+    unsigned int error = ERROR_ok;
 
     // Get the active server
     uint64 scHandlerID = ts->GetActiveServerConnectionHandlerID();
@@ -67,22 +68,45 @@ void SnT::ParseCommand(char* cmd, char* arg)
         ts->Error(scHandlerID,error,"Error retrieving connection status: ");
 
     /***** Communication *****/
-    if(!strcmp(cmd, "TS3_PTT_ACTIVATE"))
+    if(cmd == "TS3_PTT_ACTIVATE")
     {
         if(status != STATUS_DISCONNECTED)
             ts->SetPushToTalk(scHandlerID, PTT_ACTIVATE);
     }
-    else if(!strcmp(cmd, "TS3_PTT_DEACTIVATE"))
+    else if(cmd == "TS3_PTT_DEACTIVATE")
     {
         if(status != STATUS_DISCONNECTED)
             ts->SetPushToTalk(scHandlerID, PTT_DEACTIVATE);
     }
-    else if(!strcmp(cmd, "TS3_PTT_TOGGLE"))
+    else if(cmd == "TS3_PTT_TOGGLE")
     {
         if(status != STATUS_DISCONNECTED)
             ts->SetPushToTalk(scHandlerID, PTT_TOGGLE);
     }
-    else if(!strcmp(cmd, "TS3_NEXT_TAB_AND_TALK_START"))
+    else if((cmd == "TS3_SWITCH_N_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_WHISPER_END")) // universal OnKeyUp Handler
+    {
+        if(status != STATUS_DISCONNECTED)
+        {
+            ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
+            if (m_shallClearWhisper)
+            {
+                if ((error = ts3Functions.requestClientSetWhisperList(scHandlerID,NULL,NULL,NULL,NULL)) != ERROR_ok)
+                    ts->Error(scHandlerID,error, "Could not release whisperlist.");
+                else
+                    m_shallClearWhisper = false;
+            }
+        }
+        if(m_returnToSCHandler != (uint64)NULL)
+        {
+            ts->SetActiveServer(m_returnToSCHandler);
+            if((cmd == "TS3_NEXT_TAB_AND_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_WHISPER_END")) // annoy user to upgrade
+            {
+                ts->Error(m_returnToSCHandler,NULL, "Hotkeys Next Tab and Talk Stop & Next Tab and Whisper Stop are being DEPRECATED! Please use SnT Stop instead!");
+            }
+            m_returnToSCHandler = (uint64)NULL;
+        }
+    }
+    else if(cmd == "TS3_NEXT_TAB_AND_TALK_START")
     {
         uint64 nextServer;
         if ((error = ts->GetActiveServerRelative(scHandlerID,true,&nextServer)) != ERROR_ok)
@@ -95,36 +119,23 @@ void SnT::ParseCommand(char* cmd, char* arg)
             ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
 
         m_shallActivatePtt=true;
+        m_returnToSCHandler=scHandlerID;
         ts->SetActiveServer(nextServer);
     }
-    else if(!strcmp(cmd, "TS3_NEXT_TAB_AND_TALK_END"))
+    else if(cmd == "TS3_SWITCH_TAB_AND_TALK_START")
     {
-        if(status != STATUS_DISCONNECTED)
-            ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
-        ts->SetPrevActiveServer(scHandlerID);
-    }
-    else if(!strcmp(cmd, "TS3_SWITCH_N_TALK_END"))
-    {
-        if(status != STATUS_DISCONNECTED)
+        if (args.isEmpty())
         {
-            ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
-            if (m_shallClearWhisper)
-            {
-                if ((error = ts3Functions.requestClientSetWhisperList(scHandlerID,NULL,NULL,NULL,NULL)) != ERROR_ok)
-                    ts->Error(scHandlerID,error, "Could not release whisperlist.");
-            }
+            ts->Error(serverConnectionHandlerID,NULL,"No target server specified.");
+            return;
         }
-        if(m_returnToSCHandler != (uint64)NULL)
-        {
-            ts->SetActiveServer(m_returnToSCHandler);
-            m_returnToSCHandler = (uint64)NULL;
-        }
-    }
-    else if(!strcmp(cmd, "TS3_SWITCH_TAB_AND_TALK_START"))
-    {
+
         uint64 targetServer;
-        if ((error = ts->GetServerHandler(arg,&targetServer)) != ERROR_ok)
-            ts->Error(scHandlerID,error,"Could not get target server.");
+        if ((error = ts->GetServerHandler(args.at(0),&targetServer)) != ERROR_ok)
+        {
+            ts->Error(scHandlerID,error,"Could not find target server");
+            return;
+        }
 
         if(status != STATUS_DISCONNECTED)
             ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
@@ -139,30 +150,30 @@ void SnT::ParseCommand(char* cmd, char* arg)
             ts->SetPushToTalk(scHandlerID,true);
 
     }
-    else if (!strcmp(cmd, "TS3_SWITCH_TAB_AND_WHISPER_START"))
+    else if (cmd == "TS3_SWITCH_TAB_AND_WHISPER_START")
     {
-        QString arg_qs;
-        arg_qs = arg;
-        QStringList args_qs = arg_qs.split(" ",QString::SkipEmptyParts);
-        if (args_qs.count() < 3)
+        if (args.count() < 3)
         {
             ts->Error(scHandlerID,NULL,"Too few arguments.");
             return;
         }
 
-        arg_qs = args_qs.at(0);
         uint64 targetServer;
-        if ((error = ts->GetServerHandler(arg,&targetServer)) != ERROR_ok)
+        if ((error = ts->GetServerHandler(args.at(0),&targetServer)) != ERROR_ok)
+        {
             ts->Error(scHandlerID,error,"Could not get target server.");
+            return;
+        }
 
         anyID myID;
         if((error = ts->GetClientId(targetServer,&myID)) != ERROR_ok)
         {
-            ts->Error(scHandlerID,error, "Could not get my id on the target server: ");
+            ts->Error(scHandlerID,error, "Could not get my id on the target server.");
             return;
         }
 
-        arg_qs = args_qs.at(1);
+        QString arg_qs;
+        arg_qs = args.at(1);
         GroupWhisperType groupWhisperType = GROUPWHISPERTYPE_ENDMARKER;
         if (arg_qs.contains("COMMANDER",Qt::CaseInsensitive))
                 groupWhisperType = GROUPWHISPERTYPE_CHANNELCOMMANDER;
@@ -175,7 +186,7 @@ void SnT::ParseCommand(char* cmd, char* arg)
             return;
         }
 
-        arg_qs = args_qs.at(2);
+        arg_qs = args.at(2);
         GroupWhisperTargetMode groupWhisperTargetMode  = GROUPWHISPERTARGETMODE_ENDMARKER;
         if (arg_qs.contains("ALLPARENT"))
             groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALLPARENTCHANNELS;
@@ -222,7 +233,7 @@ void SnT::ParseCommand(char* cmd, char* arg)
         else
             ts->SetPushToTalk(scHandlerID,true);
     }
-    else if (!strcmp(cmd, "TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START"))
+    else if (cmd == "TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START")
     {
         uint64 nextServer;
         if ((error = ts->GetActiveServerRelative(scHandlerID,true,&nextServer)) != ERROR_ok)
@@ -248,19 +259,11 @@ void SnT::ParseCommand(char* cmd, char* arg)
             ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
 
         m_shallActivatePtt=true;
+        m_returnToSCHandler=scHandlerID;
+        m_shallClearWhisper = true;
         ts->SetActiveServer(nextServer);
     }
-    else if (!strcmp(cmd, "TS3_NEXT_TAB_AND_WHISPER_END"))
-    {
-        if(status != STATUS_DISCONNECTED)
-        {
-            ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
-            if ((error = ts3Functions.requestClientSetWhisperList(scHandlerID,NULL,NULL,NULL,NULL)) != ERROR_ok)
-                ts->Error(scHandlerID,error, "Could not release whisperlist.");
-        }
-        ts->SetPrevActiveServer(scHandlerID);
-    }
-    else if (!strcmp(cmd, "TS3_NEXT_TAB_AND_WHISPER_START"))
+    else if (cmd == "TS3_NEXT_TAB_AND_WHISPER_START")
     {
         uint64 nextServer;
         if ((error = ts->GetActiveServerRelative(scHandlerID,true,&nextServer)) != ERROR_ok)
@@ -276,17 +279,14 @@ void SnT::ParseCommand(char* cmd, char* arg)
             return;
         }
 
-
-        QString arg_qs;
-        arg_qs = arg;
-        QStringList args_qs = arg_qs.split(" ",QString::SkipEmptyParts);
-        if (args_qs.count() < 2)
+        if (args.count() < 2)
         {
             ts->Error(scHandlerID,NULL,"Too few arguments.");
             return;
         }
 
-        arg_qs = args_qs.at(0);
+        QString arg_qs;
+        arg_qs = args.at(0);
         GroupWhisperType groupWhisperType = GROUPWHISPERTYPE_ENDMARKER;
         if (arg_qs.contains("COMMANDER",Qt::CaseInsensitive))
                 groupWhisperType = GROUPWHISPERTYPE_CHANNELCOMMANDER;
@@ -299,7 +299,7 @@ void SnT::ParseCommand(char* cmd, char* arg)
             return;
         }
 
-        arg_qs = args_qs.at(1);
+        arg_qs = args.at(1);
         GroupWhisperTargetMode groupWhisperTargetMode  = GROUPWHISPERTARGETMODE_ENDMARKER;
         if (arg_qs.contains("ALLPARENT"))
             groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALLPARENTCHANNELS;
@@ -337,15 +337,11 @@ void SnT::ParseCommand(char* cmd, char* arg)
             ts->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
 
         m_shallActivatePtt=true;
+        m_returnToSCHandler=scHandlerID;
+        m_shallClearWhisper = true;
         ts->SetActiveServer(nextServer);
     }
-    /***** Error handler *****/
-//    else
-//    {
-//        ts->Error(scHandlerID, NULL, "Command not recognized");
-//    }
 }
-
 
 //! Turn Ptt off delayed by the user client setting
 /*!

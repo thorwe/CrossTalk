@@ -114,8 +114,9 @@ int ts3plugin_init() {
 
     ts->Init();
     ts->InitLocalization();
-    ts->connect(ts,SIGNAL(Command(char*,char*)),&snt,SLOT(ParseCommand(char*,char*)));
+    ts->connect(ts,SIGNAL(Command(uint64,QString,QStringList)),&snt,SLOT(ParseCommand(uint64,QString,QStringList)));
     ts->connect(ts,SIGNAL(PttDelayFinished()),&snt,SLOT(PttDelayFinished()));
+    ts->connect(ts,SIGNAL(Command(uint64,QString,QStringList)), &panTalkers, SLOT(ParseCommand(uint64,QString,QStringList)));
 
     QSettings cfg(ts->GetFullConfigPath(), QSettings::IniFormat);
     ct_Ducker.setEnabled(cfg.value("ducking_enabled",true).toBool());
@@ -268,28 +269,13 @@ const char* ts3plugin_commandKeyword() {
 
 /* Plugin processes console command. Return 0 if plugin handled the command, 1 if not handled. */
 int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* command) {
-	size_t length = strlen(command);
-	char* str = (char*)malloc(length+1);
-	_strcpy(str, length+1, command);
-
-	// Seperate the argument from the command
-	char* arg = strchr(str, ' ');
-	if(arg != NULL)
-	{
-		// Split the string by inserting a NULL-terminator
-		*arg = (char)NULL;
-		arg++;
-	}
-
-    //ParseCommand(str, arg);
-    if(!strcmp(str, "TS3_TEST_DUCKER"))
+    int ret = 0;
+    if(!strcmp(command, "TS3_TEST_DUCKER"))
         ct_Ducker.setActive(!ct_Ducker.isActive());
     else
-        ts->ParseCommand(str,arg);
+        ret = ts->ParseCommand(serverConnectionHandlerID,command);
 
-	free(str);
-
-	return 0;  /* Plugin did not handle command */
+    return ret;
 }
 
 /*
@@ -347,10 +333,10 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 	/* Register hotkeys giving a keyword and a description.
 	 * The keyword will be later passed to ts3plugin_onHotkeyEvent to identify which hotkey was triggered.
 	 * The description is shown in the clients hotkey dialog. */
-    BEGIN_CREATE_HOTKEYS(5);  /* Create 2 hotkeys. Size must be correct for allocating memory. */
-    CREATE_HOTKEY("TS3_NEXT_TAB_AND_TALK_END", "Next Tab and Talk Stop");
+    BEGIN_CREATE_HOTKEYS(3);  /* Create 2 hotkeys. Size must be correct for allocating memory. */
+//    CREATE_HOTKEY("TS3_NEXT_TAB_AND_TALK_END", "Next Tab and Talk Stop");
 	CREATE_HOTKEY("TS3_NEXT_TAB_AND_TALK_START", "Next Tab and Talk Start");
-    CREATE_HOTKEY("TS3_NEXT_TAB_AND_WHISPER_END", "Next Tab and Whisper Stop");
+//    CREATE_HOTKEY("TS3_NEXT_TAB_AND_WHISPER_END", "Next Tab and Whisper Stop");
     CREATE_HOTKEY("TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START", "Next Tab and Whisper all Channel Commanders Start");
     CREATE_HOTKEY("TS3_SWITCH_N_TALK_END", "SnT Stop");
 	END_CREATE_HOTKEYS;
@@ -361,7 +347,8 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 /* This function is called if a plugin hotkey was pressed. Omit if hotkeys are unused. */
 void ts3plugin_onHotkeyEvent(const char* keyword) {
 	/* Identify the hotkey by keyword ("keyword_1", "keyword_2" or "keyword_3" in this example) and handle here... */
-    ts->ParseCommand((char*)keyword,(char)NULL);
+    //ts->ParseCommand((char*)keyword,(char)NULL);
+    ts->ParseCommand((uint64)NULL,keyword);
 }
 
 /* Show an error message if the plugin failed to load */

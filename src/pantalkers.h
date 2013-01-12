@@ -29,6 +29,10 @@ class PanTalkers : public QObject
                READ isEnabled
                WRITE setEnabled
                NOTIFY enabledSet)
+    Q_PROPERTY(bool blocked
+               READ isBlocked
+               WRITE setEnabled
+               NOTIFY blockedSet)
     Q_PROPERTY(float spreadWidth
                READ getSpreadWidth
                WRITE setSpreadWidth
@@ -39,6 +43,8 @@ public:
     void onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask);
 
     bool isEnabled() const;
+    bool isBlocked() const;
+    bool isRunning() const; // result of enabled and blocked
     float getSpreadWidth() const;
 
     void setHomeId(uint64 serverConnectionHandlerID);
@@ -46,6 +52,7 @@ public:
 
 signals:
     void enabledSet(bool);
+    void blockedSet(bool);
     void spreadWidthSet(float);
     void expertModeEnabledSet(bool);
     void regionHomeTabSet(TALKERS_REGION);
@@ -55,6 +62,7 @@ signals:
 public slots:
     void onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID);
     void setEnabled(bool value);
+    void setBlocked(bool value);
     void setSpreadWidth(float value);
 
     void setExpertModeEnabled(bool value);
@@ -62,8 +70,10 @@ public slots:
     void setRegionWhisper(int talkersRegion);
     void setRegionOther(int talkersRegion);
 
+    void ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
 private:
     bool m_enabled;
+    bool m_blocked;
     float m_spreadWidth;
 
     TSFunctions *ts;

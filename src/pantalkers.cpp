@@ -13,7 +13,8 @@ const QList<float> SPREAD_LEFT = QList<float>() << -0.75f << -1.0f << -0.5f << -
 
 PanTalkers::PanTalkers(QObject *parent) :
     QObject(parent),
-    m_homeId(0)
+    m_homeId(0),
+    m_blocked(false)
 {
     ts = TSFunctions::instance();
     talkers = Talkers::instance();
@@ -31,6 +32,16 @@ PanTalkers::PanTalkers(QObject *parent) :
 bool PanTalkers::isEnabled() const
 {
     return m_enabled;
+}
+
+bool PanTalkers::isBlocked() const
+{
+    return m_blocked;
+}
+
+bool PanTalkers::isRunning() const
+{
+    return (m_enabled && !m_blocked);
 }
 
 float PanTalkers::getSpreadWidth() const
@@ -60,6 +71,13 @@ void PanTalkers::setEnabled(bool value)
 //    }
     ts->Log(QString("Stereo Position Spread: enabled: %1").arg((m_enabled)?"true":"false"));
     emit enabledSet(m_enabled);
+}
+
+void PanTalkers::setBlocked(bool value)
+{
+    m_blocked = value;
+    ts->Log(QString("Stereo Position Spread: blocked: %1").arg((m_enabled)?"true":"false"));
+    emit blockedSet(value);
 }
 
 void PanTalkers::setSpreadWidth(float value)
@@ -99,7 +117,7 @@ void PanTalkers::setRegionOther(int talkersRegion)
 
 void PanTalkers::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short *samples, int sampleCount, int channels, const unsigned int *channelSpeakerArray, unsigned int *channelFillMask)
 {
-    if (!(m_enabled))
+    if (!(isRunning()))
         return;
 
     // channels seems to be basically determined by soundcard setting
@@ -379,4 +397,14 @@ void PanTalkers::Print(QString inqstr)
     if (!isPrintEnabled) return;
     inqstr.prepend("SPS: ");
     ts->Print(inqstr);
+}
+
+void PanTalkers::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
+{
+    if ((cmd.compare("SPS",Qt::CaseInsensitive)) != 0)
+        return;
+
+    cmd = args.at(0);
+    if (cmd.compare("SET_BLOCKED",Qt::CaseInsensitive) == 0)
+        setBlocked((args.at(1).compare("true",Qt::CaseInsensitive) == 0));
 }

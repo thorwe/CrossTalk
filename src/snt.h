@@ -16,7 +16,7 @@ public:
 signals:
     
 public slots:
-    void ParseCommand(char *cmd, char *arg);
+    void ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
     void PttDelayFinished();
 
 private:

@@ -300,13 +300,13 @@ uint64 TSFunctions::GetServerHandler(QString name,uint64* result)
 {
     unsigned int error;
     uint64* servers;
-    uint64* server;
 
     // Get server list
     if((error = ts3Functions.getServerConnectionHandlerList(&servers)) != ERROR_ok)
         return error;
 
     // Find server in the list
+    uint64* server;
     char* s_name;
     for(server = servers; *server != (uint64)NULL; ++server)
     {
@@ -315,11 +315,12 @@ uint64 TSFunctions::GetServerHandler(QString name,uint64* result)
 
         if(name==s_name)
         {
+            ts3Functions.freeMemory(s_name);
             *result = *server;
             break;
         }
+        ts3Functions.freeMemory(s_name);
     }
-    ts3Functions.freeMemory(s_name);
     ts3Functions.freeMemory(servers);
     return error;
 }
@@ -794,17 +795,29 @@ void TSFunctions::onPttDelayFinished()
 //! Retrieves plugin commands, distributes them to the modules
 /*!
  * \brief TSFunctions::ParseCommand Retrieves plugin commands, distributes them to the modules
+ * \param serverConnectionHandlerID the server connection handler passed from the API
  * \param cmd the command
  * \param arg arguments, if any
+ * \return the error code that aborted the function or ERROR_ok
  */
-void TSFunctions::ParseCommand(char* cmd, char* arg)
+int TSFunctions::ParseCommand(uint64 serverConnectionHandlerID, const char* cmd)
 {
+    QString cmd_qs;
+    cmd_qs = cmd;
+    QStringList args_qs = cmd_qs.split(" ",QString::SkipEmptyParts);
+    if (args_qs.isEmpty())  // this might evolve to some help output
+        return 1;
+
     if (!(command_mutex->tryLock(PLUGIN_THREAD_TIMEOUT)))
     {
         ts3Functions.logMessage("Timeout while waiting for mutex", LogLevel_WARNING, PLUGIN_NAME, 0);
-        return;
+        return 1;
     }
-    emit Command(cmd,arg);
+
+    cmd_qs = args_qs.takeFirst();
+    Print(cmd_qs);
+    emit Command(serverConnectionHandlerID,cmd_qs,args_qs); //ToDo: Not too happy using Signal/Slots here
 
     command_mutex->unlock();
+    return 0;
 }

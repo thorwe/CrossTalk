@@ -55,11 +55,6 @@ private:
     Talkers* talkers;
 
     // Note: Client UI:(-30 to 20), while the API allows (-50.0 to +20.0)
-//    QMap<anyID,SimpleVolume*>* ChannelVolumes;
-//    void AddToChannelVolumes(uint64 serverConnectionHandlerID, anyID clientID); // Note that serverConnectionHandlerID is only there for checking if the client is a real client
-//    void RemoveFromChannelVolumes(anyID clientID);
-//    void ClearChannelVolumes();
-
     QMap<uint64, QMap<anyID,SimpleVolume*>* >* ServerChannelVolumes;
     void AddVolume(uint64 serverConnectionHandlerID, anyID clientID);
     void DeleteVolume(SimpleVolume *vol);

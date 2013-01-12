@@ -96,7 +96,7 @@ public:
 
     void onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
 
-    void ParseCommand(char *cmd, char *arg);
+    int ParseCommand(uint64 serverConnectionHandlerID, const char *cmd);
 
     QString GetConfigPath();
     QString GetFullConfigPath();
@@ -108,7 +108,7 @@ public:
 
     uint64 GetServerHandler(QString name, uint64 *result);
 signals:
-    void Command(char *cmd, char *arg);
+    void Command(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
     void PttDelayFinished();
 
 public slots:
