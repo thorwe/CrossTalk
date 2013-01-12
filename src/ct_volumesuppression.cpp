@@ -347,67 +347,12 @@ void CT_VolumeSuppression::onEditPlaybackVoiceDataEvent(uint64 serverConnectionH
 // ChannelVolume Helpers
 //
 
-//! Create and add a Volume object to the ChannelVolumes map
+//! Create and add a Volume object to the ServerChannelVolumes map
 /*!
- * \brief CT_VolumeSuppression::AddToChannelVolumes Helper function
- * \param serverConnectionHandlerID the server connection id; should always be the current tab in this scenario
+ * \brief CT_VolumeSuppression::AddVolume Helper function
+ * \param serverConnectionHandlerID the connection id of the server
  * \param clientID the client id
  */
-/*void CT_VolumeSuppression::AddToChannelVolumes(uint64 serverConnectionHandlerID,anyID clientID)
-{
-    int type = -1;
-    unsigned int error;
-    if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_TYPE, &type)) != ERROR_ok)
-        ts->Error(serverConnectionHandlerID,error, "(AddToChannelVolumes) Error checking if client is real.");
-    if (type != 0)
-        return;
-
-    SimpleVolume* vol = new SimpleVolume();
-    vol->setGainDesiredByGainAdjuster(m_value);
-    connect(this,SIGNAL(valueSet(float)),vol,SLOT(setGainDesiredByGainAdjuster(float)),Qt::DirectConnection);
-    vol->setGainAdjustment(m_isActive);
-    connect(this,SIGNAL(activeSet(bool)),vol,SLOT(setGainAdjustment(bool)),Qt::DirectConnection);
-    ChannelVolumes->insert(clientID,vol);
-}*/
-
-//! Remove a specific Volume object from the ChannelVolumes map
-/*!
- * \brief CT_VolumeSuppression::RemoveFromChannelVolumes Helper function
- * \param clientID the client id on the current tab
- */
-/*
-void CT_VolumeSuppression::RemoveFromChannelVolumes(anyID clientID)
-{
-    if (!(ChannelVolumes->contains(clientID)))
-        return;
-
-    SimpleVolume* vol = ChannelVolumes->value(clientID);
-    disconnect(this,SIGNAL(activeSet(bool)),vol,SLOT(setGainAdjustment(bool)));
-    vol->setGainAdjustment(false);
-    disconnect(this,SIGNAL(valueSet(float)),vol,SLOT(setGainDesiredByGainAdjuster(float)));
-    vol->blockSignals(true);
-    vol->deleteLater();
-    ChannelVolumes->remove(clientID);
-}*/
-
-//! Remove all Volume objects from the ChannelVolumes map
-/*!
- * \brief CT_VolumeSuppression::ClearChannelVolumes Helper function
- */
-/*
-void CT_VolumeSuppression::ClearChannelVolumes()
-{
-    QMutableMapIterator<anyID,SimpleVolume*> i(*ChannelVolumes);
-    while (i.hasNext())
-    {
-        i.next();
-        RemoveFromChannelVolumes(i.key());
-    }
-    ts->Log("Ducker: ChannelVolumes cleared.");
-}*/
-
-// NEW
-
 void CT_VolumeSuppression::AddVolume(uint64 serverConnectionHandlerID,anyID clientID)
 {
     int type = -1;
@@ -436,6 +381,11 @@ void CT_VolumeSuppression::AddVolume(uint64 serverConnectionHandlerID,anyID clie
 //    ts->Print(QString("Ducker: Added %1 to ServerChannelVolumes.").arg(clientID));
 }
 
+//! Prepare and schedule deletion of a SimpleVolume object
+/*!
+ * \brief CT_VolumeSuppression::DeleteVolume Helper function
+ * \param vol the SimpleVolume object to delete
+ */
 void CT_VolumeSuppression::DeleteVolume(SimpleVolume* vol)
 {
     disconnect(this,SIGNAL(activeSet(bool)),vol,SLOT(setGainAdjustment(bool)));
@@ -445,6 +395,12 @@ void CT_VolumeSuppression::DeleteVolume(SimpleVolume* vol)
     vol->deleteLater();
 }
 
+//! Remove a specific Volume object from the ServerChannelVolumes map
+/*!
+ * \brief CT_VolumeSuppression::RemoveVolume Helper function
+ * \param serverConnectionHandlerID the connection id of the server
+ * \param clientID the client id on the current tab
+ */
 void CT_VolumeSuppression::RemoveVolume(uint64 serverConnectionHandlerID, anyID clientID)
 {
     if (!(ServerChannelVolumes->contains(serverConnectionHandlerID)))
@@ -458,6 +414,11 @@ void CT_VolumeSuppression::RemoveVolume(uint64 serverConnectionHandlerID, anyID 
     DeleteVolume(vol);
 }
 
+//! Remove all Volume objects from a servers ServerChannelVolumes map
+/*!
+ * \brief CT_VolumeSuppression::ClearServerChannelVolumes
+ * \param serverConnectionHandlerID the connection id of the server
+ */
 void CT_VolumeSuppression::ClearServerChannelVolumes(uint64 serverConnectionHandlerID)
 {
     if (!(ServerChannelVolumes->contains(serverConnectionHandlerID)))
@@ -474,6 +435,10 @@ void CT_VolumeSuppression::ClearServerChannelVolumes(uint64 serverConnectionHand
     ts->Log(QString("Ducker: ServerChannelVolumes cleared: %1").arg(serverConnectionHandlerID));
 }
 
+//! Remove all Volume objects from all servers ServerChannelVolumes map
+/*!
+ * \brief CT_VolumeSuppression::ClearServerChannelVolumes Helper function
+ */
 void CT_VolumeSuppression::ClearServerChannelVolumes()
 {
     if (ServerChannelVolumes->isEmpty())
