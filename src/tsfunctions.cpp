@@ -132,12 +132,12 @@ void TSFunctions::Error(uint64 serverConnectionHandlerID, unsigned int error, ch
 
     Log(message_qstr,LogLevel_WARNING);
 
-    if ((serverConnectionHandlerID == NULL) || (serverConnectionHandlerID == 0))
-    {
-        PlayErrorSound();
-        return;
-    }
-    PlayErrorSound(serverConnectionHandlerID);
+//    if ((serverConnectionHandlerID == NULL) || (serverConnectionHandlerID == 0))
+//    {
+//        PlayErrorSound();
+//        return;
+//    }
+//    PlayErrorSound(serverConnectionHandlerID);
 
     // Format and print the error message
     // Use a transparent underscore because a double space will be collapsed

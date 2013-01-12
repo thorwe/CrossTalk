@@ -76,7 +76,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "0.9.1";
+    return "1.0.0";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -91,7 +91,7 @@ const char* ts3plugin_author() {
 
 /* Plugin description */
 const char* ts3plugin_description() {
-    return "INTERNAL USE ONLY. This plugin is in internal beta status. It is not ready or meant for public.\n\nFeatures:\nStereo Position  Spread,\nHome Tab Ducking\nSwitch\'n\'Talk Button (Cross Server Tab PTT)\n\nFor information on the modules, use the \'?\' button on the topper right of the plugin settings window.\n";
+    return "Features:\nStereo Position Spread,\nDucking\nSwitch\'n\'Talk (Cross Server Tab PTT)\n\nFor information on the modules, use the \'?\' button on the topper right of the plugin settings window.\n";
 }
 
 /* Set TeamSpeak 3 callback functions */
@@ -395,19 +395,16 @@ void ts3plugin_onNewChannelEvent(uint64 serverConnectionHandlerID, uint64 channe
 
 void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage)
 {
-    //talkers->onClientMoveEvent(serverConnectionHandlerID, clientID, oldChannelID, newChannelID, visibility, moveMessage);
     ct_Ducker.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
 }
 
 void ts3plugin_onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* timeoutMessage)
 {
-    //talkers->onClientMoveTimeoutEvent(serverConnectionHandlerID, clientID, oldChannelID, newChannelID, visibility,timeoutMessage);
     ct_Ducker.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
 }
 
 void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID moverID, const char* moverName, const char* moverUniqueIdentifier, const char* moveMessage)
 {
-    //talkers->onClientMoveMovedEvent(serverConnectionHandlerID, clientID, oldChannelID, newChannelID, visibility,moverID,moverName,moverUniqueIdentifier,moveMessage);
     ct_Ducker.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
 }
 

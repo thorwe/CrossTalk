@@ -11,7 +11,7 @@
 const QUrl PLEDGIE_IMAGE("http://pledgie.com/campaigns/18898.png");
 const QUrl PLEDGIE_CAMPAIGN("http://www.pledgie.com/campaigns/18898");
 const QUrl JIANJI_CAMPAIGN("http://www.jianji.de");
-const QUrl CROSSTALK_CAMPAING("http://addons.teamspeak.com/");
+const QUrl CROSSTALK_CAMPAING("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html");
 
 //! Constructor
 /*!

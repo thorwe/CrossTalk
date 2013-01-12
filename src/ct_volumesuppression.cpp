@@ -89,7 +89,8 @@ void CT_VolumeSuppression::onConnectStatusChanged(uint64 serverConnectionHandler
 {
 //    if ((newStatus==STATUS_DISCONNECTED) && (serverConnectionHandlerID==m_homeId))
 //        ClearChannelVolumes();
-    ClearServerChannelVolumes(serverConnectionHandlerID);
+    if (newStatus==STATUS_DISCONNECTED)
+        ClearServerChannelVolumes(serverConnectionHandlerID);
 }
 
 void CT_VolumeSuppression::setHomeId(uint64 serverConnectionHandlerID)
