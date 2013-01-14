@@ -12,6 +12,7 @@ const QUrl PLEDGIE_IMAGE("http://pledgie.com/campaigns/18898.png");
 const QUrl PLEDGIE_CAMPAIGN("http://www.pledgie.com/campaigns/18898");
 const QUrl JIANJI_CAMPAIGN("http://www.jianji.de");
 const QUrl CROSSTALK_CAMPAING("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html");
+const QUrl SNT_WIKI("http://github.com/thorwe/CrossTalk/wiki/Switch'n'Talk");
 
 //! Constructor
 /*!
@@ -75,7 +76,7 @@ void Config::Translate(QObject* obj)
 void Config::SetupUi()
 {
     setupUi(this);
-    pushButton_SNT->installEventFilter(this);
+    //pushButton_SNT->installEventFilter(this);
 
     QSettings cfg(ts->GetFullConfigPath(), QSettings::IniFormat);
     groupBox_Duck->setChecked(cfg.value("ducking_enabled",true).toBool());
@@ -106,6 +107,7 @@ void Config::SetupUi()
     connect(banner_pledgie,SIGNAL(onClick()),this,SLOT(onPledgieClicked()));
     connect(banner_jianji,SIGNAL(onClick()),this,SLOT(onJianjiClicked()));
     connect(banner_logo,SIGNAL(onClick()),this,SLOT(onCrossTalkClicked()));
+    connect(pushButton_SNT,SIGNAL(clicked()),this,SLOT(onSnTButtonClicked()));
     connect(m_netwManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetwManagerFinished(QNetworkReply*)));
     QNetworkRequest request(PLEDGIE_IMAGE);
     m_netwManager->get(request);
@@ -143,22 +145,22 @@ void Config::SetupUi()
  * \param ev MouseEnter, MouseLeave
  * \return
  */
-bool Config::eventFilter(QObject *object, QEvent *ev)
-{
-    if (object == pushButton_SNT)
-    {
-        if(ev->type() == QEvent::Enter)
-        {
-            QWhatsThis::enterWhatsThisMode ();
-        }
-        else if(ev->type() == QEvent::Leave)
-        {
-            if (QWhatsThis::inWhatsThisMode())
-                QWhatsThis::leaveWhatsThisMode();
-        }
-    }
-    return false;
-}
+//bool Config::eventFilter(QObject *object, QEvent *ev)
+//{
+//    if (object == pushButton_SNT)
+//    {
+//        if(ev->type() == QEvent::Enter)
+//        {
+//            QWhatsThis::enterWhatsThisMode ();
+//        }
+//        else if(ev->type() == QEvent::Leave)
+//        {
+//            if (QWhatsThis::inWhatsThisMode())
+//                QWhatsThis::leaveWhatsThisMode();
+//        }
+//    }
+//    return false;
+//}
 
 //! On Accept, write values to config
 /*!
@@ -322,4 +324,9 @@ void Config::onCrossTalkClicked()
 {
     QUrl url(CROSSTALK_CAMPAING);
     QDesktopServices::openUrl(url);
+}
+
+void Config::onSnTButtonClicked()
+{
+    QDesktopServices::openUrl(SNT_WIKI);
 }

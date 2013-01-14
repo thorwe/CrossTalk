@@ -28,9 +28,10 @@ protected slots:
     void onPledgieClicked();
     void onJianjiClicked();
     void onCrossTalkClicked();
+    void onSnTButtonClicked();
 
 protected:
-    bool eventFilter(QObject *object, QEvent *ev);
+//    bool eventFilter(QObject *object, QEvent *ev);
 
 signals:
     void SetDuckingEnabled(bool);
