@@ -130,32 +130,34 @@ int ts3plugin_init() {
     panTalkers.setRegionOther(cfg.value("stereo_position_spread_region_other",0).toInt());
 
     // Support enabling the plugin while already connected
-    uint64* serverList;
-    if(ts3Functions.getServerConnectionHandlerList(&serverList) == ERROR_ok)
+    uint64* servers;
+    if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
     {
-        for(int i=0; serverList[i] != NULL; ++i)
+        uint64* server;
+        for(server = servers; *server != (uint64)NULL; ++server)
         {
             int status;
-            if (ts3Functions.getConnectionStatus(serverList[i], &status) != ERROR_ok)
+            if (ts3Functions.getConnectionStatus(*server, &status) != ERROR_ok)
                 continue;
 
             if (status > STATUS_DISCONNECTED)
             {
-                uint64 channelID;
+                // Not used by now
+                //uint64 channelID;
                 for (int j=STATUS_CONNECTING; j<=status; ++j)
                 {
-                    ts3plugin_onConnectStatusChangeEvent(serverList[i], j, ERROR_ok);
-                    if (j == STATUS_CONNECTED)
+                    ts3plugin_onConnectStatusChangeEvent(*server, j, ERROR_ok);
+                    /*if (j == STATUS_CONNECTED)
                     {
                         // Get our channel and publish it as default channel
                         anyID myID;
-                        if(ts->GetClientId(serverList[i],&myID) == ERROR_ok)
+                        if(ts->GetClientId(*server,&myID) == ERROR_ok)
                         {
-                            if(ts3Functions.getChannelOfClient(serverList[i],myID,&channelID) == ERROR_ok)
+                            if(ts3Functions.getChannelOfClient(*server,myID,&channelID) == ERROR_ok)
                             {
                                 uint64 channelParentID;
-                                if (ts3Functions.getParentChannelOfChannel(serverList[i],channelID,&channelParentID) == ERROR_ok)
-                                    ts3plugin_onNewChannelEvent(serverList[i], channelID, channelParentID);
+                                if (ts3Functions.getParentChannelOfChannel(*server,channelID,&channelParentID) == ERROR_ok)
+                                    ts3plugin_onNewChannelEvent(*server, channelID, channelParentID);
                             }
                         }
                     }
@@ -163,7 +165,7 @@ int ts3plugin_init() {
                     {
                         // publish all other channels
                         uint64* channelList;
-                        if (ts3Functions.getChannelList(serverList[i],&channelList) == ERROR_ok)
+                        if (ts3Functions.getChannelList(*server,&channelList) == ERROR_ok)
                         {
                             for (int k=0;channelList[k] != NULL;++k)
                             {
@@ -171,23 +173,23 @@ int ts3plugin_init() {
                                     continue;
 
                                 uint64 channelParentID;
-                                if (ts3Functions.getParentChannelOfChannel(serverList[i],channelList[k],&channelParentID) == ERROR_ok)
-                                    ts3plugin_onNewChannelEvent(serverList[i], channelList[k], channelParentID); // ToDo: Hope it's not necessary to sort those
+                                if (ts3Functions.getParentChannelOfChannel(*server,channelList[k],&channelParentID) == ERROR_ok)
+                                    ts3plugin_onNewChannelEvent(*server, channelList[k], channelParentID); // ToDo: Hope it's not necessary to sort those
                             }
                             ts3Functions.freeMemory(channelList);
                         }
-                    }
+                    }*/
                 }
                 if (status == STATUS_CONNECTION_ESTABLISHED)
                 {
-                    ts3plugin_currentServerConnectionChanged(serverList[i]);
+                    ts3plugin_currentServerConnectionChanged(*server);
                     unsigned int error;
-                    if ((error = talkers->RefreshTalkers(serverList[i])) != ERROR_ok)
-                        ts->Error(serverList[i],error,"Error refreshing talkers: ");
+                    if ((error = talkers->RefreshTalkers(*server)) != ERROR_ok)
+                        ts->Error(*server,error,"Error refreshing talkers: ");
                 }
             }
-            ts3Functions.freeMemory(serverList);
         }
+        ts3Functions.freeMemory(servers);
 
         // Get the active server tab
         uint64 scHandlerID = ts3Functions.getCurrentServerConnectionHandlerID();
@@ -207,7 +209,7 @@ void ts3plugin_shutdown() {
 	 * If your plugin implements a settings dialog, it must be closed and deleted here, else the
 	 * TeamSpeak client will most likely crash (DLL removed but dialog from DLL code still open).
 	 */
-    ts->ShutdownLocalization();
+
 	/* Free pluginID if we registered it */
 	if(pluginID) {
 		free(pluginID);
