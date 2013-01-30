@@ -54,6 +54,7 @@ public:
     void Error(uint64 scHandlerID, unsigned int error, char *message);
     void Print(QString message, LogLevel logLevel);
     void Print(QString message);
+    void Log(QString message, LogLevel logLevel, uint64 serverConnectionHandlerID);
     void Log(QString message, LogLevel logLevel);
     void Log(QString message);
 
@@ -107,6 +108,7 @@ public:
     QTranslator* translator;
 
     uint64 GetServerHandler(QString name, uint64 *result);
+
 signals:
     void Command(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
     void PttDelayFinished();
@@ -128,12 +130,10 @@ private:
     int pttDelayMsec;
 
     QTimer* timer;
-    QMutex* mutex;
+//    QMutex* mutex;
     QMutex* command_mutex;
 
     QMap<uint64,anyID> myClientIDs;
-
-
 };
 
 #endif // TSFUNCTIONS_H

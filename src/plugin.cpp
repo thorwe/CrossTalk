@@ -27,6 +27,7 @@
 #include "ct_volumesuppression.h"
 #include "snt.h"
 #include "pantalkers.h"
+#include "ducker_global.h"
 
 struct TS3Functions ts3Functions;
 
@@ -60,9 +61,10 @@ static char requestClientMoveReturnCodes[REQUESTCLIENTMOVERETURNCODES_SLOTS][RET
 // Plugin values
 char* pluginID = NULL;
 
-CT_VolumeSuppression ct_Ducker;
 SnT snt;
 PanTalkers panTalkers;
+Ducker_Global ducker_G;
+CT_VolumeSuppression ducker_C;// = new CT_VolumeSuppression(NULL,&ducker_G);
 
 /*********************************** Required functions ************************************/
 /*
@@ -118,16 +120,24 @@ int ts3plugin_init() {
     ts->connect(ts,SIGNAL(PttDelayFinished()),&snt,SLOT(PttDelayFinished()));
     ts->connect(ts,SIGNAL(Command(uint64,QString,QStringList)), &panTalkers, SLOT(ParseCommand(uint64,QString,QStringList)));
 
+//    ducker_C.setParent(qobject_cast<Ducker_Global *>(&ducker_G));
+    ducker_C.ducker_G = &ducker_G;
+
     QSettings cfg(ts->GetFullConfigPath(), QSettings::IniFormat);
-    ct_Ducker.setEnabled(cfg.value("ducking_enabled",true).toBool());
-    ct_Ducker.setValue(cfg.value("ducking_value",-23.0f).toFloat());
-    ct_Ducker.setDuckingReverse(cfg.value("ducking_reverse",false).toBool());
+    ducker_C.setEnabled(cfg.value("ducking_enabled",true).toBool());
+    ducker_C.setValue(cfg.value("ducking_value",-23.0f).toFloat());
+    ducker_C.setDuckingReverse(cfg.value("ducking_reverse",false).toBool());
     panTalkers.setEnabled(cfg.value("stereo_position_spread_enabled",true).toBool());
     panTalkers.setSpreadWidth(cfg.value("stereo_position_spread_value",0.5f).toFloat());
     panTalkers.setExpertModeEnabled(cfg.value("stereo_position_spread_expert_enabled",false).toBool());
     panTalkers.setRegionHomeTab(cfg.value("stereo_position_spread_region_home",1).toInt());
     panTalkers.setRegionWhisper(cfg.value("stereo_position_spread_region_whisper",2).toInt());
     panTalkers.setRegionOther(cfg.value("stereo_position_spread_region_other",0).toInt());
+
+    cfg.beginGroup("ducker_global");
+    ducker_G.setEnabled(cfg.value("enabled",true).toBool());
+    ducker_G.setValue(cfg.value("value",-23.0f).toFloat());
+    cfg.endGroup();
 
     // Support enabling the plugin while already connected
     uint64* servers;
@@ -239,9 +249,12 @@ void ts3plugin_configure(void* handle, void* qParentWidget) {
 
     qParentWidget_p = new Config();
     qParentWidget_p->SetupUi();
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingEnabled(bool)),&ct_Ducker,SLOT(setEnabled(bool)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingValue(float)),&ct_Ducker,SLOT(setValue(float)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingReverse(bool)),&ct_Ducker,SLOT(setDuckingReverse(bool)));
+    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetGlobalDuckerEnabled(bool)),&ducker_G,SLOT(setEnabled(bool)));
+    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetGlobalDuckerValue(float)),&ducker_G,SLOT(setValue(float)));
+
+    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingEnabled(bool)),&ducker_C,SLOT(setEnabled(bool)));
+    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingValue(float)),&ducker_C,SLOT(setValue(float)));
+    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingReverse(bool)),&ducker_C,SLOT(setDuckingReverse(bool)));
 
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetStereoPositionSpreadEnabled(bool)), &panTalkers,SLOT(setEnabled(bool)));
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetStereoPositionSpreadValue(float)), &panTalkers,SLOT(setSpreadWidth(float)));
@@ -273,7 +286,7 @@ const char* ts3plugin_commandKeyword() {
 int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* command) {
     int ret = 0;
     if(!strcmp(command, "TS3_TEST_DUCKER"))
-        ct_Ducker.setActive(!ct_Ducker.isActive());
+        ducker_C.setActive(!ducker_C.isActive());
     else
         ret = ts->ParseCommand(serverConnectionHandlerID,command);
 
@@ -313,6 +326,90 @@ int ts3plugin_requestAutoload() {
 	return 1;  /* 1 = request autoloaded, 0 = do not request autoload */
 }
 
+/* Helper function to create a menu item */
+static struct PluginMenuItem* createMenuItem(enum PluginMenuType type, int id, const char* text, const char* icon) {
+    struct PluginMenuItem* menuItem = (struct PluginMenuItem*)malloc(sizeof(struct PluginMenuItem));
+    menuItem->type = type;
+    menuItem->id = id;
+    _strcpy(menuItem->text, PLUGIN_MENU_BUFSZ, text);
+    _strcpy(menuItem->icon, PLUGIN_MENU_BUFSZ, icon);
+    return menuItem;
+}
+
+/* Some makros to make the code to create menu items a bit more readable */
+#define BEGIN_CREATE_MENUS(x) const size_t sz = x + 1; size_t n = 0; *menuItems = (struct PluginMenuItem**)malloc(sizeof(struct PluginMenuItem*) * sz);
+#define CREATE_MENU_ITEM(a, b, c, d) (*menuItems)[n++] = createMenuItem(a, b, c, d);
+#define END_CREATE_MENUS (*menuItems)[n++] = NULL; assert(n == sz);
+
+/*
+ * Menu IDs for this plugin. Pass these IDs when creating a menuitem to the TS3 client. When the menu item is triggered,
+ * ts3plugin_onMenuItemEvent will be called passing the menu ID of the triggered menu item.
+ * These IDs are freely choosable by the plugin author. It's not really needed to use an enum, it just looks prettier.
+ */
+enum {
+    MENU_ID_CLIENT_1 = 1//,
+//	MENU_ID_CLIENT_2,
+//	MENU_ID_CHANNEL_1,
+//	MENU_ID_CHANNEL_2,
+//	MENU_ID_CHANNEL_3,
+//	MENU_ID_GLOBAL_1,
+//	MENU_ID_GLOBAL_2
+};
+
+/*
+ * Initialize plugin menus.
+ * This function is called after ts3plugin_init and ts3plugin_registerPluginID. A pluginID is required for plugin menus to work.
+ * Both ts3plugin_registerPluginID and ts3plugin_freeMemory must be implemented to use menus.
+ * If plugin menus are not used by a plugin, do not implement this function or return NULL.
+ */
+void ts3plugin_initMenus(struct PluginMenuItem*** menuItems, char** menuIcon) {
+    /*
+     * Create the menus
+     * There are three types of menu items:
+     * - PLUGIN_MENU_TYPE_CLIENT:  Client context menu
+     * - PLUGIN_MENU_TYPE_CHANNEL: Channel context menu
+     * - PLUGIN_MENU_TYPE_GLOBAL:  "Plugins" menu in menu bar of main window
+     *
+     * Menu IDs are used to identify the menu item when ts3plugin_onMenuItemEvent is called
+     *
+     * The menu text is required, max length is 128 characters
+     *
+     * The icon is optional, max length is 128 characters. When not using icons, just pass an empty string.
+     * Icons are loaded from a subdirectory in the TeamSpeak client plugins folder. The subdirectory must be named like the
+     * plugin filename, without dll/so/dylib suffix
+     * e.g. for "test_plugin.dll", icon "1.png" is loaded from <TeamSpeak 3 Client install dir>\plugins\test_plugin\1.png
+     */
+
+    BEGIN_CREATE_MENUS(1);  /* IMPORTANT: Number of menu items must be correct! */
+    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_1,  ts->tr("Toggle Global Ducking Target").toLocal8Bit().constData(),  "");
+//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_2,  "Client item 2",  "2.png");
+//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_1, "Channel item 1", "1.png");
+//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_2, "Channel item 2", "2.png");
+//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_3, "Channel item 3", "3.png");
+//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_1,  "Global item 1",  "1.png");
+//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_2,  "Global item 2",  "2.png");
+    END_CREATE_MENUS;  /* Includes an assert checking if the number of menu items matched */
+
+    /*
+     * Specify an optional icon for the plugin. This icon is used for the plugins submenu within context and main menus
+     * If unused, set menuIcon to NULL
+     */
+    *menuIcon = (char*)malloc(PLUGIN_MENU_BUFSZ * sizeof(char));
+    _strcpy(*menuIcon, PLUGIN_MENU_BUFSZ, "t.png");
+
+    /*
+     * Menus can be enabled or disabled with: ts3Functions.setPluginMenuEnabled(pluginID, menuID, 0|1);
+     * Test it with plugin command: /test enablemenu <menuID> <0|1>
+     * Menus are enabled by default. Please note that shown menus will not automatically enable or disable when calling this function to
+     * ensure Qt menus are not modified by any thread other the UI thread. The enabled or disable state will change the next time a
+     * menu is displayed.
+     */
+    /* For example, this would disable MENU_ID_GLOBAL_2: */
+    /* ts3Functions.setPluginMenuEnabled(pluginID, MENU_ID_GLOBAL_2, 0); */
+
+    /* All memory allocated in this function will be automatically released by the TeamSpeak client later by calling ts3plugin_freeMemory */
+}
+
 /* Helper function to create a hotkey */
 static struct PluginHotkey* createHotkey(const char* keyword, const char* description) {
 	struct PluginHotkey* hotkey = (struct PluginHotkey*)malloc(sizeof(struct PluginHotkey));
@@ -346,13 +443,6 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 	/* The client will call ts3plugin_freeMemory to release all allocated memory */
 }
 
-/* This function is called if a plugin hotkey was pressed. Omit if hotkeys are unused. */
-void ts3plugin_onHotkeyEvent(const char* keyword) {
-	/* Identify the hotkey by keyword ("keyword_1", "keyword_2" or "keyword_3" in this example) and handle here... */
-    //ts->ParseCommand((char*)keyword,(char)NULL);
-    ts->ParseCommand((uint64)NULL,keyword);
-}
-
 /* Show an error message if the plugin failed to load */
 void ts3plugin_onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber)
 {
@@ -384,17 +474,20 @@ void ts3plugin_onNewChannelEvent(uint64 serverConnectionHandlerID, uint64 channe
 
 void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage)
 {
-    ct_Ducker.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
+    ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
+    ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
 }
 
 void ts3plugin_onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* timeoutMessage)
 {
-    ct_Ducker.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
+    ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
+    ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
 }
 
 void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID moverID, const char* moverName, const char* moverUniqueIdentifier, const char* moveMessage)
 {
-    ct_Ducker.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
+    ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
+    ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID)
@@ -404,7 +497,8 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 
 void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels)
 {
-    ct_Ducker.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels);
+    if (!ducker_G.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels))
+        ducker_C.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels);
 }
 
 void ts3plugin_onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask)
@@ -433,6 +527,74 @@ void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID,
 /* Client changed current server connection handler */
 void ts3plugin_currentServerConnectionChanged(uint64 serverConnectionHandlerID)
 {
-    ct_Ducker.setHomeId(serverConnectionHandlerID);
+    ducker_C.setHomeId(serverConnectionHandlerID);
     panTalkers.setHomeId(serverConnectionHandlerID);
+}
+
+/* Client UI callbacks */
+
+/*
+ * Called when a plugin menu item (see ts3plugin_initMenus) is triggered. Optional function, when not using plugin menus, do not implement this.
+ *
+ * Parameters:
+ * - serverConnectionHandlerID: ID of the current server tab
+ * - type: Type of the menu (PLUGIN_MENU_TYPE_CHANNEL, PLUGIN_MENU_TYPE_CLIENT or PLUGIN_MENU_TYPE_GLOBAL)
+ * - menuItemID: Id used when creating the menu item
+ * - selectedItemID: Channel or Client ID in the case of PLUGIN_MENU_TYPE_CHANNEL and PLUGIN_MENU_TYPE_CLIENT. 0 for PLUGIN_MENU_TYPE_GLOBAL.
+ */
+void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenuType type, int menuItemID, uint64 selectedItemID) {
+    //printf("PLUGIN: onMenuItemEvent: serverConnectionHandlerID=%llu, type=%d, menuItemID=%d, selectedItemID=%llu\n", (long long unsigned int)serverConnectionHandlerID, type, menuItemID, (long long unsigned int)selectedItemID);
+    switch(type) {
+//		case PLUGIN_MENU_TYPE_GLOBAL:
+//			/* Global menu item was triggered. selectedItemID is unused and set to zero. */
+//			switch(menuItemID) {
+//				case MENU_ID_GLOBAL_1:
+//					/* Menu global 1 was triggered */
+//					break;
+//				case MENU_ID_GLOBAL_2:
+//					/* Menu global 2 was triggered */
+//					break;
+//				default:
+//					break;
+//			}
+//			break;
+//		case PLUGIN_MENU_TYPE_CHANNEL:
+//			/* Channel contextmenu item was triggered. selectedItemID is the channelID of the selected channel */
+//			switch(menuItemID) {
+//				case MENU_ID_CHANNEL_1:
+//					/* Menu channel 1 was triggered */
+//					break;
+//				case MENU_ID_CHANNEL_2:
+//					/* Menu channel 2 was triggered */
+//					break;
+//				case MENU_ID_CHANNEL_3:
+//					/* Menu channel 3 was triggered */
+//					break;
+//				default:
+//					break;
+//			}
+//			break;
+        case PLUGIN_MENU_TYPE_CLIENT:
+            /* Client contextmenu item was triggered. selectedItemID is the clientID of the selected client */
+            switch(menuItemID) {
+                case MENU_ID_CLIENT_1:
+                    ducker_G.ToggleMusicBot(serverConnectionHandlerID,(anyID)selectedItemID);
+                    break;
+//				case MENU_ID_CLIENT_2:
+//					/* Menu client 2 was triggered */
+//					break;
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+}
+
+/* This function is called if a plugin hotkey was pressed. Omit if hotkeys are unused. */
+void ts3plugin_onHotkeyEvent(const char* keyword) {
+    /* Identify the hotkey by keyword ("keyword_1", "keyword_2" or "keyword_3" in this example) and handle here... */
+    //ts->ParseCommand((char*)keyword,(char)NULL);
+    ts->ParseCommand((uint64)NULL,keyword);
 }

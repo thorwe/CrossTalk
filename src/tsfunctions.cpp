@@ -195,10 +195,14 @@ void TSFunctions::Print(QString message)
     Print(message, LogLevel_INFO);
 }
 
+void TSFunctions::Log(QString message, LogLevel logLevel, uint64 serverConnectionHandlerID)
+{
+    ts3Functions.logMessage(message.toLocal8Bit().constData(), logLevel, PLUGIN_NAME, serverConnectionHandlerID);
+}
+
 void TSFunctions::Log(QString message, LogLevel logLevel)
 {
     ts3Functions.logMessage(message.toLocal8Bit().constData(), logLevel, PLUGIN_NAME, 0);
-    Print(message,logLevel);
 }
 
 void TSFunctions::Log(QString message)
@@ -815,7 +819,6 @@ int TSFunctions::ParseCommand(uint64 serverConnectionHandlerID, const char* cmd)
     }
 
     cmd_qs = args_qs.takeFirst();
-    Print(cmd_qs);
     emit Command(serverConnectionHandlerID,cmd_qs,args_qs); //ToDo: Not too happy using Signal/Slots here
 
     command_mutex->unlock();

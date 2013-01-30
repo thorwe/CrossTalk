@@ -19,11 +19,17 @@ public:
 protected slots:
 	void accept();
 	void reject();
+
+    void onGlobalDuckerSliderValueChanged(int);
+    void onGlobalDuckerValueChanged(double);
+
     void onDuckSliderValueChanged(int);
     void onDuckValueChanged(double);
     void onDuckModeSliderValueChanged(int);
+
     void onSPSDialValueChanged(int);
     void onSPSValueChanged(double);
+
     void onNetwManagerFinished(QNetworkReply *reply);
     void onPledgieClicked();
     void onJianjiClicked();
@@ -34,6 +40,9 @@ protected:
 //    bool eventFilter(QObject *object, QEvent *ev);
 
 signals:
+    void SetGlobalDuckerEnabled(bool);
+    void SetGlobalDuckerValue(float);
+
     void SetDuckingEnabled(bool);
     void SetDuckingValue(float);
     void SetDuckingReverse(bool);

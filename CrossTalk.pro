@@ -27,7 +27,10 @@ HEADERS += \
     src/snt.h \
     src/pantalkers.h \
     src/talkers.h \
-    src/simplepanner.h
+    src/simplepanner.h \
+    src/ducker_global.h \
+    src/module.h \
+    src/volumes.h
 
 SOURCES += \
     src/banner.cpp \
@@ -40,7 +43,10 @@ SOURCES += \
     src/snt.cpp \
     src/pantalkers.cpp \
     src/talkers.cpp \
-    src/simplepanner.cpp
+    src/simplepanner.cpp \
+    src/ducker_global.cpp \
+    src/module.cpp \
+    src/volumes.cpp
 
 FORMS += \
     src/config.ui

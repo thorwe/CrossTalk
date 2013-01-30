@@ -3,17 +3,17 @@
 
 #include <QObject>
 #include "public_definitions.h"
+#include "module.h"
+#include "volumes.h"
 #include "tsfunctions.h"
 #include "simple_volume.h"
 #include "talkers.h"
 
-class CT_VolumeSuppression : public QObject
+#include "ducker_global.h"
+
+class CT_VolumeSuppression : public Module
 {
     Q_OBJECT
-    Q_PROPERTY(bool enabled
-               READ isEnabled
-               WRITE setEnabled
-               NOTIFY enabledSet)
     Q_PROPERTY(bool isActive
                READ isActive
                WRITE setActive
@@ -35,45 +35,36 @@ public:
 
     void setHomeId(uint64 serverConnectionHandlerID);
     uint64 homeId() {return m_homeId;}
-
-    bool isEnabled() const;
     bool isActive() {return m_isActive;}
-
     void setActive(bool); // for testing command, move to private later
 
+    Ducker_Global* ducker_G; // until I figure out why the class behaves weird as singleton
+
 private:
-    bool m_enabled;
     bool m_isReverse;
     bool m_isActive;
-
     float value() {return m_value;}
     float m_value;
-
     uint64 m_homeId;
 
     TSFunctions *ts;
     Talkers* talkers;
+    Volumes* vols;
 
-    // Note: Client UI:(-30 to 20), while the API allows (-50.0 to +20.0)
-    QMap<uint64, QMap<anyID,SimpleVolume*>* >* ServerChannelVolumes;
-    void AddVolume(uint64 serverConnectionHandlerID, anyID clientID);
-    void DeleteVolume(SimpleVolume *vol);
-    void RemoveVolume(uint64 serverConnectionHandlerID, anyID clientID);
-    void ClearServerChannelVolumes(uint64 serverConnectionHandlerID);
-    void ClearServerChannelVolumes();
+    SimpleVolume *AddDuckerVolume(uint64 serverConnectionHandlerID, anyID clientID);
 
 signals:
-    void enabledSet(bool);
     void valueSet(float);
     void activeSet(bool);
 
 public slots:
-    void setEnabled(bool value);
     void setValue(float newValue);
     void setDuckingReverse(bool);
 
-    void onConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
     void onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID);
+
+protected:
+    void onRunningStateChanged(bool value);
 };
 
 #endif // CT_VOLUMESUPPRESSION_H
