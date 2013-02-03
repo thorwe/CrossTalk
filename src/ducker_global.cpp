@@ -2,6 +2,8 @@
 #include "ts3_functions.h"
 #include "plugin.h"
 
+#include <QSettings>
+
 //Ducker_Global* Ducker_Global::m_Instance = 0;
 
 Ducker_Global::Ducker_Global(QObject *parent) :
@@ -107,6 +109,7 @@ void Ducker_Global::ToggleMusicBot(uint64 serverConnectionHandlerID, anyID clien
         DuckTargets->insert(uid,name);
         AddMusicBotVolume(serverConnectionHandlerID,clientID);
     }
+    SaveDuckTargets();
 }
 
 bool Ducker_Global::isClientMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
@@ -348,4 +351,34 @@ SimpleVolume* Ducker_Global::AddMusicBotVolume(uint64 serverConnectionHandlerID,
         connect(this,SIGNAL(activeSet(bool)),vol,SLOT(setGainAdjustment(bool)),Qt::DirectConnection);
     }
     return vol;
+}
+
+void Ducker_Global::SaveDuckTargets()
+{
+    QSettings cfg(ts->GetFullConfigPath(), QSettings::IniFormat);
+    cfg.beginGroup("ducker_global");
+    int oldSize = cfg.beginReadArray("targets");
+    cfg.endArray();
+    cfg.beginWriteArray("targets", DuckTargets->size());
+    QMapIterator<QString,QString> i(*(DuckTargets));
+    int count = 0;
+    while (i.hasNext())
+    {
+        i.next();
+        cfg.setArrayIndex(count);
+        cfg.setValue("uid",i.key());
+        cfg.setValue("name",i.value());
+        ++count;
+    }
+    if (oldSize > DuckTargets->size())
+    {
+        for (int j = DuckTargets->size(); j<oldSize; ++j)
+        {
+            cfg.setArrayIndex(j);
+            cfg.remove("uid");
+            cfg.remove("name");
+        }
+    }
+    cfg.endArray();
+    cfg.endGroup();
 }

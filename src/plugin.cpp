@@ -135,9 +135,17 @@ int ts3plugin_init() {
     panTalkers.setRegionOther(cfg.value("stereo_position_spread_region_other",0).toInt());
 
     cfg.beginGroup("ducker_global");
-    ducker_G.setEnabled(cfg.value("enabled",true).toBool());
+    int size = cfg.beginReadArray("targets");
+    for (int i = 0; i < size; ++i)
+    {
+        cfg.setArrayIndex(i);
+        ducker_G.DuckTargets->insert(cfg.value("uid").toString(),cfg.value("name").toString());
+    }
+    cfg.endArray();
     ducker_G.setValue(cfg.value("value",-23.0f).toFloat());
+    ducker_G.setEnabled(cfg.value("enabled",true).toBool());
     cfg.endGroup();
+
 
     // Support enabling the plugin while already connected
     uint64* servers;
@@ -300,7 +308,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
 
 /* Static title shown in the left column in the info frame */
 const char* ts3plugin_infoTitle() {
-	return NULL;
+    return PLUGIN_NAME;
 }
 
 /*
@@ -309,12 +317,25 @@ const char* ts3plugin_infoTitle() {
  * Check the parameter "type" if you want to implement this feature only for specific item types. Set the parameter
  * "data" to NULL to have the client ignore the info data.
  */
+static PluginItemType m_InfoType = PLUGIN_SERVER;
+static uint64 m_InfoId = 0;
 void ts3plugin_infoData(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, char** data) {
+    m_InfoType = type; // Save type when user manually changes the selected Item
+    m_InfoId = id; // Save currently selected Item
+    if ((type == PLUGIN_CLIENT) && ducker_G.isClientMusicBot(serverConnectionHandlerID,(anyID)id))
+    {
+        *data = (char*)malloc(INFODATA_BUFSIZE * sizeof(char));
+        //snprintf(*data, INFODATA_BUFSIZE, "infoData called %d times", m_counter);
+        //*data = QString("is VuP").toLocal8Bit().data();
+        _strcpy(*data, INFODATA_BUFSIZE, QString("is Global Ducking Target.\n").toLocal8Bit().data());
+    }
+    else
+        data = NULL;
 }
 
 /* Required to release the memory for parameter "data" allocated in ts3plugin_infoData */
 void ts3plugin_freeMemory(void* data) {
-	free(data);
+    free(data);
 }
 
 /*
@@ -347,12 +368,12 @@ static struct PluginMenuItem* createMenuItem(enum PluginMenuType type, int id, c
  * These IDs are freely choosable by the plugin author. It's not really needed to use an enum, it just looks prettier.
  */
 enum {
-    MENU_ID_CLIENT_1 = 1//,
-//	MENU_ID_CLIENT_2,
+    MENU_ID_CLIENT_1 = 1
+//  MENU_ID_CLIENT_2
 //	MENU_ID_CHANNEL_1,
 //	MENU_ID_CHANNEL_2,
 //	MENU_ID_CHANNEL_3,
-//	MENU_ID_GLOBAL_1,
+//  MENU_ID_GLOBAL_1,
 //	MENU_ID_GLOBAL_2
 };
 
@@ -382,11 +403,11 @@ void ts3plugin_initMenus(struct PluginMenuItem*** menuItems, char** menuIcon) {
 
     BEGIN_CREATE_MENUS(1);  /* IMPORTANT: Number of menu items must be correct! */
     CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_1,  ts->tr("Toggle Global Ducking Target").toLocal8Bit().constData(),  "");
-//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_2,  "Client item 2",  "2.png");
+//  CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_2,  "Client item 2",  "");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_1, "Channel item 1", "1.png");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_2, "Channel item 2", "2.png");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_3, "Channel item 3", "3.png");
-//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_1,  "Global item 1",  "1.png");
+//  CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_1,  "Global item 1",  "1.png");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_2,  "Global item 2",  "2.png");
     END_CREATE_MENUS;  /* Includes an assert checking if the number of menu items matched */
 
@@ -394,8 +415,8 @@ void ts3plugin_initMenus(struct PluginMenuItem*** menuItems, char** menuIcon) {
      * Specify an optional icon for the plugin. This icon is used for the plugins submenu within context and main menus
      * If unused, set menuIcon to NULL
      */
-    *menuIcon = (char*)malloc(PLUGIN_MENU_BUFSZ * sizeof(char));
-    _strcpy(*menuIcon, PLUGIN_MENU_BUFSZ, "t.png");
+//    *menuIcon = (char*)malloc(PLUGIN_MENU_BUFSZ * sizeof(char));
+//    _strcpy(*menuIcon, PLUGIN_MENU_BUFSZ, "t.png");
 
     /*
      * Menus can be enabled or disabled with: ts3Functions.setPluginMenuEnabled(pluginID, menuID, 0|1);
@@ -433,13 +454,10 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 	 * The keyword will be later passed to ts3plugin_onHotkeyEvent to identify which hotkey was triggered.
 	 * The description is shown in the clients hotkey dialog. */
     BEGIN_CREATE_HOTKEYS(3);  /* Create 2 hotkeys. Size must be correct for allocating memory. */
-//    CREATE_HOTKEY("TS3_NEXT_TAB_AND_TALK_END", "Next Tab and Talk Stop");
 	CREATE_HOTKEY("TS3_NEXT_TAB_AND_TALK_START", "Next Tab and Talk Start");
-//    CREATE_HOTKEY("TS3_NEXT_TAB_AND_WHISPER_END", "Next Tab and Whisper Stop");
     CREATE_HOTKEY("TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START", "Next Tab and Whisper all Channel Commanders Start");
     CREATE_HOTKEY("TS3_SWITCH_N_TALK_END", "SnT Stop");
 	END_CREATE_HOTKEYS;
-
 	/* The client will call ts3plugin_freeMemory to release all allocated memory */
 }
 
@@ -543,7 +561,7 @@ void ts3plugin_currentServerConnectionChanged(uint64 serverConnectionHandlerID)
  * - selectedItemID: Channel or Client ID in the case of PLUGIN_MENU_TYPE_CHANNEL and PLUGIN_MENU_TYPE_CLIENT. 0 for PLUGIN_MENU_TYPE_GLOBAL.
  */
 void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenuType type, int menuItemID, uint64 selectedItemID) {
-    //printf("PLUGIN: onMenuItemEvent: serverConnectionHandlerID=%llu, type=%d, menuItemID=%d, selectedItemID=%llu\n", (long long unsigned int)serverConnectionHandlerID, type, menuItemID, (long long unsigned int)selectedItemID);
+//    printf("PLUGIN: onMenuItemEvent: serverConnectionHandlerID=%llu, type=%d, menuItemID=%d, selectedItemID=%llu\n", (long long unsigned int)serverConnectionHandlerID, type, menuItemID, (long long unsigned int)selectedItemID);
     switch(type) {
 //		case PLUGIN_MENU_TYPE_GLOBAL:
 //			/* Global menu item was triggered. selectedItemID is unused and set to zero. */
@@ -590,6 +608,7 @@ void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenu
         default:
             break;
     }
+    if (m_InfoType > 0 && m_InfoId > 0) ts3Functions.requestInfoUpdate(serverConnectionHandlerID, m_InfoType, m_InfoId);
 }
 
 /* This function is called if a plugin hotkey was pressed. Omit if hotkeys are unused. */

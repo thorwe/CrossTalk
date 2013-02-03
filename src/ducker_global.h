@@ -57,6 +57,8 @@ public:
     bool isActive() {return m_isActive;}
     void setActive(bool); // for testing command, move to private later
 
+    QMap<QString,QString>* DuckTargets;
+
 signals:
     void valueSet(float);
     void activeSet(bool);
@@ -82,9 +84,10 @@ private:
     TSFunctions *ts;
     Talkers* talkers;
     Volumes* vols;
-    QMap<QString,QString>* DuckTargets;
 
     SimpleVolume *AddMusicBotVolume(uint64 serverConnectionHandlerID, anyID clientID);
+
+    void SaveDuckTargets();
 };
 
 #endif // DUCKER_GLOBAL_H
