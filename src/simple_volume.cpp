@@ -209,8 +209,8 @@ void SimpleVolume::setAgaDecayRate(float value)
 void SimpleVolume::setGainAdjustment(bool value)
 {
     gainAdjustment = value;
-    if ((value == false) && (isProcessing()))
-        printf("Should release.\n");
+//    if ((value == false) && (isProcessing()))
+//        printf("Should release.\n");
     //printf("SimpleVolume:setGainAdjustment: %s\n",(gainAdjustment)?"true":"false");
 }
 

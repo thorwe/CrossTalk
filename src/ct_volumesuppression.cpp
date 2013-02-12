@@ -297,6 +297,7 @@ void CT_VolumeSuppression::onEditPlaybackVoiceDataEvent(uint64 serverConnectionH
     if (!ChanVolumes->contains(clientID))
         return;
 
+    sampleCount = sampleCount * channels;
     SimpleVolume* vol = ChanVolumes->value(clientID);
     vol->process(samples,sampleCount);
 }

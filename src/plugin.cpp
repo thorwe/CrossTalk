@@ -78,7 +78,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.0.1";
+    return "1.1.0";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -93,7 +93,7 @@ const char* ts3plugin_author() {
 
 /* Plugin description */
 const char* ts3plugin_description() {
-    return "Features:\nStereo Position Spread,\nDucking\nSwitch\'n\'Talk (Cross Server Tab PTT)\n\nFor information on the modules, use the \'?\' button on the topper right of the plugin settings window.\n";
+    return "Features:\nStereo Position Spread,\nDucking\nSwitch\'n\'Talk (Cross Server Tab PTT)\n\nFor information on the modules, use the \'?\' button on the topper right of the plugin settings window or visit the Github wiki by clicking on the banner.\n";
 }
 
 /* Set TeamSpeak 3 callback functions */
@@ -325,9 +325,7 @@ void ts3plugin_infoData(uint64 serverConnectionHandlerID, uint64 id, enum Plugin
     if ((type == PLUGIN_CLIENT) && ducker_G.isClientMusicBot(serverConnectionHandlerID,(anyID)id))
     {
         *data = (char*)malloc(INFODATA_BUFSIZE * sizeof(char));
-        //snprintf(*data, INFODATA_BUFSIZE, "infoData called %d times", m_counter);
-        //*data = QString("is VuP").toLocal8Bit().data();
-        _strcpy(*data, INFODATA_BUFSIZE, QString("is Global Ducking Target.\n").toLocal8Bit().data());
+        _strcpy(*data, INFODATA_BUFSIZE, QString("Global Ducking Target.\n").toLocal8Bit().data());
     }
     else
         data = NULL;
@@ -404,7 +402,7 @@ void ts3plugin_initMenus(struct PluginMenuItem*** menuItems, char** menuIcon) {
     BEGIN_CREATE_MENUS(1);  /* IMPORTANT: Number of menu items must be correct! */
     CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_1,  ts->tr("Toggle Global Ducking Target").toLocal8Bit().constData(),  "");
 //  CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_2,  "Client item 2",  "");
-//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_1, "Channel item 1", "1.png");
+//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_1, "Toggle channel mute", "");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_2, "Channel item 2", "2.png");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_3, "Channel item 3", "3.png");
 //  CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_1,  "Global item 1",  "1.png");

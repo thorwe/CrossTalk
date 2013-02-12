@@ -10,6 +10,7 @@ const QList<float> SPREAD_CENTER = QList<float>() << 0 << -0.2f << 0.2f << -0.4f
 const QList<float> SPREAD_RIGHT = QList<float>() << 0.75f << 1.0f << 0.5f << 0.875f << 0.625f << 0.9375f << 0.8125f << 0.5625f << 0.6875f;
 const QList<float> SPREAD_LEFT = QList<float>() << -0.75f << -1.0f << -0.5f << -0.875f << -0.625f << -0.9375f << -0.8125f << -0.5625f << -0.6875f;
 
+const QPair<uint64,anyID> SEAT_HOLDER = qMakePair((uint64)0,(anyID)0);
 
 PanTalkers::PanTalkers(QObject *parent) :
     //QObject(parent),
@@ -21,10 +22,10 @@ PanTalkers::PanTalkers(QObject *parent) :
     ts = TSFunctions::instance();
     talkers = Talkers::instance();
     TalkersPanners = new QMap<uint64,QMap<anyID,SimplePanner*>* >;
-    TalkerSequences = new QMap<TALKERS_REGION,QList< QPair<uint64,anyID>* >* >;
+    TalkerSequences = new QMap<TALKERS_REGION,QList< QPair<uint64,anyID> >* >;
     for (int i = 0; i<TALKERS_REGION_END;++i)
     {
-        QList< QPair<uint64,anyID>* >* list = new QList< QPair<uint64,anyID>* >;
+        QList< QPair<uint64,anyID> >* list = new QList< QPair<uint64,anyID> >;
         TalkerSequences->insert((TALKERS_REGION)i,list);
     }
 }
@@ -172,8 +173,10 @@ void PanTalkers::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerI
 
 void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID)
 {
-    QList< QPair<uint64,anyID>* >* seq;
+//    QList< QPair<uint64,anyID>* >* seq;
+    QList< QPair<uint64,anyID> >* seq;
     QPair<uint64,anyID> seqPair = qMakePair(serverConnectionHandlerID,clientID);
+//    Print(QString("scHandler: %1, seqPair: %2,%3").arg(serverConnectionHandlerID).arg(seqPair.first).arg(seqPair.second));
     if (status == STATUS_TALKING)
     {
         SimplePanner* panner = new SimplePanner(this);
@@ -217,14 +220,14 @@ void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int statu
         seq = TalkerSequences->value(region);
 
         float val = 0.0f;
-        int position = seq->indexOf(NULL,0);
+        int position = seq->indexOf(SEAT_HOLDER,0);
         if (position != -1)
         {
-            seq->replace(position,&seqPair);
+            seq->replace(position,seqPair);
         }
         else
         {
-            seq->append(&seqPair);
+            seq->append(seqPair);
             position = seq->size() - 1;
         }
 
@@ -237,7 +240,7 @@ void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int statu
         if (panner->getPanDesiredByManual() == 0.0f)
             panner->setPanCurrent(val); //don't ramp, pre-set pan
 
-//        Print(QString("Added Panner for %1,%2 on position %3 with value %4").arg(seqPair.first).arg(seqPair.second).arg(position).arg(val));
+//        Print(QString("Added Panner on position %1 with value %2").arg(position).arg(val));
     }
     else if (status == STATUS_NOT_TALKING)
     {
@@ -266,28 +269,31 @@ void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int statu
         else
             seq = TalkerSequences->value(m_RegionOther);
 
-
-        if (!(seq->contains(&seqPair)))
+        if (!(seq->contains(seqPair)))
         {
             for (int i = 0; i<TALKERS_REGION_END; ++i)
             {
                 seq = TalkerSequences->value((TALKERS_REGION)i);
-                if (seq->contains(&seqPair))
+//                Print(QString("TalkerSequence region size: %1").arg(seq->size()));
+//                if (seq->size() > 0)
+//                    Print(QString("seq: %1, %2").arg(seq->first().first).arg(seq->first().second));
+
+                if (seq->contains(seqPair))
                     break;
             }
-        }
-        if(!(seq->contains(&seqPair)))
-        {
-            ts->Error(NULL,NULL,"SPS: Could not find talker to remove.");
-            return;
+            if(!(seq->contains(seqPair)))
+            {
+                ts->Error(serverConnectionHandlerID,NULL,"SPS: Could not find talker to remove.");
+                return;
+            }
         }
 
-        int position = seq->indexOf(&seqPair);
-        seq->replace(position,NULL);
+        int position = seq->indexOf(seqPair);
+        seq->replace(position,SEAT_HOLDER);
         bool shallClear = true;
         for (int i=0;i<seq->size();++i)
         {
-            if (seq->value(i) != NULL)
+            if (seq->value(i) != SEAT_HOLDER)
             {
                 shallClear = false;
                 break;

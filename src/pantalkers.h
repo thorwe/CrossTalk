@@ -54,8 +54,9 @@ private:
     TSFunctions *ts;
     Talkers* talkers;
 
-    QMap<TALKERS_REGION,QList< QPair<uint64,anyID>* >* >* TalkerSequences;
-    const QPair<uint64,anyID> EmptyPair;
+//    QMap<TALKERS_REGION,QList< QPair<uint64,anyID>* >* >* TalkerSequences;
+//    const QPair<uint64,anyID> EmptyPair;
+    QMap<TALKERS_REGION,QList< QPair<uint64,anyID> >* >* TalkerSequences;
 
 //    bool isReported;
 
