@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QMap>
 #include "public_definitions.h"
-#include "tsfunctions.h"
 #include "simple_volume.h"
 
 class Volumes : public QObject
@@ -25,7 +24,6 @@ public slots:
 protected:
 
 private:
-    TSFunctions *ts;
 };
 
 #endif // VOLUMES_H

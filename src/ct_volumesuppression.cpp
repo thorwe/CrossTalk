@@ -10,12 +10,11 @@
 #include "tsfunctions.h"
 
 CT_VolumeSuppression::CT_VolumeSuppression(QObject *parent) :
-//    QObject(parent),
     m_isActive(false),
     m_value(0.0f),
     m_homeId(0)
 {
-    m_isPrintEnabled = true;
+    m_isPrintEnabled = false;
     this->setParent(parent);
     this->setObjectName("ChannelDucker");
     ts = TSFunctions::instance();
@@ -63,7 +62,16 @@ void CT_VolumeSuppression::setValue(float newValue)
 
 void CT_VolumeSuppression::setDuckingReverse(bool val)
 {
+    if (val==m_isReverse)
+        return;
+
     m_isReverse = val;
+    if (isEnabled())  //since everything needs to be re-evaluated might as well toggle off/on
+    {
+        setEnabled(false);
+        setEnabled(true);
+    }
+
     Log(QString("isReverse: %1").arg((m_isReverse)?"true":"false"));
 }
 
@@ -81,13 +89,9 @@ void CT_VolumeSuppression::setHomeId(uint64 serverConnectionHandlerID)
         uint64 channelID;
         unsigned int error;
         if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&channelID)) != ERROR_ok)
-        {
-            ts->Error(serverConnectionHandlerID,error,"Error getting Client Channel Id:");
-        }
+            Error("(setHomeId) Error getting Client Channel Id",serverConnectionHandlerID,error);
         else
-        {
             onClientMoveEvent(serverConnectionHandlerID,myID,0,channelID,RETAIN_VISIBILITY);
-        }
     }
 
     Log(QString("setHomeId: %1").arg(m_homeId));
@@ -96,7 +100,7 @@ void CT_VolumeSuppression::setHomeId(uint64 serverConnectionHandlerID)
 void CT_VolumeSuppression::setActive(bool value)
 {
     m_isActive = value;
-    Log(QString("setActive: %1").arg((value)?"true":"false"));
+//    Log(QString("setActive: %1").arg((value)?"true":"false"));
     emit activeSet(m_isActive);
 }
 
@@ -104,6 +108,8 @@ void CT_VolumeSuppression::setActive(bool value)
 
 void CT_VolumeSuppression::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility)
 {
+    Q_UNUSED(visibility);
+
     if (ducker_G->isEnabled() && ducker_G->isClientMusicBot(serverConnectionHandlerID,clientID))
         return;
 
@@ -122,17 +128,21 @@ void CT_VolumeSuppression::onClientMoveEvent(uint64 serverConnectionHandlerID, a
 
         vols->RemoveVolumes(serverConnectionHandlerID);
 
+        unsigned int error;
         // Get Channel Client List
         anyID* clients;
-        ts->GetChannelClientList(serverConnectionHandlerID,newChannelID,&clients);
-
-        // for every client insert volume
-        for(int i=0; clients[i]; i++)
+        if((error = ts3Functions.getChannelClientList(serverConnectionHandlerID, newChannelID, &clients)) != ERROR_ok)
+            Error("(onClientMoveEvent) Error getting Channel Client List", serverConnectionHandlerID, error);
+        else
         {
-            if (clients[i] == myID)
-                continue;
+            // for every client insert volume
+            for(int i=0; clients[i]; i++)
+            {
+                if (clients[i] == myID)
+                    continue;
 
-            AddDuckerVolume(serverConnectionHandlerID,clients[i]);
+                AddDuckerVolume(serverConnectionHandlerID,clients[i]);
+            }
         }
     }
     else                                    // Someone else has...
@@ -141,24 +151,20 @@ void CT_VolumeSuppression::onClientMoveEvent(uint64 serverConnectionHandlerID, a
         uint64 channelID;
         unsigned int error;
         if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&channelID)) != ERROR_ok)
-        {
-            ts->Error(serverConnectionHandlerID,error,"(CT_VolumeSuppression::onClientMoveEvent) Error getting Client Channel Id:");
-        }
+            Error("(onClientMoveEvent) Error getting Client Channel Id", serverConnectionHandlerID, error);
         else
         {
             if (channelID == oldChannelID)      // left
                 vols->RemoveVolume(serverConnectionHandlerID,clientID);
             else if (channelID == newChannelID) // joined
-            {
                 AddDuckerVolume(serverConnectionHandlerID,clientID);
-            }
         }
     }
 }
 
 void CT_VolumeSuppression::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID)
 {
-//    ts->Print(QString("(onTalkStatusChangeEvent): serverConnectionHandlerID: %1").arg(serverConnectionHandlerID));
+    //Print("(onTalkStatusChangeEvent)",serverConnectionHandlerID,LogLevel_INFO);
     if (ducker_G->isEnabled() && ducker_G->isClientMusicBot(serverConnectionHandlerID,clientID))
         return;
 
@@ -189,7 +195,7 @@ void CT_VolumeSuppression::onTalkStatusChanged(uint64 serverConnectionHandlerID,
 
             if (((!m_isReverse) && (i.key() != m_homeId)) || ((m_isReverse) && (i.key() == m_homeId)))
             {
-//                    ts->Print("Staying active because there are talkers.");
+//                    Print("Staying active because there are talkers.");
                     stayActive = true;
                     break;
             }
@@ -199,8 +205,8 @@ void CT_VolumeSuppression::onTalkStatusChanged(uint64 serverConnectionHandlerID,
                 QList<anyID> whisp = i.value()->keys(true);
                 if (whisp.count() > 0)
                 {
-                    ts->Print("Staying active because a whisperer has been found.");
-                    ts->Print(QString("Amount whisperers: %1").arg(whisp.count()));
+//                    Print("Staying active because a whisperer has been found.");
+//                    Print(QString("Amount whisperers: %1").arg(whisp.count()));
                     stayActive = true;
                     break;
                 }
@@ -289,7 +295,6 @@ void CT_VolumeSuppression::onEditPlaybackVoiceDataEvent(uint64 serverConnectionH
     if (((!m_isReverse) && (serverConnectionHandlerID != m_homeId)) || ((m_isReverse) && (serverConnectionHandlerID == m_homeId)))
         return;
 
-
     if (!vols->VolumesMap->contains(serverConnectionHandlerID))
         return;
 
@@ -319,7 +324,7 @@ SimpleVolume* CT_VolumeSuppression::AddDuckerVolume(uint64 serverConnectionHandl
         vol->setGainAdjustment(m_isActive);
         connect(this,SIGNAL(activeSet(bool)),vol,SLOT(setGainAdjustment(bool)),Qt::DirectConnection);
     }
-    //    ts->Print(QString("Ducker: Added %1 to ServerChannelVolumes.").arg(clientID));
+    //    Print(QString("Ducker: Added %1 to ServerChannelVolumes.").arg(clientID));
     return vol;
 }
 

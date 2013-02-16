@@ -1,14 +1,9 @@
 #include "ts_settings_qt.h"
 
-#include "public_errors.h"
-#include "public_errors_rare.h"
-#include "public_definitions.h"
-#include "public_rare_definitions.h"
-#include "ts3_functions.h"
-
-#include "plugin.h"
+TSSettings* TSSettings::m_Instance = 0;
 
 TSSettings::TSSettings(){}
+TSSettings::~TSSettings(){}
 
 //! Find out which Sound Pack the user is currently using
 /*!

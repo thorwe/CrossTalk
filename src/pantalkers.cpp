@@ -19,7 +19,6 @@ PanTalkers::PanTalkers(QObject *parent) :
     this->setParent(parent);
     this->setObjectName("Position Spread");
     m_isPrintEnabled = true;
-    ts = TSFunctions::instance();
     talkers = Talkers::instance();
     TalkersPanners = new QMap<uint64,QMap<anyID,SimplePanner*>* >;
     TalkerSequences = new QMap<TALKERS_REGION,QList< QPair<uint64,anyID> >* >;
@@ -149,7 +148,7 @@ void PanTalkers::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerI
             }
             if ((leftChannelNr == -1) || (rightChannelNr == -1))
             {
-                Log("Could not find Front Speakers.", LogLevel_ERROR,serverConnectionHandlerID);
+                Log("Could not find Front Speakers.",serverConnectionHandlerID, LogLevel_ERROR);
                 return;
             }
 
@@ -246,14 +245,14 @@ void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int statu
     {
         if (!TalkersPanners->contains(serverConnectionHandlerID))
         {
-            ts->Error(serverConnectionHandlerID,NULL,"(SPS) Trying to remove talker from an invalid server connection handler id.");
+            Error("(onTalkStatusChanged) Trying to remove talker from an invalid server connection handler id.",serverConnectionHandlerID,NULL);
             return;
         }
 
         QMap<anyID,SimplePanner*>* sPanners = TalkersPanners->value(serverConnectionHandlerID);
         if (!(sPanners->contains(clientID)))
         {
-            ts->Error(serverConnectionHandlerID,NULL,"(SPS) Trying to remove talker with an invalid client id.");
+            Error("(onTalkStatusChanged) Trying to remove talker with an invalid client id.",serverConnectionHandlerID,NULL);
             return;
         }
         SimplePanner* panner = sPanners->value(clientID);
@@ -283,7 +282,7 @@ void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int statu
             }
             if(!(seq->contains(seqPair)))
             {
-                ts->Error(serverConnectionHandlerID,NULL,"SPS: Could not find talker to remove.");
+                Error("(onTalkStatusChanged) Could not find talker to remove.",serverConnectionHandlerID,NULL);
                 return;
             }
         }
@@ -306,12 +305,25 @@ void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int statu
 //    Print(QString("TalkerSequence region size: %1").arg(seq->size()));
 }
 
-void PanTalkers::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
+/*!
+ * \brief PanTalkers::ParseCommand
+ * \param serverConnectionHandlerID
+ * \param cmd
+ * \param args
+ * \return Return 0 if plugin handled the command, 1 if not handled.
+ */
+int PanTalkers::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
 {
+    Q_UNUSED(serverConnectionHandlerID);
+
     if ((cmd.compare("SPS",Qt::CaseInsensitive)) != 0)
-        return;
+        return 1;
 
     cmd = args.at(0);
     if (cmd.compare("SET_BLOCKED",Qt::CaseInsensitive) == 0)
+    {
         setBlocked((args.at(1).compare("true",Qt::CaseInsensitive) == 0));
+        return 0;
+    }
+    return 1;
 }

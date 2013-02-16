@@ -11,11 +11,10 @@
 #else
 #define PLUGINS_EXPORTDLL __attribute__ ((visibility("default")))
 #endif
-
+#include <QMutex>
 extern struct TS3Functions ts3Functions;
-
+extern QMutex command_mutex;
 /* Plugin global values */
-#define PLUGIN_NAME "CrossTalk"
 #define CONSOLE_OUTPUT true
 
 extern char* pluginID;

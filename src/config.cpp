@@ -6,7 +6,8 @@
 #include <QDesktopServices>
 
 #include "MMtoDB.h"
-//#include "plugin.h"
+#include "ts_logging_qt.h"
+#include "ts_helpers_qt.h"
 
 const QUrl PLEDGIE_IMAGE("http://pledgie.com/campaigns/18898.png");
 const QUrl PLEDGIE_CAMPAIGN("http://www.pledgie.com/campaigns/18898");
@@ -78,7 +79,7 @@ void Config::SetupUi()
     setupUi(this);
     //pushButton_SNT->installEventFilter(this);
 
-    QSettings cfg(ts->GetFullConfigPath(), QSettings::IniFormat);
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.beginGroup("ducker_global");
     groupBox_Duck_G->setChecked(cfg.value("enabled",true).toBool());
     cfg.endGroup();
@@ -123,7 +124,7 @@ void Config::SetupUi()
     QNetworkRequest request(PLEDGIE_IMAGE);
     m_netwManager->get(request);
 
-    QString lang = ts->GetLanguage();
+    QString lang = TSHelpers::GetLanguage();
     if (lang != "de_DE") // outside of germany, use larger banner and hide jianji banner
     {
         banner_jianji->setVisible(false);
@@ -133,11 +134,7 @@ void Config::SetupUi()
     }
 
     if ((ts->translator != NULL) && !(ts->translator->isEmpty()))
-    {
-//        ts->Print("Localizing...");
         Translate(this);
-//        ts->Print("Localization done...");
-    }
 
     label_SPS_Home->setText(qApp->translate("HotkeyDialog","Current Server"));
     label_SPS_Whisper->setText(qApp->translate("WhisperSetup","Whisper"));
@@ -181,7 +178,7 @@ void Config::SetupUi()
  */
 void Config::accept()
 {
-    QSettings cfg(ts->GetFullConfigPath(), QSettings::IniFormat);
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.beginGroup("ducker_global");
     cfg.setValue("enabled",groupBox_Duck_G->isChecked());
     cfg.setValue("value",static_cast< float >(doubleSpinBox_Duck_G->value()));
@@ -204,7 +201,7 @@ void Config::accept()
  */
 void Config::reject()
 {
-    QSettings cfg(ts->GetFullConfigPath(), QSettings::IniFormat);
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.beginGroup("ducker_global");
     emit SetGlobalDuckerEnabled(cfg.value("enabled",true).toBool());
     emit SetGlobalDuckerValue(cfg.value("value",-23.0f).toFloat());
@@ -331,14 +328,14 @@ void Config::onSPSValueChanged(double val)
 void Config::onNetwManagerFinished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError) {
-        ts->Log(reply->errorString(),LogLevel_WARNING);
+        TSLogging::Log(reply->errorString(),LogLevel_WARNING);
         return;
     }
 
     QByteArray jpegData = reply->readAll();
     QPixmap pixmap;
     if (!(pixmap.loadFromData(jpegData)))
-        ts->Log("Error loading pledgie image.",LogLevel_WARNING);
+        TSLogging::Log("Error loading pledgie image.",LogLevel_WARNING);
     else if ((reply->url()) == PLEDGIE_IMAGE)
         banner_pledgie->setPixmap(pixmap);
 

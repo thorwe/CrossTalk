@@ -6,14 +6,34 @@
 #define TS_SETTINGS_QT_H
 
 #include <QtSql>
+#include <QMutex>
 
 class TSSettings
 {
 
 public:
 
-    TSSettings();
-    
+    static TSSettings* instance() {
+        static QMutex mutex;
+        if(!m_Instance) {
+            mutex.lock();
+
+            if(!m_Instance)
+                m_Instance = new TSSettings;
+
+            mutex.unlock();
+        }
+        return m_Instance;
+    }
+
+    static void drop() {
+        static QMutex mutex;
+        mutex.lock();
+        delete m_Instance;
+        m_Instance = 0;
+        mutex.unlock();
+    }
+
     bool GetSoundPack(QString& result);
     bool GetIconPack(QString& result);
     bool GetDefaultCaptureProfile(QString& result);
@@ -29,6 +49,13 @@ public:
     QSqlError GetLastError();
 
 private:
+    //singleton
+    explicit TSSettings();
+    ~TSSettings();
+    static TSSettings* m_Instance;
+    TSSettings(const TSSettings &);
+    TSSettings& operator=(const TSSettings &);
+
     QMap<QString,QString> GetMapFromValue(QString value);
     bool GetValueFromQuery(QString query, QString &result, bool isEmptyValid);
     bool GetValuesFromQuery(QString query, QStringList &result);

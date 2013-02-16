@@ -3,6 +3,7 @@
 #include "plugin.h"
 
 #include <QSettings>
+#include "ts_helpers_qt.h"
 
 //Ducker_Global* Ducker_Global::m_Instance = 0;
 
@@ -44,12 +45,12 @@ void Ducker_Global::AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID
         uint64 my_channelID;
         unsigned int error;
         if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&my_channelID)) != ERROR_ok)
-            ts->Error(serverConnectionHandlerID,error,"(Ducker_Global::AddMusicBot) Error getting Client Channel Id:");
+            Error("(AddMusicBot) Error getting Client Channel Id",serverConnectionHandlerID,error);
         else
         {
             uint64 channelID;
             if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,clientID,&channelID)) != ERROR_ok)
-                ts->Error(serverConnectionHandlerID,error,"(Ducker_Global::AddMusicBot) Error getting Client Channel Id:");
+                Error("(AddMusicBot) Error getting Client Channel Id",serverConnectionHandlerID,error);
             else
             {
                 if (channelID!=my_channelID)
@@ -74,7 +75,7 @@ void Ducker_Global::AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID
 void Ducker_Global::RemoveMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
 {
     QString uid;
-    if (ts->GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
+    if (TSHelpers::GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
         return;
 
     DuckTargets->remove(uid);
@@ -89,7 +90,7 @@ void Ducker_Global::RemoveMusicBot(uint64 serverConnectionHandlerID, anyID clien
 void Ducker_Global::ToggleMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
 {
     QString uid;
-    if (ts->GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
+    if (TSHelpers::GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
         return;
 
     if (DuckTargets->contains(uid))
@@ -103,7 +104,7 @@ void Ducker_Global::ToggleMusicBot(uint64 serverConnectionHandlerID, anyID clien
         unsigned int error;
         if((error = ts3Functions.getClientDisplayName(serverConnectionHandlerID, clientID, name, 512)) != ERROR_ok)
         {
-            ts->Error(serverConnectionHandlerID,error, "Error getting client display name");
+            Error("(ToggleMusicBot) Error getting client display name",serverConnectionHandlerID,error);
             return;
         }
         DuckTargets->insert(uid,name);
@@ -115,15 +116,17 @@ void Ducker_Global::ToggleMusicBot(uint64 serverConnectionHandlerID, anyID clien
 bool Ducker_Global::isClientMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
 {
     QString uid;
-    if (ts->GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
+    if (TSHelpers::GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
         return false;
 
-//    ts->Print(uid);
+//    Print(uid);
     return (DuckTargets->contains(uid));
 }
 
 void Ducker_Global::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility)
 {
+    Q_UNUSED(visibility);
+
     // Get My Id on this handler
     anyID myID;
     if(ts->GetClientId(serverConnectionHandlerID,&myID) != ERROR_ok)
@@ -136,18 +139,22 @@ void Ducker_Global::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID cl
 
         vols->RemoveVolumes(serverConnectionHandlerID);
 
+        unsigned int error;
         // Get Channel Client List
         anyID* clients;
-        ts->GetChannelClientList(serverConnectionHandlerID,newChannelID,&clients);
-
-        // for every GDT client insert volume
-        for(int i=0; clients[i]; i++)
+        if((error = ts3Functions.getChannelClientList(serverConnectionHandlerID, newChannelID, &clients)) != ERROR_ok)
+            Error("(onClientMoveEvent): Error getting Channel Client List", serverConnectionHandlerID, error);
+        else
         {
-            if (clients[i] == myID)
-                continue;
+            // for every GDT client insert volume
+            for(int i=0; clients[i]; i++)
+            {
+                if (clients[i] == myID)
+                    continue;
 
-            if (isClientMusicBot(serverConnectionHandlerID,clients[i]))
-                AddMusicBotVolume(serverConnectionHandlerID,clients[i]);
+                if (isClientMusicBot(serverConnectionHandlerID,clients[i]))
+                    AddMusicBotVolume(serverConnectionHandlerID,clients[i]);
+            }
         }
     }
     else                                    // Someone else has...
@@ -156,7 +163,7 @@ void Ducker_Global::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID cl
         uint64 channelID;
         unsigned int error;
         if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&channelID)) != ERROR_ok)
-            ts->Error(serverConnectionHandlerID,error,"(Ducker_Global::onClientMoveEvent) Error getting Client Channel Id:");
+            Error("(onClientMoveEvent) Error getting Client Channel Id",serverConnectionHandlerID,error);
         else
         {
             if (channelID == oldChannelID)      // left
@@ -194,6 +201,7 @@ bool Ducker_Global::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerI
     if (!ConnectionHandlerVolumes->contains(clientID))
         return false;
 
+    sampleCount = sampleCount * channels;
     SimpleVolume* vol = ConnectionHandlerVolumes->value(clientID);
     vol->process(samples,sampleCount);
     return true;
@@ -227,7 +235,7 @@ void Ducker_Global::onRunningStateChanged(bool value)
                     uint64 channelID;
                     unsigned int error;
                     if((error=ts3Functions.getChannelOfClient(*server,myID,&channelID)) != ERROR_ok)
-                        ts->Error(*server,error,"Ducker_Global::onRunningStateChanged: Could not get channel of client.");
+                        Error("(onRunningStateChanged) Could not get channel of client.",*server,error);
                     else
                         onClientMoveEvent(*server, myID, 0, channelID, RETAIN_VISIBILITY);
                 }
@@ -282,7 +290,7 @@ void Ducker_Global::setValue(float newValue)
 
 void Ducker_Global::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID)
 {
-    //    ts->Print(QString("(onTalkStatusChangeEvent): serverConnectionHandlerID: %1").arg(serverConnectionHandlerID));
+    //Print("(onTalkStatusChangeEvent)", serverConnectionHandlerID, LogLevel_INFO) ;
 
     if (DuckTargets->isEmpty())
         return;
@@ -355,7 +363,7 @@ SimpleVolume* Ducker_Global::AddMusicBotVolume(uint64 serverConnectionHandlerID,
 
 void Ducker_Global::SaveDuckTargets()
 {
-    QSettings cfg(ts->GetFullConfigPath(), QSettings::IniFormat);
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.beginGroup("ducker_global");
     int oldSize = cfg.beginReadArray("targets");
     cfg.endArray();

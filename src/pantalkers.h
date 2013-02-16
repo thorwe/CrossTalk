@@ -30,6 +30,8 @@ public:
     void setHomeId(uint64 serverConnectionHandlerID);
     uint64 homeId() {return m_homeId;}
 
+    int ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
+
 signals:
     void spreadWidthSet(float);
     void expertModeEnabledSet(bool);
@@ -46,12 +48,9 @@ public slots:
     void setRegionWhisper(int talkersRegion);
     void setRegionOther(int talkersRegion);
 
-    void ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
-
 private:
     float m_spreadWidth;
 
-    TSFunctions *ts;
     Talkers* talkers;
 
 //    QMap<TALKERS_REGION,QList< QPair<uint64,anyID>* >* >* TalkerSequences;

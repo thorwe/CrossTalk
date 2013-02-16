@@ -30,7 +30,11 @@ HEADERS += \
     src/simplepanner.h \
     src/ducker_global.h \
     src/module.h \
-    src/volumes.h
+    src/volumes.h \
+    src/muter_channel.h \
+    src/ts_logging_qt.h \
+    src/ts_helpers_qt.h \
+    src/ts_ptt_qt.h
 
 SOURCES += \
     src/banner.cpp \
@@ -46,7 +50,11 @@ SOURCES += \
     src/simplepanner.cpp \
     src/ducker_global.cpp \
     src/module.cpp \
-    src/volumes.cpp
+    src/volumes.cpp \
+    src/muter_channel.cpp \
+    src/ts_logging_qt.cpp \
+    src/ts_helpers_qt.cpp \
+    src/ts_ptt_qt.cpp
 
 FORMS += \
     src/config.ui

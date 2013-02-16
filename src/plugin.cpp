@@ -21,6 +21,8 @@
 #include "ts3_functions.h"
 #include "plugin.h"
 
+#include "ts_logging_qt.h"
+#include "ts_helpers_qt.h"
 #include "tsfunctions.h"
 #include "talkers.h"
 #include "config.h"
@@ -28,6 +30,7 @@
 #include "snt.h"
 #include "pantalkers.h"
 #include "ducker_global.h"
+#include "muter_channel.h"
 
 struct TS3Functions ts3Functions;
 
@@ -51,13 +54,14 @@ Talkers* talkers = Talkers::instance();
 #define RETURNCODE_BUFSIZE 128
 #define REQUESTCLIENTMOVERETURNCODES_SLOTS 5
 
-//#define PLUGIN_THREAD_TIMEOUT 1000
+#define PLUGIN_THREAD_TIMEOUT 1000
 
 #define TIMER_MSEC 10000
 
 /* Array for request client move return codes. See comments within ts3plugin_processCommand for details */
 static char requestClientMoveReturnCodes[REQUESTCLIENTMOVERETURNCODES_SLOTS][RETURNCODE_BUFSIZE];
 
+QMutex command_mutex;
 // Plugin values
 char* pluginID = NULL;
 
@@ -65,6 +69,7 @@ SnT snt;
 PanTalkers panTalkers;
 Ducker_Global ducker_G;
 CT_VolumeSuppression ducker_C;// = new CT_VolumeSuppression(NULL,&ducker_G);
+ChannelMuter channel_Muter;
 
 /*********************************** Required functions ************************************/
 /*
@@ -73,7 +78,7 @@ CT_VolumeSuppression ducker_C;// = new CT_VolumeSuppression(NULL,&ducker_G);
 
 /* Unique name identifying this plugin */
 const char* ts3plugin_name() {
-    return PLUGIN_NAME;
+    return "CrossTalk";
 }
 
 /* Plugin version */
@@ -106,7 +111,7 @@ void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
  * If the function returns 1 on failure, the plugin will be unloaded again.
  */
 int ts3plugin_init() {
-    ts3Functions.logMessage("CrossTalk:init",LogLevel_INFO,PLUGIN_NAME, 0);
+    ts3Functions.logMessage("CrossTalk:init",LogLevel_INFO,ts3plugin_name(), 0);
 
     if (CONSOLE_OUTPUT)
         freopen("CONOUT$", "wb", stdout);   //Makes printf work in Release mode (shouldn't been necessary, but is...)
@@ -114,16 +119,18 @@ int ts3plugin_init() {
 	/* Initialize return codes array for requestClientMove */
 	memset(requestClientMoveReturnCodes, 0, REQUESTCLIENTMOVERETURNCODES_SLOTS * RETURNCODE_BUFSIZE);
 
-    ts->Init();
+//    ptt->Init();
+//    snt.connect(ptt,SIGNAL(PttDelayFinished()),&snt,SLOT(PttDelayFinished()),Qt::UniqueConnection);
     ts->InitLocalization();
-    ts->connect(ts,SIGNAL(Command(uint64,QString,QStringList)),&snt,SLOT(ParseCommand(uint64,QString,QStringList)));
-    ts->connect(ts,SIGNAL(PttDelayFinished()),&snt,SLOT(PttDelayFinished()));
-    ts->connect(ts,SIGNAL(Command(uint64,QString,QStringList)), &panTalkers, SLOT(ParseCommand(uint64,QString,QStringList)));
+//    ts->connect(ts,SIGNAL(Command(uint64,QString,QStringList)),&snt,SLOT(ParseCommand(uint64,QString,QStringList)));
+//    ts->connect(ts,SIGNAL(Command(uint64,QString,QStringList)), &panTalkers, SLOT(ParseCommand(uint64,QString,QStringList)));
+
+    channel_Muter.setEnabled(true);
 
 //    ducker_C.setParent(qobject_cast<Ducker_Global *>(&ducker_G));
     ducker_C.ducker_G = &ducker_G;
 
-    QSettings cfg(ts->GetFullConfigPath(), QSettings::IniFormat);
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     ducker_C.setEnabled(cfg.value("ducking_enabled",true).toBool());
     ducker_C.setValue(cfg.value("ducking_value",-23.0f).toFloat());
     ducker_C.setDuckingReverse(cfg.value("ducking_reverse",false).toBool());
@@ -169,7 +176,7 @@ int ts3plugin_init() {
                     {
                         // Get our channel and publish it as default channel
                         anyID myID;
-                        if(ts->GetClientId(*server,&myID) == ERROR_ok)
+                        if(ts3Functions.getClientID(*server,&myID) == ERROR_ok)
                         {
                             if(ts3Functions.getChannelOfClient(*server,myID,&channelID) == ERROR_ok)
                             {
@@ -203,7 +210,7 @@ int ts3plugin_init() {
                     ts3plugin_currentServerConnectionChanged(*server);
                     unsigned int error;
                     if ((error = talkers->RefreshTalkers(*server)) != ERROR_ok)
-                        ts->Error(*server,error,"Error refreshing talkers: ");
+                        TSLogging::Error("Error refreshing talkers: ",*server,error);
                 }
             }
         }
@@ -215,7 +222,7 @@ int ts3plugin_init() {
             ts3plugin_currentServerConnectionChanged(scHandlerID);
     }
 
-    ts3Functions.logMessage("CrossTalk:init done",LogLevel_INFO,PLUGIN_NAME, 0);
+    ts3Functions.logMessage("CrossTalk:init done",LogLevel_INFO,ts3plugin_name(), 0);
     return 0;  /* 0 = success, 1 = failure */
 }
 
@@ -292,12 +299,31 @@ const char* ts3plugin_commandKeyword() {
 
 /* Plugin processes console command. Return 0 if plugin handled the command, 1 if not handled. */
 int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* command) {
-    int ret = 0;
-    if(!strcmp(command, "TS3_TEST_DUCKER"))
-        ducker_C.setActive(!ducker_C.isActive());
-    else
-        ret = ts->ParseCommand(serverConnectionHandlerID,command);
+    if (!(command_mutex.tryLock(PLUGIN_THREAD_TIMEOUT)))
+    {
+        TSLogging::Log("Timeout while waiting for mutex",serverConnectionHandlerID,LogLevel_WARNING);
+        return 1;
+    }
 
+    int ret = 0;
+
+    QString cmd_qs;
+    cmd_qs = command;
+    QStringList args_qs = cmd_qs.split(" ",QString::SkipEmptyParts);
+    if (args_qs.isEmpty())  // this might evolve to some help output
+        return 1;
+
+    cmd_qs = args_qs.takeFirst();
+
+    // Dispatch
+    ret = panTalkers.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
+    if (ret != 0)
+    {
+        snt.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
+        ret = 1;    // ToDo: Suffer through snt.ParseCommand to return an int
+    }
+
+    command_mutex.unlock();
     return ret;
 }
 
@@ -308,7 +334,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
 
 /* Static title shown in the left column in the info frame */
 const char* ts3plugin_infoTitle() {
-    return PLUGIN_NAME;
+    return ts3plugin_name();
 }
 
 /*
@@ -322,10 +348,27 @@ static uint64 m_InfoId = 0;
 void ts3plugin_infoData(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, char** data) {
     m_InfoType = type; // Save type when user manually changes the selected Item
     m_InfoId = id; // Save currently selected Item
-    if ((type == PLUGIN_CLIENT) && ducker_G.isClientMusicBot(serverConnectionHandlerID,(anyID)id))
+    if (type == PLUGIN_CLIENT)
+    {
+        QString outstr = "";
+        if (ducker_G.isClientMusicBot(serverConnectionHandlerID,(anyID)id))
+            outstr.append("Global Ducking Target (MusicBot)\n");
+
+        if (channel_Muter.isClientWhitelisted(serverConnectionHandlerID,(anyID)id))
+            outstr.append("ChannelMuter whitelisted [temp]\n");
+
+        if (outstr != "")
+        {
+            *data = (char*)malloc(INFODATA_BUFSIZE * sizeof(char));
+            _strcpy(*data, INFODATA_BUFSIZE, outstr.toLocal8Bit().data());
+        }
+        else
+            data = NULL;
+    }
+    else if ((type == PLUGIN_CHANNEL) && channel_Muter.isChannelMuted(serverConnectionHandlerID,id))
     {
         *data = (char*)malloc(INFODATA_BUFSIZE * sizeof(char));
-        _strcpy(*data, INFODATA_BUFSIZE, QString("Global Ducking Target.\n").toLocal8Bit().data());
+        _strcpy(*data, INFODATA_BUFSIZE, QString("Channel Muted [temp]\n").toLocal8Bit().data());
     }
     else
         data = NULL;
@@ -366,9 +409,9 @@ static struct PluginMenuItem* createMenuItem(enum PluginMenuType type, int id, c
  * These IDs are freely choosable by the plugin author. It's not really needed to use an enum, it just looks prettier.
  */
 enum {
-    MENU_ID_CLIENT_1 = 1
-//  MENU_ID_CLIENT_2
-//	MENU_ID_CHANNEL_1,
+    MENU_ID_CLIENT_1 = 1,
+    MENU_ID_CLIENT_2,
+    MENU_ID_CHANNEL_1
 //	MENU_ID_CHANNEL_2,
 //	MENU_ID_CHANNEL_3,
 //  MENU_ID_GLOBAL_1,
@@ -399,10 +442,10 @@ void ts3plugin_initMenus(struct PluginMenuItem*** menuItems, char** menuIcon) {
      * e.g. for "test_plugin.dll", icon "1.png" is loaded from <TeamSpeak 3 Client install dir>\plugins\test_plugin\1.png
      */
 
-    BEGIN_CREATE_MENUS(1);  /* IMPORTANT: Number of menu items must be correct! */
+    BEGIN_CREATE_MENUS(3);  /* IMPORTANT: Number of menu items must be correct! */
     CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_1,  ts->tr("Toggle Global Ducking Target").toLocal8Bit().constData(),  "");
-//  CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_2,  "Client item 2",  "");
-//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_1, "Toggle channel mute", "");
+    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_2,  "Toggle ChannelMuter Whitelisting [temp]",  "");
+    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_1, "Toggle channel mute [temp]", "");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_2, "Channel item 2", "2.png");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_3, "Channel item 3", "3.png");
 //  CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_1,  "Global item 1",  "1.png");
@@ -471,13 +514,13 @@ void ts3plugin_onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int 
 
         // Get My Id on this handler
         anyID myID;
-        if(ts->GetClientId(serverConnectionHandlerID,&myID) == ERROR_ok)
+        if(ts3Functions.getClientID(serverConnectionHandlerID,&myID) == ERROR_ok)
         {
             // Get My channel on this handler
             uint64 channelID;
             unsigned int error;
             if((error=ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&channelID)) != ERROR_ok)
-                ts->Error(serverConnectionHandlerID,error,"ts3plugin_onConnectStatusChangeEvent: Could not get channel of client.");
+                TSLogging::Error("ts3plugin_onConnectStatusChangeEvent: Could not get channel of client.",serverConnectionHandlerID,error);
             else
                 ts3plugin_onClientMoveEvent(serverConnectionHandlerID, myID, 0, channelID, RETAIN_VISIBILITY, "");
         }
@@ -490,18 +533,21 @@ void ts3plugin_onNewChannelEvent(uint64 serverConnectionHandlerID, uint64 channe
 
 void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage)
 {
+    channel_Muter.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
 }
 
 void ts3plugin_onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* timeoutMessage)
 {
+    channel_Muter.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
 }
 
 void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID moverID, const char* moverName, const char* moverUniqueIdentifier, const char* moveMessage)
 {
+    channel_Muter.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility);
 }
@@ -513,6 +559,9 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 
 void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels)
 {
+    if (channel_Muter.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels))
+        return;
+
     if (!ducker_G.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels))
         ducker_C.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels);
 }
@@ -526,18 +575,11 @@ void ts3plugin_onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID,
 void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char* oldValue, const char* newValue)
 {
      snt.onClientSelfVariableUpdateEvent(serverConnectionHandlerID,flag,oldValue,newValue);
-//	if ((flag == CLIENT_INPUT_HARDWARE) && (strcmp (newValue,"1") == 0))
-//	{
-//		if (wo_shallActivatePtt==true)
-//		{
-//            ts->SetPushToTalk(serverConnectionHandlerID, PTT_ACTIVATE);
-//			wo_shallActivatePtt=false;
-//		}
-//        //seems to be equal to a ts3plugin_currentServerConnectionChanged when initiated by the user
-//        //except that this version will fire when returning from a cross server ptt event
-//        // (ts3plugin_currentServerConnectionChanged is not even fired when ptt-switching for whatever reason)
-//        // Furtunately, we like that here.
-//	}
+
+    // seems to be equal to a ts3plugin_currentServerConnectionChanged when initiated by the user
+    // except that this version will fire when returning from a cross server ptt event
+    // (ts3plugin_currentServerConnectionChanged is not even fired when ptt-switching for whatever reason)
+    // Furtunately, we can make use of that difference.
 }
 
 /* Client changed current server connection handler */
@@ -574,31 +616,33 @@ void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenu
 //					break;
 //			}
 //			break;
-//		case PLUGIN_MENU_TYPE_CHANNEL:
-//			/* Channel contextmenu item was triggered. selectedItemID is the channelID of the selected channel */
-//			switch(menuItemID) {
-//				case MENU_ID_CHANNEL_1:
-//					/* Menu channel 1 was triggered */
-//					break;
+        case PLUGIN_MENU_TYPE_CHANNEL:
+            /* Channel contextmenu item was triggered. selectedItemID is the channelID of the selected channel */
+            switch(menuItemID) {
+                case MENU_ID_CHANNEL_1:
+                    /* Menu channel 1 was triggered */
+                    channel_Muter.toggleChannelMute(serverConnectionHandlerID,selectedItemID);
+                    break;
 //				case MENU_ID_CHANNEL_2:
 //					/* Menu channel 2 was triggered */
 //					break;
 //				case MENU_ID_CHANNEL_3:
 //					/* Menu channel 3 was triggered */
 //					break;
-//				default:
-//					break;
-//			}
-//			break;
+                default:
+                    break;
+            }
+            break;
         case PLUGIN_MENU_TYPE_CLIENT:
             /* Client contextmenu item was triggered. selectedItemID is the clientID of the selected client */
             switch(menuItemID) {
                 case MENU_ID_CLIENT_1:
                     ducker_G.ToggleMusicBot(serverConnectionHandlerID,(anyID)selectedItemID);
                     break;
-//				case MENU_ID_CLIENT_2:
-//					/* Menu client 2 was triggered */
-//					break;
+                case MENU_ID_CLIENT_2:
+                    /* Menu client 2 was triggered */
+                    channel_Muter.toggleClientWhitelisted(serverConnectionHandlerID,(anyID)selectedItemID);
+                    break;
                 default:
                     break;
             }
@@ -612,6 +656,5 @@ void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenu
 /* This function is called if a plugin hotkey was pressed. Omit if hotkeys are unused. */
 void ts3plugin_onHotkeyEvent(const char* keyword) {
     /* Identify the hotkey by keyword ("keyword_1", "keyword_2" or "keyword_3" in this example) and handle here... */
-    //ts->ParseCommand((char*)keyword,(char)NULL);
-    ts->ParseCommand((uint64)NULL,keyword);
+    ts3plugin_processCommand((uint64)NULL,keyword);
 }

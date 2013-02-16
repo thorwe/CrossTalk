@@ -6,11 +6,11 @@
 #include "public_rare_definitions.h"
 #include "ts3_functions.h"
 #include "plugin.h"
+#include "ts_logging_qt.h"
 
 Volumes::Volumes(QObject *parent) :
     QObject(parent)
 {
-    ts = TSFunctions::instance();
     VolumesMap = new QMap<uint64, QMap<anyID,SimpleVolume*>* >;
 }
 
@@ -26,7 +26,7 @@ SimpleVolume* Volumes::AddVolume(uint64 serverConnectionHandlerID,anyID clientID
     unsigned int error;
     if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_TYPE, &type)) != ERROR_ok)
     {
-        ts->Error(serverConnectionHandlerID,error, "(AddVolume) Error checking if client is real.");
+        TSLogging::Error("(Volumes::AddVolume) Error checking if client is real.",serverConnectionHandlerID,error);
         return (SimpleVolume*)NULL;
     }
     if (type != 0)
@@ -112,7 +112,7 @@ void Volumes::RemoveVolumes(uint64 serverConnectionHandlerID)
         DeleteVolume(dspObj);
     }
     VolumesMap->remove(serverConnectionHandlerID);
-    //ts->Log(QString("Volumes: Server Volumes cleared: %1").arg(serverConnectionHandlerID));
+    //TSLogging::Log("Volumes: Server Volumes cleared",serverConnectionHandlerID,LogLevel_INFO);
 }
 
 //! Remove all Volume objects from all servers Volumes map

@@ -140,7 +140,7 @@ void Talkers::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int n
                 onTalkStatusChangeEvent(serverConnectionHandlerID, STATUS_NOT_TALKING, isWhisper, i.key());
             }
 //            if (map->isEmpty())
-//                ts->Print("Manually send talker false successfull.\n");
+//                TSLogging::Print("Manually send talker false successfull.");
 
             TalkersMap->remove(serverConnectionHandlerID);
         }

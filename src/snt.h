@@ -2,7 +2,7 @@
 #define SNT_H
 
 #include <QObject>
-#include "tsfunctions.h"
+#include "ts_ptt_qt.h"
 
 class SnT : public QObject
 {
@@ -10,17 +10,18 @@ class SnT : public QObject
 
 public:
     explicit SnT(QObject *parent = 0);
-    
+    void ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
     void onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char* oldValue, const char* newValue);
 
 signals:
     
 public slots:
-    void ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
+
     void PttDelayFinished();
 
 private:
-    TSFunctions *ts;
+
+    TSPtt *ptt;
 
     bool m_shallActivatePtt;
 
