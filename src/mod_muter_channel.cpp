@@ -1,4 +1,4 @@
-#include "muter_channel.h"
+#include "mod_muter_channel.h"
 
 #include "public_errors.h"
 #include "public_errors_rare.h"
@@ -7,16 +7,14 @@
 #include "ts3_functions.h"
 
 #include "plugin.h"
-#include "tsfunctions.h"
 
 #include "ts_helpers_qt.h"
 
 ChannelMuter::ChannelMuter(QObject *parent)
 {
-    m_isPrintEnabled = false;
+    m_isPrintEnabled = true;
     this->setParent(parent);
     this->setObjectName("ChannelMuter");
-    ts = TSFunctions::instance();
     talkers = Talkers::instance();
     vols = new Volumes(this);
     MutedChannels = new QSet<QPair<uint64,uint64> >;
@@ -30,8 +28,7 @@ void ChannelMuter::onRunningStateChanged(bool value)
     if (!value)  // this module is always active, used solely as init function
         return;
 
-    connect(talkers,SIGNAL(TalkStatusChanged(uint64,int,bool,anyID)),this,SLOT(onTalkStatusChanged(uint64,int,bool,anyID)));
-    connect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)));
+    connect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
 
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }
@@ -82,7 +79,7 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
                         if ((error = TSHelpers::GetTalkStatus(serverConnectionHandlerID,clients[i],talkStatus,isReceivedWhisper)) != ERROR_ok)
                             Error("(toggleChannelMute) Error receiving client talk status",serverConnectionHandlerID,error);
                         else
-                            onTalkStatusChanged(serverConnectionHandlerID, talkStatus, (isReceivedWhisper == 1), clients[i]);
+                            onTalkStatusChanged(serverConnectionHandlerID, talkStatus, (isReceivedWhisper == 1), clients[i], clients[i]==myID);
                     }
                 }
             }
@@ -126,7 +123,7 @@ bool ChannelMuter::toggleClientWhitelisted(uint64 serverConnectionHandlerID, any
     if ((error = TSHelpers::GetTalkStatus(serverConnectionHandlerID,clientID,talkStatus,isReceivedWhisper)) != ERROR_ok)
         Error("(toggleClientWhitelisted) Error receiving client talk status",serverConnectionHandlerID,error);
     else
-        onTalkStatusChanged(serverConnectionHandlerID, talkStatus, (isReceivedWhisper == 1), clientID);
+        onTalkStatusChanged(serverConnectionHandlerID, talkStatus, (isReceivedWhisper == 1), clientID,false);
 
     return (ClientWhiteList->contains(newPair));
 }
@@ -155,23 +152,15 @@ bool ChannelMuter::isClientWhitelisted(uint64 serverConnectionHandlerID, anyID c
  * \param newChannelID the...new channel!
  * \param visibility unused here
  */
-void ChannelMuter::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility)
+void ChannelMuter::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID)
 {
     Q_UNUSED(visibility);
 
-    // Get My Id on this handler
-    anyID myID;
-    if(ts->GetClientId(serverConnectionHandlerID,&myID) != ERROR_ok)
-        return;
-
+    unsigned int error;
     if (clientID == myID)                   // I have switched channels
     {
-        if (newChannelID == 0)
-            return;
-
         vols->RemoveVolumes(serverConnectionHandlerID);
 
-        unsigned int error;
         // Get Channel Client List
         anyID* clients;
         if((error = ts3Functions.getChannelClientList(serverConnectionHandlerID, newChannelID, &clients)) != ERROR_ok)
@@ -192,7 +181,6 @@ void ChannelMuter::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID cli
     {
         // Get My channel on this handler
         uint64 channelID;
-        unsigned int error;
         if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&channelID)) != ERROR_ok)
             Error("(onClientMoveEvent) Error getting Client Channel Id",serverConnectionHandlerID,error);
         else
@@ -200,7 +188,10 @@ void ChannelMuter::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID cli
             if (channelID == oldChannelID)      // left
                 vols->RemoveVolume(serverConnectionHandlerID,clientID);
             else if (channelID == newChannelID) // joined
+            {
                 vols->AddVolume(serverConnectionHandlerID,clientID);
+//                Print("Added Volume");
+            }
         }
     }
 }
@@ -213,19 +204,16 @@ void ChannelMuter::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID cli
  * \param isReceivedWhisper is it a whisper?
  * \param clientID the client changing its talk status
  */
-void ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID)
+bool ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe)
 {
-    //Print("(onTalkStatusChanged)", serverConnectionHandlerID, LogLevel_INFO);
+    if (!isRunning())
+        return false;
 
     if (isReceivedWhisper)
-        return;
+        return false;
 
-    anyID myID;
-    if(ts->GetClientId(serverConnectionHandlerID,&myID) != ERROR_ok)
-        return;
-
-    if (clientID == myID)
-        return;
+    if (isMe)
+        return false;
 
     if (((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING)) && (vols->VolumesMap->contains(serverConnectionHandlerID)))
     {
@@ -235,7 +223,10 @@ void ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int sta
             unsigned int error = ERROR_ok;
             uint64 channelID;
             if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,clientID,&channelID)) != ERROR_ok)
-                Error("(onTalkStatusChanged) Error getting Client Channel Id",serverConnectionHandlerID,error);
+            {
+                if (error!=ERROR_not_connected)
+                    Error("(onTalkStatusChanged) Error getting Client Channel Id",serverConnectionHandlerID,error);
+            }
             else
             {
                 SimpleVolume* vol = ChanVolumes->value(clientID);
@@ -243,9 +234,11 @@ void ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int sta
                 QPair<uint64,anyID> clientPair = qMakePair(serverConnectionHandlerID,clientID);
                 vol->setMuted((MutedChannels->contains(channelPair)) && (!(ClientWhiteList->contains(clientPair))));
                 vol->setProcessing(status==STATUS_TALKING);
+                return vol->isMuted();
             }
         }
     }
+    return false;
 }
 
 //! Routes the arguments of the event to the corresponding volume object

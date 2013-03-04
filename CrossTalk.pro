@@ -20,41 +20,47 @@ HEADERS += \
     src/banner.h \
     src/plugin.h \
     src/config.h \
-    src/ct_volumesuppression.h \
-    src/tsfunctions.h \
     src/ts_settings_qt.h \
     src/simple_volume.h \
     src/snt.h \
-    src/pantalkers.h \
     src/talkers.h \
     src/simplepanner.h \
-    src/ducker_global.h \
     src/module.h \
     src/volumes.h \
-    src/muter_channel.h \
     src/ts_logging_qt.h \
     src/ts_helpers_qt.h \
-    src/ts_ptt_qt.h
+    src/ts_ptt_qt.h \
+    src/mod_ducker_channel.h \
+    src/mod_ducker_global.h \
+    src/mod_muter_channel.h \
+    src/mod_position_spread.h \
+    src/translator.h #\
+#    src/mod_positionalaudio.h \
+#    src/universe.h #\
+#    src/ts_infodata_qt.h
 
 SOURCES += \
     src/banner.cpp \
     src/plugin.cpp \
     src/config.cpp \
-    src/ct_volumesuppression.cpp \
-    src/tsfunctions.cpp \
     src/ts_settings_qt.cpp \
     src/simple_volume.cpp \
     src/snt.cpp \
-    src/pantalkers.cpp \
     src/talkers.cpp \
     src/simplepanner.cpp \
-    src/ducker_global.cpp \
     src/module.cpp \
     src/volumes.cpp \
-    src/muter_channel.cpp \
     src/ts_logging_qt.cpp \
     src/ts_helpers_qt.cpp \
-    src/ts_ptt_qt.cpp
+    src/ts_ptt_qt.cpp \
+    src/mod_ducker_channel.cpp \
+    src/mod_ducker_global.cpp \
+    src/mod_muter_channel.cpp \
+    src/mod_position_spread.cpp \
+    src/translator.cpp \
+#    src/mod_positionalaudio.cpp \
+#    src/universe.cpp \
+#    src/ts_infodata_qt.cpp
 
 FORMS += \
     src/config.ui

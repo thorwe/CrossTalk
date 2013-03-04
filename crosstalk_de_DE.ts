@@ -86,4 +86,22 @@
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.pledgie.com/campaigns/15624&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Unterstütze die Entwicklung!&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
+<context>
+    <name>context_menu</name>
+    <message>
+        <location filename="src/plugin.cpp" line="394"/>
+        <source>Toggle Global Ducking Target</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/plugin.cpp" line="395"/>
+        <source>Toggle ChannelMuter Whitelisting [temp]</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="src/plugin.cpp" line="396"/>
+        <source>Toggle Channel Mute [temp]</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 </TS>

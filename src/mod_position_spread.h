@@ -1,5 +1,5 @@
-#ifndef PANTALKERS_H
-#define PANTALKERS_H
+#ifndef MOD_POSITION_SPREAD_H
+#define MOD_POSITION_SPREAD_H
 
 #include <QObject>
 #include "public_definitions.h"
@@ -14,15 +14,16 @@ enum TALKERS_REGION {
     TALKERS_REGION_END
 };
 
-class PanTalkers : public Module//QObject
+class PositionSpread : public Module, public TalkInterface
 {
     Q_OBJECT
+    Q_INTERFACES(TalkInterface)
     Q_PROPERTY(float spreadWidth
                READ getSpreadWidth
                WRITE setSpreadWidth
                NOTIFY spreadWidthSet)
 public:
-    explicit PanTalkers(QObject *parent = 0);
+    explicit PositionSpread(QObject *parent = 0);
 
     void onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask);
 
@@ -32,6 +33,8 @@ public:
 
     int ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
 
+    bool onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe);
+
 signals:
     void spreadWidthSet(float);
     void expertModeEnabledSet(bool);
@@ -40,8 +43,6 @@ signals:
     void regionOtherSet(TALKERS_REGION);
 
 public slots:
-    void onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID);
-
     void setSpreadWidth(float value);
     void setExpertModeEnabled(bool value);
     void setRegionHomeTab(int talkersRegion);
@@ -53,8 +54,6 @@ private:
 
     Talkers* talkers;
 
-//    QMap<TALKERS_REGION,QList< QPair<uint64,anyID>* >* >* TalkerSequences;
-//    const QPair<uint64,anyID> EmptyPair;
     QMap<TALKERS_REGION,QList< QPair<uint64,anyID> >* >* TalkerSequences;
 
 //    bool isReported;
@@ -67,8 +66,10 @@ private:
     TALKERS_REGION m_RegionWhisper;
     TALKERS_REGION m_RegionOther;
 
+    inline void CheckClearSeq(QList<QPair<uint64, anyID> > *seq);
+    void RemoveSeqPair(QPair<uint64, anyID> seqPair, QList<QPair<uint64, anyID> > *seq);
 protected:
     void onRunningStateChanged(bool value);
 };
 
-#endif // PANTALKERS_H
+#endif // MOD_POSITION_SPREAD_H

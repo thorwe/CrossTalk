@@ -16,7 +16,6 @@ namespace TSHelpers
         // Find config path for config class
         char* configPath = (char*)malloc(PATH_BUFSIZE);
         ts3Functions.getConfigPath(configPath, PATH_BUFSIZE);
-
         return configPath;
     }
 
@@ -32,16 +31,28 @@ namespace TSHelpers
     {
         QString lang = "";
         if (!TSSettings::instance()->GetLanguage(lang))
-            TSLogging::Error("(TSHelpers::GetLanguage()) " + TSSettings::instance()->GetLastError().text());
+            TSLogging::Error("(TSHelpers::GetLanguage) " + TSSettings::instance()->GetLastError().text(), true);
 
         return lang;
+    }
+
+    int IsClientQuery(uint64 serverConnectionHandlerID, anyID clientID) //A normal Client-Connection (Voice-Connection) has client-type 0, a Query-Connection has client-type 1.
+    {
+        int type = 0;
+        unsigned int error;
+        if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_TYPE, &type)) != ERROR_ok)
+            TSLogging::Error("Error checking if client is real.",serverConnectionHandlerID,error);
+
+        return type;
     }
 
     unsigned int GetClientUID(uint64 serverConnectionHandlerID, anyID clientID, QString &result)
     {
         unsigned int error;
         char* res;
-        if((error = ts3Functions.getClientVariableAsString(serverConnectionHandlerID, clientID, CLIENT_UNIQUE_IDENTIFIER, &res)) == ERROR_ok)
+        if((error = ts3Functions.getClientVariableAsString(serverConnectionHandlerID, clientID, CLIENT_UNIQUE_IDENTIFIER, &res)) != ERROR_ok)
+            TSLogging::Error("(TSHelpers::GetClientUID)",serverConnectionHandlerID,error,true);
+        else
         {
             result = QString::fromUtf8(res);
             ts3Functions.freeMemory(res);
@@ -52,32 +63,41 @@ namespace TSHelpers
     unsigned int GetTalkStatus(uint64 serverConnectionHandlerID, anyID clientID, int &status, int &isWhispering)
     {
         unsigned int error;
-        if((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_FLAG_TALKING, &status)) == ERROR_ok)
+        if((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_FLAG_TALKING, &status)) != ERROR_ok)
+            TSLogging::Error("(TSHelpers::GetTalkStatus)",serverConnectionHandlerID,error,true);
+        else
         {
             if (status == STATUS_TALKING)
-                error = ts3Functions.isWhispering(serverConnectionHandlerID, clientID, &isWhispering);
+            {
+                if((error = ts3Functions.isWhispering(serverConnectionHandlerID, clientID, &isWhispering)) != ERROR_ok)
+                    TSLogging::Error("(TSHelpers::GetTalkStatus)",serverConnectionHandlerID,error,true);
+            }
         }
         return error;
     }
 
     unsigned int GetSubChannels(uint64 serverConnectionHandlerID, uint64 channelId, QList<uint64>* result)
     {
-        unsigned int error = ERROR_ok;
+        unsigned int error;
 
         uint64* channelList;
         if ((error = ts3Functions.getChannelList(serverConnectionHandlerID,&channelList)) != ERROR_ok)
-            return error;
-
-        for (int i = 0; channelList[i]!=NULL; ++i)
+            TSLogging::Error("(TSHelpers::GetSubChannels)",serverConnectionHandlerID,error,true);
+        else
         {
-            uint64 channel;
-            if ((error = ts3Functions.getParentChannelOfChannel(serverConnectionHandlerID,channelList[i],&channel)) != ERROR_ok)
-                break;
-
-            if (channel == channelId)
-                result->append(channel);
+            for (int i = 0; channelList[i]!=NULL; ++i)
+            {
+                uint64 channel;
+                if ((error = ts3Functions.getParentChannelOfChannel(serverConnectionHandlerID,channelList[i],&channel)) != ERROR_ok)
+                {
+                    TSLogging::Error("(TSHelpers::GetSubChannels)",serverConnectionHandlerID,error,true);
+                    break;
+                }
+                if (channel == channelId)
+                    result->append(channel);
+            }
+            ts3Functions.freeMemory(channelList);
         }
-        ts3Functions.freeMemory(channelList);
         return error;
     }
 
@@ -88,25 +108,30 @@ namespace TSHelpers
 
         // Get server list
         if((error = ts3Functions.getServerConnectionHandlerList(&servers)) != ERROR_ok)
-            return error;
-
-        // Find server in the list
-        uint64* server;
-        char* s_name;
-        for(server = servers; *server != (uint64)NULL; ++server)
+            TSLogging::Error("(TSHelpers::GetServerHandler)",NULL,error,true);
+        else
         {
-            if ((error = ts3Functions.getServerVariableAsString(*server, VIRTUALSERVER_NAME, &s_name)) != ERROR_ok)
-                break;
-
-            if(name==s_name)
+            // Find server in the list
+            uint64* server;
+            char* s_name;
+            for(server = servers; *server != (uint64)NULL; ++server)
             {
+                if ((error = ts3Functions.getServerVariableAsString(*server, VIRTUALSERVER_NAME, &s_name)) != ERROR_ok)
+                {
+                    TSLogging::Error("(TSHelpers::GetServerHandler)",NULL,error,true);
+                    break;
+                }
+
+                if(name==s_name)
+                {
+                    ts3Functions.freeMemory(s_name);
+                    *result = *server;
+                    break;
+                }
                 ts3Functions.freeMemory(s_name);
-                *result = *server;
-                break;
             }
-            ts3Functions.freeMemory(s_name);
+            ts3Functions.freeMemory(servers);
         }
-        ts3Functions.freeMemory(servers);
         return error;
     }
 
@@ -119,7 +144,7 @@ namespace TSHelpers
 
         if((error = ts3Functions.getServerConnectionHandlerList(&servers)) != ERROR_ok)
         {
-            TSLogging::Error("Error retrieving list of servers:",error);
+            TSLogging::Error("(TSHelpers::GetActiveServerConnectionHandlerID) Error retrieving list of servers",error);
             return NULL;
         }
 
@@ -128,7 +153,7 @@ namespace TSHelpers
         {
             int result;
             if((error = ts3Functions.getClientSelfVariableAsInt(*server, CLIENT_INPUT_HARDWARE, &result)) != ERROR_ok)
-                TSLogging::Error("Error retrieving client variable:",*server,error);
+                TSLogging::Error("(TSHelpers::GetActiveServerConnectionHandlerID) Error retrieving client variable",*server,error);
             else if(result)
             {
                 handle = *server;
@@ -148,7 +173,10 @@ namespace TSHelpers
 
         // Get server list
         if((error = ts3Functions.getServerConnectionHandlerList(&servers)) != ERROR_ok)
+        {
+            TSLogging::Error("(TSHelpers::GetActiveServerRelative) Error retrieving list of servers",NULL,error,true);
             return error;
+        }
 
         // Find active server in the list
         for(server = servers; *server != (uint64)NULL && *server!=serverConnectionHandlerID; server++);
@@ -179,7 +207,7 @@ namespace TSHelpers
 
         if((error = ts3Functions.activateCaptureDevice(serverConnectionHandlerID)) != ERROR_ok)
         {
-            TSLogging::Error("Error activating server:",serverConnectionHandlerID,error);
+            TSLogging::Error("(TSHelpers::SetActiveServer) Error activating server",serverConnectionHandlerID,error);
             return 1;
         }
 
@@ -198,7 +226,7 @@ namespace TSHelpers
         int result;
         if((error = ts3Functions.getClientSelfVariableAsInt(server, CLIENT_INPUT_HARDWARE, &result)) != ERROR_ok)
         {
-            TSLogging::Error("Error retrieving client variable:",serverConnectionHandlerID,error);
+            TSLogging::Error("(TSHelpers::SetActiveServerRelative) Error retrieving client variable",serverConnectionHandlerID,error);
             return 1;
         }
         if(!result) SetActiveServer(server);
@@ -212,7 +240,10 @@ namespace TSHelpers
 
         anyID myID;
         if((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
+        {
+            TSLogging::Error("(TSHelpers::SetWhisperList)",serverConnectionHandlerID,error,true);
             return error;
+        }
 
         if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ALL)
         {
@@ -246,7 +277,11 @@ namespace TSHelpers
             // get my channel
             uint64 mychannel;
             if ((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&mychannel)) != ERROR_ok)
+            {
+                TSLogging::Error("(TSHelpers::SetWhisperList)",serverConnectionHandlerID,error,true);
                 return error;
+            }
+
             QList<uint64> targetChannels;
 
             if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_CURRENTCHANNEL)
@@ -322,4 +357,20 @@ namespace TSHelpers
         }
         return error;
     }
+
+    unsigned int GetDefaultProfile(PluginGuiProfile profile, QString &result)
+    {
+        unsigned int error;
+        char** profiles;
+        int defaultProfile;
+        if((error = ts3Functions.getProfileList(profile, &defaultProfile, &profiles)) != ERROR_ok)
+            TSLogging::Error("Error retrieving profiles",error);
+        else
+        {
+            result = profiles[defaultProfile];
+            ts3Functions.freeMemory(profiles);
+        }
+        return error;
+    }
+
 }

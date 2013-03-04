@@ -17,6 +17,9 @@ public:
     void RemoveVolume(uint64 serverConnectionHandlerID, anyID clientID);
     void RemoveVolumes(uint64 serverConnectionHandlerID);
     void RemoveVolumes();
+    bool ContainsVolume(uint64 serverConnectionHandlerID, anyID clientID);
+    SimpleVolume* GetVolume(uint64 serverConnectionHandlerID, anyID clientID);
+
 signals:
 
 public slots:

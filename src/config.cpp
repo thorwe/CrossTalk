@@ -21,7 +21,7 @@ const QUrl SNT_WIKI("http://github.com/thorwe/CrossTalk/wiki/Switch'n'Talk");
  */
 Config::Config()
 {
-    ts = TSFunctions::instance();
+    loca = Translator::instance();
     m_netwManager = new QNetworkAccessManager(this);
 }
 
@@ -62,7 +62,7 @@ void Config::Translate(QObject* obj)
             QString trans = test.toString();
             if (!trans.isEmpty())
             {
-                trans = ts->translator->translate("Config",trans.toLocal8Bit().constData());
+                trans = loca->translator->translate("Config",trans.toLocal8Bit().constData());
                 if (!trans.isEmpty())
                     obj->setProperty(prop.toLocal8Bit().constData(),trans.toLocal8Bit().constData());
             }
@@ -133,7 +133,7 @@ void Config::SetupUi()
         banner_logo->setPixmap(logo_int);
     }
 
-    if ((ts->translator != NULL) && !(ts->translator->isEmpty()))
+    if ((loca->translator != NULL) && !(loca->translator->isEmpty()))
         Translate(this);
 
     label_SPS_Home->setText(qApp->translate("HotkeyDialog","Current Server"));

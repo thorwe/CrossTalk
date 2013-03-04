@@ -4,7 +4,7 @@
 #include <QDialog>
 #include <QtNetwork/QtNetwork>
 #include "ui_config.h"
-#include "tsfunctions.h"
+#include "translator.h"
 #include "banner.h"
 
 class Config : public QDialog, public Ui::Config
@@ -55,7 +55,7 @@ signals:
     void SetStereoPositionSpreadExpertValueOther(int);
 
 private:
-    TSFunctions *ts;
+    Translator *loca;
     QNetworkAccessManager *m_netwManager;
     void Translate(QObject *obj);
 };

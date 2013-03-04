@@ -37,6 +37,9 @@ SimplePanner::SimplePanner(QObject *parent) :
 */
 void SimplePanner::setPanCurrent(float value)
 {
+    if (panCurrent == value)
+        return;
+
     panCurrent = value;
 }
 
@@ -56,6 +59,9 @@ float SimplePanner::getPanCurrent() const
 */
 void SimplePanner::setPanDesired(float value)
 {
+    if (panDesired == value)
+        return;
+
     panDesired = value;
 }
 
@@ -75,6 +81,9 @@ float SimplePanner::getPanDesired() const
 */
 void SimplePanner::setPanDesiredByManual(float value)
 {
+    if (panDesiredByManual == value)
+        return;
+
     panDesiredByManual = value;
     setPanDesired(value);
 }
@@ -95,6 +104,9 @@ float SimplePanner::getPanDesiredByManual() const
 */
 void SimplePanner::setPanDesiredByPanAdjuster(float value)
 {
+    if (panDesiredByPanAdjuster == value)
+        return;
+
     panDesiredByPanAdjuster = value;
     setPanDesired(value);
 }
@@ -127,11 +139,11 @@ bool SimplePanner::getPanAdjustment() const
 
 void SimplePanner::setApaAttackRate(float value)
 {
-    if (apaAttackRate != value) {
-        apaAttackRate = value;
-        emit ApaAttackRateChanged(value);
-    }
+    if (apaAttackRate == value)
+        return;
 
+    apaAttackRate = value;
+    emit ApaAttackRateChanged(value);
 }
 
 void SimplePanner::setApaDecayRate(float value)
@@ -144,8 +156,10 @@ void SimplePanner::setApaDecayRate(float value)
 
 void SimplePanner::setPanAdjustment(bool value)
 {
+    if (panAdjustment == value)
+        return;
+
     panAdjustment = value;
-    //printf("SimplePanner:setGainAdjustment: %s\n",(gainAdjustment)?"true":"false");
 }
 
 
@@ -261,7 +275,7 @@ void SimplePanner::process(short *samples, int sampleCount, int channels,int lef
     float desiredPanByPanAdjuster = getPanDesiredByPanAdjuster();
 
     if (desiredPan != desiredPanByManual) {
-        if (panAdjustment == true) {
+        if (getPanAdjustment() == true) {
             // is attacking
             float fade_step_down = (apaAttackRate / sampleRate) * sampleCount;
             float fade_step_up = (apaDecayRate / sampleRate) * sampleCount;

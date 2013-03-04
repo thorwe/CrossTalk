@@ -1,19 +1,17 @@
-#ifndef CT_VOLUMESUPPRESSION_H
-#define CT_VOLUMESUPPRESSION_H
+#ifndef MOD_DUCKER_CHANNEL_H
+#define MOD_DUCKER_CHANNEL_H
 
 #include <QObject>
 #include "public_definitions.h"
 #include "module.h"
 #include "volumes.h"
-#include "tsfunctions.h"
 #include "simple_volume.h"
 #include "talkers.h"
 
-#include "ducker_global.h"
-
-class CT_VolumeSuppression : public Module
+class Ducker_Channel : public Module, public TalkInterface
 {
     Q_OBJECT
+    Q_INTERFACES(TalkInterface)
     Q_PROPERTY(bool isActive
                READ isActive
                WRITE setActive
@@ -27,10 +25,10 @@ class CT_VolumeSuppression : public Module
                WRITE setHomeId)
 
 public:
-    explicit CT_VolumeSuppression(QObject *parent = 0);
+    explicit Ducker_Channel(QObject *parent = 0);
 
     // events forwarded from plugin.cpp
-    void onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility);
+    void onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID);
     void onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels);
 
     void setHomeId(uint64 serverConnectionHandlerID);
@@ -38,7 +36,7 @@ public:
     bool isActive() {return m_isActive;}
     void setActive(bool); // for testing command, move to private later
 
-    Ducker_Global* ducker_G; // until I figure out why the class behaves weird as singleton
+    bool onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe);
 
 private:
     bool m_isReverse;
@@ -47,11 +45,11 @@ private:
     float m_value;
     uint64 m_homeId;
 
-    TSFunctions *ts;
     Talkers* talkers;
     Volumes* vols;
 
     SimpleVolume *AddDuckerVolume(uint64 serverConnectionHandlerID, anyID clientID);
+    void UpdateActive();
 
 signals:
     void valueSet(float);
@@ -61,10 +59,8 @@ public slots:
     void setValue(float newValue);
     void setDuckingReverse(bool);
 
-    void onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID);
-
 protected:
     void onRunningStateChanged(bool value);
 };
 
-#endif // CT_VOLUMESUPPRESSION_H
+#endif // MOD_DUCKER_CHANNEL_H

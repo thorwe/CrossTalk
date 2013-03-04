@@ -16,7 +16,6 @@ class Module : public QObject
                WRITE setEnabled
                NOTIFY blockedSet)
 public:
-//    explicit Module(QObject *parent = 0);
     bool isEnabled() const;
     bool isBlocked() const;
     bool isRunning() const; // result of enabled and blocked
@@ -44,10 +43,10 @@ protected:
     inline void Error(QString message, unsigned int error)  {Error(message, 0, error);}
     inline void Error(QString message)                      {Error(message, 0, NULL);}
     bool m_isPrintEnabled;
+
 private:
     bool m_enabled;
     bool m_blocked;
-    bool m_isInit;
 };
 
 #endif // MODULE_H

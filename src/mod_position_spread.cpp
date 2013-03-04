@@ -1,4 +1,4 @@
-#include "pantalkers.h"
+#include "mod_position_spread.h"
 
 #include "ts3_functions.h"
 #include "plugin.h"
@@ -12,8 +12,7 @@ const QList<float> SPREAD_LEFT = QList<float>() << -0.75f << -1.0f << -0.5f << -
 
 const QPair<uint64,anyID> SEAT_HOLDER = qMakePair((uint64)0,(anyID)0);
 
-PanTalkers::PanTalkers(QObject *parent) :
-    //QObject(parent),
+PositionSpread::PositionSpread(QObject *parent) :
     m_homeId(0)
 {
     this->setParent(parent);
@@ -31,68 +30,94 @@ PanTalkers::PanTalkers(QObject *parent) :
 
 //Properties
 
-float PanTalkers::getSpreadWidth() const
+float PositionSpread::getSpreadWidth() const
 {
     return m_spreadWidth;
 }
 
-void PanTalkers::setHomeId(uint64 serverConnectionHandlerID)
+void PositionSpread::setHomeId(uint64 serverConnectionHandlerID)
 {
     if (serverConnectionHandlerID == m_homeId)
         return;
     m_homeId = serverConnectionHandlerID;
+    if (m_homeId == 0)
+        return;
+    if ((isRunning()) && (m_ExpertModeEnabled))
+        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
 }
 
-void PanTalkers::onRunningStateChanged(bool value)
+void PositionSpread::onRunningStateChanged(bool value)
 {
-    if (value)
-    {
-        connect(talkers,SIGNAL(TalkStatusChanged(uint64,int,bool,anyID)),this,SLOT(onTalkStatusChanged(uint64,int,bool,anyID)));
-    }
-    else
-    {
-        disconnect(talkers,SIGNAL(TalkStatusChanged(uint64,int,bool,anyID)),this,SLOT(onTalkStatusChanged(uint64,int,bool,anyID)));
-        // TODO: iterate and talkstatus stop
-    }
+//    if (value)
+//        connect(talkers,SIGNAL(TalkStatusChanged(uint64,int,bool,anyID)),this,SLOT(onTalkStatusChanged(uint64,int,bool,anyID)));
+//    else
+//        disconnect(talkers,SIGNAL(TalkStatusChanged(uint64,int,bool,anyID)),this,SLOT(onTalkStatusChanged(uint64,int,bool,anyID)));
+//    talkers->RegisterEventTalkStatusChange(this,value);
+    talkers->DumpTalkStatusChanges(this,((value)?STATUS_TALKING:STATUS_NOT_TALKING));//FlushTalkStatusChanges((value)?STATUS_TALKING:STATUS_NOT_TALKING);
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }
 
-void PanTalkers::setSpreadWidth(float value)
+void PositionSpread::setSpreadWidth(float value)
 {
+    if (m_spreadWidth == value)
+        return;
     m_spreadWidth = value;
+    if (isRunning())
+        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+
     Log(QString("setSpreadWidth: %1").arg(m_spreadWidth));
     emit spreadWidthSet(value);
 }
 
-void PanTalkers::setExpertModeEnabled(bool value)
+void PositionSpread::setExpertModeEnabled(bool value)
 {
+    if (m_ExpertModeEnabled == value)
+        return;
     m_ExpertModeEnabled = value;
+    if (isRunning())
+        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+
     Log(QString("setExpertModeEnabled: %1").arg((m_ExpertModeEnabled)?"true":"false"));
     emit expertModeEnabledSet(value);
 }
 
-void PanTalkers::setRegionHomeTab(int talkersRegion)
+void PositionSpread::setRegionHomeTab(int talkersRegion)
 {
+    if (m_RegionHomeTab == (TALKERS_REGION)talkersRegion)
+        return;
     m_RegionHomeTab = (TALKERS_REGION)talkersRegion;
+    if ((isRunning()) && (m_ExpertModeEnabled))
+        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+
     Log(QString("setRegionHomeTab: %1").arg(talkersRegion));
     emit regionHomeTabSet(m_RegionHomeTab);
 }
 
-void PanTalkers::setRegionWhisper(int talkersRegion)
+void PositionSpread::setRegionWhisper(int talkersRegion)
 {
+    if (m_RegionWhisper == (TALKERS_REGION)talkersRegion)
+        return;
     m_RegionWhisper = (TALKERS_REGION)talkersRegion;
+    if ((isRunning()) && (m_ExpertModeEnabled))
+        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+
     Log(QString("setRegionWhisper: %1").arg(talkersRegion));
     emit regionWhisperSet(m_RegionWhisper);
 }
 
-void PanTalkers::setRegionOther(int talkersRegion)
+void PositionSpread::setRegionOther(int talkersRegion)
 {
+    if (m_RegionOther ==  (TALKERS_REGION)talkersRegion)
+        return;
     m_RegionOther = (TALKERS_REGION)talkersRegion;
+    if ((isRunning()) && (m_ExpertModeEnabled))
+        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+
     Log(QString("setRegionOther: %1").arg(talkersRegion));
     emit regionOtherSet(m_RegionOther);
 }
 
-void PanTalkers::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short *samples, int sampleCount, int channels, const unsigned int *channelSpeakerArray, unsigned int *channelFillMask)
+void PositionSpread::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short *samples, int sampleCount, int channels, const unsigned int *channelSpeakerArray, unsigned int *channelFillMask)
 {
     if (!(isRunning()))
         return;
@@ -170,19 +195,22 @@ void PanTalkers::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerI
 //    }
 }
 
-void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID)
+bool PositionSpread::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe)
 {
+    if (isMe || !isRunning())
+        return false;
+
 //    QList< QPair<uint64,anyID>* >* seq;
     QList< QPair<uint64,anyID> >* seq;
     QPair<uint64,anyID> seqPair = qMakePair(serverConnectionHandlerID,clientID);
 //    Print(QString("scHandler: %1, seqPair: %2,%3").arg(serverConnectionHandlerID).arg(seqPair.first).arg(seqPair.second));
     if (status == STATUS_TALKING)
-    {
-        SimplePanner* panner = new SimplePanner(this);
-        panner->setPanAdjustment(true);
-
+    {   // Robust against multiple STATUS_TALKING in a row to be able to use it when the user changes settings
+        SimplePanner* panner;
+        bool isNewDspObj = true;
         if (!(TalkersPanners->contains(serverConnectionHandlerID)))
         {
+            panner = new SimplePanner(this);
             QMap<anyID,SimplePanner*>* ConnectionHandlerPanners = new QMap<anyID,SimplePanner*>;
             ConnectionHandlerPanners->insert(clientID,panner);
             TalkersPanners->insert(serverConnectionHandlerID,ConnectionHandlerPanners);
@@ -190,8 +218,18 @@ void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int statu
         else
         {
             QMap<anyID,SimplePanner*>* ConnectionHandlerPanners = TalkersPanners->value(serverConnectionHandlerID);
-            ConnectionHandlerPanners->insert(clientID,panner);
+            if (ConnectionHandlerPanners->contains(clientID))
+            {
+                panner = ConnectionHandlerPanners->value(clientID);
+                isNewDspObj = false;
+            }
+            else
+            {
+                panner = new SimplePanner(this);
+                ConnectionHandlerPanners->insert(clientID,panner);
+            }
         }
+        panner->setPanAdjustment(true);
 
         TALKERS_REGION region;
         const QList<float>* spread;
@@ -218,42 +256,56 @@ void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int statu
         }
         seq = TalkerSequences->value(region);
 
-        float val = 0.0f;
-        int position = seq->indexOf(SEAT_HOLDER,0);
-        if (position != -1)
-        {
-            seq->replace(position,seqPair);
-        }
-        else
-        {
-            seq->append(seqPair);
-            position = seq->size() - 1;
+        if ((!isNewDspObj) && (!seq->contains(seqPair)))
+        {   // some user setting change that demands for clean up
+            RemoveSeqPair(seqPair,seq);
+            seq = TalkerSequences->value(region);
         }
 
+        int position;
+        if (seq->contains(seqPair))
+            position = seq->indexOf(seqPair,0);
+        else
+        {
+            position = seq->indexOf(SEAT_HOLDER,0);
+            if (position != -1)
+                seq->replace(position,seqPair);
+            else
+            {
+//                Print(QString("%1,%2,%3").arg((seq==NULL)?"seq is NULL":"seq is not NULL").arg(seqPair.first).arg(seqPair.second));
+//                Log(QString("%1,%2,%3").arg((seq==NULL)?"seq is NULL":"seq is not NULL").arg(seqPair.first).arg(seqPair.second));
+                seq->append(seqPair);
+                position = seq->size() - 1;
+            }
+        }
+
+        float val = 0.0f;
         if (spread->size() > position)
             val = spread->at(position) * m_spreadWidth;
         else
             val = spread->at(0) * m_spreadWidth;
 
         panner->setPanDesiredByPanAdjuster(val);
-        if (panner->getPanDesiredByManual() == 0.0f)
+        if ((panner->getPanDesiredByManual() == 0.0f) && (isNewDspObj))
             panner->setPanCurrent(val); //don't ramp, pre-set pan
 
 //        Print(QString("Added Panner on position %1 with value %2").arg(position).arg(val));
+        return true;
     }
     else if (status == STATUS_NOT_TALKING)
     {
+        // Removing does not need to be robust against multiple STATUS_NOT_TALKING in a row, since that doesn't happen on user setting change
         if (!TalkersPanners->contains(serverConnectionHandlerID))
         {
             Error("(onTalkStatusChanged) Trying to remove talker from an invalid server connection handler id.",serverConnectionHandlerID,NULL);
-            return;
+            return false;
         }
 
         QMap<anyID,SimplePanner*>* sPanners = TalkersPanners->value(serverConnectionHandlerID);
         if (!(sPanners->contains(clientID)))
         {
-            Error("(onTalkStatusChanged) Trying to remove talker with an invalid client id.",serverConnectionHandlerID,NULL);
-            return;
+            //Error("(onTalkStatusChanged) Trying to remove talker with an invalid client id.",serverConnectionHandlerID,NULL);
+            return false;
         }
         SimplePanner* panner = sPanners->value(clientID);
         panner->setPanAdjustment(false);
@@ -268,51 +320,78 @@ void PanTalkers::onTalkStatusChanged(uint64 serverConnectionHandlerID, int statu
         else
             seq = TalkerSequences->value(m_RegionOther);
 
-        if (!(seq->contains(seqPair)))
-        {
-            for (int i = 0; i<TALKERS_REGION_END; ++i)
-            {
-                seq = TalkerSequences->value((TALKERS_REGION)i);
-//                Print(QString("TalkerSequence region size: %1").arg(seq->size()));
-//                if (seq->size() > 0)
-//                    Print(QString("seq: %1, %2").arg(seq->first().first).arg(seq->first().second));
-
-                if (seq->contains(seqPair))
-                    break;
-            }
-            if(!(seq->contains(seqPair)))
-            {
-                Error("(onTalkStatusChanged) Could not find talker to remove.",serverConnectionHandlerID,NULL);
-                return;
-            }
-        }
-
-        int position = seq->indexOf(seqPair);
-        seq->replace(position,SEAT_HOLDER);
-        bool shallClear = true;
-        for (int i=0;i<seq->size();++i)
-        {
-            if (seq->value(i) != SEAT_HOLDER)
-            {
-                shallClear = false;
-                break;
-            }
-        }
-        if (shallClear)
-            seq->clear();
+        RemoveSeqPair(seqPair,seq);
     }
-
+    return false;
 //    Print(QString("TalkerSequence region size: %1").arg(seq->size()));
 }
 
+void PositionSpread::CheckClearSeq(QList< QPair<uint64,anyID> >* seq)
+{
+    if (seq->isEmpty())
+        return;
+
+    bool shallClear = true;
+    for (int i=0;i<seq->size();++i)
+    {
+        if (seq->value(i) != SEAT_HOLDER)
+        {
+            shallClear = false;
+            break;
+        }
+    }
+    if (shallClear)
+    {
+        seq->clear();
+//        Print("Seq cleared.");
+    }
+}
+
+void PositionSpread::RemoveSeqPair(QPair<uint64,anyID> seqPair,QList< QPair<uint64,anyID> >* seq)
+{
+//    Print(QString("RemoveSeqPair: <%1,%2>").arg(seqPair.first).arg(seqPair.second));
+//    int position = (seq->contains(seqPair))?seq->indexOf(seqPair):FindSeqPair(seqPair,seq);
+    int position;
+    if (seq->contains(seqPair))
+            position = seq->indexOf(seqPair);
+    else
+    {
+        for (int i = 0; i<TALKERS_REGION_END; ++i)
+        {
+            seq = TalkerSequences->value((TALKERS_REGION)i);
+            if (seq->contains(seqPair))
+                break;
+        }
+        if(seq->contains(seqPair))
+            position = seq->indexOf(seqPair);
+        else
+            position = -1;
+    }
+
+    if (position == -1)
+    {
+        Error(QString("(FindSeqPair) Could not find clientID %1 in sequence.").arg(seqPair.second),seqPair.first,NULL);
+        return;
+    }
+//    Print(QString("Position: %1, Size: %2").arg(position).arg(seq->size()));
+    if (seq->size() == 0)
+    {
+        Error("seq size is 0");
+        return;
+    }
+
+    seq->replace(position,SEAT_HOLDER);
+    CheckClearSeq(seq);
+}
+
 /*!
- * \brief PanTalkers::ParseCommand
+ * \brief PositionSpread::ParseCommand
  * \param serverConnectionHandlerID
  * \param cmd
  * \param args
  * \return Return 0 if plugin handled the command, 1 if not handled.
  */
-int PanTalkers::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
+int PositionSpread::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
 {
     Q_UNUSED(serverConnectionHandlerID);
 

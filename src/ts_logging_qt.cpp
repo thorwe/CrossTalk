@@ -79,7 +79,7 @@ void TSLogging::PlayErrorSound(uint64 serverConnectionHandlerID)
     }
 }
 
-void TSLogging::Error(QString message, uint64 serverConnectionHandlerID, unsigned int error)
+void TSLogging::Error(QString message, uint64 serverConnectionHandlerID, unsigned int error, bool isSoundSilent)
 {
 
     if (error != NULL)
@@ -93,7 +93,8 @@ void TSLogging::Error(QString message, uint64 serverConnectionHandlerID, unsigne
     }
 
     Log(message,serverConnectionHandlerID,LogLevel_ERROR);
-    PlayErrorSound(serverConnectionHandlerID);
+    if (!isSoundSilent)
+        PlayErrorSound(serverConnectionHandlerID);
 
     // Format and print the error message
     if ((serverConnectionHandlerID == NULL) || (serverConnectionHandlerID == 0))

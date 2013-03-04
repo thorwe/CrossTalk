@@ -1,11 +1,10 @@
-#ifndef DUCKER_GLOBAL_H
-#define DUCKER_GLOBAL_H
+#ifndef MOD_DUCKER_GLOBAL_H
+#define MOD_DUCKER_GLOBAL_H
 
 #include <QObject>
 #include "public_definitions.h"
 #include "module.h"
 #include "volumes.h"
-#include "tsfunctions.h"
 #include "talkers.h"
 
 class Ducker_Global : public Module
@@ -50,9 +49,11 @@ public:
     void ToggleMusicBot(uint64 serverConnectionHandlerID, anyID clientID);
 
     // events forwarded from plugin.cpp
-    void onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility);
+    void onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID);
     bool onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels);
     bool isClientMusicBot(uint64 serverConnectionHandlerID, anyID clientID);
+    bool isClientMusicBotRt(uint64 serverConnectionHandlerID, anyID clientID);
+    void onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe);
 
     bool isActive() {return m_isActive;}
     void setActive(bool); // for testing command, move to private later
@@ -64,7 +65,7 @@ signals:
     void activeSet(bool);
 public slots:
     void setValue(float newValue);
-    void onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID);
+
 
 protected:
     void onRunningStateChanged(bool value);
@@ -81,13 +82,13 @@ private:
     float value() {return m_value;}
     float m_value;
 
-    TSFunctions *ts;
     Talkers* talkers;
     Volumes* vols;
 
     SimpleVolume *AddMusicBotVolume(uint64 serverConnectionHandlerID, anyID clientID);
 
     void SaveDuckTargets();
+    void UpdateActive();
 };
 
-#endif // DUCKER_GLOBAL_H
+#endif // MOD_DUCKER_GLOBAL_H

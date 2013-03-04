@@ -458,7 +458,7 @@
      <bool>true</bool>
     </property>
     <property name="title">
-     <string notr="true">Global (Music Bots)</string>
+     <string notr="true">Global (music bots)</string>
     </property>
     <property name="checkable">
      <bool>true</bool>

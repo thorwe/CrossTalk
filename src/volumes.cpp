@@ -1,11 +1,5 @@
 #include "volumes.h"
-#include "clientlib_publicdefinitions.h"
-#include "public_errors.h"
-#include "public_errors_rare.h"
-#include "public_definitions.h"
-#include "public_rare_definitions.h"
-#include "ts3_functions.h"
-#include "plugin.h"
+
 #include "ts_logging_qt.h"
 
 Volumes::Volumes(QObject *parent) :
@@ -22,16 +16,6 @@ Volumes::Volumes(QObject *parent) :
  */
 SimpleVolume* Volumes::AddVolume(uint64 serverConnectionHandlerID,anyID clientID)
 {
-    int type = -1;
-    unsigned int error;
-    if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_TYPE, &type)) != ERROR_ok)
-    {
-        TSLogging::Error("(Volumes::AddVolume) Error checking if client is real.",serverConnectionHandlerID,error);
-        return (SimpleVolume*)NULL;
-    }
-    if (type != 0)
-        return (SimpleVolume*)NULL;
-
     SimpleVolume* dspObj = new SimpleVolume();
     if (!(VolumesMap->contains(serverConnectionHandlerID)))
     {
@@ -56,6 +40,7 @@ SimpleVolume* Volumes::AddVolume(uint64 serverConnectionHandlerID,anyID clientID
  */
 void Volumes::onConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber)
 {
+    Q_UNUSED(errorNumber);
     if (newStatus==STATUS_DISCONNECTED)
         RemoveVolumes(serverConnectionHandlerID);
 }
@@ -130,4 +115,20 @@ void Volumes::RemoveVolumes()
         i.next();
         RemoveVolumes(i.key());
     }
+}
+
+bool Volumes::ContainsVolume(uint64 serverConnectionHandlerID, anyID clientID)
+{
+    if (!VolumesMap->contains(serverConnectionHandlerID))
+        return false;
+    return VolumesMap->value(serverConnectionHandlerID)->contains(clientID);
+}
+
+SimpleVolume *Volumes::GetVolume(uint64 serverConnectionHandlerID, anyID clientID)
+{
+    if (!VolumesMap->contains(serverConnectionHandlerID))
+        return NULL;
+    if (!VolumesMap->value(serverConnectionHandlerID)->contains(clientID))
+        return NULL;
+    return VolumesMap->value(serverConnectionHandlerID)->value(clientID);
 }

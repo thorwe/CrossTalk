@@ -2,12 +2,23 @@
 #define TALKERS_H
 
 #include <QObject>
+#include <QtCore>
 #include "public_definitions.h"
-#include "tsfunctions.h"
+
+#include "module.h"
+
+class TalkInterface
+{
+public:
+    virtual bool onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool itsMe) = 0;
+};
+Q_DECLARE_INTERFACE(TalkInterface,"net.thorwe.CrossTalk.TalkInterface/1.0")
 
 class Talkers : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(uint64 isMeTalking
+               READ isMeTalking)
 
 public:
     static Talkers* instance() {
@@ -31,16 +42,20 @@ public:
         mutex.unlock();
     }
     
-    void onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID);
+    bool onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID);
     void onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
 
-    QMap<uint64, QMap<anyID, bool> *>* GetTalkersMap() const;
+//    QMap<uint64, QMap<anyID, bool> *>* GetTalkersMap() const;
+    QMultiMap<uint64, anyID> GetTalkerMap() const;
+    QMultiMap<uint64, anyID> GetWhisperMap() const;
+    uint64 isMeTalking() const;
 
     unsigned int RefreshTalkers(uint64 serverConnectionHandlerID);
     unsigned int RefreshAllTalkers();
 
+    void DumpTalkStatusChanges(QObject* p, int status);
+
 signals:
-    void TalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID);
     void ConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
 public slots:
     
@@ -52,11 +67,16 @@ private:
     Talkers& operator=(const Talkers &);
     QMutex* mutex;
 
-    TSFunctions *ts;
+//    void ProcessClientMove(uint64 serverConnectionHandlerID, anyID clientID, uint64 newChannelID);
 
-    void ProcessClientMove(uint64 serverConnectionHandlerID, anyID clientID, uint64 newChannelID);
+//    QMap<uint64,QMap<anyID,bool>* >* TalkersMap;
+    uint64 m_meTalkingScHandler;
+    bool m_meTalkingIsWhisper;
 
-    QMap<uint64,QMap<anyID,bool>* >* TalkersMap;
+    QMultiMap<uint64,anyID> TalkerMap;
+    QMultiMap<uint64,anyID> WhisperMap;
+//    void FireTalkStatusChange(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID);
+//    QList<QPointer<Module> > TalkStatusChangeModules;
 };
 
 #endif // TALKERS_H

@@ -8,6 +8,7 @@
 #include <QString>
 
 #include "public_definitions.h"
+#include "plugin_definitions.h"
 
 namespace TSHelpers
 {
@@ -16,6 +17,7 @@ namespace TSHelpers
 
     QString GetLanguage();
 
+    int IsClientQuery(uint64 serverConnectionHandlerID, anyID clientID);
     unsigned int GetClientUID(uint64 serverConnectionHandlerID, anyID clientID, QString &result);
     unsigned int GetTalkStatus(uint64 serverConnectionHandlerID, anyID clientID, int &status, int &isWhispering);
     unsigned int GetSubChannels(uint64 serverConnectionHandlerID, uint64 channelId, QList<uint64> *result);
@@ -29,6 +31,8 @@ namespace TSHelpers
     inline int SetPrevActiveServer(uint64 serverConnectionHandlerID) { return SetActiveServerRelative(serverConnectionHandlerID, false); }
 
     unsigned int SetWhisperList(uint64 serverConnectionHandlerID, GroupWhisperType groupWhisperType, GroupWhisperTargetMode groupWhisperTargetMode);
+
+    unsigned int GetDefaultProfile(PluginGuiProfile profile, QString &result);
 }
 
 #endif // TS_HELPERS_QT_H

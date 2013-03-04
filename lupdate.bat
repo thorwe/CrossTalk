@@ -1,1 +1,1 @@
-C:\Qt\4.7.2_VS_2008_x64\bin\lupdate -noobsolete -extensions 'ui' CrossTalk.pro
+C:\Qt\4.8.3_x64\bin\lupdate -noobsolete -extensions 'ui' CrossTalk.pro

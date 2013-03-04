@@ -31,6 +31,8 @@ SnT::SnT(QObject *parent) :
  */
 void SnT::onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char *oldValue, const char *newValue)
 {
+    Q_UNUSED(oldValue);
+
     if ((flag == CLIENT_INPUT_HARDWARE) && (strcmp (newValue,"1") == 0))
     {
         if (m_shallActivatePtt==true)
@@ -72,35 +74,27 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
     if((error = ts3Functions.getConnectionStatus(scHandlerID, &status)) != ERROR_ok)
         TSLogging::Error("Error retrieving connection status",scHandlerID,error);
 
+    if(status == STATUS_DISCONNECTED)
+        return;
+
     /***** Communication *****/
     if(cmd == "TS3_PTT_ACTIVATE")
-    {
-        if(status != STATUS_DISCONNECTED)
-            ptt->SetPushToTalk(scHandlerID, PTT_ACTIVATE);
-    }
+        ptt->SetPushToTalk(scHandlerID, PTT_ACTIVATE);
     else if(cmd == "TS3_PTT_DEACTIVATE")
-    {
-        if(status != STATUS_DISCONNECTED)
-            ptt->SetPushToTalk(scHandlerID, PTT_DEACTIVATE);
-    }
+        ptt->SetPushToTalk(scHandlerID, PTT_DEACTIVATE);
     else if(cmd == "TS3_PTT_TOGGLE")
-    {
-        if(status != STATUS_DISCONNECTED)
-            ptt->SetPushToTalk(scHandlerID, PTT_TOGGLE);
-    }
+        ptt->SetPushToTalk(scHandlerID, PTT_TOGGLE);
     else if((cmd == "TS3_SWITCH_N_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_WHISPER_END")) // universal OnKeyUp Handler
     {
-        if(status != STATUS_DISCONNECTED)
+        ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
+        if (m_shallClearWhisper)
         {
-            ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
-            if (m_shallClearWhisper)
-            {
-                if ((error = ts3Functions.requestClientSetWhisperList(scHandlerID,NULL,NULL,NULL,NULL)) != ERROR_ok)
-                    TSLogging::Error("Could not release whisperlist.",scHandlerID,error);
-                else
-                    m_shallClearWhisper = false;
-            }
+            if ((error = ts3Functions.requestClientSetWhisperList(scHandlerID,NULL,NULL,NULL,NULL)) != ERROR_ok)
+                TSLogging::Error("Could not release whisperlist.",scHandlerID,error);
+            else
+                m_shallClearWhisper = false;
         }
+
         if(m_returnToSCHandler != (uint64)NULL)
         {
             TSHelpers::SetActiveServer(m_returnToSCHandler);
@@ -120,8 +114,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         if (scHandlerID == nextServer)
             return;
 
-        if(status != STATUS_DISCONNECTED)
-            ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
+        ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
 
         m_shallActivatePtt=true;
         m_returnToSCHandler=scHandlerID;
@@ -142,8 +135,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
         }
 
-        if(status != STATUS_DISCONNECTED)
-            ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
+        ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
 
         if (scHandlerID != targetServer)
         {
@@ -260,8 +252,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
         }
 
-        if(status != STATUS_DISCONNECTED)
-            ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
+        ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
 
         m_shallActivatePtt=true;
         m_returnToSCHandler=scHandlerID;

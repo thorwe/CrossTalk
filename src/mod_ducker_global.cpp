@@ -1,5 +1,9 @@
-#include "ducker_global.h"
+#include "mod_ducker_global.h"
+
+#include "public_errors.h"
+#include "public_errors_rare.h"
 #include "ts3_functions.h"
+
 #include "plugin.h"
 
 #include <QSettings>
@@ -14,7 +18,6 @@ Ducker_Global::Ducker_Global(QObject *parent) :
     m_isPrintEnabled = true;
     this->setParent(parent);
     this->setObjectName("GlobalDucker");
-    ts = TSFunctions::instance();
     talkers = Talkers::instance();
     vols = new Volumes(this);
     DuckTargets = new QMap<QString,QString>;
@@ -26,8 +29,11 @@ Ducker_Global::Ducker_Global(QObject *parent) :
 
 void Ducker_Global::setActive(bool value)
 {
+    if (value == m_isActive)
+        return;
+
     m_isActive = value;
-    Log(QString("setActive: %1").arg((value)?"true":"false"));
+//    Log(QString("setActive: %1").arg((value)?"true":"false"));
     emit activeSet(m_isActive);
 }
 
@@ -36,14 +42,18 @@ void Ducker_Global::AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID
     int talking;
     if(ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_FLAG_TALKING, &talking) == ERROR_ok)
     {
+        unsigned int error;
+
         // Get My Id on this handler
         anyID myID;
-        if(ts->GetClientId(serverConnectionHandlerID,&myID) != ERROR_ok)
+        if((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
+        {
+            Error("AddMusicBot",serverConnectionHandlerID,error);
             return;
+        }
 
         // Get My channel on this handler
         uint64 my_channelID;
-        unsigned int error;
         if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&my_channelID)) != ERROR_ok)
             Error("(AddMusicBot) Error getting Client Channel Id",serverConnectionHandlerID,error);
         else
@@ -67,11 +77,6 @@ void Ducker_Global::AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID
     }
 }
 
-//void Ducker_Global::AddMusicBot(QString uid)
-//{
-//    DuckTargets->insert(uid);
-//}
-
 void Ducker_Global::RemoveMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
 {
     QString uid;
@@ -82,32 +87,33 @@ void Ducker_Global::RemoveMusicBot(uint64 serverConnectionHandlerID, anyID clien
     vols->RemoveVolume(serverConnectionHandlerID,clientID);
 }
 
-//void Ducker_Global::RemoveMusicBot(QString uid)
-//{
-//    DuckTargets->remove(uid);
-//}
-
 void Ducker_Global::ToggleMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
 {
+    unsigned int error;
+
     QString uid;
     if (TSHelpers::GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
+    {
+        Error("(ToggleMusicBot)");
         return;
+    }
 
     if (DuckTargets->contains(uid))
     {
         DuckTargets->remove(uid);
+        UpdateActive();
         vols->RemoveVolume(serverConnectionHandlerID,clientID);
     }
     else
     {
         char name[512];
-        unsigned int error;
         if((error = ts3Functions.getClientDisplayName(serverConnectionHandlerID, clientID, name, 512)) != ERROR_ok)
         {
             Error("(ToggleMusicBot) Error getting client display name",serverConnectionHandlerID,error);
             return;
         }
         DuckTargets->insert(uid,name);
+        UpdateActive();
         AddMusicBotVolume(serverConnectionHandlerID,clientID);
     }
     SaveDuckTargets();
@@ -123,23 +129,21 @@ bool Ducker_Global::isClientMusicBot(uint64 serverConnectionHandlerID, anyID cli
     return (DuckTargets->contains(uid));
 }
 
-void Ducker_Global::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility)
+bool Ducker_Global::isClientMusicBotRt(uint64 serverConnectionHandlerID, anyID clientID)
+{
+    return vols->ContainsVolume(serverConnectionHandlerID,clientID);
+}
+
+void Ducker_Global::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID)
 {
     Q_UNUSED(visibility);
 
-    // Get My Id on this handler
-    anyID myID;
-    if(ts->GetClientId(serverConnectionHandlerID,&myID) != ERROR_ok)
-        return;
+    unsigned int error;
 
     if (clientID == myID)                   // I have switched channels
     {
-        if (newChannelID == 0)
-            return;
-
         vols->RemoveVolumes(serverConnectionHandlerID);
 
-        unsigned int error;
         // Get Channel Client List
         anyID* clients;
         if((error = ts3Functions.getChannelClientList(serverConnectionHandlerID, newChannelID, &clients)) != ERROR_ok)
@@ -161,7 +165,6 @@ void Ducker_Global::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID cl
     {
         // Get My channel on this handler
         uint64 channelID;
-        unsigned int error;
         if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&channelID)) != ERROR_ok)
             Error("(onClientMoveEvent) Error getting Client Channel Id",serverConnectionHandlerID,error);
         else
@@ -181,13 +184,13 @@ void Ducker_Global::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID cl
 
 //! Routes the arguments of the event to the corresponding volume object
 /*!
- * \brief CT_VolumeSuppression::onEditPlaybackVoiceDataEvent pre-processing voice event
+ * \brief Ducker_Global::onEditPlaybackVoiceDataEvent pre-processing voice event
  * \param serverConnectionHandlerID the connection id of the server
  * \param clientID the client-side runtime-id of the sender
  * \param samples the sample array to manipulate
  * \param sampleCount amount of samples in the array
  * \param channels currently always 1 on TS3; unused
- * \return true, if the ducker has processed
+ * \return true, if the ducker has processed / the client is a music bot
  */
 bool Ducker_Global::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short *samples, int sampleCount, int channels)
 {
@@ -211,8 +214,7 @@ void Ducker_Global::onRunningStateChanged(bool value)
 {
     if (value)
     {
-        connect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)));
-        connect(talkers,SIGNAL(TalkStatusChanged(uint64,int,bool,anyID)),this,SLOT(onTalkStatusChanged(uint64,int,bool,anyID)));
+        connect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
 
         uint64* servers;
         if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
@@ -227,52 +229,33 @@ void Ducker_Global::onRunningStateChanged(bool value)
                 if (status != STATUS_CONNECTION_ESTABLISHED)
                     continue;
 
+                unsigned int error;
+
                 // Get My Id on this handler
                 anyID myID;
-                if(ts->GetClientId(*server,&myID) == ERROR_ok)
+                if((error = ts3Functions.getClientID(*server,&myID)) != ERROR_ok)
                 {
-                    // Get My channel on this handler
-                    uint64 channelID;
-                    unsigned int error;
-                    if((error=ts3Functions.getChannelOfClient(*server,myID,&channelID)) != ERROR_ok)
-                        Error("(onRunningStateChanged) Could not get channel of client.",*server,error);
-                    else
-                        onClientMoveEvent(*server, myID, 0, channelID, RETAIN_VISIBILITY);
+                    Error("onRunningStateChanged",*server,error);
+                    continue;
                 }
+
+                // Get My channel on this handler
+                uint64 channelID;
+                if((error=ts3Functions.getChannelOfClient(*server,myID,&channelID)) != ERROR_ok)
+                    Error("(onRunningStateChanged) Could not get channel of client.",*server,error);
+                else
+                    onClientMoveEvent(*server, myID, 0, channelID, RETAIN_VISIBILITY, myID);
+
             }
             ts3Functions.freeMemory(servers);
 
-            bool is_active = false;
-            QMapIterator<uint64,QMap<anyID,bool>* > i(*(talkers->GetTalkersMap()));
-            while (i.hasNext())
-            {
-                i.next();
-                if (i.value()->isEmpty())
-                    continue;
-
-                QMapIterator<anyID,bool> j(*i.value());
-                while (j.hasNext())
-                {
-                    j.next();
-                    if (!isClientMusicBot(i.key(),j.key()))
-                    {
-                        is_active = true;
-                        break;
-                    }
-                }
-                if (is_active)
-                    break;
-            }
-            setActive(is_active);
+            UpdateActive();
         }
     }
     else
     {
         disconnect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)));
-        disconnect(talkers,SIGNAL(TalkStatusChanged(uint64,int,bool,anyID)),this,SLOT(onTalkStatusChanged(uint64,int,bool,anyID)));
-        if (isActive())
-            setActive(false);
-
+        setActive(false);
         vols->RemoveVolumes();
     }
     Log(QString("enabled: %1").arg((value)?"true":"false"));
@@ -288,54 +271,24 @@ void Ducker_Global::setValue(float newValue)
     emit valueSet(m_value);
 }
 
-void Ducker_Global::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID)
+void Ducker_Global::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe)
 {
-    //Print("(onTalkStatusChangeEvent)", serverConnectionHandlerID, LogLevel_INFO) ;
+    Q_UNUSED(isReceivedWhisper);
+
+    if (isMe || !isRunning())
+        return;
 
     if (DuckTargets->isEmpty())
-        return;
-
-    anyID myID;
-    if(ts->GetClientId(serverConnectionHandlerID,&myID) != ERROR_ok)
-        return;
-
-    if (clientID == myID)
         return;
 
     // Compute if this change causes a ducking change
     if ((!isActive()) && (status==STATUS_TALKING))
     {
-        if (!isClientMusicBot(serverConnectionHandlerID,clientID))
+        if (!isClientMusicBotRt(serverConnectionHandlerID,clientID))
             setActive(true);
     }
     else if (isActive() && (status==STATUS_NOT_TALKING))
-    {
-        // iterate if there are triggers left
-        bool stayActive = false;
-
-        QMapIterator<uint64,QMap<anyID,bool>* > i(*(talkers->GetTalkersMap()));
-        while (i.hasNext())
-        {
-            i.next();
-            if (i.value()->isEmpty())
-                continue;
-
-            QMapIterator<anyID,bool> j(*i.value());
-            while (j.hasNext())
-            {
-                j.next();
-                if (!isClientMusicBot(i.key(),j.key()))
-                {
-                    stayActive = true;
-                    break;
-                }
-            }
-            if (stayActive)
-                break;
-        }
-        if (!(stayActive))
-            setActive(false);
-    }
+        UpdateActive();
 
     if (((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING)) && (vols->VolumesMap->contains(serverConnectionHandlerID)))
     {
@@ -389,4 +342,53 @@ void Ducker_Global::SaveDuckTargets()
     }
     cfg.endArray();
     cfg.endGroup();
+}
+
+void Ducker_Global::UpdateActive()
+{
+    bool is_active = false;
+//    QMapIterator<uint64,QMap<anyID,bool>* > i(*(talkers->GetTalkersMap()));
+//    while (i.hasNext())
+//    {
+//        i.next();
+//        if (i.value()->isEmpty())
+//            continue;
+
+//        QMapIterator<anyID,bool> j(*i.value());
+//        while (j.hasNext())
+//        {
+//            j.next();
+//            if (!isClientMusicBotRt(i.key(),j.key()))
+//            {
+//                is_active = true;
+//                break;
+//            }
+//        }
+//        if (is_active)
+//            break;
+//    }
+    QMapIterator<uint64,anyID> i(talkers->GetTalkerMap());
+    while (i.hasNext())
+    {
+        i.next();
+        if (!isClientMusicBotRt(i.key(),i.value()))
+        {
+            is_active = true;
+            break;
+        }
+    }
+    if (!is_active)
+    {
+        i = talkers->GetWhisperMap();
+        while (i.hasNext())
+        {
+            i.next();
+            if (!isClientMusicBotRt(i.key(),i.value()))
+            {
+                is_active = true;
+                break;
+            }
+        }
+    }
+    setActive(is_active);
 }
