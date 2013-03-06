@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QtCore>
-#include <QMutex>
+//#include <QMutex>
 
 #include "public_definitions.h"
 
@@ -38,17 +38,9 @@ public:
         m_Instance = 0;
         mutex.unlock();
     }
-    
-    inline void Init()
-    {
-        if (!timer)
-        {
-            timer = new QTimer(this);
-            connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()));
-            timer->setSingleShot(true);
-        }
-    }
 
+    void Init(QMutex* mutex_cmd);
+    
     int SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS action);
     int SetPushToTalk(uint64 scHandlerID, bool shouldTalk);
 
@@ -65,7 +57,8 @@ private:
     TSPtt(const TSPtt &);
     TSPtt& operator=(const TSPtt &);
 
-//    QMutex* command_mutex;
+    QMutex* command_mutex;
+
     QTimer* timer;
 
     bool pttActive;

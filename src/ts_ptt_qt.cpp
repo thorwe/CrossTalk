@@ -31,31 +31,29 @@ TSPtt::~TSPtt()
     delete timer;
 }
 
-////! Explicit initialization called from within ts3plugin_init
-///*!
-// * \brief TSPtt::Init For stuff that cannot be put inside the constructor, since that is called on file level
-// */
-//void TSPtt::Init()
-//{
-//    if (!timer)
-//    {
-//        timer = new QTimer(this);
-//        connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()));
-//        timer->setSingleShot(true);
-//    }
-//}
+void TSPtt::Init(QMutex *mutex_cmd)
+{
+    timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()));
+    timer->setSingleShot(true);
+    command_mutex = mutex_cmd;
+}
 
 int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS action)
 {
-    Init();
-
+//    connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()),Qt::UniqueConnection);
     if (action == PTT_ACTIVATE)
     {
-        timer->stop();
+//        TSLogging::Print("PTT_ACTIVATE",serverConnectionHandlerID,LogLevel_DEBUG);
+//        TSLogging::Print(QString("Timer is running: %1").arg(timer->isActive()?"true":"false"),serverConnectionHandlerID,LogLevel_DEBUG);
+        if (timer->isActive())
+            timer->stop();
+
         return SetPushToTalk(serverConnectionHandlerID, true);
     }
     else if (action == PTT_DEACTIVATE)
     {
+//        TSLogging::Print("PTT_DEACTIVATE",serverConnectionHandlerID,LogLevel_DEBUG);
         UpdatePttDelayInfo();
         if (pttDelayEnabled)
             timer->start(pttDelayMsec);
@@ -64,7 +62,7 @@ int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS act
     }
     else if (action == PTT_TOGGLE)  // Toggling is always instant
     {
-        if (pttActive)
+        if (pttActive && timer->isActive())
             timer->stop();
 
         return SetPushToTalk(serverConnectionHandlerID, !pttActive);
@@ -79,7 +77,8 @@ int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS act
 
 int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, bool shouldTalk)
 {
-    Init();
+//    TSLogging::Print(QString("SetPushToTalk: %1").arg(shouldTalk?"true":"false"),serverConnectionHandlerID,LogLevel_DEBUG);
+//    connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()),Qt::UniqueConnection);
 
     unsigned int error;
 
@@ -180,7 +179,7 @@ void TSPtt::UpdatePttDelayInfo()
  */
 void TSPtt::onPttDelayFinished()
 {
-    command_mutex.tryLock(PLUGIN_THREAD_TIMEOUT);
+    command_mutex->tryLock(PLUGIN_THREAD_TIMEOUT);
     emit PttDelayFinished();
-    command_mutex.unlock();
+    command_mutex->unlock();
 }

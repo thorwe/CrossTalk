@@ -124,7 +124,10 @@ void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
         for (int i = 0; i<list.size(); ++i)
         {
             SimpleVolume* vol = vols->GetVolume(oldHomeId,list[i]);
-            vol->setDuckBlocked(!m_isReverse);
+            if (vol==NULL)
+                Error("(setHomeId) old home tab volume is NULL");
+            else
+                vol->setDuckBlocked(!m_isReverse);
         }
     }
 
@@ -133,25 +136,13 @@ void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
         QList<anyID> list = map.values(m_homeId);
         for (int i = 0; i<list.size(); ++i)
         {
-            SimpleVolume* vol = vols->GetVolume(oldHomeId,list[i]);
-            vol->setDuckBlocked(m_isReverse);
+            SimpleVolume* vol = vols->GetVolume(m_homeId,list[i]);
+            if (vol==NULL)
+                Error("(setHomeId) home tab volume is NULL");
+            else
+                vol->setDuckBlocked(m_isReverse);
         }
     }
-
-//    unsigned int error;
-//    // Get My Id on this handler
-//    anyID myID;
-//    if((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
-//        Error("(setHomeId) Error getting my clientID",serverConnectionHandlerID,error);
-//    else
-//    {
-//        // Get My channel on this handler
-//        uint64 channelID;
-//        if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&channelID)) != ERROR_ok)
-//            Error("(setHomeId) Error getting my clients channel id",serverConnectionHandlerID,error);
-//        else
-//            onClientMoveEvent(serverConnectionHandlerID,myID,0,channelID,RETAIN_VISIBILITY, myID);
-//    }
 
     Log(QString("setHomeId: %1").arg(m_homeId));
 }

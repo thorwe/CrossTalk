@@ -32,6 +32,7 @@
 #include "mod_muter_channel.h"
 #include "mod_position_spread.h"
 //#include "mod_positionalaudio.h"
+#include "ts_ptt_qt.h"
 
 struct TS3Functions ts3Functions;
 
@@ -85,7 +86,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.2.0";
+    return "1.2.1";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -121,6 +122,8 @@ int ts3plugin_init() {
 	/* Initialize return codes array for requestClientMove */
 	memset(requestClientMoveReturnCodes, 0, REQUESTCLIENTMOVERETURNCODES_SLOTS * RETURNCODE_BUFSIZE);
 
+    TSPtt::instance()->Init(&command_mutex);
+
     loca->InitLocalization();
 
 //    positionalAudio.setEnabled(true);
@@ -148,9 +151,6 @@ int ts3plugin_init() {
     cfg.endArray();
     ducker_G.setValue(cfg.value("value",-23.0f).toFloat());
     ducker_G.setEnabled(cfg.value("enabled",true).toBool());
-    //temp hack
-//    ducker_M.setValue(cfg.value("value",-23.0f).toFloat());
-//    ducker_M.setEnabled(cfg.value("enabled",true).toBool());
     cfg.endGroup();
 
 
@@ -270,10 +270,6 @@ void ts3plugin_configure(void* handle, void* qParentWidget) {
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetGlobalDuckerEnabled(bool)),&ducker_G,SLOT(setEnabled(bool)));
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetGlobalDuckerValue(float)),&ducker_G,SLOT(setValue(float)));
 
-    //temp hack
-//    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetGlobalDuckerEnabled(bool)),&ducker_M,SLOT(setEnabled(bool)));
-//    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetGlobalDuckerValue(float)),&ducker_M,SLOT(setValue(float)));
-
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingEnabled(bool)),&ducker_C,SLOT(setEnabled(bool)));
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingValue(float)),&ducker_C,SLOT(setValue(float)));
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingReverse(bool)),&ducker_C,SLOT(setDuckingReverse(bool)));
@@ -366,11 +362,11 @@ static struct PluginMenuItem* createMenuItem(enum PluginMenuType type, int id, c
 enum {
     MENU_ID_CLIENT_1 = 1,
     MENU_ID_CLIENT_2,
-    MENU_ID_CHANNEL_1
+    MENU_ID_CHANNEL_1,
 //	MENU_ID_CHANNEL_2,
 //	MENU_ID_CHANNEL_3,
-//  MENU_ID_GLOBAL_1,
-//	MENU_ID_GLOBAL_2
+    MENU_ID_GLOBAL_1,
+    MENU_ID_GLOBAL_2
 };
 
 /*
@@ -410,8 +406,8 @@ void ts3plugin_initMenus(struct PluginMenuItem*** menuItems, char** menuIcon) {
     CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_1, (trans.isEmpty()?src:trans).toLocal8Bit().constData(),  "");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_2, "Channel item 2", "2.png");
 //	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_3, "Channel item 3", "3.png");
-//  CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_1,  "Global item 1",  "1.png");
-//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_2,  "Global item 2",  "2.png");
+//    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_1,  "Global item 1",  "");
+//    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_2,  "Global item 2",  "");
     END_CREATE_MENUS;  /* Includes an assert checking if the number of menu items matched */
 
     /*
@@ -608,6 +604,7 @@ void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientI
     channel_Muter.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+//    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
 }
 
 void ts3plugin_onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* timeoutMessage)
@@ -640,6 +637,7 @@ void ts3plugin_onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID 
     channel_Muter.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+//    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
 }
 
 void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID moverID, const char* moverName, const char* moverUniqueIdentifier, const char* moveMessage)
@@ -675,6 +673,7 @@ void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID cl
     channel_Muter.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+//    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID)
@@ -756,19 +755,19 @@ void ts3plugin_currentServerConnectionChanged(uint64 serverConnectionHandlerID)
 void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenuType type, int menuItemID, uint64 selectedItemID) {
 //    printf("PLUGIN: onMenuItemEvent: serverConnectionHandlerID=%llu, type=%d, menuItemID=%d, selectedItemID=%llu\n", (long long unsigned int)serverConnectionHandlerID, type, menuItemID, (long long unsigned int)selectedItemID);
     switch(type) {
-//		case PLUGIN_MENU_TYPE_GLOBAL:
-//			/* Global menu item was triggered. selectedItemID is unused and set to zero. */
-//			switch(menuItemID) {
-//				case MENU_ID_GLOBAL_1:
-//					/* Menu global 1 was triggered */
-//					break;
-//				case MENU_ID_GLOBAL_2:
-//					/* Menu global 2 was triggered */
-//					break;
-//				default:
-//					break;
-//			}
-//			break;
+        case PLUGIN_MENU_TYPE_GLOBAL:
+            /* Global menu item was triggered. selectedItemID is unused and set to zero. */
+            switch(menuItemID) {
+                case MENU_ID_GLOBAL_1:
+                    /* Menu global 1 was triggered */
+                    break;
+                case MENU_ID_GLOBAL_2:
+                    /* Menu global 2 was triggered */
+                    break;
+                default:
+                    break;
+            }
+            break;
         case PLUGIN_MENU_TYPE_CHANNEL:
             /* Channel contextmenu item was triggered. selectedItemID is the channelID of the selected channel */
             switch(menuItemID) {
@@ -808,26 +807,27 @@ void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenu
 
 void ts3plugin_onPluginCommandEvent(uint64 serverConnectionHandlerID, const char* pluginName, const char* pluginCommand)
 {
-//    if (QString(pluginName) != ts3plugin_name())
-//        return;
+    if (QString(pluginName) != ts3plugin_name())
+        return;
 
-//    anyID myID;
-//    unsigned int error;
-//    if ((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
-//    {
-//        TSLogging::Error("(ts3plugin_onPluginCommandEvent)",serverConnectionHandlerID,error);
-//        return;
-//    }
+    anyID myID;
+    unsigned int error;
+    if ((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
+    {
+        TSLogging::Error("(ts3plugin_onPluginCommandEvent)",serverConnectionHandlerID,error);
+        return;
+    }
 
-//    QString cmd_qs(pluginCommand);
-//    QTextStream args_qs(&cmd_qs);
+    QString cmd_qs(pluginCommand);
+    QTextStream args_qs(&cmd_qs);
 
-//    anyID clientID;
-//    args_qs >> clientID;
+    anyID clientID;
+    args_qs >> clientID;
 
-//    QString cmd;
-//    args_qs >> cmd;
+    QString cmd;
+    args_qs >> cmd;
 
+    // note: args_qs leading white space if streaming to QByteArray or using readAll()
 //    if (!positionalAudio.onPluginCommand(serverConnectionHandlerID, clientID, (clientID == myID) , cmd, args_qs))
 //    {
 //        TSLogging::Error("Error on plugin command",serverConnectionHandlerID,NULL,true);

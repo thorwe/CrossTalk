@@ -13,7 +13,7 @@
 #endif
 #include <QMutex>
 extern struct TS3Functions ts3Functions;
-extern QMutex command_mutex;
+//extern QMutex command_mutex;
 /* Plugin global values */
 #define CONSOLE_OUTPUT true
 

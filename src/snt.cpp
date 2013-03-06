@@ -86,6 +86,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         ptt->SetPushToTalk(scHandlerID, PTT_TOGGLE);
     else if((cmd == "TS3_SWITCH_N_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_WHISPER_END")) // universal OnKeyUp Handler
     {
+//        TSLogging::Print("TS3_SWITCH_N_TALK_END");
         ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
         if (m_shallClearWhisper)
         {
@@ -107,6 +108,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
     }
     else if(cmd == "TS3_NEXT_TAB_AND_TALK_START")
     {
+//        TSLogging::Print("TS3_NEXT_TAB_AND_TALK_START");
         uint64 nextServer;
         if ((error = TSHelpers::GetActiveServerRelative(scHandlerID,true,&nextServer)) != ERROR_ok)
             TSLogging::Error("Could not get next server.",scHandlerID,error);
@@ -115,10 +117,13 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
 
         ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
-
+//        TSLogging::Print(QString("This: %1 Next: %2").arg(scHandlerID).arg(nextServer));
         m_shallActivatePtt=true;
         m_returnToSCHandler=scHandlerID;
         TSHelpers::SetActiveServer(nextServer);
+//        if((error = ts3Functions.activateCaptureDevice(nextServer)) != ERROR_ok)
+//            TSLogging::Error("(SnT::activateCaptureDevice)",scHandlerID,error,true);
+//        TSLogging::Print("TS3_NEXT_TAB_AND_TALK_START done");
     }
     else if(cmd == "TS3_SWITCH_TAB_AND_TALK_START")
     {
@@ -136,12 +141,13 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         }
 
         ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
-
         if (scHandlerID != targetServer)
         {
             m_shallActivatePtt=true;
             m_returnToSCHandler=scHandlerID;
             TSHelpers::SetActiveServer(targetServer);
+//            if((error = ts3Functions.activateCaptureDevice(targetServer)) != ERROR_ok)
+//                TSLogging::Error("(SnT::activateCaptureDevice)",targetServer,error,true);
         }
         else
             ptt->SetPushToTalk(scHandlerID,true);
