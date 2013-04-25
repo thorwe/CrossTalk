@@ -238,9 +238,16 @@ bool Ducker_Channel::onTalkStatusChanged(uint64 serverConnectionHandlerID, int s
             return false;
         }
         bool isTrigger = ((m_isTargetOtherTabs && (serverConnectionHandlerID == m_homeId)) || (!m_isTargetOtherTabs && (serverConnectionHandlerID != m_homeId)));
-        vol->setDuckBlocked(isTrigger || ((isReceivedWhisper) && (status==STATUS_TALKING)));
+
+        //non ideal i guess
+        unsigned int error;
+        int isPrioritySpeaker = 0;
+        if ((status==STATUS_TALKING) && (error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_IS_PRIORITY_SPEAKER, &isPrioritySpeaker)) != ERROR_ok)
+            Error("(onTalkStatusChangeEvent)",serverConnectionHandlerID,error);
+
+        vol->setDuckBlocked(isTrigger || ((isReceivedWhisper || isPrioritySpeaker) && (status==STATUS_TALKING)));
         vol->setProcessing(status==STATUS_TALKING);
-        return ((status==STATUS_TALKING) && !(isReceivedWhisper));
+        return ((status==STATUS_TALKING) && !(isReceivedWhisper || isPrioritySpeaker));
     }
     return false;
 }
