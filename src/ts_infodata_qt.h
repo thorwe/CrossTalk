@@ -8,6 +8,13 @@
 #include "public_definitions.h"
 #include "plugin_definitions.h"
 
+class InfoDataInterface
+{
+public:
+    virtual bool onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, uint64 mine, QTextStream &data) = 0;
+};
+Q_DECLARE_INTERFACE(InfoDataInterface,"net.thorwe.CrossTalk.InfoDataInterface/1.0")
+
 class TSInfoData : public QObject
 {
     Q_OBJECT
@@ -42,18 +49,21 @@ public:
     PluginItemType getInfoType() const;
     uint64 getInfoId() const;
 
-    void setHomeId(uint64 serverConnectionHandlerID);
+//    void setHomeId(uint64 serverConnectionHandlerID);
     
+    bool Register(QObject *p, bool isRegister, int priority);
+    void onInfoData(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type, char **data);
+
 signals:
     void infoTypeChanged(PluginItemType);
     void infoIdChanged(uint64);
     
 public slots:
-    void requestUpdate(uint64 serverConnectionHandlerID);
-    void requestUpdate(uint64 serverConnectionHandlerID, uint64 channelID);
-    void requestUpdate(uint64 serverConnectionHandlerID, anyID clientID);
-
-    void SetInfo(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type, QString ModuleName, QString info);
+    void RequestUpdate(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type);
+    void RequestUpdate(uint64 serverConnectionHandlerID, uint64 id) {RequestUpdate(serverConnectionHandlerID,id,PLUGIN_CHANNEL);}
+    void RequestUpdate(uint64 serverConnectionHandlerID, anyID id) {RequestUpdate(serverConnectionHandlerID,id,PLUGIN_CLIENT);}
+    void RequestUpdate(uint64 serverConnectionHandlerID) {RequestUpdate(serverConnectionHandlerID,NULL,PLUGIN_SERVER);}
+    void RequestSelfUpdate();
 
 private:
     //singleton
@@ -68,9 +78,7 @@ private:
 
     uint64 m_homeId;
 
-    QMap<QPair<uint64,QString>,QString> m_Map_PLUGIN_SERVER;
-    QMultiMap<QPair<uint64,uint64>, QPair<QString,QString> > m_Map_PLUGIN_CHANNEL;
-    QMultiMap<QPair<uint64,anyID>, QPair<QString,QString> > m_Map_PLUGIN_CLIENT;
+    QList<QPointer<QObject> > m_Callbacks;
 };
 
 #endif // TS_INFODATA_QT_H

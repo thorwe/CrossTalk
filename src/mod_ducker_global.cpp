@@ -13,7 +13,8 @@
 
 Ducker_Global::Ducker_Global(QObject *parent) :
     m_isActive(false),
-    m_value(0.0f)
+    m_value(0.0f),
+    m_ContextMenuToggleMusicBot(-1)
 {
     m_isPrintEnabled = true;
     this->setParent(parent);
@@ -35,6 +36,42 @@ void Ducker_Global::setActive(bool value)
     m_isActive = value;
 //    Log(QString("setActive: %1").arg((value)?"true":"false"));
     emit activeSet(m_isActive);
+}
+
+bool Ducker_Global::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type, uint64 mine, QTextStream &data)
+{
+    if (!isRunning())
+        return false;
+
+    bool isDirty = false;
+    if (type == PLUGIN_CLIENT)
+    {
+        ts3Functions.setPluginMenuEnabled(pluginID,m_ContextMenuToggleMusicBot,(id != mine)?1:0);
+
+        if ((id != mine) && isClientMusicBot(serverConnectionHandlerID,(anyID)id))
+        {
+//            Print("(onInfoDataChanged) adding info");
+            data << this->objectName() << ":";
+            isDirty = true;
+
+            data << "Global Ducking Target (MusicBot)";
+        }
+    }
+    return isDirty;
+}
+
+void Ducker_Global::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
+{
+    Q_UNUSED(type);
+
+//    Print("(onContextMenuEvent)",serverConnectionHandlerID,LogLevel_DEBUG);
+    if (menuItemID == m_ContextMenuToggleMusicBot)
+    {
+        ToggleMusicBot(serverConnectionHandlerID,(anyID)selectedItemID);
+//        Print(QString("Toggle: %1").arg((anyID)selectedItemID),serverConnectionHandlerID,LogLevel_DEBUG);
+    }
+//    else
+//        Error("Received bad context menu event.",serverConnectionHandlerID,NULL);
 }
 
 void Ducker_Global::AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
@@ -89,6 +126,7 @@ void Ducker_Global::RemoveMusicBot(uint64 serverConnectionHandlerID, anyID clien
 
 void Ducker_Global::ToggleMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
 {
+    Print(QString("(ToggleMusicBot) %1").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
     unsigned int error;
 
     QString uid;
@@ -212,6 +250,12 @@ bool Ducker_Global::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerI
 
 void Ducker_Global::onRunningStateChanged(bool value)
 {
+    if(m_ContextMenuToggleMusicBot == -1)
+    {
+        m_ContextMenuToggleMusicBot = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle Global Ducking Target","");
+        connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
+    }
+
     if (value)
     {
         connect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
@@ -258,6 +302,7 @@ void Ducker_Global::onRunningStateChanged(bool value)
         setActive(false);
         vols->RemoveVolumes();
     }
+    TSInfoData::instance()->Register(this,value,1);
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }
 

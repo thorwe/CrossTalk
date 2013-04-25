@@ -1,10 +1,22 @@
 #include "ts_infodata_qt.h"
+#include "public_errors.h"
+#include "public_errors_rare.h"
 #include "ts3_functions.h"
 #include "plugin.h"
 
+#include "ts_logging_qt.h"
+
+#ifndef INFODATA_BUFSIZE
+#define INFODATA_BUFSIZE 128
+#endif
+
 TSInfoData* TSInfoData::m_Instance = 0;
 
-TSInfoData::TSInfoData(){}
+TSInfoData::TSInfoData() :
+    m_homeId(0),
+    m_InfoType(PLUGIN_SERVER),
+    m_InfoId(0)
+{}
 TSInfoData::~TSInfoData(){}
 
 
@@ -18,101 +30,201 @@ uint64 TSInfoData::getInfoId() const
     return m_InfoId;
 }
 
-void TSInfoData::setHomeId(uint64 serverConnectionHandlerID)
+//void TSInfoData::setHomeId(uint64 serverConnectionHandlerID)
+//{
+//    if (serverConnectionHandlerID == m_homeId)
+//        return;
+//    m_homeId = serverConnectionHandlerID;
+//}
+
+void TSInfoData::RequestUpdate(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type)
 {
-    if (serverConnectionHandlerID == m_homeId)
-        return;
-    m_homeId = serverConnectionHandlerID;
-}
-
-void TSInfoData::requestUpdate(uint64 serverConnectionHandlerID)
-{
-    if (serverConnectionHandlerID != m_homeId)
+//    TSLogging::Print(QString("(TSInfoData::RequestUpdate) id: %1 type: %2").arg(id).arg(type),serverConnectionHandlerID,LogLevel_DEBUG);
+//    TSLogging::Print(QString("(TSInfoData::RequestUpdate) m_id: %1 m_type: %2").arg(m_InfoId).arg(m_InfoType),m_homeId,LogLevel_DEBUG);
+    if ((m_InfoId == 0) || (type != m_InfoType) || (serverConnectionHandlerID != m_homeId))
         return;
 
-    if (m_InfoType != PLUGIN_SERVER)
-        return;
-
-    if (m_InfoType > 0 && m_InfoId > 0) ts3Functions.requestInfoUpdate(serverConnectionHandlerID, m_InfoType, m_InfoId);
-}
-
-void TSInfoData::requestUpdate(uint64 serverConnectionHandlerID, uint64 channelID)
-{
-    if (serverConnectionHandlerID != m_homeId)
-        return;
-
-    if ((m_InfoType != PLUGIN_CHANNEL) || (m_InfoId != channelID))
-        return;
-
-    if (m_InfoType > 0 && m_InfoId > 0) ts3Functions.requestInfoUpdate(serverConnectionHandlerID, m_InfoType, m_InfoId);
-}
-
-void TSInfoData::requestUpdate(uint64 serverConnectionHandlerID, anyID clientID)
-{
-    if (serverConnectionHandlerID != m_homeId)
-        return;
-
-    if (m_InfoType != PLUGIN_CLIENT || (m_InfoId != (uint64)clientID))
-        return;
-
-    if (m_InfoType > 0 && m_InfoId > 0) ts3Functions.requestInfoUpdate(serverConnectionHandlerID, m_InfoType, m_InfoId);
-}
-
-void TSInfoData::SetInfo(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type, QString ModuleName, QString info)
-{
     switch(type)
     {
-     case PLUGIN_SERVER:
+    case PLUGIN_CLIENT:
     {
-        m_Map_PLUGIN_SERVER.insert(qMakePair(serverConnectionHandlerID,ModuleName),info);
+        if (m_InfoId == id)
+        {
+//            TSLogging::Print("(TSInfoData::RequestUpdate) Requesting update (client).",serverConnectionHandlerID,LogLevel_DEBUG);
+            ts3Functions.requestInfoUpdate(serverConnectionHandlerID, m_InfoType, m_InfoId);
+        }
     }
         break;
-
-     case PLUGIN_CHANNEL:
+    case PLUGIN_CHANNEL:
     {
-        QPair<uint64,uint64> key = qMakePair(serverConnectionHandlerID,id);
-        QPair<QString,QString> info_p = qMakePair(ModuleName,info);
-        if (m_Map_PLUGIN_CHANNEL.contains(key))
+        if (m_InfoId == id)
         {
-//            QList<QString,QString> m_Map_PLUGIN_CHANNEL.values(key);
-            QMutableMapIterator<QPair<uint64,uint64>, QPair<QString,QString> > i (m_Map_PLUGIN_CHANNEL);
-            while (i.hasNext())
+//            TSLogging::Print("(TSInfoData::RequestUpdate) Requesting update (channel).",serverConnectionHandlerID,LogLevel_DEBUG);
+            ts3Functions.requestInfoUpdate(serverConnectionHandlerID, m_InfoType, m_InfoId);
+        }
+    }
+        break;
+    case PLUGIN_SERVER:
+    {
+//        TSLogging::Print("(TSInfoData::RequestUpdate) Requesting update (server).",serverConnectionHandlerID,LogLevel_DEBUG);
+        ts3Functions.requestInfoUpdate(serverConnectionHandlerID, m_InfoType, m_InfoId);
+    }
+        break;
+    default:
+        break;
+    }
+}
+
+void TSInfoData::RequestSelfUpdate()
+{
+//    TSLogging::Print("RequestSelfUpdate()");
+    if (m_homeId != 0)
+    {
+        unsigned int error;
+        int status;
+        if ((error = ts3Functions.getConnectionStatus(m_homeId,&status)) != ERROR_ok)
+        {
+            TSLogging::Error("(TSInfoData::RequestSelfUpdate)",NULL,error,false);
+            return;
+        }
+        // Get My Id on this handler
+        anyID myID;
+        if((error = ts3Functions.getClientID(m_homeId,&myID)) != ERROR_ok)
+        {
+            TSLogging::Error("(TSInfoData::RequestSelfUpdate)",m_homeId,error);
+            return;
+        }
+        if (myID == (anyID)m_InfoId)
+            RequestUpdate(m_homeId,myID,PLUGIN_CLIENT);
+    }
+}
+
+bool TSInfoData::Register(QObject *p, bool isRegister, int priority)
+{
+    InfoDataInterface *iInfoData = qobject_cast<InfoDataInterface *>(p);
+    if (!iInfoData)
+        return false;
+
+    if (isRegister)
+    {
+        if (m_Callbacks.contains(QPointer<QObject>(p)))
+            return true;
+
+        if (m_Callbacks.size() < priority)
+        {
+            for (int i = m_Callbacks.size(); i<priority; ++i)
             {
-                i.next();
-                if ((i.key().first == serverConnectionHandlerID) && (i.key().second == id) && (i.value().first == ModuleName))
+                m_Callbacks.insert(i,0);
+            }
+        }
+        else if (m_Callbacks.at(priority) != 0)
+        {
+            for (int i = priority+1; i>m_Callbacks.size(); ++i)
+            {
+                if (m_Callbacks.at(i) == 0)
                 {
-                    i.remove();
+                    m_Callbacks.removeAt(i);
                     break;
                 }
             }
         }
-        m_Map_PLUGIN_CHANNEL.insert(key,info_p);
+        m_Callbacks.insert(priority,QPointer<QObject>(p));
     }
-        break;
-
-     case PLUGIN_CLIENT:
+    else
     {
-        QPair<uint64,anyID> key = qMakePair(serverConnectionHandlerID,(anyID)id);
-        QPair<QString,QString> info_p = qMakePair(ModuleName,info);
-        if (m_Map_PLUGIN_CLIENT.contains(key))
+        int rem;
+        if ((rem = m_Callbacks.removeAll(QPointer<QObject>(p))) != 1)
         {
-            QMutableMapIterator<QPair<uint64,anyID>, QPair<QString,QString> > i (m_Map_PLUGIN_CLIENT);
-            while (i.hasNext())
-            {
-                i.next();
-                if ((i.key().first == serverConnectionHandlerID) && (i.key().second == (anyID)id) && (i.value().first == ModuleName))
-                {
-                    i.remove();
-                    break;
-                }
-            }
+            TSLogging::Error(QString("Unexpected callback item amount: %1").arg(rem));
+            return false;
         }
-        m_Map_PLUGIN_CLIENT.insert(key,info_p);
     }
-        break;
+    return true;
+}
 
-     default:
-        break;
+void TSInfoData::onInfoData(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, char** data)
+{
+//    TSLogging::Print(QString("onInfoData %1 %2 %3 ").arg(serverConnectionHandlerID).arg(id).arg(type));
+    // When disconnecting a server tab, an info update will be sent with this scHandlerID
+    // That's rather not helpfull
+    unsigned int error;
+    int con_status;
+    if ((error = ts3Functions.getConnectionStatus(serverConnectionHandlerID,&con_status)) != ERROR_ok)
+    {
+        TSLogging::Error("(TSInfoData::onInfoData)",serverConnectionHandlerID,error);
+        return;
     }
-    ts3Functions.requestInfoUpdate(serverConnectionHandlerID,type,id);
+    if (con_status == STATUS_DISCONNECTED)
+        return;
+
+    m_homeId = serverConnectionHandlerID;
+    m_InfoType = type;
+    m_InfoId = id;
+
+    uint64 mine;
+    if ((type == PLUGIN_CLIENT) || (type == PLUGIN_CHANNEL))
+    {
+        unsigned int error;
+        // Get My Id on this handler
+        anyID myID;
+        if((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
+        {
+            if (error != ERROR_not_connected)
+                TSLogging::Error("(TSInfoData::onInfoData)",serverConnectionHandlerID,error);
+
+            return;
+        }
+        if (type == PLUGIN_CLIENT)
+        {
+            mine = (uint64)myID;
+        }
+        else
+        {
+            // Get My channel on this handler
+            uint64 channelID;
+            if((error=ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&channelID)) != ERROR_ok)
+            {
+                TSLogging::Error("(TSInfoData::onInfoData)",serverConnectionHandlerID,error);
+                return;
+            }
+            mine = channelID;
+        }
+    }
+
+    QString outstr;
+    QTextStream data_stream(&outstr);
+    for (int i = 0; i < m_Callbacks.size(); ++i)
+    {
+        if (m_Callbacks.at(i) != 0)
+        {
+            InfoDataInterface *iInfo = qobject_cast<InfoDataInterface *>(m_Callbacks.at(i));
+            if(iInfo->onInfoDataChanged(serverConnectionHandlerID,id,type,mine,data_stream))
+                data_stream << ".\n";
+        }
+    }
+    if (outstr.isEmpty())
+    {
+//        TSLogging::Print("(TSInfoData::onInfoData): outstr is empty.");
+        data = NULL;
+    }
+    else
+    {
+//        TSLogging::Print("(TSInfoData::onInfoData)" + outstr,LogLevel_DEBUG);
+        *data = (char*)malloc(INFODATA_BUFSIZE * sizeof(char));
+//        _strcpy(*data, INFODATA_BUFSIZE, outstr.toLocal8Bit().data());
+        if (outstr.size() > INFODATA_BUFSIZE-1)
+        {
+            // untested
+            TSLogging::Error("Infodata too long for teamspeak. Shortening.",true);
+            outstr = outstr.trimmed();
+            if (outstr.size() > INFODATA_BUFSIZE-1)
+                outstr.truncate(INFODATA_BUFSIZE-1);
+
+//            QString tr_outstr = data_stream.read(511);
+//            data_stream.setString(&tr_outstr);
+        }
+//        data_stream >> *data;
+        qstrncpy(*data,outstr.toLatin1().constData(),INFODATA_BUFSIZE-1);
+
+    }
 }

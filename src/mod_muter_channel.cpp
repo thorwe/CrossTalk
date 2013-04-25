@@ -10,7 +10,9 @@
 
 #include "ts_helpers_qt.h"
 
-ChannelMuter::ChannelMuter(QObject *parent)
+ChannelMuter::ChannelMuter(QObject *parent) :
+    m_ContextMenuIdToggleChannelMute(-1),
+    m_ContextMenuToggleClientWhitelisted(-1)
 {
     m_isPrintEnabled = true;
     this->setParent(parent);
@@ -19,6 +21,9 @@ ChannelMuter::ChannelMuter(QObject *parent)
     vols = new Volumes(this);
     MutedChannels = new QSet<QPair<uint64,uint64> >;
     ClientWhiteList = new QSet<QPair<uint64,anyID> >;
+
+//    m_ContextMenuIdToggleChannelMute = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CHANNEL,"Toggle Channel Mute [temp]","");
+//    m_ContextMenuToggleClientWhitelisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle ChannelMuter Whitelisting [temp]","");
 }
 
 // User Setting interaction
@@ -28,6 +33,16 @@ void ChannelMuter::onRunningStateChanged(bool value)
     if (!value)  // this module is always active, used solely as init function
         return;
 
+    if (m_ContextMenuIdToggleChannelMute == -1)
+    {
+        m_ContextMenuIdToggleChannelMute = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CHANNEL,"Toggle Channel Mute [temp]","");
+        connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
+    }
+
+    if (m_ContextMenuToggleClientWhitelisted == -1)
+        m_ContextMenuToggleClientWhitelisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle ChannelMuter Whitelisting [temp]","");
+
+    TSInfoData::instance()->Register(this,value,1);
     connect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
 
     Log(QString("enabled: %1").arg((value)?"true":"false"));
@@ -42,6 +57,8 @@ void ChannelMuter::onRunningStateChanged(bool value)
  */
 bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 channelID)
 {
+    Print(QString("(toggleChannelMute) %1").arg(channelID),serverConnectionHandlerID,LogLevel_DEBUG);
+
     QPair<uint64,uint64> newPair = qMakePair(serverConnectionHandlerID,channelID);
     if (!(MutedChannels->contains(newPair)))
         MutedChannels->insert(newPair);
@@ -111,6 +128,7 @@ bool ChannelMuter::isChannelMuted(uint64 serverConnectionHandlerID, uint64 chann
  */
 bool ChannelMuter::toggleClientWhitelisted(uint64 serverConnectionHandlerID, anyID clientID)
 {
+    Print(QString("(toggleClientWhitelisted) %1").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
     QPair<uint64,anyID> newPair = qMakePair(serverConnectionHandlerID,clientID);
     if (!(ClientWhiteList->contains(newPair)))
         ClientWhiteList->insert(newPair);
@@ -239,6 +257,48 @@ bool ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int sta
         }
     }
     return false;
+}
+
+bool ChannelMuter::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type, uint64 mine, QTextStream &data)
+{
+//    Print("InfoDing");
+    bool isDirty = false;
+    if (type == PLUGIN_CLIENT)
+    {
+        if (m_ContextMenuToggleClientWhitelisted != -1)
+            ts3Functions.setPluginMenuEnabled(pluginID,m_ContextMenuToggleClientWhitelisted,(id != mine)?1:0);
+
+        if ((id != mine) && isClientWhitelisted(serverConnectionHandlerID,(anyID)id))
+        {
+//            Print("(onInfoDataChanged) adding info");
+            data << this->objectName() << ":";
+            isDirty = true;
+            data << "whitelisted [temp]";
+        }
+    }
+    else if (type == PLUGIN_CHANNEL)
+    {
+        if (isChannelMuted(serverConnectionHandlerID,id))
+        {
+//            Print("(onInfoDataChanged) adding info");
+            data << this->objectName() << ":";
+            isDirty = true;
+            data << "channel muted [temp]";
+        }
+    }
+    return isDirty;
+}
+
+void ChannelMuter::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
+{
+//    Print("(onContextMenuEvent)",serverConnectionHandlerID,LogLevel_DEBUG);
+    Q_UNUSED(type);
+    if (menuItemID == m_ContextMenuIdToggleChannelMute)
+        toggleChannelMute(serverConnectionHandlerID,selectedItemID);
+    else if (menuItemID == m_ContextMenuToggleClientWhitelisted)
+        toggleClientWhitelisted(serverConnectionHandlerID,(anyID)selectedItemID);
+//    else
+//        Error("Received bad context menu event.",serverConnectionHandlerID,NULL);
 }
 
 //! Routes the arguments of the event to the corresponding volume object

@@ -7,10 +7,13 @@
 #include "volumes.h"
 #include "simple_volume.h"
 #include "talkers.h"
+#include "ts_infodata_qt.h"
+#include "ts_context_menu_qt.h"
 
-class ChannelMuter : public Module
+class ChannelMuter : public Module, public InfoDataInterface, public ContextMenuInterface
 {
     Q_OBJECT
+    Q_INTERFACES(InfoDataInterface ContextMenuInterface)
 protected:
     void onRunningStateChanged(bool value);
 public:
@@ -27,9 +30,14 @@ public:
     bool onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels);
 
     bool onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe);
+
+    bool onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, uint64 mine, QTextStream &data);
+
+
 signals:
     
 public slots:
+    void onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID);
 
 private:
     Talkers* talkers;
@@ -37,6 +45,9 @@ private:
 
     QSet<QPair<uint64,uint64> >* MutedChannels;
     QSet<QPair<uint64,anyID> >* ClientWhiteList;
+
+    int m_ContextMenuIdToggleChannelMute;
+    int m_ContextMenuToggleClientWhitelisted;
 };
 
 #endif // MOD_MUTER_CHANNEL_H
