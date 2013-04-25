@@ -39,7 +39,7 @@ public:
     bool onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe);
 
 private:
-    bool m_isReverse;
+    bool m_isTargetOtherTabs;
     bool m_isActive;
     float value() {return m_value;}
     float m_value;

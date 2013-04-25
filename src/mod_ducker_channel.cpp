@@ -91,16 +91,16 @@ void Ducker_Channel::setValue(float newValue)
 
 void Ducker_Channel::setDuckingReverse(bool val)
 {
-    if (val==m_isReverse)
+    if (val==m_isTargetOtherTabs)
         return;
 
-    m_isReverse = val;
+    m_isTargetOtherTabs = val;
     if (isRunning())  //since everything needs to be re-evaluated might as well toggle off/on
     {
         onRunningStateChanged(false); //setEnabled would trigger signal
         onRunningStateChanged(true);
     }
-    Log(QString("isReverse: %1").arg((m_isReverse)?"true":"false"));
+    Log(QString("isTargetOtherTabs: %1").arg((m_isTargetOtherTabs)?"true":"false"));
 }
 
 void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
@@ -127,7 +127,7 @@ void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
             if (vol==NULL)
                 Error("(setHomeId) old home tab volume is NULL");
             else
-                vol->setDuckBlocked(!m_isReverse);
+                vol->setDuckBlocked(!m_isTargetOtherTabs);
         }
     }
 
@@ -140,7 +140,7 @@ void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
             if (vol==NULL)
                 Error("(setHomeId) home tab volume is NULL");
             else
-                vol->setDuckBlocked(m_isReverse);
+                vol->setDuckBlocked(m_isTargetOtherTabs);
         }
     }
 
@@ -159,6 +159,7 @@ void Ducker_Channel::setActive(bool value)
 
 // ts event handlers
 
+//! Have a volume object for everyone in the clients channel
 void Ducker_Channel::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID)
 {
     Q_UNUSED(visibility);
@@ -213,13 +214,13 @@ bool Ducker_Channel::onTalkStatusChanged(uint64 serverConnectionHandlerID, int s
     if (!isRunning())
         return false;
 
-    if (isMe && !m_isReverse)
+    if (isMe && !m_isTargetOtherTabs)
         return false;
 
     // Compute if this change causes a ducking change
     if ((!isActive()) && (status==STATUS_TALKING))
     {
-        if ((isReceivedWhisper) || (!m_isReverse && (serverConnectionHandlerID != m_homeId)) || (m_isReverse && (serverConnectionHandlerID == m_homeId)))
+        if ((isReceivedWhisper) || (!m_isTargetOtherTabs && (serverConnectionHandlerID != m_homeId)) || (m_isTargetOtherTabs && (serverConnectionHandlerID == m_homeId)))
             setActive(true);
     }
     else if (isActive() && (status==STATUS_NOT_TALKING))
@@ -236,7 +237,7 @@ bool Ducker_Channel::onTalkStatusChanged(uint64 serverConnectionHandlerID, int s
 //            Error("(onTalkStatusChanged) Could not get volume.",serverConnectionHandlerID,NULL);
             return false;
         }
-        bool isTrigger = ((m_isReverse && (serverConnectionHandlerID == m_homeId)) || (!m_isReverse && (serverConnectionHandlerID != m_homeId)));
+        bool isTrigger = ((m_isTargetOtherTabs && (serverConnectionHandlerID == m_homeId)) || (!m_isTargetOtherTabs && (serverConnectionHandlerID != m_homeId)));
         vol->setDuckBlocked(isTrigger || ((isReceivedWhisper) && (status==STATUS_TALKING)));
         vol->setProcessing(status==STATUS_TALKING);
         return ((status==STATUS_TALKING) && !(isReceivedWhisper));
@@ -258,7 +259,7 @@ void Ducker_Channel::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandler
     if (!(isRunning()))
         return;
 
-    if (((!m_isReverse) && (serverConnectionHandlerID != m_homeId)) || ((m_isReverse) && (serverConnectionHandlerID == m_homeId)))
+    if (((!m_isTargetOtherTabs) && (serverConnectionHandlerID != m_homeId)) || ((m_isTargetOtherTabs) && (serverConnectionHandlerID == m_homeId)))
         return;
 
     if (!vols->VolumesMap->contains(serverConnectionHandlerID))
@@ -298,13 +299,13 @@ void Ducker_Channel::UpdateActive()
 {
     bool is_active = false;
 
-    if (m_isReverse && (talkers->isMeTalking() != 0))
+    if (m_isTargetOtherTabs && (talkers->isMeTalking() != 0))
         is_active = true;
     else if (!(talkers->GetWhisperMap().isEmpty()))
         is_active=true;
     else
     {
-        if (m_isReverse)
+        if (m_isTargetOtherTabs)
         {
             if (talkers->GetTalkerMap().contains(m_homeId))
                 is_active=true;
