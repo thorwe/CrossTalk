@@ -162,6 +162,35 @@ bool TSSettings::GetLanguage(QString &result)
     return true;
 }
 
+bool TSSettings::Is3DSoundEnabled(bool &result)
+{
+    QString qstr_result;
+    QString query("Select value FROM Application WHERE key='3DSoundEnabled'");
+    if (!(GetValueFromQuery(query, qstr_result,false)))
+    {
+        error_qsql.setDriverText(error_qsql.driverText().prepend("(Is3DSoundEnabled) "));
+        return false;
+    }
+    result = (qstr_result == "true");
+    return true;
+}
+
+bool TSSettings::Set3DSoundEnabled(bool val)
+{
+    QSqlQuery q_query(QString("UPDATE Application SET value='%1' WHERE key='3DSoundEnabled'").arg((val)?"true":"false"));
+    if (!q_query.exec())
+    {
+        QSqlError sql_error = q_query.lastError();
+        if (sql_error.isValid())
+            error_qsql=sql_error;
+        else
+            SetError("Unknown error on query.exec.");
+
+        return false;
+    }
+    return true;
+}
+
 //! Returns the last SQL Error; optional usage when a TSSettings function doesn't return true
 /*!
  * \brief TSSettings::GetLastError Returns the last SQL Error

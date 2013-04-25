@@ -46,6 +46,9 @@ public:
 
     bool GetLanguage(QString &result);
 
+    bool Is3DSoundEnabled(bool &result);
+    bool Set3DSoundEnabled(bool val);
+
     QSqlError GetLastError();
 
 private:
