@@ -43,7 +43,7 @@ void PositionSpread::setHomeId(uint64 serverConnectionHandlerID)
     if (m_homeId == 0)
         return;
     if ((isRunning()) && (m_ExpertModeEnabled))
-        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+        talkers->DumpTalkStatusChanges(this,true);
 }
 
 void PositionSpread::onRunningStateChanged(bool value)
