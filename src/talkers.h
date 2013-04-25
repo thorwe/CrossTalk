@@ -14,6 +14,8 @@ public:
 };
 Q_DECLARE_INTERFACE(TalkInterface,"net.thorwe.CrossTalk.TalkInterface/1.0")
 
+
+
 class Talkers : public QObject
 {
     Q_OBJECT
@@ -41,13 +43,18 @@ public:
         m_Instance = 0;
         mutex.unlock();
     }
-    
+
+    enum TsTalker {isOther = 0x00, isMe = 0x01, isPrioritySpeaker = 0x02, isWhispering = 0x04};
+    Q_DECLARE_FLAGS(TsTalkers, TsTalker)
+    Q_FLAGS(TsTalkers)
+
     bool onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID);
     void onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
 
 //    QMap<uint64, QMap<anyID, bool> *>* GetTalkersMap() const;
     QMultiMap<uint64, anyID> GetTalkerMap() const;
     QMultiMap<uint64, anyID> GetWhisperMap() const;
+//    QMultiMap<uint64, anyID> GetPrioritySpeakerMap() const; // commented out until I need it
     uint64 isMeTalking() const;
 
     unsigned int RefreshTalkers(uint64 serverConnectionHandlerID);
@@ -55,6 +62,7 @@ public:
 
     void DumpTalkStatusChanges(QObject* p, int status);
 
+    //    int RegisterEventTalkStatusChange(QObject *p, int priority, bool isRegister);
 signals:
     void ConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
 public slots:
@@ -75,8 +83,10 @@ private:
 
     QMultiMap<uint64,anyID> TalkerMap;
     QMultiMap<uint64,anyID> WhisperMap;
+//    QMultiMap<uint64,anyID> PrioritySpeakerMap; // commented out until I need it
+
 //    void FireTalkStatusChange(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID);
-//    QList<QPointer<Module> > TalkStatusChangeModules;
+//    QList<QPointer<QObject> > TalkStatusChangeModules;
 };
 
 #endif // TALKERS_H

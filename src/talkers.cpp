@@ -15,7 +15,7 @@ Talkers* Talkers::m_Instance = 0;
 Talkers::Talkers():
     m_meTalkingScHandler(0)
 {
-//    TalkersMap = new QMap<uint64,QMap<anyID,bool>* >;
+
 }
 
 Talkers::~Talkers()
@@ -97,20 +97,6 @@ void Talkers::DumpTalkStatusChanges(QObject *p, int status)
         return;
     }
 
-//    QMapIterator<uint64,QMap<anyID,bool>* > i(*TalkersMap);
-//    while (i.hasNext())
-//    {
-//        i.next();
-//        if (i.value()->isEmpty())
-//            continue;
-
-//        QMapIterator<anyID,bool> j(*i.value());
-//        while (j.hasNext())
-//        {
-//            j.next();
-//            iTalk->onTalkStatusChanged(i.key(),status,j.value(),j.key(),false);
-//        }
-//    }
     QMapIterator<uint64,anyID> i(TalkerMap);
     while (i.hasNext())
     {
@@ -137,8 +123,9 @@ void Talkers::DumpTalkStatusChanges(QObject *p, int status)
     }
 }
 
-//void Talkers::RegisterEventTalkStatusChange(QPointer<Module> p, bool isRegister)
+//int Talkers::RegisterEventTalkStatusChange(QObject* p, int priority, bool isRegister)
 //{
+
 //    if (isRegister)
 //    {
 //        if (TalkStatusChangeModules.contains(p))
@@ -178,8 +165,6 @@ bool Talkers::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int stat
         return false;
     }
 
-//    bool isWhisper = (isReceivedWhisper == 1);
-
     if (clientID == myID)
     {
         m_meTalkingIsWhisper = isReceivedWhisper;
@@ -193,27 +178,12 @@ bool Talkers::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int stat
         return true;
     }
 
-//    if (status==STATUS_TALKING)
-//    {
-//        if (!(TalkersMap->contains(serverConnectionHandlerID)))
-//        {
-//            QMap<anyID,bool>* map = new QMap<anyID,bool>;
-//            map->insert(clientID,isWhisper);
-//            TalkersMap->insert(serverConnectionHandlerID, map);
-//        }
-//        else
-//        {
-//            QMap<anyID,bool>* map = TalkersMap->value(serverConnectionHandlerID);
-//            map->insert(clientID,isWhisper);
-//        }
-//    }
-//    else if (status==STATUS_NOT_TALKING)
-//    {
-//        QMap<anyID,bool>* map = TalkersMap->value(serverConnectionHandlerID);
-//        map->remove(clientID);
-//    }
     if (status == STATUS_TALKING)
     {
+//        int isPrioritySpeaker = 0;
+//        if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_IS_PRIORITY_SPEAKER, &isPrioritySpeaker)) != ERROR_ok)
+//            TSLogging::Error("(onTalkStatusChangeEvent)",serverConnectionHandlerID,error);
+
         if (isReceivedWhisper)
         {
             if (!WhisperMap.contains(serverConnectionHandlerID,clientID))   // pure safety measurement
@@ -221,6 +191,11 @@ bool Talkers::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int stat
         }
         else
         {
+//            if (isPrioritySpeaker)
+//            {
+//                if (!PrioritySpeakerMap.contains(serverConnectionHandlerID,clientID))
+//                    PrioritySpeakerMap.insert(serverConnectionHandlerID,clientID);
+//            }
             if (!TalkerMap.contains(serverConnectionHandlerID,clientID))
                 TalkerMap.insert(serverConnectionHandlerID,clientID);
         }
@@ -230,11 +205,14 @@ bool Talkers::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int stat
         if (isReceivedWhisper)
             WhisperMap.remove(serverConnectionHandlerID,clientID);
         else
-            TalkerMap.remove(serverConnectionHandlerID,clientID);
+        {
+            if (0 == TalkerMap.remove(serverConnectionHandlerID,clientID))
+            {
+//                PrioritySpeakerMap.remove(serverConnectionHandlerID,clientID);
+            }
+        }
     }
 
-    //emit TalkStatusChanged(serverConnectionHandlerID,status,isWhisper,clientID);
-//    FireTalkStatusChange(serverConnectionHandlerID,status,isWhisper,clientID);
     return false;
 }
 
@@ -242,40 +220,30 @@ void Talkers::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int n
 {
     if (newStatus == STATUS_DISCONNECTED)
     {
-//        if (TalkersMap->contains(serverConnectionHandlerID))
+//        if (PrioritySpeakerMap.contains(serverConnectionHandlerID))
 //        {
-//            QMap<anyID,bool>* map = TalkersMap->value(serverConnectionHandlerID);
-//            QMutableMapIterator<anyID,bool> i(*map);
-//            while (i.hasNext())
-//            {
-//                i.next();
-//                ts3plugin_onTalkStatusChangeEvent(serverConnectionHandlerID, STATUS_NOT_TALKING, ((i.value())?1:0), i.key());
-//            }
-//            if (map->isEmpty())
-//                TSLogging::Print("Manually send talker false successfull.");
-
-////            TalkersMap->remove(serverConnectionHandlerID);
+////            PrioritySpeakerMap.remove(serverConnectionHandlerID);
+//            QList<anyID> values = PrioritySpeakerMap.values(serverConnectionHandlerID);
+//            for (int i = 0; i < values.size(); ++i)
+//                ts3plugin_onTalkStatusChangeEvent(serverConnectionHandlerID, STATUS_NOT_TALKING, 0, values.at(i));
 //        }
         if (WhisperMap.contains(serverConnectionHandlerID))
         {
+//            WhisperMap.remove(serverConnectionHandlerID);
             QList<anyID> values = WhisperMap.values(serverConnectionHandlerID);
-             for (int i = 0; i < values.size(); ++i)
-                 ts3plugin_onTalkStatusChangeEvent(serverConnectionHandlerID, STATUS_NOT_TALKING, 0, values.at(i));
+            for (int i = 0; i < values.size(); ++i)
+                ts3plugin_onTalkStatusChangeEvent(serverConnectionHandlerID, STATUS_NOT_TALKING, 0, values.at(i));
         }
         if (TalkerMap.contains(serverConnectionHandlerID))
         {
+//            TalkerMap.remove(serverConnectionHandlerID);
             QList<anyID> values = TalkerMap.values(serverConnectionHandlerID);
-             for (int i = 0; i < values.size(); ++i)
-                 ts3plugin_onTalkStatusChangeEvent(serverConnectionHandlerID, STATUS_NOT_TALKING, 0, values.at(i));
+            for (int i = 0; i < values.size(); ++i)
+                ts3plugin_onTalkStatusChangeEvent(serverConnectionHandlerID, STATUS_NOT_TALKING, 0, values.at(i));
         }
     }
     emit ConnectStatusChanged(serverConnectionHandlerID, newStatus, errorNumber);
 }
-
-//QMap<uint64, QMap<anyID, bool> *>* Talkers::GetTalkersMap() const
-//{
-//    return TalkersMap;
-//}
 
 QMultiMap<uint64, anyID> Talkers::GetTalkerMap() const
 {
@@ -286,6 +254,12 @@ QMultiMap<uint64, anyID> Talkers::GetWhisperMap() const
 {
     return WhisperMap;
 }
+
+// commented out until I need it
+//QMultiMap<uint64,anyID> Talkers::GetPrioritySpeakerMap() const
+//{
+//    return PrioritySpeakerMap;
+//}
 
 uint64 Talkers::isMeTalking() const
 {
