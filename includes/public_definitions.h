@@ -46,7 +46,9 @@ enum CodecType {
 	CODEC_SPEEX_NARROWBAND = 0,   //mono, 16bit,  8kHz, bitrate dependant on the quality setting
 	CODEC_SPEEX_WIDEBAND,         //mono, 16bit, 16kHz, bitrate dependant on the quality setting
 	CODEC_SPEEX_ULTRAWIDEBAND,    //mono, 16bit, 32kHz, bitrate dependant on the quality setting
-    CODEC_CELT_MONO              //mono, 16bit, 48kHz, bitrate dependant on the quality setting
+    CODEC_CELT_MONO,              //mono,   16bit, 48kHz, bitrate dependent on the quality setting
+    CODEC_OPUS_VOICE,             //mono,   16bit, 48khz, bitrate dependent on the quality setting, optimized for voice
+    CODEC_OPUS_MUSIC              //stereo, 16bit, 48khz, bitrate dependent on the quality setting, optimized for music
 };
 
 enum CodecEncryptionMode {
@@ -213,7 +215,7 @@ enum ConnectionProperties {
 	CONNECTION_BANDWIDTH_RECEIVED_LAST_MINUTE_KEEPALIVE,
 	CONNECTION_BANDWIDTH_RECEIVED_LAST_MINUTE_CONTROL,
 	CONNECTION_BANDWIDTH_RECEIVED_LAST_MINUTE_TOTAL,
-	CONNECTION_ENDMARKER,
+    CONNECTION_ENDMARKER
 };
 
 enum LogTypes {
