@@ -120,7 +120,7 @@ void Updater::ShowUpdateDialog(QString remoteVersion)
     // Get MainWindow
     QList<QWidget*> candidates;
     foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-        if (widget->isWindow() && !widget->windowTitle().isEmpty())
+        if (widget->isWindow() && widget->inherits("QMainWindow") && !widget->windowTitle().isEmpty())
             candidates.append(widget);
     }
     QWidget* mainWindow;
@@ -128,7 +128,8 @@ void Updater::ShowUpdateDialog(QString remoteVersion)
         mainWindow = candidates.at(0);
     else
     {
-        TSLogging::Error("Too many candidates for main window.");
+        TSLogging::Error("Updater: Too many candidates for MainWindow. Report to the plugin developer.");
+        return;
     }
 
     // Create Dialog
@@ -154,7 +155,7 @@ void Updater::ShowUpdateDialog(QString remoteVersion)
         qApp->quit();
     }
     else if (ret == QMessageBox::Cancel || ret == QMessageBox::No)
-        TSLogging::Print("Rejected");
+        TSLogging::Log("Update Rejected",LogLevel_INFO);
     else
         TSLogging::Print("Could not find button role");
 }
