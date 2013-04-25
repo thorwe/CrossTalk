@@ -5,8 +5,6 @@
 
 #ifdef _WIN32
 #pragma warning (disable : 4100)  /* Disable Unreferenced parameter warning */
-//#include <Windows.h>
-//#include <TlHelp32.h>
 #endif
 
 #include <stdio.h>
@@ -24,6 +22,9 @@
 #include "ts_logging_qt.h"
 #include "ts_helpers_qt.h"
 #include "translator.h"
+
+#include "ts_context_menu_qt.h"
+
 #include "talkers.h"
 #include "config.h"
 #include "snt.h"
@@ -34,10 +35,14 @@
 //#include "mod_positionalaudio.h"
 #include "ts_ptt_qt.h"
 
+#include "updater.h"
+
 struct TS3Functions ts3Functions;
 
 Translator* loca = Translator::instance();
 Talkers* talkers = Talkers::instance();
+TSContextMenu* contextMenu = TSContextMenu::instance();
+TSInfoData* infoData = TSInfoData::instance();
 
 #ifdef _WIN32
 #define _strcpy(dest, destSize, src) strcpy_s(dest, destSize, src)
@@ -50,7 +55,7 @@ Talkers* talkers = Talkers::instance();
 
 #define PATH_BUFSIZE 512
 #define COMMAND_BUFSIZE 128
-#define INFODATA_BUFSIZE 128
+//#define INFODATA_BUFSIZE 128
 #define SERVERINFO_BUFSIZE 256
 #define CHANNELINFO_BUFSIZE 512
 #define RETURNCODE_BUFSIZE 128
@@ -67,6 +72,7 @@ QMutex command_mutex;
 // Plugin values
 char* pluginID = NULL;
 
+Updater updater;
 SnT snt;
 PositionSpread positionSpread;
 Ducker_Global ducker_G;
@@ -86,7 +92,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.2.1";
+    return "1.2.2";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -126,6 +132,7 @@ int ts3plugin_init() {
 
     loca->InitLocalization();
 
+    contextMenu->setMainIcon("ct_16x16.png");
 //    positionalAudio.setEnabled(true);
 
     channel_Muter.setEnabled(true);
@@ -221,6 +228,8 @@ int ts3plugin_init() {
         if (scHandlerID != 0)
             ts3plugin_currentServerConnectionChanged(scHandlerID);
     }
+
+    updater.CheckUpdate();
 
     TSLogging::Log("init done");
     return 0;  /* 0 = success, 1 = failure */
@@ -339,36 +348,6 @@ int ts3plugin_requestAutoload() {
 	return 1;  /* 1 = request autoloaded, 0 = do not request autoload */
 }
 
-/* Helper function to create a menu item */
-static struct PluginMenuItem* createMenuItem(enum PluginMenuType type, int id, const char* text, const char* icon) {
-    struct PluginMenuItem* menuItem = (struct PluginMenuItem*)malloc(sizeof(struct PluginMenuItem));
-    menuItem->type = type;
-    menuItem->id = id;
-    _strcpy(menuItem->text, PLUGIN_MENU_BUFSZ, text);
-    _strcpy(menuItem->icon, PLUGIN_MENU_BUFSZ, icon);
-    return menuItem;
-}
-
-/* Some makros to make the code to create menu items a bit more readable */
-#define BEGIN_CREATE_MENUS(x) const size_t sz = x + 1; size_t n = 0; *menuItems = (struct PluginMenuItem**)malloc(sizeof(struct PluginMenuItem*) * sz);
-#define CREATE_MENU_ITEM(a, b, c, d) (*menuItems)[n++] = createMenuItem(a, b, c, d);
-#define END_CREATE_MENUS (*menuItems)[n++] = NULL; assert(n == sz);
-
-/*
- * Menu IDs for this plugin. Pass these IDs when creating a menuitem to the TS3 client. When the menu item is triggered,
- * ts3plugin_onMenuItemEvent will be called passing the menu ID of the triggered menu item.
- * These IDs are freely choosable by the plugin author. It's not really needed to use an enum, it just looks prettier.
- */
-enum {
-    MENU_ID_CLIENT_1 = 1,
-    MENU_ID_CLIENT_2,
-    MENU_ID_CHANNEL_1,
-//	MENU_ID_CHANNEL_2,
-//	MENU_ID_CHANNEL_3,
-    MENU_ID_GLOBAL_1,
-    MENU_ID_GLOBAL_2
-};
-
 /*
  * Initialize plugin menus.
  * This function is called after ts3plugin_init and ts3plugin_registerPluginID. A pluginID is required for plugin menus to work.
@@ -376,6 +355,7 @@ enum {
  * If plugin menus are not used by a plugin, do not implement this function or return NULL.
  */
 void ts3plugin_initMenus(struct PluginMenuItem*** menuItems, char** menuIcon) {
+    contextMenu->onInitMenus(menuItems,menuIcon);
     /*
      * Create the menus
      * There are three types of menu items:
@@ -392,30 +372,6 @@ void ts3plugin_initMenus(struct PluginMenuItem*** menuItems, char** menuIcon) {
      * plugin filename, without dll/so/dylib suffix
      * e.g. for "test_plugin.dll", icon "1.png" is loaded from <TeamSpeak 3 Client install dir>\plugins\test_plugin\1.png
      */
-    BEGIN_CREATE_MENUS(3);  /* IMPORTANT: Number of menu items must be correct! */
-    QString src;
-    QString trans;
-    src = "Toggle Global Ducking Target";
-    trans = loca->translator->translate("context_menu", src.toLocal8Bit().constData());
-    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_1,  (trans.isEmpty()?src:trans).toLocal8Bit().constData(),  "");
-    src = "Toggle ChannelMuter Whitelisting [temp]";
-    trans = loca->translator->translate("context_menu", src.toLocal8Bit().constData());
-    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CLIENT,  MENU_ID_CLIENT_2,  (trans.isEmpty()?src:trans).toLocal8Bit().constData(),  "");
-    src = "Toggle Channel Mute [temp]";
-    trans = loca->translator->translate("context_menu", src.toLocal8Bit().constData());
-    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_1, (trans.isEmpty()?src:trans).toLocal8Bit().constData(),  "");
-//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_2, "Channel item 2", "2.png");
-//	CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_CHANNEL, MENU_ID_CHANNEL_3, "Channel item 3", "3.png");
-//    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_1,  "Global item 1",  "");
-//    CREATE_MENU_ITEM(PLUGIN_MENU_TYPE_GLOBAL,  MENU_ID_GLOBAL_2,  "Global item 2",  "");
-    END_CREATE_MENUS;  /* Includes an assert checking if the number of menu items matched */
-
-    /*
-     * Specify an optional icon for the plugin. This icon is used for the plugins submenu within context and main menus
-     * If unused, set menuIcon to NULL
-     */
-//    *menuIcon = (char*)malloc(PLUGIN_MENU_BUFSZ * sizeof(char));
-//    _strcpy(*menuIcon, PLUGIN_MENU_BUFSZ, "t.png");
 
     /*
      * Menus can be enabled or disabled with: ts3Functions.setPluginMenuEnabled(pluginID, menuID, 0|1);
@@ -446,67 +402,9 @@ const char* ts3plugin_infoTitle() {
  * Check the parameter "type" if you want to implement this feature only for specific item types. Set the parameter
  * "data" to NULL to have the client ignore the info data.
  */
-static PluginItemType m_InfoType = PLUGIN_SERVER;
-static uint64 m_InfoId = 0;
 void ts3plugin_infoData(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, char** data) {
-    m_InfoType = type; // Save type when user manually changes the selected Item
-    m_InfoId = id; // Save currently selected Item
-    if (type == PLUGIN_CLIENT)
-    {
-        unsigned int error;
-        // Get My Id on this handler
-        anyID myID;
-        if((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
-        {
-            TSLogging::Error("(ts3plugin_infoData) Error getting my client id",serverConnectionHandlerID,error);
-            return;
-        }
-
-        ts3Functions.setPluginMenuEnabled(pluginID,MENU_ID_CLIENT_1,((anyID)id != myID)?1:0);
-        ts3Functions.setPluginMenuEnabled(pluginID,MENU_ID_CLIENT_2,((anyID)id != myID)?1:0);
-
-        QString outstr = "";
-        if ((anyID)id == myID)
-        {
-//            if (positionalAudio.isRunning())
-//            {
-//                QString game = positionalAudio.getMyGame();
-//                if (!game.isEmpty())
-//                {
-//                    outstr.append(QString("is playing %1").arg(game));
-//                    QString id = positionalAudio.getMyIdentity();
-//                    if (!id.isEmpty())
-//                        outstr.append(QString(" as %1").arg(id));
-
-//                    outstr.append(".\n");
-//                    TSLogging::Print(outstr);
-//                }
-//            }
-        }
-        else
-        {
-            if (ducker_G.isClientMusicBot(serverConnectionHandlerID,(anyID)id))
-                outstr.append("Global Ducking Target (MusicBot)\n");
-
-            if (channel_Muter.isClientWhitelisted(serverConnectionHandlerID,(anyID)id))
-                outstr.append("ChannelMuter whitelisted [temp]\n");
-        }
-
-        if (outstr != "")
-        {
-            *data = (char*)malloc(INFODATA_BUFSIZE * sizeof(char));
-            _strcpy(*data, INFODATA_BUFSIZE, outstr.toLocal8Bit().data());
-        }
-        else
-            data = NULL;
-    }
-    else if ((type == PLUGIN_CHANNEL) && channel_Muter.isChannelMuted(serverConnectionHandlerID,id))
-    {
-        *data = (char*)malloc(INFODATA_BUFSIZE * sizeof(char));
-        _strcpy(*data, INFODATA_BUFSIZE, QString("Channel Muted [temp]\n").toLocal8Bit().data());
-    }
-    else
-        data = NULL;
+    infoData->onInfoData(serverConnectionHandlerID,id,type,data);
+    //don't add code here when using infoData. It's all been done.
 }
 
 /* Required to release the memory for parameter "data" allocated in ts3plugin_infoData */
@@ -547,7 +445,6 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 /* Show an error message if the plugin failed to load */
 void ts3plugin_onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber)
 {
-//    TSLogging::Print(QString("ts3plugin_onConnectStatusChangeEvent: %1").arg(newStatus),serverConnectionHandlerID,LogLevel_DEBUG);
     talkers->onConnectStatusChangeEvent(serverConnectionHandlerID,newStatus,errorNumber);
     if (newStatus==STATUS_CONNECTION_ESTABLISHED)
     {
@@ -590,7 +487,7 @@ void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientI
         if (con_status == STATUS_DISCONNECTED)
             return;
     }
-    else if (TSHelpers::IsClientQuery(serverConnectionHandlerID,clientID))
+    else if ((visibility != LEAVE_VISIBILITY) && (TSHelpers::IsClientQuery(serverConnectionHandlerID,clientID)))
         return;
 
     // Get My Id on this handler
@@ -623,7 +520,7 @@ void ts3plugin_onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID 
         if (con_status == STATUS_DISCONNECTED)
             return;
     }
-    else if (TSHelpers::IsClientQuery(serverConnectionHandlerID,clientID))
+    else if ((visibility != LEAVE_VISIBILITY) && (TSHelpers::IsClientQuery(serverConnectionHandlerID,clientID)))
         return;
 
     // Get My Id on this handler
@@ -659,7 +556,7 @@ void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID cl
         if (con_status == STATUS_DISCONNECTED)
             return;
     }
-    else if (TSHelpers::IsClientQuery(serverConnectionHandlerID,clientID))
+    else if ((visibility != LEAVE_VISIBILITY) && (TSHelpers::IsClientQuery(serverConnectionHandlerID,clientID)))
         return;
 
     // Get My Id on this handler; it's used anywhere anyways so get it now
@@ -674,6 +571,32 @@ void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID cl
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
 //    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+}
+
+int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage) {
+//    TSLogging::Print(QString("onServerErrorEvent: %1 %2 %3").arg((returnCode ? returnCode : "")).arg(error).arg(errorMessage),serverConnectionHandlerID,LogLevel_DEBUG);
+
+    if  (error== ERROR_client_is_flooding)
+    {
+//        TSLogging::Error("Client is flooding. Need throttle.");
+    }
+
+//    if(returnCode) {
+//        TSLogging::Print("have returnCode");
+//        /* A plugin could now check the returnCode with previously (when calling a function) remembered returnCodes and react accordingly */
+//        /* In case of using a a plugin return code, the plugin can return:
+//         * 0: Client will continue handling this error (print to chat tab)
+//         * 1: Client will ignore this error, the plugin announces it has handled it */
+
+//        if(error != ERROR_ok)
+//        {
+//            TSLogging::Print("error != ERROR_ok");
+//            return positionalAudio.onServerErrorEvent(serverConnectionHandlerID,errorMessage,error,returnCode,extraMessage);
+//        }
+
+//        return 1;
+//    }
+    return 0;  /* If no plugin return code was used, the return value of this function is ignored */
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID)
@@ -709,6 +632,12 @@ void ts3plugin_onEditMixedPlaybackVoiceDataEvent(uint64 serverConnectionHandlerI
 {
 }
 
+void ts3plugin_onCustom3dRolloffCalculationClientEvent(uint64 serverConnectionHandlerID, anyID clientID, float distance, float* volume)
+{
+//    TSLogging::Print(QString("Distance: %1 Volume: %2").arg(distance).arg(*volume));
+//    *volume = 1.0f; // Who would want low volumes on a voicecom
+}
+
 /* Clientlib rare */
 void ts3plugin_onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char* oldValue, const char* newValue)
 {
@@ -739,6 +668,7 @@ void ts3plugin_currentServerConnectionChanged(uint64 serverConnectionHandlerID)
     }
     ducker_C.setHomeId(serverConnectionHandlerID);
     positionSpread.setHomeId(serverConnectionHandlerID);
+//    infoData->setHomeId(serverConnectionHandlerID);
 }
 
 /* Client UI callbacks */
@@ -753,61 +683,42 @@ void ts3plugin_currentServerConnectionChanged(uint64 serverConnectionHandlerID)
  * - selectedItemID: Channel or Client ID in the case of PLUGIN_MENU_TYPE_CHANNEL and PLUGIN_MENU_TYPE_CLIENT. 0 for PLUGIN_MENU_TYPE_GLOBAL.
  */
 void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenuType type, int menuItemID, uint64 selectedItemID) {
-//    printf("PLUGIN: onMenuItemEvent: serverConnectionHandlerID=%llu, type=%d, menuItemID=%d, selectedItemID=%llu\n", (long long unsigned int)serverConnectionHandlerID, type, menuItemID, (long long unsigned int)selectedItemID);
+    contextMenu->onMenuItemEvent(serverConnectionHandlerID,type,menuItemID,selectedItemID);
+    PluginItemType itype;
     switch(type) {
         case PLUGIN_MENU_TYPE_GLOBAL:
             /* Global menu item was triggered. selectedItemID is unused and set to zero. */
-            switch(menuItemID) {
-                case MENU_ID_GLOBAL_1:
-                    /* Menu global 1 was triggered */
-                    break;
-                case MENU_ID_GLOBAL_2:
-                    /* Menu global 2 was triggered */
-                    break;
-                default:
-                    break;
-            }
+            itype = PLUGIN_SERVER;   //admittedly not the same, however...
+//            switch(menuItemID) {
+//                case MENU_ID_GLOBAL_1:
+//                    /* Menu global 1 was triggered */
+//                    break;
+//                case MENU_ID_GLOBAL_2:
+//                    /* Menu global 2 was triggered */
+//                    break;
+//                default:
+//                    break;
+//            }
             break;
         case PLUGIN_MENU_TYPE_CHANNEL:
             /* Channel contextmenu item was triggered. selectedItemID is the channelID of the selected channel */
-            switch(menuItemID) {
-                case MENU_ID_CHANNEL_1:
-                    /* Menu channel 1 was triggered */
-                    channel_Muter.toggleChannelMute(serverConnectionHandlerID,selectedItemID);
-                    break;
-//				case MENU_ID_CHANNEL_2:
-//					/* Menu channel 2 was triggered */
-//					break;
-//				case MENU_ID_CHANNEL_3:
-//					/* Menu channel 3 was triggered */
-//					break;
-                default:
-                    break;
-            }
+            itype = PLUGIN_CHANNEL;
             break;
         case PLUGIN_MENU_TYPE_CLIENT:
             /* Client contextmenu item was triggered. selectedItemID is the clientID of the selected client */
-            switch(menuItemID) {
-                case MENU_ID_CLIENT_1:
-                    ducker_G.ToggleMusicBot(serverConnectionHandlerID,(anyID)selectedItemID);
-                    break;
-                case MENU_ID_CLIENT_2:
-                    /* Menu client 2 was triggered */
-                    channel_Muter.toggleClientWhitelisted(serverConnectionHandlerID,(anyID)selectedItemID);
-                    break;
-                default:
-                    break;
-            }
+            itype = PLUGIN_CLIENT;
             break;
         default:
             break;
     }
-    if (m_InfoType > 0 && m_InfoId > 0) ts3Functions.requestInfoUpdate(serverConnectionHandlerID, m_InfoType, m_InfoId);
+    infoData->RequestUpdate(serverConnectionHandlerID,selectedItemID,itype);
 }
 
 void ts3plugin_onPluginCommandEvent(uint64 serverConnectionHandlerID, const char* pluginName, const char* pluginCommand)
 {
-    if (QString(pluginName) != ts3plugin_name())
+    // pluginName is the dll name minus _someOS, not ts3plugin_name(); thanks for wasting my lifes time.
+    // if the user for whatever reason renames the dll, this breaks the code
+    if (QString(pluginName) != QString(ts3plugin_name()).toLower())
         return;
 
     anyID myID;

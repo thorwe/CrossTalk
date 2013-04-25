@@ -20,9 +20,12 @@ HEADERS += \
     includes/MMtoDB.h \
     src/ts_settings_qt.h \
     src/ts_infodata_qt.h \
+    src/ts_context_menu_qt.h \
     src/ts_logging_qt.h \
     src/ts_helpers_qt.h \
     src/ts_ptt_qt.h \
+    src/updater.h \
+    src/translator.h \
     src/banner.h \
     src/plugin.h \
     src/config.h \
@@ -35,15 +38,19 @@ HEADERS += \
     src/mod_ducker_channel.h \
     src/mod_ducker_global.h \
     src/mod_muter_channel.h \
-    src/mod_position_spread.h \
-    src/translator.h
+    src/mod_position_spread.h #\
+    #src/universe.h \
+    #src/mod_positionalaudio.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
     src/ts_infodata_qt.cpp \
+    src/ts_context_menu_qt.cpp \
     src/ts_logging_qt.cpp \
     src/ts_helpers_qt.cpp \
     src/ts_ptt_qt.cpp \
+    src/updater.cpp \
+    src/translator.cpp \
     src/banner.cpp \
     src/plugin.cpp \
     src/config.cpp \
@@ -56,8 +63,9 @@ SOURCES += \
     src/mod_ducker_channel.cpp \
     src/mod_ducker_global.cpp \
     src/mod_muter_channel.cpp \
-    src/mod_position_spread.cpp \
-    src/translator.cpp
+    src/mod_position_spread.cpp #\
+    #src/universe.cpp \
+    #src/mod_positionalaudio.cpp
 
 FORMS += \
     src/config.ui
