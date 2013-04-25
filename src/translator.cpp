@@ -17,7 +17,7 @@ bool Translator::InitLocalization()
     translator = new QTranslator(this);
     bool isTranslate;
     isTranslate = translator->load(":/locales/crosstalk_" + lang);
-    TSLogging::Print(QString("Have translation: %1").arg((isTranslate)?"true":"false"));
+//    TSLogging::Print(QString("Have translation: %1").arg((isTranslate)?"true":"false"));
 
 //    if (isTranslate)
 //        qApp->installTranslator(translator);

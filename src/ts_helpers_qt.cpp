@@ -41,7 +41,7 @@ namespace TSHelpers
         int type = 0;
         unsigned int error;
         if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_TYPE, &type)) != ERROR_ok)
-            TSLogging::Error("Error checking if client is real.",serverConnectionHandlerID,error);
+            TSLogging::Error("Error checking if client is query.",serverConnectionHandlerID,error);
 
         return type;
     }
