@@ -6,6 +6,7 @@
 #endif
 
 #include <QString>
+#include <QWidget>
 
 #include "public_definitions.h"
 #include "plugin_definitions.h"
@@ -33,6 +34,8 @@ namespace TSHelpers
     unsigned int SetWhisperList(uint64 serverConnectionHandlerID, GroupWhisperType groupWhisperType, GroupWhisperTargetMode groupWhisperTargetMode);
 
     unsigned int GetDefaultProfile(PluginGuiProfile profile, QString &result);
+
+    QWidget* GetMainWindow();
 }
 
 #endif // TS_HELPERS_QT_H

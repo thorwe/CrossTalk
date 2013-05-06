@@ -9,6 +9,8 @@
 #include "ts_settings_qt.h"
 #include "ts_logging_qt.h"
 
+#include <QApplication>
+
 namespace TSHelpers
 {
     QString GetConfigPath()
@@ -373,4 +375,21 @@ namespace TSHelpers
         return error;
     }
 
+    QWidget* GetMainWindow()
+    {
+        // Get MainWindow
+        QList<QWidget*> candidates;
+        foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+            if (widget->isWindow() && widget->inherits("QMainWindow") && !widget->windowTitle().isEmpty())
+                candidates.append(widget);
+        }
+
+        if (candidates.count() == 1)
+            return candidates.at(0);
+        else
+        {
+            TSLogging::Error("Too many candidates for MainWindow. Report to the plugin developer.");
+            return NULL;
+        }
+    }
 }
