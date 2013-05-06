@@ -2,7 +2,10 @@ TEMPLATE = lib
 # CONFIG += console
 #CONFIG-=embed_manifest_dll
 
-QT += sql += network
+#VERSION = 1.2.3
+#CONFIG += beta
+
+QT += sql network
 
 INCLUDEPATH += includes \
 
@@ -38,9 +41,7 @@ HEADERS += \
     src/mod_ducker_channel.h \
     src/mod_ducker_global.h \
     src/mod_muter_channel.h \
-    src/mod_position_spread.h #\
-    #src/universe.h \
-    #src/mod_positionalaudio.h
+    src/mod_position_spread.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -63,15 +64,44 @@ SOURCES += \
     src/mod_ducker_channel.cpp \
     src/mod_ducker_global.cpp \
     src/mod_muter_channel.cpp \
-    src/mod_position_spread.cpp #\
-    #src/universe.cpp \
-    #src/mod_positionalaudio.cpp
+    src/mod_position_spread.cpp
 
 FORMS += \
     src/config.ui
 
 RESOURCES += \
     CrossTalkRes.qrc
+
+beta {
+    # Positional Audio Module
+    include(src/positional_audio/PositionalAudio.pri) {
+        DEFINES += USE_POSITIONAL_AUDIO
+        !build_pass:message( "Positional Audio module included." )
+    }
+
+    # Radio Module
+    include(DSPFilters/DSPFilters.pri) {
+        HEADERS += \
+            src/dsp_radio.h \
+            src/mod_radio.h \
+            src/config_radio.h \
+            src/config_radio_groupbox.h
+
+        SOURCES += \
+            src/dsp_radio.cpp \
+            src/mod_radio.cpp \
+            src/config_radio.cpp \
+            src/config_radio_groupbox.cpp
+
+        FORMS += \
+            src/config_radio.ui \
+            src/config_radio_groupbox.ui
+
+        DEFINES += USE_RADIO
+        !build_pass:message( "Radio module included." )
+    }
+
+}
 
 win32 {
     CONFIG(release, debug|release){ #release build

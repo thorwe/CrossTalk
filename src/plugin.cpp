@@ -32,10 +32,18 @@
 #include "mod_ducker_global.h"
 #include "mod_muter_channel.h"
 #include "mod_position_spread.h"
-//#include "mod_positionalaudio.h"
+
+#ifdef USE_POSITIONAL_AUDIO
+#include "mod_positionalaudio.h"
+#endif
+
 #include "ts_ptt_qt.h"
 
 #include "updater.h"
+
+#ifdef USE_RADIO
+#include "mod_radio.h"
+#endif
 
 struct TS3Functions ts3Functions;
 
@@ -78,7 +86,13 @@ PositionSpread positionSpread;
 Ducker_Global ducker_G;
 Ducker_Channel ducker_C;
 ChannelMuter channel_Muter;
-//PositionalAudio positionalAudio;
+#ifdef USE_POSITIONAL_AUDIO
+PositionalAudio positionalAudio;
+#endif
+#ifdef USE_RADIO
+Radio radio;
+#endif
+
 
 /*********************************** Required functions ************************************/
 /*
@@ -92,7 +106,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.2.2";
+    return "1.2.3";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -133,7 +147,15 @@ int ts3plugin_init() {
     loca->InitLocalization();
 
     contextMenu->setMainIcon("ct_16x16.png");
-//    positionalAudio.setEnabled(true);
+
+#ifdef USE_RADIO
+    radio.setEnabled(true);
+#endif
+
+#ifdef USE_POSITIONAL_AUDIO
+    positionalAudio.setEnabled(true);
+#endif
+
 
     channel_Muter.setEnabled(true);
 
@@ -244,8 +266,10 @@ void ts3plugin_shutdown() {
 	 * TeamSpeak client will most likely crash (DLL removed but dialog from DLL code still open).
 	 */
 
-//    if (positionalAudio.isRunning())
-//        positionalAudio.setBlocked(true);
+    #ifdef USE_POSITIONAL_AUDIO
+    if (positionalAudio.isRunning())
+        positionalAudio.setBlocked(true);
+    #endif
 
 	/* Free pluginID if we registered it */
 	if(pluginID) {
@@ -321,7 +345,21 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
 
     QString cmd_qs;
     cmd_qs = command;
-    QStringList args_qs = cmd_qs.split(" ",QString::SkipEmptyParts);
+
+    bool inside = (cmd_qs.startsWith("\"")); //true if the first character is "
+    QStringList tmpList = cmd_qs.split(QRegExp("\""), QString::SkipEmptyParts); // Split by " and make sure you don't have an empty string at the beginning
+    QStringList args_qs;
+    foreach (QString s, tmpList)
+    {
+        if (inside) // If 's' is inside quotes ...
+            args_qs.append(s); // ... get the whole string
+        else // If 's' is outside quotes ...
+            args_qs.append(s.split(" ", QString::SkipEmptyParts)); // ... get the splitted string
+
+        inside = !inside;
+    }
+
+//    QStringList args_qs = cmd_qs.split(" ",QString::SkipEmptyParts);
     if (args_qs.isEmpty())  // this might evolve to some help output
         return 1;
 
@@ -501,7 +539,9 @@ void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientI
     channel_Muter.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
-//    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+    #ifdef USE_POSITIONAL_AUDIO
+    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+    #endif
 }
 
 void ts3plugin_onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* timeoutMessage)
@@ -534,7 +574,9 @@ void ts3plugin_onClientMoveTimeoutEvent(uint64 serverConnectionHandlerID, anyID 
     channel_Muter.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
-//    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+    #ifdef USE_POSITIONAL_AUDIO
+    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+    #endif
 }
 
 void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID moverID, const char* moverName, const char* moverUniqueIdentifier, const char* moveMessage)
@@ -570,7 +612,9 @@ void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID cl
     channel_Muter.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_G.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
     ducker_C.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
-//    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+    #ifdef USE_POSITIONAL_AUDIO
+    positionalAudio.onClientMoveEvent(serverConnectionHandlerID,clientID,oldChannelID,newChannelID,visibility,myID);
+    #endif
 }
 
 int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage) {
@@ -591,7 +635,9 @@ int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* e
 //        if(error != ERROR_ok)
 //        {
 //            TSLogging::Print("error != ERROR_ok");
+//          #ifdef USE_POSITIONAL_AUDIO
 //            return positionalAudio.onServerErrorEvent(serverConnectionHandlerID,errorMessage,error,returnCode,extraMessage);
+//          #endif
 //        }
 
 //        return 1;
@@ -606,6 +652,11 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
     if (channel_Muter.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe))
         return; //Client is muted;
 
+#ifdef USE_RADIO
+    radio.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
+#endif
+
+
     ducker_G.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
     if (!ducker_G.isRunning() || !ducker_G.isClientMusicBotRt(serverConnectionHandlerID,clientID))
     {
@@ -618,6 +669,10 @@ void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, an
 {
     if (channel_Muter.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels))
         return; //Client is muted;
+
+#ifdef USE_RADIO
+    radio.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels);
+#endif
 
     if (!ducker_G.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels))
         ducker_C.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels);
@@ -635,7 +690,9 @@ void ts3plugin_onEditMixedPlaybackVoiceDataEvent(uint64 serverConnectionHandlerI
 void ts3plugin_onCustom3dRolloffCalculationClientEvent(uint64 serverConnectionHandlerID, anyID clientID, float distance, float* volume)
 {
 //    TSLogging::Print(QString("Distance: %1 Volume: %2").arg(distance).arg(*volume));
-//    *volume = 1.0f; // Who would want low volumes on a voicecom
+#ifdef USE_POSITIONAL_AUDIO
+    *volume = 1.0f; // Who would want low volumes on a voicecom
+#endif
 }
 
 /* Clientlib rare */
@@ -666,6 +723,9 @@ void ts3plugin_currentServerConnectionChanged(uint64 serverConnectionHandlerID)
 //        TSLogging::Print("ts3plugin_currentServerConnectionChanged: filtering early tab change event",serverConnectionHandlerID,LogLevel_DEBUG);
         return;
     }
+#ifdef USE_RADIO
+    radio.setHomeId(serverConnectionHandlerID);
+#endif
     ducker_C.setHomeId(serverConnectionHandlerID);
     positionSpread.setHomeId(serverConnectionHandlerID);
 //    infoData->setHomeId(serverConnectionHandlerID);
@@ -739,10 +799,12 @@ void ts3plugin_onPluginCommandEvent(uint64 serverConnectionHandlerID, const char
     args_qs >> cmd;
 
     // note: args_qs leading white space if streaming to QByteArray or using readAll()
-//    if (!positionalAudio.onPluginCommand(serverConnectionHandlerID, clientID, (clientID == myID) , cmd, args_qs))
-//    {
-//        TSLogging::Error("Error on plugin command",serverConnectionHandlerID,NULL,true);
-//    }
+    #ifdef USE_POSITIONAL_AUDIO
+    if (!positionalAudio.onPluginCommand(serverConnectionHandlerID, clientID, (clientID == myID) , cmd, args_qs))
+    {
+        TSLogging::Error("Error on plugin command",serverConnectionHandlerID,NULL,true);
+    }
+    #endif
 }
 
 /* This function is called if a plugin hotkey was pressed. Omit if hotkeys are unused. */
