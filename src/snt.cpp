@@ -132,15 +132,23 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             TSLogging::Error("No target server specified.",serverConnectionHandlerID,NULL);
             return;
         }
+        QString name;
+        if (args.count() == 1)
+            name = args.at(0);
+        else
+            name = args.join(" ");
 
-        uint64 targetServer;
-        if ((error = TSHelpers::GetServerHandler(args.at(0),&targetServer)) != ERROR_ok)
+        uint64 targetServer = 0;
+        if ((error = TSHelpers::GetServerHandler(name,&targetServer)) != ERROR_ok)
         {
             //TSLogging::Error("Could not find target server",scHandlerID,error);
             return;
         }
+        if (targetServer == 0)
+            return;
 
         ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
+
         if (scHandlerID != targetServer)
         {
             m_shallActivatePtt=true;
@@ -161,26 +169,36 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
         }
 
-        uint64 targetServer;
-        if ((error = TSHelpers::GetServerHandler(args.at(0),&targetServer)) != ERROR_ok)
+        QString groupWhisperTargetModeArg = args.takeLast();
+        QString groupWhisperTypeArg = args.takeLast();
+        QString name;
+        if (args.count() == 1)
+            name = args.at(0);
+        else
+            name = args.join(" ");
+
+        uint64 targetServer = 0;
+        if ((error = TSHelpers::GetServerHandler(name,&targetServer)) != ERROR_ok)
         {
             TSLogging::Error("Could not get target server.",scHandlerID,error);
             return;
         }
-
-        anyID myID;
-        if((error = ts3Functions.getClientID(targetServer,&myID)) != ERROR_ok)
-        {
-            TSLogging::Error("Could not get my id on the target server.",scHandlerID,error);
+        if (targetServer == 0)
             return;
-        }
 
-        QString arg_qs;
-        arg_qs = args.at(1);
+//        anyID myID;
+//        if((error = ts3Functions.getClientID(targetServer,&myID)) != ERROR_ok)
+//        {
+//            TSLogging::Error("Could not get my id on the target server.",scHandlerID,error);
+//            return;
+//        }
+
+//        QString arg_qs;
+//        arg_qs = args.at(1);
         GroupWhisperType groupWhisperType = GROUPWHISPERTYPE_ENDMARKER;
-        if (arg_qs.contains("COMMANDER",Qt::CaseInsensitive))
+        if (groupWhisperTypeArg.contains("COMMANDER",Qt::CaseInsensitive))
                 groupWhisperType = GROUPWHISPERTYPE_CHANNELCOMMANDER;
-        else if (arg_qs.contains("ALLC",Qt::CaseInsensitive))
+        else if (groupWhisperTypeArg.contains("ALLC",Qt::CaseInsensitive))
                 groupWhisperType = GROUPWHISPERTYPE_ALLCLIENTS;
 
         if (groupWhisperType == GROUPWHISPERTYPE_ENDMARKER)
@@ -189,21 +207,21 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
         }
 
-        arg_qs = args.at(2);
+//        arg_qs = args.at(2);
         GroupWhisperTargetMode groupWhisperTargetMode  = GROUPWHISPERTARGETMODE_ENDMARKER;
-        if (arg_qs.contains("ALLPARENT"))
+        if (groupWhisperTargetModeArg.contains("ALLPARENT"))
             groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALLPARENTCHANNELS;
-        else if (arg_qs.contains("PARENT"))
+        else if (groupWhisperTargetModeArg.contains("PARENT"))
             groupWhisperTargetMode = GROUPWHISPERTARGETMODE_PARENTCHANNEL;
-        else if (arg_qs.contains("CURRENT"))
+        else if (groupWhisperTargetModeArg.contains("CURRENT"))
             groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CURRENTCHANNEL;
-        else if (arg_qs.contains("SUB"))
+        else if (groupWhisperTargetModeArg.contains("SUB"))
             groupWhisperTargetMode = GROUPWHISPERTARGETMODE_SUBCHANNELS;
-        else if (arg_qs.contains("ANCESTORCHANNELFAMILY"))
+        else if (groupWhisperTargetModeArg.contains("ANCESTORCHANNELFAMILY"))
             groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ANCESTORCHANNELFAMILY;
-        else if (arg_qs.contains("FAMILY"))
+        else if (groupWhisperTargetModeArg.contains("FAMILY"))
             groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CHANNELFAMILY;
-        else if (arg_qs.contains("ALL"))
+        else if (groupWhisperTargetModeArg.contains("ALL"))
             groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALL;
 
         if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ENDMARKER)
