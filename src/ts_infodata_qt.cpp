@@ -211,20 +211,13 @@ void TSInfoData::onInfoData(uint64 serverConnectionHandlerID, uint64 id, enum Pl
     {
 //        TSLogging::Print("(TSInfoData::onInfoData)" + outstr,LogLevel_DEBUG);
         *data = (char*)malloc(INFODATA_BUFSIZE * sizeof(char));
-//        _strcpy(*data, INFODATA_BUFSIZE, outstr.toLocal8Bit().data());
         if (outstr.size() > INFODATA_BUFSIZE-1)
         {
-            // untested
             TSLogging::Error("Infodata too long for teamspeak. Shortening.",true);
             outstr = outstr.trimmed();
             if (outstr.size() > INFODATA_BUFSIZE-1)
                 outstr.truncate(INFODATA_BUFSIZE-1);
-
-//            QString tr_outstr = data_stream.read(511);
-//            data_stream.setString(&tr_outstr);
         }
-//        data_stream >> *data;
         qstrncpy(*data,outstr.toLatin1().constData(),INFODATA_BUFSIZE-1);
-
     }
 }

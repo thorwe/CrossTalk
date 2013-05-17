@@ -124,9 +124,7 @@ void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
         for (int i = 0; i<list.size(); ++i)
         {
             SimpleVolume* vol = vols->GetVolume(oldHomeId,list[i]);
-            if (vol==NULL)
-                Error("(setHomeId) old home tab volume is NULL");
-            else
+            if (vol!=NULL)
                 vol->setDuckBlocked(!m_isTargetOtherTabs);
         }
     }
@@ -137,9 +135,7 @@ void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
         for (int i = 0; i<list.size(); ++i)
         {
             SimpleVolume* vol = vols->GetVolume(m_homeId,list[i]);
-            if (vol==NULL)
-                Error("(setHomeId) home tab volume is NULL");
-            else
+            if (vol!=NULL)
                 vol->setDuckBlocked(m_isTargetOtherTabs);
         }
     }
