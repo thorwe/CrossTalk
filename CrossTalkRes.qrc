@@ -3,8 +3,15 @@
         <file alias="jianji">res/jianji.png</file>
         <file alias="logo_int">res/logo_int.png</file>
         <file alias="logo_deDE">res/logo_deDE.png</file>
+        <file alias="logo">res/ct_logo_60.png</file>
+        <file alias="logo_320">res/logo_320x60.png</file>
+        <file alias="logo_320_2">res/logo_320x60_2.png</file>
     </qresource>
     <qresource prefix="/locales">
         <file alias="crosstalk_de_DE">res/crosstalk_de_DE.qm</file>
+    </qresource>
+    <qresource prefix="/positionalaudio">
+        <file alias="avatar">res/avatar.png</file>
+        <file alias="camera">res/camera.png</file>
     </qresource>
 </RCC>
