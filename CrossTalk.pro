@@ -3,7 +3,7 @@ TEMPLATE = lib
 #CONFIG-=embed_manifest_dll
 
 #VERSION = 1.2.3
-#CONFIG += beta
+CONFIG += beta
 
 QT += sql network
 
@@ -41,7 +41,13 @@ HEADERS += \
     src/mod_ducker_channel.h \
     src/mod_ducker_global.h \
     src/mod_muter_channel.h \
-    src/mod_position_spread.h
+    src/mod_position_spread.h \
+    src/config_ducking.h \
+    src/fader_vertical.h \
+    src/settings_duck.h \
+    src/config_position_spread.h \
+    src/settings_position_spread.h \
+    src/banner_frame.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -64,15 +70,27 @@ SOURCES += \
     src/mod_ducker_channel.cpp \
     src/mod_ducker_global.cpp \
     src/mod_muter_channel.cpp \
-    src/mod_position_spread.cpp
+    src/mod_position_spread.cpp \
+    src/config_ducking.cpp \
+    src/fader_vertical.cpp \
+    src/settings_duck.cpp \
+    src/config_position_spread.cpp \
+    src/settings_position_spread.cpp \
+    src/banner_frame.cpp
 
 FORMS += \
-    src/config.ui
+    src/config.ui \
+    src/config_ducking.ui \
+    src/fader_vertical.ui \
+    src/config_position_spread.ui \
+    src/banner_frame.ui
 
 RESOURCES += \
     CrossTalkRes.qrc
 
 beta {
+    DEFINES += CROSSTALK_BETA
+
     # Positional Audio Module
     include(src/positional_audio/PositionalAudio.pri) {
         DEFINES += USE_POSITIONAL_AUDIO

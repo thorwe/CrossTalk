@@ -33,7 +33,11 @@
 #include "mod_muter_channel.h"
 #include "mod_position_spread.h"
 
+#include "settings_duck.h"
+#include "settings_position_spread.h"
+
 #ifdef USE_POSITIONAL_AUDIO
+#include "settings_positionalaudio.h"
 #include "mod_positionalaudio.h"
 #endif
 
@@ -87,12 +91,15 @@ Ducker_Global ducker_G;
 Ducker_Channel ducker_C;
 ChannelMuter channel_Muter;
 #ifdef USE_POSITIONAL_AUDIO
+SettingsPositionalAudio* settingsPositionalAudio = SettingsPositionalAudio::instance();
 PositionalAudio positionalAudio;
 #endif
 #ifdef USE_RADIO
 Radio radio;
 #endif
 
+SettingsDuck* settingsDuck = SettingsDuck::instance();
+SettingsPositionSpread* settingsPositionSpread = SettingsPositionSpread::instance();
 
 /*********************************** Required functions ************************************/
 /*
@@ -106,7 +113,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.2.3";
+    return "1.3.053101";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -148,39 +155,43 @@ int ts3plugin_init() {
 
     contextMenu->setMainIcon("ct_16x16.png");
 
+    settingsDuck->Init(&ducker_G,&ducker_C);
+    settingsPositionSpread->Init(&positionSpread);
+
 #ifdef USE_RADIO
     radio.setEnabled(true);
 #endif
 
 #ifdef USE_POSITIONAL_AUDIO
-    positionalAudio.setEnabled(true);
+//    positionalAudio.setEnabled(true);
+    settingsPositionalAudio->Init(&positionalAudio);
 #endif
 
 
     channel_Muter.setEnabled(true);
 
-    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    ducker_C.setEnabled(cfg.value("ducking_enabled",true).toBool());
-    ducker_C.setValue(cfg.value("ducking_value",-23.0f).toFloat());
-    ducker_C.setDuckingReverse(cfg.value("ducking_reverse",false).toBool());
-    positionSpread.setEnabled(cfg.value("stereo_position_spread_enabled",true).toBool());
-    positionSpread.setSpreadWidth(cfg.value("stereo_position_spread_value",0.5f).toFloat());
-    positionSpread.setExpertModeEnabled(cfg.value("stereo_position_spread_expert_enabled",false).toBool());
-    positionSpread.setRegionHomeTab(cfg.value("stereo_position_spread_region_home",1).toInt());
-    positionSpread.setRegionWhisper(cfg.value("stereo_position_spread_region_whisper",2).toInt());
-    positionSpread.setRegionOther(cfg.value("stereo_position_spread_region_other",0).toInt());
+//    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+//    ducker_C.setEnabled(cfg.value("ducking_enabled",true).toBool());
+//    ducker_C.setValue(cfg.value("ducking_value",-23.0f).toFloat());
+//    ducker_C.setDuckingReverse(cfg.value("ducking_reverse",false).toBool());
+//    positionSpread.setEnabled(cfg.value("stereo_position_spread_enabled",true).toBool());
+//    positionSpread.setSpreadWidth(cfg.value("stereo_position_spread_value",0.5f).toFloat());
+//    positionSpread.setExpertModeEnabled(cfg.value("stereo_position_spread_expert_enabled",false).toBool());
+//    positionSpread.setRegionHomeTab(cfg.value("stereo_position_spread_region_home",1).toInt());
+//    positionSpread.setRegionWhisper(cfg.value("stereo_position_spread_region_whisper",2).toInt());
+//    positionSpread.setRegionOther(cfg.value("stereo_position_spread_region_other",0).toInt());
 
-    cfg.beginGroup("ducker_global");
-    int size = cfg.beginReadArray("targets");
-    for (int i = 0; i < size; ++i)
-    {
-        cfg.setArrayIndex(i);
-        ducker_G.DuckTargets->insert(cfg.value("uid").toString(),cfg.value("name").toString());
-    }
-    cfg.endArray();
-    ducker_G.setValue(cfg.value("value",-23.0f).toFloat());
-    ducker_G.setEnabled(cfg.value("enabled",true).toBool());
-    cfg.endGroup();
+//    cfg.beginGroup("ducker_global");
+//    int size = cfg.beginReadArray("targets");
+//    for (int i = 0; i < size; ++i)
+//    {
+//        cfg.setArrayIndex(i);
+//        ducker_G.DuckTargets->insert(cfg.value("uid").toString(),cfg.value("name").toString());
+//    }
+//    cfg.endArray();
+//    ducker_G.setValue(cfg.value("value",-23.0f).toFloat());
+//    ducker_G.setEnabled(cfg.value("enabled",true).toBool());
+//    cfg.endGroup();
 
 
     // Support enabling the plugin while already connected
@@ -472,10 +483,11 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 	/* Register hotkeys giving a keyword and a description.
 	 * The keyword will be later passed to ts3plugin_onHotkeyEvent to identify which hotkey was triggered.
 	 * The description is shown in the clients hotkey dialog. */
-    BEGIN_CREATE_HOTKEYS(3);  /* Create 2 hotkeys. Size must be correct for allocating memory. */
+    BEGIN_CREATE_HOTKEYS(4);  /* Create n hotkeys. Size must be correct for allocating memory. */
 	CREATE_HOTKEY("TS3_NEXT_TAB_AND_TALK_START", "Next Tab and Talk Start");
     CREATE_HOTKEY("TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START", "Next Tab and Whisper all Channel Commanders Start");
     CREATE_HOTKEY("TS3_SWITCH_N_TALK_END", "SnT Stop");
+    CREATE_HOTKEY("CHANNEL_MUTER", "Toggle Channel Mute");
 	END_CREATE_HOTKEYS;
 	/* The client will call ts3plugin_freeMemory to release all allocated memory */
 }
