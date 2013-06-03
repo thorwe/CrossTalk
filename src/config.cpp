@@ -145,6 +145,7 @@ void Config::SetupUi()
     label_Duck_quiet->setText(qApp->translate("PlaybackSoundSetupDialog","Quiet"));
     label_Duck_loud->setText(qApp->translate("PlaybackSoundSetupDialog","Loud"));
 
+    this->setAttribute( Qt::WA_DeleteOnClose );
     //this->update();
 }
 
