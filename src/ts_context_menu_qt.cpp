@@ -41,6 +41,8 @@ bool TSContextMenu::setMainIcon(QString icon)
 
 int TSContextMenu::Register(QObject* p, PluginMenuType type, QString text, QString icon)
 {
+    Q_UNUSED(p);
+
     if (m_isInit)
         return -1;
 
@@ -55,6 +57,7 @@ int TSContextMenu::Register(QObject* p, PluginMenuType type, QString text, QStri
 //    m_Callbacks.append(QPointer<QObject>(p));
 //    TSLogging::Print(QString("(TSContextMenu::Register): %1").arg(m_Callbacks.size()),LogLevel_DEBUG);
 //    int id = m_Callbacks.size()-1;
+
     int id = m_Items.size();
     m_Items.append(createMenuItem(type,id,(trans.isEmpty()?text:trans).toLatin1().constData(),icon.toLatin1().constData()));
 
@@ -123,6 +126,3 @@ void TSContextMenu::onMenuItemEvent(uint64 serverConnectionHandlerID, PluginMenu
 //    }
     emit FireContextMenuEvent(serverConnectionHandlerID, type, menuItemID, selectedItemID);
 }
-
-
-
