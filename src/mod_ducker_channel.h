@@ -17,15 +17,20 @@ class Ducker_Channel : public Module, public TalkInterface
                WRITE setActive
                NOTIFY activeSet)
     Q_PROPERTY(float value
-               READ value
+               READ getValue
                WRITE setValue
                NOTIFY valueSet)
     Q_PROPERTY(uint64 homeId
                READ homeId
                WRITE setHomeId)
+    Q_PROPERTY(bool targetOtherTabs
+               READ isTargetOtherTabs)
 
 public:
     explicit Ducker_Channel(QObject *parent = 0);
+
+    float getValue() const;
+    bool isTargetOtherTabs() const;
 
     // events forwarded from plugin.cpp
     void onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID);
@@ -58,6 +63,8 @@ signals:
 public slots:
     void setValue(float newValue);
     void setDuckingReverse(bool);
+
+    void saveSettings();
 
 protected:
     void onRunningStateChanged(bool value);

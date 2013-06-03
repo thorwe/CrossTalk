@@ -7,6 +7,7 @@
 #include "ts3_functions.h"
 
 #include "plugin.h"
+#include "ts_helpers_qt.h"
 
 Ducker_Channel::Ducker_Channel(QObject *parent) :
     m_isActive(false),
@@ -18,6 +19,16 @@ Ducker_Channel::Ducker_Channel(QObject *parent) :
     this->setObjectName("ChannelDucker");
     talkers = Talkers::instance();
     vols = new Volumes(this);
+}
+
+float Ducker_Channel::getValue() const
+{
+    return m_value;
+}
+
+bool Ducker_Channel::isTargetOtherTabs() const
+{
+    return m_isTargetOtherTabs;
 }
 
 // User Setting interaction
@@ -101,6 +112,14 @@ void Ducker_Channel::setDuckingReverse(bool val)
         onRunningStateChanged(true);
     }
     Log(QString("isTargetOtherTabs: %1").arg((m_isTargetOtherTabs)?"true":"false"));
+}
+
+void Ducker_Channel::saveSettings()
+{
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    cfg.setValue("ducking_enabled", isEnabled());
+    cfg.setValue("ducking_value", getValue());
+    cfg.setValue("ducking_reverse", isTargetOtherTabs());
 }
 
 void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
