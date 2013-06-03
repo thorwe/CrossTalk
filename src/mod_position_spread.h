@@ -22,12 +22,34 @@ class PositionSpread : public Module, public TalkInterface
                READ getSpreadWidth
                WRITE setSpreadWidth
                NOTIFY spreadWidthSet)
+    Q_PROPERTY(bool expertModeEnabled
+               READ isExpertModeEnabled
+               WRITE setExpertModeEnabled
+               NOTIFY expertModeEnabledSet)
+    Q_PROPERTY(TALKERS_REGION regionHomeTab
+               READ getRegionHomeTab
+               WRITE setRegionHomeTab
+               NOTIFY regionHomeTabSet)
+    Q_PROPERTY(TALKERS_REGION regionWhisper
+               READ getRegionWhisper
+               WRITE setRegionWhisper
+               NOTIFY regionWhisperSet)
+    Q_PROPERTY(TALKERS_REGION regionOther
+               READ getRegionOther
+               WRITE setRegionOther
+               NOTIFY regionOtherSet)
 public:
     explicit PositionSpread(QObject *parent = 0);
 
     void onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask);
 
+    //property getters
     float getSpreadWidth() const;
+    bool isExpertModeEnabled() const;
+    TALKERS_REGION getRegionHomeTab() const;
+    TALKERS_REGION getRegionWhisper() const;
+    TALKERS_REGION getRegionOther() const;
+
     void setHomeId(uint64 serverConnectionHandlerID);
     uint64 homeId() {return m_homeId;}
 

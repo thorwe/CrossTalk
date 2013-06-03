@@ -35,6 +35,26 @@ float PositionSpread::getSpreadWidth() const
     return m_spreadWidth;
 }
 
+bool PositionSpread::isExpertModeEnabled() const
+{
+    return m_ExpertModeEnabled;
+}
+
+TALKERS_REGION PositionSpread::getRegionHomeTab() const
+{
+    return m_RegionHomeTab;
+}
+
+TALKERS_REGION PositionSpread::getRegionWhisper() const
+{
+    return m_RegionWhisper;
+}
+
+TALKERS_REGION PositionSpread::getRegionOther() const
+{
+    return m_RegionOther;
+}
+
 void PositionSpread::setHomeId(uint64 serverConnectionHandlerID)
 {
     if (serverConnectionHandlerID == m_homeId)
