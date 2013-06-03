@@ -91,8 +91,13 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
 
 void Updater::CheckUpdate()
 {
-    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    CheckUpdate((cfg.value("beta",false).toBool())?BETA_CHECK:STABLE);
+//    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+//    CheckUpdate((cfg.value("beta",false).toBool())?BETA_CHECK:STABLE);
+#ifdef CROSSTALK_BETA
+    CheckUpdate(BETA_CHECK);
+#else
+    CheckUpdate(STABLE);
+#endif
 }
 
 void Updater::CheckUpdate(QUrl url)
