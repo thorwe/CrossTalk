@@ -59,6 +59,10 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
 {
     Print(QString("(toggleChannelMute) %1").arg(channelID),serverConnectionHandlerID,LogLevel_DEBUG);
 
+    // For hotkey support
+    if (serverConnectionHandlerID == (uint64)NULL)
+        serverConnectionHandlerID = TSHelpers::GetActiveServerConnectionHandlerID();
+
     QPair<uint64,uint64> newPair = qMakePair(serverConnectionHandlerID,channelID);
     if (!(MutedChannels->contains(newPair)))
         MutedChannels->insert(newPair);
@@ -78,11 +82,11 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
             Error("(toggleChannelMute) Error getting Client Channel Id",serverConnectionHandlerID,error);
         else
         {
-            if (channelID == myChannelID)   // only if it's my current channel immediate action is necessary
+            if ((channelID == myChannelID) || (channelID == (uint64)NULL))   // only if it's my current channel / hotkey immediate action is necessary
             {
                 // Get Channel Client List
                 anyID* clients;
-                if((error = ts3Functions.getChannelClientList(serverConnectionHandlerID,channelID, &clients)) != ERROR_ok)
+                if((error = ts3Functions.getChannelClientList(serverConnectionHandlerID,myChannelID, &clients)) != ERROR_ok)
                     Error("(toggleChannelMute) Error getting Client Channel List",serverConnectionHandlerID,error);
                 else
                 {
@@ -327,4 +331,22 @@ bool ChannelMuter::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID
     SimpleVolume* vol = ChanVolumes->value(clientID);
     vol->process(samples,sampleCount);
     return vol->isMuted();
+}
+
+int ChannelMuter::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
+{
+    if ((cmd.compare("CHANNEL_MUTER",Qt::CaseInsensitive)) != 0)
+        return 1;
+
+    uint64 channelID = (uint64)NULL;
+
+    if (!args.isEmpty())
+    {
+        // TODO: first argument toggle/whitelist etc.
+        // second argument server name
+        // third argument channel name
+    }
+
+    toggleChannelMute(serverConnectionHandlerID, channelID);
+    return 0;
 }

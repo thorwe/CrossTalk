@@ -33,6 +33,7 @@ public:
 
     bool onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, uint64 mine, QTextStream &data);
 
+    int ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
 
 signals:
     
