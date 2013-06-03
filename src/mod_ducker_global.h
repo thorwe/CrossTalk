@@ -18,7 +18,7 @@ class Ducker_Global : public Module, public InfoDataInterface, public ContextMen
                WRITE setActive
                NOTIFY activeSet)
     Q_PROPERTY(float value
-               READ value
+               READ getValue
                WRITE setValue
                NOTIFY valueSet)
 
@@ -44,6 +44,7 @@ public:
 //        m_Instance = 0;
 //        mutex.unlock();
 //    }
+    float getValue() const;
 
     void AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID);
 //    void AddMusicBot(QString uid);
@@ -72,6 +73,8 @@ signals:
 public slots:
     void setValue(float newValue);
     void onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID);
+
+    void saveSettings();
 
 protected:
     void onRunningStateChanged(bool value);

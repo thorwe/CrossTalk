@@ -24,6 +24,11 @@ Ducker_Global::Ducker_Global(QObject *parent) :
     DuckTargets = new QMap<QString,QString>;
 }
 
+float Ducker_Global::getValue() const
+{
+    return m_value;
+}
+
 //Ducker_Global::~Ducker_Global()
 //{
 //}
@@ -60,10 +65,18 @@ bool Ducker_Global::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 i
     return isDirty;
 }
 
+void Ducker_Global::saveSettings()
+{
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    cfg.beginGroup("ducker_global");
+    cfg.setValue("enabled",isEnabled());
+    cfg.setValue("value",getValue());
+    cfg.endGroup();
+}
+
 void Ducker_Global::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
 {
     Q_UNUSED(type);
-
 //    Print("(onContextMenuEvent)",serverConnectionHandlerID,LogLevel_DEBUG);
     if (menuItemID == m_ContextMenuToggleMusicBot)
     {
