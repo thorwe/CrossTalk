@@ -25,6 +25,8 @@
 
 #include "ts_context_menu_qt.h"
 
+#include "ts_serversinfo.h"
+
 #include "talkers.h"
 #include "config.h"
 #include "snt.h"
@@ -46,6 +48,7 @@
 #include "updater.h"
 
 #ifdef USE_RADIO
+#include "settings_radio.h"
 #include "mod_radio.h"
 #endif
 
@@ -95,11 +98,14 @@ SettingsPositionalAudio* settingsPositionalAudio = SettingsPositionalAudio::inst
 PositionalAudio positionalAudio;
 #endif
 #ifdef USE_RADIO
+SettingsRadio* settingsRadio = SettingsRadio::instance();
 Radio radio;
 #endif
 
 SettingsDuck* settingsDuck = SettingsDuck::instance();
 SettingsPositionSpread* settingsPositionSpread = SettingsPositionSpread::instance();
+
+TSServersInfo* centralStation = TSServersInfo::instance();
 
 /*********************************** Required functions ************************************/
 /*
@@ -159,7 +165,8 @@ int ts3plugin_init() {
     settingsPositionSpread->Init(&positionSpread);
 
 #ifdef USE_RADIO
-    radio.setEnabled(true);
+    settingsRadio->Init(&radio);
+//    radio.setEnabled(true);
 #endif
 
 #ifdef USE_POSITIONAL_AUDIO
@@ -302,11 +309,12 @@ int ts3plugin_offersConfigure() {
 	 * PLUGIN_OFFERS_CONFIGURE_NEW_THREAD - Plugin does implement ts3plugin_configure and requests to run this function in an own thread
 	 * PLUGIN_OFFERS_CONFIGURE_QT_THREAD  - Plugin does implement ts3plugin_configure and requests to run this function in the Qt GUI thread
 	 */
-	return PLUGIN_OFFERS_CONFIGURE_QT_THREAD;  /* In this case ts3plugin_configure does not need to be implemented */
+    return PLUGIN_OFFERS_CONFIGURE_QT_THREAD;
 }
 
 /* Plugin might offer a configuration window. If ts3plugin_offersConfigure returns 0, this function does not need to be implemented. */
 void ts3plugin_configure(void* handle, void* qParentWidget) {
+    Q_UNUSED(handle);
     Config* qParentWidget_p = (Config*)qParentWidget;
 
     qParentWidget_p = new Config();
@@ -376,12 +384,85 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
 
     cmd_qs = args_qs.takeFirst();
 
-    // Dispatch
-    ret = positionSpread.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
-    if (ret != 0)
+    if (cmd_qs == "TOGGLE_SELF_SERVER_GROUP")
     {
-        snt.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
-        ret = 1;    // ToDo: Suffer through snt.ParseCommand to return an int
+        if (args_qs.size() < 2)
+            ret = 1;
+        else
+        {
+            unsigned int error;
+            uint64 targetServer = 0;
+            QString serverName = args_qs.takeFirst();
+
+            if ((error = TSHelpers::GetServerHandler(serverName,&targetServer)) != ERROR_ok)
+                ret = 0;
+            else
+            {
+//                TSLogging::Print(QString("Target Server: %1, %2").arg(serverName).arg(targetServer));
+                QSet<uint64> myServerGroups;
+                if ((error = TSHelpers::GetClientSelfServerGroups(targetServer, &myServerGroups)) != ERROR_ok)
+                {
+                    TSLogging::Error("(GET_SELF_SERVER_GROUPS) Could not get self server groups", targetServer, error, true);
+                    ret = 1;
+                }
+                else
+                {
+                    QString serverGroupName = args_qs.takeFirst();
+                    uint64 serverGroupId = centralStation->GetServerInfo(targetServer)->GetServerGroupId(serverGroupName);
+                    if (serverGroupId == (uint64)NULL)
+                        ret = 1;
+                    else
+                    {
+//                        TSLogging::Print(QString("Target Server Group: %1, %2").arg(serverGroupName).arg(serverGroupId));
+
+                        // Get My Id on this handler
+                        anyID myID;
+                        if((error = ts3Functions.getClientID(targetServer,&myID)) != ERROR_ok)
+                        {
+                            TSLogging::Error("(GET_SELF_SERVER_GROUPS)",serverConnectionHandlerID,error);
+                            ret = 1;
+                        }
+                        else
+                        {
+                            // Doesn't work with ClientSelf
+                            int myDbId;
+                            if ((error = ts3Functions.getClientVariableAsInt(targetServer,myID,CLIENT_DATABASE_ID,&myDbId)) != ERROR_ok)
+                            {
+                                TSLogging::Error("(GET_SELF_SERVER_GROUPS) Could not get self client db id", targetServer, error, true);
+                                ret = 1;
+                            }
+                            else
+                            {
+//                                TSLogging::Print(QString("My Client db id: %1").arg(myDbId));
+
+                                if (myServerGroups.contains(serverGroupId))
+                                {
+//                                    TSLogging::Print(QString("I am in group: %1; Removing...").arg(serverGroupId));
+                                    ts3Functions.requestServerGroupDelClient(serverConnectionHandlerID,serverGroupId,myDbId,NULL);
+                                }
+                                else
+                                {
+//                                    TSLogging::Print(QString("I am not in group: %1; Adding...").arg(serverGroupId));
+                                    ts3Functions.requestServerGroupAddClient(serverConnectionHandlerID,serverGroupId,myDbId,NULL);
+                                }
+
+                                ret = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        // Dispatch
+        ret = positionSpread.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
+        if (ret != 0)
+        {
+            snt.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
+            ret = 1;    // ToDo: Suffer through snt.ParseCommand to return an int
+        }
     }
 
     command_mutex.unlock();
@@ -495,6 +576,7 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 /* Show an error message if the plugin failed to load */
 void ts3plugin_onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber)
 {
+    centralStation->onConnectStatusChangeEvent(serverConnectionHandlerID,newStatus,errorNumber);
     talkers->onConnectStatusChangeEvent(serverConnectionHandlerID,newStatus,errorNumber);
     if (newStatus==STATUS_CONNECTION_ESTABLISHED)
     {
@@ -824,3 +906,18 @@ void ts3plugin_onHotkeyEvent(const char* keyword) {
     /* Identify the hotkey by keyword ("keyword_1", "keyword_2" or "keyword_3" in this example) and handle here... */
     ts3plugin_processCommand((uint64)NULL,keyword);
 }
+
+void ts3plugin_onServerGroupListEvent(uint64 serverConnectionHandlerID, uint64 serverGroupID, const char* name, int type, int iconID, int saveDB)
+{
+    centralStation->onServerGroupListEvent(serverConnectionHandlerID,serverGroupID,name,type,iconID,saveDB);
+}
+
+void ts3plugin_onServerGroupListFinishedEvent(uint64 serverConnectionHandlerID)
+{
+    centralStation->onServerGroupListFinishedEvent(serverConnectionHandlerID);
+}
+
+//void ts3plugin_onServerGroupClientListEvent(uint64 serverConnectionHandlerID, uint64 serverGroupID, uint64 clientDatabaseID, const char* clientNameIdentifier, const char* clientUniqueID)
+//{
+//    TSLogging::Print(QString("onServerGroupClientListEvent: %1,%2,%3,%4,%5").arg(serverConnectionHandlerID).arg(serverGroupID).arg(clientDatabaseID).arg(clientNameIdentifier).arg(clientUniqueID));
+//}

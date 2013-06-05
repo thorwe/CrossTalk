@@ -128,9 +128,11 @@ namespace TSHelpers
                 {
                     ts3Functions.freeMemory(s_name);
                     *result = *server;
+                    error = ERROR_ok;
                     break;
                 }
                 ts3Functions.freeMemory(s_name);
+                error = ERROR_not_connected;
             }
             ts3Functions.freeMemory(servers);
         }
@@ -391,5 +393,43 @@ namespace TSHelpers
             TSLogging::Error("Too many candidates for MainWindow. Report to the plugin developer.");
             return NULL;
         }
+    }
+
+    unsigned int GetClientSelfServerGroups(uint64 serverConnectionHandlerID, QSet<uint64> *result)
+    {
+        unsigned int error;
+        anyID myID;
+        if((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
+        {
+            TSLogging::Error("(TSHelpers::GetClientSelfServerGroups)",serverConnectionHandlerID,error,true);
+            return error;
+        }
+
+        char* cP_result;
+        if ((error = ts3Functions.getClientVariableAsString(serverConnectionHandlerID, myID, CLIENT_SERVERGROUPS, &cP_result)) == ERROR_ok)
+        {
+            QStringList qsl_result = QString(cP_result).split(",",QString::SkipEmptyParts);
+//            TSLogging::Print(cP_result);
+            ts3Functions.freeMemory(cP_result);
+
+            bool ok;
+            while (!qsl_result.isEmpty())
+            {
+                *result << qsl_result.takeFirst().toInt(&ok,10);
+                if (!ok)
+                {
+                    TSLogging::Error("Error converting Server Group to int");
+                    return ERROR_not_implemented;
+                }
+            }
+
+//            QString debOut = "My Server Groups:";
+//            QSetIterator<uint64> i(*result);
+//            while (i.hasNext())
+//                debOut.append(QString("%1; ").arg(i.next()));
+
+//            TSLogging::Print(debOut);
+        }
+        return error;
     }
 }

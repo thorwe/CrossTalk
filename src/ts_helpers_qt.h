@@ -36,6 +36,8 @@ namespace TSHelpers
     unsigned int GetDefaultProfile(PluginGuiProfile profile, QString &result);
 
     QWidget* GetMainWindow();
+
+    unsigned int GetClientSelfServerGroups(uint64 serverConnectionHandlerID, QSet<uint64> *result);
 }
 
 #endif // TS_HELPERS_QT_H
