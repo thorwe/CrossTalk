@@ -16,7 +16,7 @@ Ducker_Global::Ducker_Global(QObject *parent) :
     m_value(0.0f),
     m_ContextMenuToggleMusicBot(-1)
 {
-    m_isPrintEnabled = true;
+    m_isPrintEnabled = false;
     this->setParent(parent);
     this->setObjectName("GlobalDucker");
     talkers = Talkers::instance();

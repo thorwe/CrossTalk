@@ -14,7 +14,7 @@ Ducker_Channel::Ducker_Channel(QObject *parent) :
     m_value(0.0f),
     m_homeId(0)
 {
-    m_isPrintEnabled = true;
+    m_isPrintEnabled = false;
     this->setParent(parent);
     this->setObjectName("ChannelDucker");
     talkers = Talkers::instance();

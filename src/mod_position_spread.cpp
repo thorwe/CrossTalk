@@ -17,7 +17,7 @@ PositionSpread::PositionSpread(QObject *parent) :
 {
     this->setParent(parent);
     this->setObjectName("Position Spread");
-    m_isPrintEnabled = true;
+    m_isPrintEnabled = false;
     talkers = Talkers::instance();
     TalkersPanners = new QMap<uint64,QMap<anyID,SimplePanner*>* >;
     TalkerSequences = new QMap<TALKERS_REGION,QList< QPair<uint64,anyID> >* >;

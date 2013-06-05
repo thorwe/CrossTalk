@@ -14,7 +14,7 @@ ChannelMuter::ChannelMuter(QObject *parent) :
     m_ContextMenuIdToggleChannelMute(-1),
     m_ContextMenuToggleClientWhitelisted(-1)
 {
-    m_isPrintEnabled = true;
+    m_isPrintEnabled = false;
     this->setParent(parent);
     this->setObjectName("ChannelMuter");
     talkers = Talkers::instance();
