@@ -119,7 +119,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.3.053101";
+    return "1.3.060501";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -402,7 +402,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                 QSet<uint64> myServerGroups;
                 if ((error = TSHelpers::GetClientSelfServerGroups(targetServer, &myServerGroups)) != ERROR_ok)
                 {
-                    TSLogging::Error("(GET_SELF_SERVER_GROUPS) Could not get self server groups", targetServer, error, true);
+                    TSLogging::Error("(TOGGLE_SELF_SERVER_GROUP) Could not get self server groups", targetServer, error, true);
                     ret = 1;
                 }
                 else
@@ -419,7 +419,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                         anyID myID;
                         if((error = ts3Functions.getClientID(targetServer,&myID)) != ERROR_ok)
                         {
-                            TSLogging::Error("(GET_SELF_SERVER_GROUPS)",serverConnectionHandlerID,error);
+                            TSLogging::Error("(TOGGLE_SELF_SERVER_GROUP)",serverConnectionHandlerID,error);
                             ret = 1;
                         }
                         else
@@ -428,7 +428,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                             int myDbId;
                             if ((error = ts3Functions.getClientVariableAsInt(targetServer,myID,CLIENT_DATABASE_ID,&myDbId)) != ERROR_ok)
                             {
-                                TSLogging::Error("(GET_SELF_SERVER_GROUPS) Could not get self client db id", targetServer, error, true);
+                                TSLogging::Error("(TOGGLE_SELF_SERVER_GROUP) Could not get self client db id", targetServer, error, true);
                                 ret = 1;
                             }
                             else

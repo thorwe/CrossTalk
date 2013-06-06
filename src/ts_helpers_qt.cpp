@@ -110,7 +110,7 @@ namespace TSHelpers
 
         // Get server list
         if((error = ts3Functions.getServerConnectionHandlerList(&servers)) != ERROR_ok)
-            TSLogging::Error("(TSHelpers::GetServerHandler)",NULL,error,true);
+            TSLogging::Error("(TSHelpers::GetServerHandler)getServerConnectionHandlerList",NULL,error,true);
         else
         {
             // Find server in the list
@@ -120,19 +120,24 @@ namespace TSHelpers
             {
                 if ((error = ts3Functions.getServerVariableAsString(*server, VIRTUALSERVER_NAME, &s_name)) != ERROR_ok)
                 {
-                    TSLogging::Error("(TSHelpers::GetServerHandler)",NULL,error,true);
-                    break;
+                    if (error != ERROR_not_connected)
+                    {
+                        TSLogging::Error("(TSHelpers::GetServerHandler)getServerVariableAsString",NULL,error,true);
+                        break;
+                    }
                 }
-
-                if(name==s_name)
+                else
                 {
+                    if(name==s_name)
+                    {
+                        ts3Functions.freeMemory(s_name);
+                        *result = *server;
+                        error = ERROR_ok;
+                        break;
+                    }
                     ts3Functions.freeMemory(s_name);
-                    *result = *server;
-                    error = ERROR_ok;
-                    break;
+                    error = ERROR_not_connected;
                 }
-                ts3Functions.freeMemory(s_name);
-                error = ERROR_not_connected;
             }
             ts3Functions.freeMemory(servers);
         }
