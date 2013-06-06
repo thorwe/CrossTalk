@@ -11,19 +11,19 @@ CrossTalk is a Teamspeak 3 plugin that enhances the general audio experience and
 
 ## Features
 
-* Stereo Position Spread  
-![Stereo Position Spread](https://github.com/thorwe/CrossTalk/raw/master/misc/sps.png "Stereo Position Spread")
-* Channel Ducking  
-![Channel Ducking](https://github.com/thorwe/CrossTalk/raw/master/misc/duck.png "Channel Ducking")
-* Cross-Server Push-to-Talk & Whispering
+### Stereo Position Spread  
+![Stereo Position Spread](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_ps.png "Stereo Position Spread")
+### Channel Ducking  
+![Channel Ducking](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_duck.png "Channel Ducking")
+### Radio FX
+Walkie Talkie? Walkie Talkie.
+
+![Radio FX](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_radio.png "Radio FX")
+### Cross-Server Push-to-Talk & Whispering
 
 ## Installation
 
 Head over to the official download site at Teamspeak for an [installer package](http://addons.teamspeak.com/).
-
-## Screenshots
-
-![Plugin config](https://github.com/thorwe/CrossTalk/raw/master/misc/crosstalk_screenie.png "plugin config")
 
 ## Support
 
