@@ -317,7 +317,8 @@ bool PositionSpread::onTalkStatusChanged(uint64 serverConnectionHandlerID, int s
         // Removing does not need to be robust against multiple STATUS_NOT_TALKING in a row, since that doesn't happen on user setting change
         if (!TalkersPanners->contains(serverConnectionHandlerID))
         {
-            Error("(onTalkStatusChanged) Trying to remove talker from an invalid server connection handler id.",serverConnectionHandlerID,NULL);
+            // return silent bec. of ChannelMuter implementation
+//            Error("(onTalkStatusChanged) Trying to remove talker from an invalid server connection handler id.",serverConnectionHandlerID,NULL);
             return false;
         }
 
