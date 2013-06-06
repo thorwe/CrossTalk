@@ -457,11 +457,15 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
     else
     {
         // Dispatch
-        ret = positionSpread.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
+        ret = channel_Muter.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
         if (ret != 0)
         {
-            snt.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
-            ret = 1;    // ToDo: Suffer through snt.ParseCommand to return an int
+            ret = positionSpread.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
+            if (ret != 0)
+            {
+                snt.ParseCommand(serverConnectionHandlerID,cmd_qs,args_qs);
+                ret = 1;    // ToDo: Suffer through snt.ParseCommand to return an int
+            }
         }
     }
 

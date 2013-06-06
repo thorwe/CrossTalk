@@ -14,7 +14,7 @@ ChannelMuter::ChannelMuter(QObject *parent) :
     m_ContextMenuIdToggleChannelMute(-1),
     m_ContextMenuToggleClientWhitelisted(-1)
 {
-    m_isPrintEnabled = false;
+    m_isPrintEnabled = true;
     this->setParent(parent);
     this->setObjectName("ChannelMuter");
     talkers = Talkers::instance();
@@ -53,21 +53,18 @@ void ChannelMuter::onRunningStateChanged(bool value)
  * \brief ChannelMuter::toggleChannelMute Toggles a channels mute status on a server tab
  * \param serverConnectionHandlerID the server tab
  * \param channelID the channel id
- * \return true if the toggling results in muting, otherwise false
+ * \return true if the toggling results in active muting, otherwise false
  */
 bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 channelID)
 {
-    Print(QString("(toggleChannelMute) %1").arg(channelID),serverConnectionHandlerID,LogLevel_DEBUG);
+//    Print(QString("(toggleChannelMute) %1").arg(channelID),serverConnectionHandlerID,LogLevel_DEBUG);
 
-    // For hotkey support
     if (serverConnectionHandlerID == (uint64)NULL)
+    {
         serverConnectionHandlerID = TSHelpers::GetActiveServerConnectionHandlerID();
-
-    QPair<uint64,uint64> newPair = qMakePair(serverConnectionHandlerID,channelID);
-    if (!(MutedChannels->contains(newPair)))
-        MutedChannels->insert(newPair);
-    else
-        MutedChannels->remove(newPair);
+        if (serverConnectionHandlerID == (uint64)NULL)
+            return false;
+    }
 
     unsigned int error;
     // Get My Id on this handler
@@ -82,11 +79,20 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
             Error("(toggleChannelMute) Error getting Client Channel Id",serverConnectionHandlerID,error);
         else
         {
-            if ((channelID == myChannelID) || (channelID == (uint64)NULL))   // only if it's my current channel / hotkey immediate action is necessary
+            uint64 targetChannelId = (channelID != (uint64)NULL)?channelID:myChannelID;
+//            Print(QString("(toggleChannelMute2) %1").arg(targetChannelId),serverConnectionHandlerID,LogLevel_DEBUG);
+
+            QPair<uint64,uint64> newPair = qMakePair(serverConnectionHandlerID,targetChannelId);
+            if (!(MutedChannels->contains(newPair)))
+                MutedChannels->insert(newPair);
+            else
+                MutedChannels->remove(newPair);
+
+            if (targetChannelId == myChannelID)   // only if it's my current channel / hotkey immediate action is necessary
             {
                 // Get Channel Client List
                 anyID* clients;
-                if((error = ts3Functions.getChannelClientList(serverConnectionHandlerID,myChannelID, &clients)) != ERROR_ok)
+                if((error = ts3Functions.getChannelClientList(serverConnectionHandlerID, targetChannelId, &clients)) != ERROR_ok)
                     Error("(toggleChannelMute) Error getting Client Channel List",serverConnectionHandlerID,error);
                 else
                 {
@@ -102,12 +108,16 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
                         else
                             onTalkStatusChanged(serverConnectionHandlerID, talkStatus, (isReceivedWhisper == 1), clients[i], clients[i]==myID);
                     }
+
+                    // for info update on hotkey
+                    if (channelID == (uint64)NULL)
+                        TSInfoData::instance()->RequestUpdate(serverConnectionHandlerID, targetChannelId, PLUGIN_CHANNEL);
                 }
             }
+            return (MutedChannels->contains(newPair));
         }
     }
-
-    return (MutedChannels->contains(newPair));
+    return false;
 }
 
 //! Is a channel muted on the server tab?
