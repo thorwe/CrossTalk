@@ -13,7 +13,11 @@ CrossTalk is a Teamspeak 3 plugin that enhances the general audio experience and
 
 ### Stereo Position Spread  
 ![Stereo Position Spread](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_ps.png "Stereo Position Spread")
-### Channel Ducking  
+### Ducking
+Global Ducking: Reduce the volume of musicbots when someone talks.
+
+Channel Ducking: Reduce the volume of home or foreing tabs when someone talks on the other one or you receive a whisper.
+
 ![Channel Ducking](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_duck.png "Channel Ducking")
 ### Radio FX
 Walkie Talkie? Walkie Talkie.
