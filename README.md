@@ -1,5 +1,5 @@
 ![Logo](https://github.com/thorwe/CrossTalk/raw/master/res/logo_320x60.png "CrossTalk")
-[![Pledgie](https://www.pledgie.com/campaigns/18898.png "Click here to lend your support to CrossTalk and make a donation!")][pledgie]
+[![Click here to lend your support to CrossTalk and make a donation!](http://www.pledgie.com/campaigns/18898.png)][pledgie]
 
 CrossTalk is a Teamspeak 3 plugin that enhances the general audio experience and provides advanced features for commanders.
 
