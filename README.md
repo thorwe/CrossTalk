@@ -19,6 +19,8 @@ CrossTalk is a Teamspeak 3 plugin that enhances the general audio experience and
 Walkie Talkie? Walkie Talkie.
 
 ![Radio FX](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_radio.png "Radio FX")
+### ChannelMuter
+You want to listen only to a few selected people in a crowded channel? Meet the ChannelMuter.
 ### Cross-Server Push-to-Talk & Whispering
 
 ## Installation
