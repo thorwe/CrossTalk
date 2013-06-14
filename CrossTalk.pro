@@ -2,12 +2,12 @@ TEMPLATE = lib
 # CONFIG += console
 #CONFIG-=embed_manifest_dll
 
-#VERSION = 1.2.3
+#VERSION = 1.3.1
 CONFIG += beta
 
 QT += sql network
 
-INCLUDEPATH += includes \
+INCLUDEPATH += includes
 
 TRANSLATIONS = crosstalk_de_DE.ts
 
@@ -94,6 +94,28 @@ FORMS += \
 RESOURCES += \
     CrossTalkRes.qrc
 
+# Radio Module
+include(DSPFilters/DSPFilters.pri) {
+    HEADERS += \
+        src/dsp_radio.h \
+        src/mod_radio.h \
+        src/config_radio.h \
+        src/config_radio_groupbox.h
+
+    SOURCES += \
+        src/dsp_radio.cpp \
+        src/mod_radio.cpp \
+        src/config_radio.cpp \
+        src/config_radio_groupbox.cpp
+
+    FORMS += \
+        src/config_radio.ui \
+        src/config_radio_groupbox.ui
+
+    DEFINES += USE_RADIO
+    !build_pass:message( "Radio module included." )
+}
+
 beta {
     DEFINES += CROSSTALK_BETA
 
@@ -102,29 +124,6 @@ beta {
         DEFINES += USE_POSITIONAL_AUDIO
         !build_pass:message( "Positional Audio module included." )
     }
-
-    # Radio Module
-    include(DSPFilters/DSPFilters.pri) {
-        HEADERS += \
-            src/dsp_radio.h \
-            src/mod_radio.h \
-            src/config_radio.h \
-            src/config_radio_groupbox.h
-
-        SOURCES += \
-            src/dsp_radio.cpp \
-            src/mod_radio.cpp \
-            src/config_radio.cpp \
-            src/config_radio_groupbox.cpp
-
-        FORMS += \
-            src/config_radio.ui \
-            src/config_radio_groupbox.ui
-
-        DEFINES += USE_RADIO
-        !build_pass:message( "Radio module included." )
-    }
-
 }
 
 win32 {
