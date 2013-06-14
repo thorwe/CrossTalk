@@ -119,7 +119,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.3.060501";
+    return "1.3.060801";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -166,40 +166,13 @@ int ts3plugin_init() {
 
 #ifdef USE_RADIO
     settingsRadio->Init(&radio);
-//    radio.setEnabled(true);
 #endif
 
 #ifdef USE_POSITIONAL_AUDIO
-//    positionalAudio.setEnabled(true);
     settingsPositionalAudio->Init(&positionalAudio);
 #endif
 
-
     channel_Muter.setEnabled(true);
-
-//    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-//    ducker_C.setEnabled(cfg.value("ducking_enabled",true).toBool());
-//    ducker_C.setValue(cfg.value("ducking_value",-23.0f).toFloat());
-//    ducker_C.setDuckingReverse(cfg.value("ducking_reverse",false).toBool());
-//    positionSpread.setEnabled(cfg.value("stereo_position_spread_enabled",true).toBool());
-//    positionSpread.setSpreadWidth(cfg.value("stereo_position_spread_value",0.5f).toFloat());
-//    positionSpread.setExpertModeEnabled(cfg.value("stereo_position_spread_expert_enabled",false).toBool());
-//    positionSpread.setRegionHomeTab(cfg.value("stereo_position_spread_region_home",1).toInt());
-//    positionSpread.setRegionWhisper(cfg.value("stereo_position_spread_region_whisper",2).toInt());
-//    positionSpread.setRegionOther(cfg.value("stereo_position_spread_region_other",0).toInt());
-
-//    cfg.beginGroup("ducker_global");
-//    int size = cfg.beginReadArray("targets");
-//    for (int i = 0; i < size; ++i)
-//    {
-//        cfg.setArrayIndex(i);
-//        ducker_G.DuckTargets->insert(cfg.value("uid").toString(),cfg.value("name").toString());
-//    }
-//    cfg.endArray();
-//    ducker_G.setValue(cfg.value("value",-23.0f).toFloat());
-//    ducker_G.setEnabled(cfg.value("enabled",true).toBool());
-//    cfg.endGroup();
-
 
     // Support enabling the plugin while already connected
     uint64* servers;
@@ -765,6 +738,13 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 
 void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels)
 {
+//    TSLogging::Print(QString("clientID: %1").arg(clientID));
+    if (clientID > 32767)
+    {
+        clientID = 65535 - clientID + 1;
+//        TSLogging::Print(QString("corrected clientID: %1").arg(clientID));
+    }
+
     if (channel_Muter.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels))
         return; //Client is muted;
 
@@ -778,6 +758,13 @@ void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, an
 
 void ts3plugin_onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask)
 {
+//    TSLogging::Print(QString("clientID: %1").arg(clientID));
+    if (clientID > 32767)
+    {
+        clientID = 65535 - clientID + 1;
+//        TSLogging::Print(QString("corrected clientID: %1").arg(clientID));
+    }
+
     positionSpread.onEditPostProcessVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels,channelSpeakerArray,channelFillMask);
 }
 
