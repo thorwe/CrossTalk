@@ -337,9 +337,8 @@ bool ChannelMuter::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID
     if (!ChanVolumes->contains(clientID))
         return false;
 
-    sampleCount = sampleCount * channels;
     SimpleVolume* vol = ChanVolumes->value(clientID);
-    vol->process(samples,sampleCount);
+    vol->process(samples, sampleCount * channels);
     return vol->isMuted();
 }
 

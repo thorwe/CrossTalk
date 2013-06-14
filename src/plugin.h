@@ -11,6 +11,10 @@
 #else
 #define PLUGINS_EXPORTDLL __attribute__ ((visibility("default")))
 #endif
+
+#include "public_definitions.h"
+#include "plugin_definitions.h"
+
 //#include <QMutex>
 extern struct TS3Functions ts3Functions;
 //extern QMutex command_mutex;
