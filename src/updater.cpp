@@ -123,20 +123,20 @@ void Updater::CheckUpdate(QUrl url)
 void Updater::ShowUpdateDialog(QString remoteVersion)
 {
     // Get MainWindow
-    QList<QWidget*> candidates;
-    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-        if (widget->isWindow() && widget->inherits("QMainWindow") && !widget->windowTitle().isEmpty())
-            candidates.append(widget);
-    }
-    QWidget* mainWindow;
-    if (candidates.count() == 1)
-        mainWindow = candidates.at(0);
-    else
-    {
-        TSLogging::Error("Updater: Too many candidates for MainWindow. Report to the plugin developer.");
-        return;
-    }
-
+//    QList<QWidget*> candidates;
+//    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
+//        if (widget->isWindow() && widget->inherits("QMainWindow") && !widget->windowTitle().isEmpty())
+//            candidates.append(widget);
+//    }
+//    QWidget* mainWindow;
+//    if (candidates.count() == 1)
+//        mainWindow = candidates.at(0);
+//    else
+//    {
+//        TSLogging::Error("Updater: Too many candidates for MainWindow. Report to the plugin developer.");
+//        return;
+//    }
+    QWidget* mainWindow = TSHelpers::GetMainWindow();
     // Create Dialog
     QMessageBox updateMsgBox(mainWindow);
 //    updateMsgBox = new QMessageBox();
