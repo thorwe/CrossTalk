@@ -691,11 +691,10 @@ void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID cl
 int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage) {
 //    TSLogging::Print(QString("onServerErrorEvent: %1 %2 %3").arg((returnCode ? returnCode : "")).arg(error).arg(errorMessage),serverConnectionHandlerID,LogLevel_DEBUG);
 
-    if  (error== ERROR_client_is_flooding)
-    {
-//        TSLogging::Error("Client is flooding. Need throttle.");
-    }
-
+//    if  (error== ERROR_client_is_flooding)
+//    {
+////        TSLogging::Error("Client is flooding. Need throttle.");
+//    }
 //    if(returnCode) {
 //        TSLogging::Print("have returnCode");
 //        /* A plugin could now check the returnCode with previously (when calling a function) remembered returnCodes and react accordingly */
@@ -713,7 +712,12 @@ int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* e
 
 //        return 1;
 //    }
-    return 0;  /* If no plugin return code was used, the return value of this function is ignored */
+    int isHandledError = 0;
+#ifdef USE_POSITIONAL_AUDIO
+    isHandledError = positionalAudio.onServerErrorEvent(serverConnectionHandlerID,errorMessage,error,returnCode,extraMessage);
+#endif
+
+    return isHandledError;  /* If no plugin return code was used, the return value of this function is ignored */
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID)
@@ -726,7 +730,6 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 #ifdef USE_RADIO
     radio.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
 #endif
-
 
     ducker_G.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
     if (!ducker_G.isRunning() || !ducker_G.isClientMusicBotRt(serverConnectionHandlerID,clientID))
