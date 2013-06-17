@@ -31,6 +31,20 @@ QString TSServerInfo::getName() const
     return name;
 }
 
+QString TSServerInfo::getUniqueId() const
+{
+    unsigned int error;
+    char* s_val;
+    if ((error = ts3Functions.getServerVariableAsString(m_ServerConnectionHandlerID, VIRTUALSERVER_UNIQUE_IDENTIFIER, &s_val)) != ERROR_ok)
+    {
+        TSLogging::Error("(TSServerInfo::getUniqueId())",NULL,error,true);
+        return QString::null;
+    }
+    QString val = QString::fromUtf8(s_val);
+    ts3Functions.freeMemory(s_val);
+    return val;
+}
+
 uint64 TSServerInfo::GetServerGroupId(QString name) const
 {
     return (m_ServerGroups.key(name,(uint64)NULL));
