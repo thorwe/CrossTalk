@@ -49,8 +49,7 @@ HEADERS += \
     src/settings_position_spread.h \
     src/banner_frame.h \
     src/ts_serverinfo_qt.h \
-    src/ts_serversinfo.h \
-    src/settings_radio.h
+    src/ts_serversinfo.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -81,8 +80,7 @@ SOURCES += \
     src/settings_position_spread.cpp \
     src/banner_frame.cpp \
     src/ts_serverinfo_qt.cpp \
-    src/ts_serversinfo.cpp \
-    src/settings_radio.cpp
+    src/ts_serversinfo.cpp
 
 FORMS += \
     src/config.ui \
@@ -100,13 +98,15 @@ include(DSPFilters/DSPFilters.pri) {
         src/dsp_radio.h \
         src/mod_radio.h \
         src/config_radio.h \
-        src/config_radio_groupbox.h
+        src/config_radio_groupbox.h \
+        src/settings_radio.h
 
     SOURCES += \
         src/dsp_radio.cpp \
         src/mod_radio.cpp \
         src/config_radio.cpp \
-        src/config_radio_groupbox.cpp
+        src/config_radio_groupbox.cpp \
+        src/settings_radio.cpp
 
     FORMS += \
         src/config_radio.ui \
