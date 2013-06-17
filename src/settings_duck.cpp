@@ -83,7 +83,7 @@ void SettingsDuck::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMe
                 this->connect(p_config,SIGNAL(globalDuckerEnabledSet(bool)),SIGNAL(globalDuckerEnabledSet(bool)));
                 this->connect(p_config,SIGNAL(globalDuckerValueChanged(float)),SIGNAL(globalDuckerValueChanged(float)));
 
-                this->connect(p_config,SIGNAL(channelDuckingEnabledSet(bool)),SIGNAL(channelDuckingEnabledSet(bool)));
+                this->connect(p_config,SIGNAL(channelDuckerEnabledSet(bool)),SIGNAL(channelDuckerEnabledSet(bool)));
                 this->connect(p_config,SIGNAL(channelDuckingValueChanged(float)),SIGNAL(channelDuckingValueChanged(float)));
                 this->connect(p_config,SIGNAL(channelDuckingReverseSet(bool)),SIGNAL(channelDuckingReverseSet(bool)));
 
@@ -127,13 +127,13 @@ void SettingsDuck::onMenusInitialized()
 
 //    enabled = cfg.value("ducking_enabled",true).toBool();
 //    if (!enabled)
-//        emit channelDuckingEnabledSet(enabled);
+//        emit channelDuckerEnabledSet(enabled);
 
 //    emit channelDuckingValueChanged(cfg.value("ducking_value",-23.0f).toFloat());
 //    emit channelDuckingReverseSet(cfg.value("ducking_reverse",false).toBool());
 
 //    if (enabled)
-//        emit channelDuckingEnabledSet(enabled);
+//        emit channelDuckerEnabledSet(enabled);
 //}
 
 void SettingsDuck::saveSettings(int r)
