@@ -73,9 +73,9 @@ void ConfigDucking::UpdateChannelDuckerReverse(bool val)
     this->blockSignals(false);
 }
 
-//! Retrieves ducking mode slider change, sets label, emits channelDuckingReverseSet as bool
+//! Retrieves ducking mode slider change, sets label, emits channelDuckerReverseSet as bool
 /*!
- * \brief Config::onChannelDuckingDuckModeSliderValueChanged Retrieves ducking mode slider change, sets label, emits channelDuckingReverseSet as bool
+ * \brief Config::onChannelDuckingDuckModeSliderValueChanged Retrieves ducking mode slider change, sets label, emits channelDuckerReverseSet as bool
  * \param val slider value (0-100)
  */
 void ConfigDucking::onChannelDuckingDuckModeSliderValueChanged(int val)

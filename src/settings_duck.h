@@ -45,8 +45,8 @@ signals:
     void globalDuckerEnabledSet(bool);
     void globalDuckerValueChanged(float);
     void channelDuckerEnabledSet(bool);
-    void channelDuckingValueChanged(float);
-    void channelDuckingReverseSet(bool);
+    void channelDuckerValueChanged(float);
+    void channelDuckerReverseSet(bool);
 
     void settingsSave();
 
