@@ -74,7 +74,7 @@ public slots:
     void setValue(float newValue);
     void onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID);
 
-    void saveSettings();
+//    void saveSettings();
 
 protected:
     void onRunningStateChanged(bool value);

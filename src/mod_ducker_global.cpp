@@ -65,14 +65,14 @@ bool Ducker_Global::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 i
     return isDirty;
 }
 
-void Ducker_Global::saveSettings()
-{
-    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    cfg.beginGroup("ducker_global");
-    cfg.setValue("enabled",isEnabled());
-    cfg.setValue("value",getValue());
-    cfg.endGroup();
-}
+//void Ducker_Global::saveSettings()
+//{
+//    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+//    cfg.beginGroup("ducker_global");
+//    cfg.setValue("enabled",isEnabled());
+//    cfg.setValue("value",getValue());
+//    cfg.endGroup();
+//}
 
 void Ducker_Global::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
 {
