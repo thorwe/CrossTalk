@@ -11,20 +11,6 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     ui->setupUi(this);
     this->setAttribute( Qt::WA_DeleteOnClose );
 
-//    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-//    cfg.beginGroup("ducker_global");
-//    ui->groupBox_gDuck->setChecked(cfg.value("enabled",true).toBool());
-//    ui->wFader_gDuck->setValue(cfg.value("value",-23.0f).toFloat());
-//    cfg.endGroup();
-
-//    ui->groupBox_cDuck->setChecked(cfg.value("ducking_enabled",true).toBool());
-//    ui->wFader_cDuck->setValue(cfg.value("ducking_value",-23.0).toFloat());
-//    int isDuckingReverse = (cfg.value("ducking_reverse",false).toBool())?1:0;
-//    ui->slider_cDuck_Mode->setValue(isDuckingReverse);
-//    this->blockSignals(true);
-//    onChannelDuckingDuckModeSliderValueChanged(isDuckingReverse);
-//    this->blockSignals(false);
-
     this->connect(ui->groupBox_gDuck,SIGNAL(toggled(bool)),SIGNAL(globalDuckerEnabledSet(bool)));
     this->connect(ui->groupBox_cDuck,SIGNAL(toggled(bool)),SIGNAL(channelDuckerEnabledSet(bool)));
     this->connect(ui->wFader_gDuck,SIGNAL(valueChanged(float)),SIGNAL(globalDuckerValueChanged(float)));

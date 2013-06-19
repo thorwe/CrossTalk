@@ -119,7 +119,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.3.060801";
+    return "1.3.2";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -134,7 +134,7 @@ const char* ts3plugin_author() {
 
 /* Plugin description */
 const char* ts3plugin_description() {
-    return "Features:\nStereo Position Spread,\nDucking\nSwitch\'n\'Talk (Cross Server Tab PTT)\n\nFor information on the modules, use the \'?\' button on the topper right of the plugin settings window or visit the Github wiki by clicking on the banner.\n";
+    return "Features:\nRadio FX\nStereo Position Spread,\nDucking\nSwitch\'n\'Talk (Cross Server Tab PTT)\n\nFor information on the modules, use the \'?\' button on the topper right of the plugin settings window or visit the Github wiki by clicking on the banner.\n";
 }
 
 /* Set TeamSpeak 3 callback functions */
@@ -257,10 +257,10 @@ void ts3plugin_shutdown() {
 	 * TeamSpeak client will most likely crash (DLL removed but dialog from DLL code still open).
 	 */
 
-    #ifdef USE_POSITIONAL_AUDIO
-    if (positionalAudio.isRunning())
-        positionalAudio.setBlocked(true);
-    #endif
+//    #ifdef USE_POSITIONAL_AUDIO
+//    if (positionalAudio.isRunning())
+//        positionalAudio.setBlocked(true);
+//    #endif
 
 	/* Free pluginID if we registered it */
 	if(pluginID) {
@@ -713,9 +713,9 @@ int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* e
 //        return 1;
 //    }
     int isHandledError = 0;
-#ifdef USE_POSITIONAL_AUDIO
-    isHandledError = positionalAudio.onServerErrorEvent(serverConnectionHandlerID,errorMessage,error,returnCode,extraMessage);
-#endif
+//#ifdef USE_POSITIONAL_AUDIO
+//    isHandledError = positionalAudio.onServerErrorEvent(serverConnectionHandlerID,errorMessage,error,returnCode,extraMessage);
+//#endif
 
     return isHandledError;  /* If no plugin return code was used, the return value of this function is ignored */
 }

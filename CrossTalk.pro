@@ -2,8 +2,8 @@ TEMPLATE = lib
 # CONFIG += console
 #CONFIG-=embed_manifest_dll
 
-#VERSION = 1.3.1
-CONFIG += beta
+#VERSION = 1.3.2
+#CONFIG += beta
 
 QT += sql network
 
