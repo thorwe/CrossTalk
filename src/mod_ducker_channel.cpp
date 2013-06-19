@@ -114,13 +114,13 @@ void Ducker_Channel::setDuckingReverse(bool val)
     Log(QString("isTargetOtherTabs: %1").arg((m_isTargetOtherTabs)?"true":"false"));
 }
 
-void Ducker_Channel::saveSettings()
-{
-    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    cfg.setValue("ducking_enabled", isEnabled());
-    cfg.setValue("ducking_value", getValue());
-    cfg.setValue("ducking_reverse", isTargetOtherTabs());
-}
+//void Ducker_Channel::saveSettings()
+//{
+//    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+//    cfg.setValue("ducking_enabled", isEnabled());
+//    cfg.setValue("ducking_value", getValue());
+//    cfg.setValue("ducking_reverse", isTargetOtherTabs());
+//}
 
 void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
 {

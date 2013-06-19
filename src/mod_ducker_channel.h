@@ -64,7 +64,7 @@ public slots:
     void setValue(float newValue);
     void setDuckingReverse(bool);
 
-    void saveSettings();
+//    void saveSettings();
 
 protected:
     void onRunningStateChanged(bool value);
