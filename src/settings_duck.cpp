@@ -26,7 +26,7 @@ void SettingsDuck::Init(Ducker_Global* ducker_G, Ducker_Channel* ducker_C)
     this->connect(this,SIGNAL(globalDuckerValueChanged(float)),ducker_G, SLOT(setValue(float)));
 
     this->connect(this,SIGNAL(channelDuckerEnabledSet(bool)),ducker_C, SLOT(setEnabled(bool)));
-    this->connect(this,SIGNAL(channelDuckerValueChanged(float)),ducker_C,SLOT(setEnabled(bool)));
+    this->connect(this,SIGNAL(channelDuckerValueChanged(float)),ducker_C,SLOT(setValue(float)));
     this->connect(this,SIGNAL(channelDuckerReverseSet(bool)), ducker_C, SLOT(setDuckingReverse(bool)));
 
 //    this->connect(this,SIGNAL(settingsSave()),ducker_G, SLOT(saveSettings()));
