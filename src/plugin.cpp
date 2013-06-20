@@ -119,7 +119,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.3.2";
+    return "1.3.061901";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -690,7 +690,9 @@ void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID cl
 
 int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage) {
 //    TSLogging::Print(QString("onServerErrorEvent: %1 %2 %3").arg((returnCode ? returnCode : "")).arg(error).arg(errorMessage),serverConnectionHandlerID,LogLevel_DEBUG);
-
+    Q_UNUSED(errorMessage);
+    Q_UNUSED(returnCode);
+    Q_UNUSED(extraMessage);
 //    if  (error== ERROR_client_is_flooding)
 //    {
 ////        TSLogging::Error("Client is flooding. Need throttle.");
@@ -713,9 +715,13 @@ int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* e
 //        return 1;
 //    }
     int isHandledError = 0;
-//#ifdef USE_POSITIONAL_AUDIO
-//    isHandledError = positionalAudio.onServerErrorEvent(serverConnectionHandlerID,errorMessage,error,returnCode,extraMessage);
-//#endif
+#ifdef USE_POSITIONAL_AUDIO
+    if ((error==ERROR_client_is_flooding) && (positionalAudio.isRunning()))
+    {
+        QString sUId = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getUniqueId();
+        settingsPositionalAudio->SetServerBlock(sUId,true,serverConnectionHandlerID);
+    }
+#endif
 
     return isHandledError;  /* If no plugin return code was used, the return value of this function is ignored */
 }
