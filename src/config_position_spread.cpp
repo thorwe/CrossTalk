@@ -7,6 +7,7 @@ ConfigPositionSpread::ConfigPositionSpread(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setAttribute( Qt::WA_DeleteOnClose );
+    this->setFixedSize(this->width(),this->height());
 
     ui->label_SPS_Home->setText(qApp->translate("HotkeyDialog","Current Server"));
     ui->label_SPS_Whisper->setText(qApp->translate("WhisperSetup","Whisper"));

@@ -12,8 +12,8 @@ ConfigRadio::ConfigRadio(QWidget *parent) :
     ui(new Ui::ConfigRadio)
 {
     ui->setupUi(this);
-
     this->setAttribute( Qt::WA_DeleteOnClose );
+    this->setFixedSize(this->width(),this->height());
 
     connect(ui->groupBox_Home,SIGNAL(toggled(bool)),this,SIGNAL(HomeEnabledSet(bool)));
     connect(ui->groupBox_Home,SIGNAL(CenterFrequencySet(double)),this,SIGNAL(HomeLowFrequencySet(double)));

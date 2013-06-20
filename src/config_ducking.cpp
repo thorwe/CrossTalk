@@ -10,6 +10,7 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setAttribute( Qt::WA_DeleteOnClose );
+    this->setFixedSize(this->width(),this->height());
 
     this->connect(ui->groupBox_gDuck,SIGNAL(toggled(bool)),SIGNAL(globalDuckerEnabledSet(bool)));
     this->connect(ui->groupBox_cDuck,SIGNAL(toggled(bool)),SIGNAL(channelDuckerEnabledSet(bool)));

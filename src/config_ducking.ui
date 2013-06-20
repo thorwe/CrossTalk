@@ -61,7 +61,7 @@
         </rect>
        </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -178,7 +178,7 @@
         </rect>
        </property>
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+        <sizepolicy hsizetype="Fixed" vsizetype="MinimumExpanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -207,15 +207,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>FaderVertical</class>
-   <extends>QWidget</extends>
-   <header>fader_vertical.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>BannerFrame</class>
    <extends>QFrame</extends>
    <header>banner_frame.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>FaderVertical</class>
+   <extends>QWidget</extends>
+   <header>fader_vertical.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
