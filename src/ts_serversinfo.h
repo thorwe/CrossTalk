@@ -58,7 +58,7 @@ private:
     TSServersInfo(const TSServersInfo &);
     TSServersInfo& operator=(const TSServersInfo &);
 
-    TSServerInfo* _GetServerInfo(uint64 serverConnectionHandlerID, bool createOnNotExist);
+    TSServerInfo* _GetServerInfo(uint64 serverConnectionHandlerID, bool createOnNotExist = false);
     QMap<uint64,QPointer<TSServerInfo> > m_serverInfoMap;
 };
 
