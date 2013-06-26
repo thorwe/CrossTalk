@@ -11,6 +11,10 @@ CrossTalk is a Teamspeak 3 plugin that enhances the general audio experience and
 
 ## Features
 
+### Positional Audio
+This module enables you to hear clients from the position they are in a supported game.
+![Positional Audio](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_posa.png "Positional Audio")
+
 ### Stereo Position Spread  
 ![Stereo Position Spread](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_ps.png "Stereo Position Spread")
 ### Ducking
