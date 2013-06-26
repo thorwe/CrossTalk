@@ -116,14 +116,14 @@ include(DSPFilters/DSPFilters.pri) {
     !build_pass:message( "Radio module included." )
 }
 
+# Positional Audio Module
+include(src/positional_audio/PositionalAudio.pri) {
+    DEFINES += USE_POSITIONAL_AUDIO
+    !build_pass:message( "Positional Audio module included." )
+}
+
 beta {
     DEFINES += CROSSTALK_BETA
-
-    # Positional Audio Module
-    include(src/positional_audio/PositionalAudio.pri) {
-        DEFINES += USE_POSITIONAL_AUDIO
-        !build_pass:message( "Positional Audio module included." )
-    }
 }
 
 win32 {
