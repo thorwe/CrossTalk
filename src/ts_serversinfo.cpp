@@ -44,6 +44,20 @@ void TSServersInfo::onServerGroupListFinishedEvent(uint64 serverConnectionHandle
         tsServerInfo->onServerGroupListFinishedEvent();
 }
 
+void TSServersInfo::onChannelGroupListEvent(uint64 serverConnectionHandlerID, uint64 channelGroupID, const char *name, int type, int iconID, int saveDB)
+{
+    TSServerInfo* tsServerInfo = _GetServerInfo(serverConnectionHandlerID,true);
+    if (tsServerInfo)
+        tsServerInfo->onChannelGroupListEvent(channelGroupID,name,type,iconID,saveDB);
+}
+
+void TSServersInfo::onChannelGroupListFinishedEvent(uint64 serverConnectionHandlerID)
+{
+    TSServerInfo* tsServerInfo = _GetServerInfo(serverConnectionHandlerID,false);
+    if (tsServerInfo)
+        tsServerInfo->onChannelGroupListFinishedEvent();
+}
+
 
 TSServerInfo* TSServersInfo::_GetServerInfo(uint64 serverConnectionHandlerID, bool createOnNotExist)
 {

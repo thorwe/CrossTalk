@@ -41,6 +41,8 @@ public:
 
     void onServerGroupListEvent(uint64 serverConnectionHandlerID, uint64 serverGroupID, const char* name, int type, int iconID, int saveDB);
     void onServerGroupListFinishedEvent(uint64 serverConnectionHandlerID);
+    void onChannelGroupListEvent(uint64 serverConnectionHandlerID, uint64 channelGroupID, const char* name, int type, int iconID, int saveDB);
+    void onChannelGroupListFinishedEvent(uint64 serverConnectionHandlerID);
 
 signals:
     void connectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);

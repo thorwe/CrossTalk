@@ -25,12 +25,17 @@ public:
     // forwards from plugin.cpp
     void onServerGroupListEvent(uint64 serverGroupID, const char* name, int type, int iconID, int saveDB);
     void onServerGroupListFinishedEvent();
+    void onChannelGroupListEvent(uint64 channelGroupID, const char* name, int type, int iconID, int saveDB);
+    void onChannelGroupListFinishedEvent();
 
     uint64 GetServerGroupId(QString name) const;
     QString GetServerGroupName(uint64 id) const;
+    uint64 GetChannelGroupId(QString name) const;
+    QString GetChannelGroupName(uint64 id) const;
 
 signals:
     void serverGroupListUpdated(uint64 serverConnectionHandlerID, QMap<uint64,QString>);
+    void channelGroupListUpdated(uint64 serverConnectionHandlerID, QMap<uint64,QString>);
 
 public slots:
 
@@ -39,6 +44,8 @@ private:
 
     QMap<uint64,QString> m_ServerGroups;
     bool m_isServerGroupsUpdating;
+    QMap<uint64,QString> m_ChannelGroups;
+    bool m_isChannelGroupsUpdating;
 };
 
 #endif // TS_SERVERINFO_QT_H

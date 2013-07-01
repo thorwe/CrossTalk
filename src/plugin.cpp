@@ -119,7 +119,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.4";
+    return "1.4.070101";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -357,7 +357,13 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
 
     cmd_qs = args_qs.takeFirst();
 
-    if (cmd_qs == "TOGGLE_SELF_SERVER_GROUP")
+    if (cmd_qs == "FLOOD_TEST")
+    {
+#ifdef USE_POSITIONAL_AUDIO
+        ts3plugin_onServerErrorEvent(serverConnectionHandlerID,"CrossTalk Flood Test", ERROR_client_is_flooding,"CrossTalk Flood Test Return Code", "CrossTalk Flood Test Extra Message");
+#endif
+    }
+    else if (cmd_qs == "TOGGLE_SELF_SERVER_GROUP")
     {
         if (args_qs.size() < 2)
             ret = 1;
@@ -371,7 +377,6 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                 ret = 0;
             else
             {
-//                TSLogging::Print(QString("Target Server: %1, %2").arg(serverName).arg(targetServer));
                 QSet<uint64> myServerGroups;
                 if ((error = TSHelpers::GetClientSelfServerGroups(targetServer, &myServerGroups)) != ERROR_ok)
                 {
@@ -386,8 +391,6 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                         ret = 1;
                     else
                     {
-//                        TSLogging::Print(QString("Target Server Group: %1, %2").arg(serverGroupName).arg(serverGroupId));
-
                         // Get My Id on this handler
                         anyID myID;
                         if((error = ts3Functions.getClientID(targetServer,&myID)) != ERROR_ok)
@@ -406,20 +409,93 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                             }
                             else
                             {
-//                                TSLogging::Print(QString("My Client db id: %1").arg(myDbId));
-
                                 if (myServerGroups.contains(serverGroupId))
-                                {
-//                                    TSLogging::Print(QString("I am in group: %1; Removing...").arg(serverGroupId));
-                                    ts3Functions.requestServerGroupDelClient(serverConnectionHandlerID,serverGroupId,myDbId,NULL);
-                                }
+                                    ts3Functions.requestServerGroupDelClient(targetServer,serverGroupId,myDbId,NULL);
                                 else
-                                {
-//                                    TSLogging::Print(QString("I am not in group: %1; Adding...").arg(serverGroupId));
-                                    ts3Functions.requestServerGroupAddClient(serverConnectionHandlerID,serverGroupId,myDbId,NULL);
-                                }
+                                    ts3Functions.requestServerGroupAddClient(targetServer,serverGroupId,myDbId,NULL);
 
                                 ret = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    else if ((cmd_qs == "SET_SELF_CHANNEL_GROUP") || (cmd_qs == "SET_SELF_CHANNEL_GROUP_INHERITED"))
+    {
+        if (args_qs.size() < 2)
+            ret = 1;
+        else
+        {
+            unsigned int error;
+            uint64 targetServer = 0;
+            QString serverName = args_qs.takeFirst();
+
+            if ((error = TSHelpers::GetServerHandler(serverName,&targetServer)) != ERROR_ok)
+                ret = 0;
+            else
+            {
+                anyID myID;
+                if((error = ts3Functions.getClientID(targetServer,&myID)) != ERROR_ok)
+                {
+                    TSLogging::Error("(SET_SELF_CHANNEL_GROUP)",targetServer,error,true);
+                    ret = 0;
+                }
+                else
+                {
+                    // Doesn't work with ClientSelf
+                    int myDbId;
+                    if ((error = ts3Functions.getClientVariableAsInt(targetServer,myID,CLIENT_DATABASE_ID,&myDbId)) != ERROR_ok)
+                    {
+                        TSLogging::Error("(SET_SELF_CHANNEL_GROUP) Could not get self client db id", targetServer, error, true);
+                        ret = 1;
+                    }
+                    else
+                    {
+                        int myChannelGroupId;
+                        if ((error = ts3Functions.getClientVariableAsInt(targetServer, myID, CLIENT_CHANNEL_GROUP_ID, &myChannelGroupId)) != ERROR_ok)
+                        {
+                            TSLogging::Error("(SET_SELF_CHANNEL_GROUP)",targetServer,error,true);
+                            ret = 0;
+                        }
+                        else
+                        {
+                            QString channelGroupName = args_qs.takeFirst();
+                            uint64 channelGroupId = centralStation->GetServerInfo(targetServer)->GetChannelGroupId(channelGroupName);
+                            if ((channelGroupId == (uint64)NULL) || (channelGroupId == myChannelGroupId))
+                                ret = 1;
+                            else
+                            {
+                                uint64 targetChannelId;
+                                if (cmd_qs == "SET_SELF_CHANNEL_GROUP")
+                                {
+                                    if ((error = ts3Functions.getChannelOfClient(targetServer,myID,&targetChannelId)) != ERROR_ok)
+                                    {
+                                        TSLogging::Error("(SET_SELF_CHANNEL_GROUP)",targetServer,error,true);
+                                        ret = 0;
+                                    }
+                                }
+                                else if (cmd_qs == "SET_SELF_CHANNEL_GROUP_INHERITED")
+                                {
+                                    int inheritingChannelId;
+                                    if ((error = ts3Functions.getClientVariableAsInt(targetServer, myID, CLIENT_CHANNEL_GROUP_INHERITED_CHANNEL_ID, &inheritingChannelId)) != ERROR_ok)
+                                    {
+                                        TSLogging::Error("(SET_SELF_CHANNEL_GROUP)",targetServer,error,true);
+                                        ret = 0;
+                                    }
+                                    else
+                                        targetChannelId = (uint64)inheritingChannelId;
+                                }
+                                if (error == ERROR_ok)
+                                {
+                                    const int SIZE = 1;
+                                    uint64 channelGroupIdArray[SIZE] = {channelGroupId};
+                                    uint64 channelIdArray[SIZE] = {targetChannelId};
+                                    uint64 clientDbIdArray[SIZE] = {myDbId};
+//                                    TSLogging::Print(QString("SET_SELF_CHANNEL_GROUP: %1 %2 %3").arg(channelGroupIdArray[0]).arg(channelIdArray[0]).arg(clientDbIdArray[0]));
+                                    ts3Functions.requestSetClientChannelGroup(targetServer,&channelGroupIdArray[0],&channelIdArray[0],&clientDbIdArray[0],SIZE,NULL);
+                                }
                             }
                         }
                     }
@@ -915,6 +991,16 @@ void ts3plugin_onServerGroupListEvent(uint64 serverConnectionHandlerID, uint64 s
 void ts3plugin_onServerGroupListFinishedEvent(uint64 serverConnectionHandlerID)
 {
     centralStation->onServerGroupListFinishedEvent(serverConnectionHandlerID);
+}
+
+void ts3plugin_onChannelGroupListEvent(uint64 serverConnectionHandlerID, uint64 channelGroupID, const char* name, int type, int iconID, int saveDB)
+{
+    centralStation->onChannelGroupListEvent(serverConnectionHandlerID,channelGroupID,name,type,iconID,saveDB);
+}
+
+void ts3plugin_onChannelGroupListFinishedEvent(uint64 serverConnectionHandlerID)
+{
+    centralStation->onChannelGroupListFinishedEvent(serverConnectionHandlerID);
 }
 
 //void ts3plugin_onServerGroupClientListEvent(uint64 serverConnectionHandlerID, uint64 serverGroupID, uint64 clientDatabaseID, const char* clientNameIdentifier, const char* clientUniqueID)

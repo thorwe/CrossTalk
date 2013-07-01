@@ -7,7 +7,8 @@
 
 TSServerInfo::TSServerInfo(QObject *parent, uint64 serverConnectionHandlerID) :
     QObject(parent),
-    m_isServerGroupsUpdating(false)
+    m_isServerGroupsUpdating(false),
+    m_isChannelGroupsUpdating(false)
 {
     m_ServerConnectionHandlerID = serverConnectionHandlerID;
 }
@@ -58,6 +59,37 @@ QString TSServerInfo::GetServerGroupName(uint64 id) const
     return QString::null;
 }
 
+uint64 TSServerInfo::GetChannelGroupId(QString name) const
+{
+    QList<uint64> list = m_ChannelGroups.keys(name);
+    int elementCount = list.size();
+    if (elementCount == 0)
+        return (uint64)NULL;
+    else if (elementCount == 1)
+        return list.at(0);
+    else
+    {
+        uint64 highest = 0;
+        for (int i = 0; i < elementCount; ++i)
+        {
+            uint64 e_key = list.at(i);
+            if (e_key>highest)
+                highest = e_key;
+        }
+        return highest;
+    }
+
+    //return (m_ChannelGroups.key(name,(uint64)NULL));
+}
+
+QString TSServerInfo::GetChannelGroupName(uint64 id) const
+{
+    if (m_ChannelGroups.contains(id))
+        return m_ChannelGroups.value(id);
+
+    return QString::null;
+}
+
 void TSServerInfo::onServerGroupListEvent(uint64 serverGroupID, const char *name, int type, int iconID, int saveDB)
 {
     Q_UNUSED(type);
@@ -84,4 +116,26 @@ void TSServerInfo::onServerGroupListFinishedEvent()
 //    TSLogging::Print(debout);
 
     emit serverGroupListUpdated(m_ServerConnectionHandlerID, m_ServerGroups);
+}
+
+void TSServerInfo::onChannelGroupListEvent(uint64 channelGroupID, const char *name, int type, int iconID, int saveDB)
+{
+    Q_UNUSED(type);
+    Q_UNUSED(iconID);
+    Q_UNUSED(saveDB);
+
+    if (!m_isChannelGroupsUpdating)
+        m_ChannelGroups.clear();
+
+    m_ChannelGroups.insert(channelGroupID,name);
+    m_isChannelGroupsUpdating = true;
+
+//    TSLogging::Print(QString("%1 %2").arg(channelGroupID).arg(name));
+}
+
+void TSServerInfo::onChannelGroupListFinishedEvent()
+{
+//    TSLogging::Print("ChannelGroupList Finished");
+    m_isChannelGroupsUpdating = false;
+    emit channelGroupListUpdated(m_ServerConnectionHandlerID, m_ChannelGroups);
 }
