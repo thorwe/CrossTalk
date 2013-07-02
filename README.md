@@ -33,7 +33,7 @@ You want to listen only to a few selected people in a crowded channel? Meet the 
 
 ## Installation
 
-Head over to the official download site at Teamspeak for an [installer package](http://addons.teamspeak.com/).
+Head over to the official download site at Teamspeak for an [installer package](http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html).
 
 ## Support
 
