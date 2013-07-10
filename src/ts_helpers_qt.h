@@ -38,6 +38,7 @@ namespace TSHelpers
     QWidget* GetMainWindow();
 
     unsigned int GetClientSelfServerGroups(uint64 serverConnectionHandlerID, QSet<uint64> *result);
+    unsigned int GetClientChannelGroup(uint64 serverConnectionHandlerID, uint64* result, anyID clientId = (anyID)NULL);
 }
 
 #endif // TS_HELPERS_QT_H

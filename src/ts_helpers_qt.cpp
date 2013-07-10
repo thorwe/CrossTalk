@@ -363,6 +363,36 @@ namespace TSHelpers
                 if (error == ERROR_ok)
                     return ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID,NULL,NULL,channelCommanders.toVector().constData(),NULL);
             }
+            else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
+            {
+                // Get My Channel Group
+                uint64 myChannelGroup;
+                if ((error = GetClientChannelGroup(serverConnectionHandlerID,&myChannelGroup)) != ERROR_ok)
+                    return error;
+
+                // Set whisper with channels NULL and client list
+                QList<anyID> list;
+                for (int i = 0; i<targetChannels.count();++i)
+                {
+                    // get clients in channel
+                    anyID *clientList;
+                    if ((error = ts3Functions.getChannelClientList(serverConnectionHandlerID,targetChannels.at(i),&clientList)) != ERROR_ok)
+                        return error;
+
+                    for (int i=0; clientList[i]!=NULL ; ++i)
+                    {
+                        uint64 channelGroup;
+                        if ((error = GetClientChannelGroup(serverConnectionHandlerID, &channelGroup, clientList[i])) != ERROR_ok)
+                            break;
+
+                        if (channelGroup == myChannelGroup)
+                            list.append(clientList[i]);
+                    }
+                    ts3Functions.freeMemory(clientList);
+                }
+                if (error == ERROR_ok)
+                    return ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID,NULL,NULL,list.toVector().constData(),NULL);
+            }
         }
         return error;
     }
@@ -435,6 +465,29 @@ namespace TSHelpers
 
 //            TSLogging::Print(debOut);
         }
+        return error;
+    }
+
+    unsigned int GetClientChannelGroup(uint64 serverConnectionHandlerID, uint64* result, anyID clientId)
+    {
+        unsigned int error;
+        if (clientId == (anyID)NULL)    // use my id
+        {
+            if((error = ts3Functions.getClientID(serverConnectionHandlerID,&clientId)) != ERROR_ok)
+            {
+                TSLogging::Error("(GetClientChannelGroup)",serverConnectionHandlerID,error,true);
+                return error;
+            }
+        }
+
+        int channelGroupId;
+        if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientId, CLIENT_CHANNEL_GROUP_ID, &channelGroupId)) != ERROR_ok)
+        {
+            TSLogging::Error("(GetClientChannelGroup)",serverConnectionHandlerID,error,true);
+            return error;
+        }
+        *result = (uint64)channelGroupId;
+
         return error;
     }
 }
