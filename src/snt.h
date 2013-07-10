@@ -21,6 +21,9 @@ public slots:
 
 private:
 
+    static inline GroupWhisperTargetMode GetGroupWhisperTargetMode(QString val);
+    static inline GroupWhisperType GetGroupWhisperType(QString val);
+
     TSPtt *ptt;
 
     bool m_shallActivatePtt;

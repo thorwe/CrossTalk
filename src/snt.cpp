@@ -106,9 +106,30 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             m_returnToSCHandler = (uint64)NULL;
         }
     }
+    else if (cmd == "TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START")
+    {
+        uint64 nextServer;
+        if ((error = TSHelpers::GetActiveServerRelative(scHandlerID,true,&nextServer)) != ERROR_ok)
+            TSLogging::Error("Could not get next server.",scHandlerID,error);
+
+        if (scHandlerID == nextServer)
+            return;
+
+        if ((error = TSHelpers::SetWhisperList(nextServer,GROUPWHISPERTYPE_CHANNELCOMMANDER,GROUPWHISPERTARGETMODE_ALL)) != ERROR_ok)
+        {
+            TSLogging::Error("Could not set whisperlist",scHandlerID,error);
+            return;
+        }
+
+        ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
+
+        m_shallActivatePtt=true;
+        m_returnToSCHandler=scHandlerID;
+        m_shallClearWhisper = true;
+        TSHelpers::SetActiveServer(nextServer);
+    }
     else if(cmd == "TS3_NEXT_TAB_AND_TALK_START")
     {
-//        TSLogging::Print("TS3_NEXT_TAB_AND_TALK_START");
         uint64 nextServer;
         if ((error = TSHelpers::GetActiveServerRelative(scHandlerID,true,&nextServer)) != ERROR_ok)
             TSLogging::Error("Could not get next server.",scHandlerID,error);
@@ -117,13 +138,10 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
 
         ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
-//        TSLogging::Print(QString("This: %1 Next: %2").arg(scHandlerID).arg(nextServer));
+
         m_shallActivatePtt=true;
         m_returnToSCHandler=scHandlerID;
         TSHelpers::SetActiveServer(nextServer);
-//        if((error = ts3Functions.activateCaptureDevice(nextServer)) != ERROR_ok)
-//            TSLogging::Error("(SnT::activateCaptureDevice)",scHandlerID,error,true);
-//        TSLogging::Print("TS3_NEXT_TAB_AND_TALK_START done");
     }
     else if(cmd == "TS3_SWITCH_TAB_AND_TALK_START")
     {
@@ -140,10 +158,8 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
 
         uint64 targetServer = 0;
         if ((error = TSHelpers::GetServerHandler(name,&targetServer)) != ERROR_ok)
-        {
-            //TSLogging::Error("Could not find target server",scHandlerID,error);
             return;
-        }
+
         if (targetServer == 0)
             return;
 
@@ -154,8 +170,6 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             m_shallActivatePtt=true;
             m_returnToSCHandler=scHandlerID;
             TSHelpers::SetActiveServer(targetServer);
-//            if((error = ts3Functions.activateCaptureDevice(targetServer)) != ERROR_ok)
-//                TSLogging::Error("(SnT::activateCaptureDevice)",targetServer,error,true);
         }
         else
             ptt->SetPushToTalk(scHandlerID,true);
@@ -186,44 +200,14 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         if (targetServer == 0)
             return;
 
-//        anyID myID;
-//        if((error = ts3Functions.getClientID(targetServer,&myID)) != ERROR_ok)
-//        {
-//            TSLogging::Error("Could not get my id on the target server.",scHandlerID,error);
-//            return;
-//        }
-
-//        QString arg_qs;
-//        arg_qs = args.at(1);
-        GroupWhisperType groupWhisperType = GROUPWHISPERTYPE_ENDMARKER;
-        if (groupWhisperTypeArg.contains("COMMANDER",Qt::CaseInsensitive))
-                groupWhisperType = GROUPWHISPERTYPE_CHANNELCOMMANDER;
-        else if (groupWhisperTypeArg.contains("ALLC",Qt::CaseInsensitive))
-                groupWhisperType = GROUPWHISPERTYPE_ALLCLIENTS;
-
+        GroupWhisperType groupWhisperType = GetGroupWhisperType(groupWhisperTypeArg);
         if (groupWhisperType == GROUPWHISPERTYPE_ENDMARKER)
         {
             TSLogging::Error("Unsupported group whisper type.",scHandlerID,NULL);
             return;
         }
 
-//        arg_qs = args.at(2);
-        GroupWhisperTargetMode groupWhisperTargetMode  = GROUPWHISPERTARGETMODE_ENDMARKER;
-        if (groupWhisperTargetModeArg.contains("ALLPARENT"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALLPARENTCHANNELS;
-        else if (groupWhisperTargetModeArg.contains("PARENT"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_PARENTCHANNEL;
-        else if (groupWhisperTargetModeArg.contains("CURRENT"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CURRENTCHANNEL;
-        else if (groupWhisperTargetModeArg.contains("SUB"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_SUBCHANNELS;
-        else if (groupWhisperTargetModeArg.contains("ANCESTORCHANNELFAMILY"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ANCESTORCHANNELFAMILY;
-        else if (groupWhisperTargetModeArg.contains("FAMILY"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CHANNELFAMILY;
-        else if (groupWhisperTargetModeArg.contains("ALL"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALL;
-
+        GroupWhisperTargetMode groupWhisperTargetMode  = GetGroupWhisperTargetMode(groupWhisperTargetModeArg);
         if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ENDMARKER)
         {
             TSLogging::Error("Could not recognize group whisper target mode.",scHandlerID,NULL);
@@ -254,35 +238,6 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         else
             ptt->SetPushToTalk(scHandlerID,true);
     }
-    else if (cmd == "TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START")
-    {
-        uint64 nextServer;
-        if ((error = TSHelpers::GetActiveServerRelative(scHandlerID,true,&nextServer)) != ERROR_ok)
-            TSLogging::Error("Could not get next server.",scHandlerID,error);
-
-        if (scHandlerID == nextServer)
-            return;
-
-        anyID myID;
-        if((error = ts3Functions.getClientID(nextServer,&myID)) != ERROR_ok)
-        {
-            TSLogging::Error("Could not get my id on the next server: ", scHandlerID,error);
-            return;
-        }
-
-        if ((error = TSHelpers::SetWhisperList(nextServer,GROUPWHISPERTYPE_CHANNELCOMMANDER,GROUPWHISPERTARGETMODE_ALL)) != ERROR_ok)
-        {
-            TSLogging::Error("Could not set whisperlist",scHandlerID,error);
-            return;
-        }
-
-        ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
-
-        m_shallActivatePtt=true;
-        m_returnToSCHandler=scHandlerID;
-        m_shallClearWhisper = true;
-        TSHelpers::SetActiveServer(nextServer);
-    }
     else if (cmd == "TS3_NEXT_TAB_AND_WHISPER_START")
     {
         uint64 nextServer;
@@ -292,13 +247,6 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         if (scHandlerID == nextServer)
             return;
 
-        anyID myID;
-        if((error = ts3Functions.getClientID(nextServer,&myID)) != ERROR_ok)
-        {
-            TSLogging::Error("Could not get my id on the next server",scHandlerID,error);
-            return;
-        }
-
         if (args.count() < 2)
         {
             TSLogging::Error("Too few arguments.",scHandlerID,NULL);
@@ -307,12 +255,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
 
         QString arg_qs;
         arg_qs = args.at(0);
-        GroupWhisperType groupWhisperType = GROUPWHISPERTYPE_ENDMARKER;
-        if (arg_qs.contains("COMMANDER",Qt::CaseInsensitive))
-                groupWhisperType = GROUPWHISPERTYPE_CHANNELCOMMANDER;
-        else if (arg_qs.contains("ALLC",Qt::CaseInsensitive))
-                groupWhisperType = GROUPWHISPERTYPE_ALLCLIENTS;
-
+        GroupWhisperType groupWhisperType = GetGroupWhisperType(arg_qs);
         if (groupWhisperType == GROUPWHISPERTYPE_ENDMARKER)
         {
             TSLogging::Error("Unsupported group whisper type.",scHandlerID,NULL);
@@ -320,22 +263,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         }
 
         arg_qs = args.at(1);
-        GroupWhisperTargetMode groupWhisperTargetMode  = GROUPWHISPERTARGETMODE_ENDMARKER;
-        if (arg_qs.contains("ALLPARENT"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALLPARENTCHANNELS;
-        else if (arg_qs.contains("PARENT"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_PARENTCHANNEL;
-        else if (arg_qs.contains("CURRENT"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CURRENTCHANNEL;
-        else if (arg_qs.contains("SUB"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_SUBCHANNELS;
-        else if (arg_qs.contains("ANCESTORCHANNELFAMILY"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ANCESTORCHANNELFAMILY;
-        else if (arg_qs.contains("FAMILY"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CHANNELFAMILY;
-        else if (arg_qs.contains("ALL"))
-            groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALL;
-
+        GroupWhisperTargetMode groupWhisperTargetMode  = GetGroupWhisperTargetMode(arg_qs);
         if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ENDMARKER)
         {
             TSLogging::Error("Could not recognize group whisper target mode.",scHandlerID,NULL);
@@ -371,4 +299,39 @@ void SnT::PttDelayFinished()
 {
     // Turn off PTT
     ptt->SetPushToTalk(TSHelpers::GetActiveServerConnectionHandlerID(), false);
+}
+
+GroupWhisperTargetMode SnT::GetGroupWhisperTargetMode(QString val)
+{
+    GroupWhisperTargetMode groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ENDMARKER;
+
+    if (val.contains("ALLPARENT"))
+        groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALLPARENTCHANNELS;
+    else if (val.contains("PARENT"))
+        groupWhisperTargetMode = GROUPWHISPERTARGETMODE_PARENTCHANNEL;
+    else if (val.contains("CURRENT"))
+        groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CURRENTCHANNEL;
+    else if (val.contains("SUB"))
+        groupWhisperTargetMode = GROUPWHISPERTARGETMODE_SUBCHANNELS;
+    else if (val.contains("ANCESTORCHANNELFAMILY"))
+        groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ANCESTORCHANNELFAMILY;
+    else if (val.contains("FAMILY"))
+        groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CHANNELFAMILY;
+    else if (val.contains("ALL"))
+        groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALL;
+
+    return groupWhisperTargetMode;
+}
+
+GroupWhisperType SnT::GetGroupWhisperType(QString val)
+{
+    GroupWhisperType groupWhisperType = GROUPWHISPERTYPE_ENDMARKER;
+    if (val.contains("COMMANDER",Qt::CaseInsensitive))
+        groupWhisperType = GROUPWHISPERTYPE_CHANNELCOMMANDER;
+    else if (val.contains("CHANNEL_GROUP",Qt::CaseInsensitive))
+        groupWhisperType = GROUPWHISPERTYPE_CHANNELGROUP;
+    else if (val.contains("ALLC",Qt::CaseInsensitive))
+        groupWhisperType = GROUPWHISPERTYPE_ALLCLIENTS;
+
+    return groupWhisperType;
 }
