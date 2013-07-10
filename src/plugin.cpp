@@ -80,9 +80,6 @@ TSInfoData* infoData = TSInfoData::instance();
 
 #define TIMER_MSEC 10000
 
-/* Array for request client move return codes. See comments within ts3plugin_processCommand for details */
-static char requestClientMoveReturnCodes[REQUESTCLIENTMOVERETURNCODES_SLOTS][RETURNCODE_BUFSIZE];
-
 QMutex command_mutex;
 // Plugin values
 char* pluginID = NULL;
@@ -151,9 +148,6 @@ int ts3plugin_init() {
 
     if (CONSOLE_OUTPUT)
         freopen("CONOUT$", "wb", stdout);   //Makes printf work in Release mode (shouldn't been necessary, but is...)
-
-	/* Initialize return codes array for requestClientMove */
-	memset(requestClientMoveReturnCodes, 0, REQUESTCLIENTMOVERETURNCODES_SLOTS * RETURNCODE_BUFSIZE);
 
     TSPtt::instance()->Init(&command_mutex);
 
@@ -792,10 +786,17 @@ int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* e
 //    }
     int isHandledError = 0;
 #ifdef USE_POSITIONAL_AUDIO
-    if ((error==ERROR_client_is_flooding) && (positionalAudio.isRunning()))
+    if (positionalAudio.isRunning())
     {
-        QString sUId = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getUniqueId();
-        settingsPositionalAudio->SetServerBlock(sUId,true,serverConnectionHandlerID);
+        if (error==ERROR_client_is_flooding)
+        {
+            QString sUId = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getUniqueId();
+            settingsPositionalAudio->SetServerBlock(sUId,true,serverConnectionHandlerID);
+        }
+//        else if (error==ERROR_channel_invalid_password)
+//        {
+//            TSLogging::Print("Invalid Password.");
+//        }
     }
 #endif
 
@@ -861,7 +862,7 @@ void ts3plugin_onCustom3dRolloffCalculationClientEvent(uint64 serverConnectionHa
 {
 //    TSLogging::Print(QString("Distance: %1 Volume: %2").arg(distance).arg(*volume));
 #ifdef USE_POSITIONAL_AUDIO
-    *volume = 1.0f; // Who would want low volumes on a voicecom
+    positionalAudio.onCustom3dRolloffCalculationClientEvent(serverConnectionHandlerID,clientID,distance,volume);
 #endif
 }
 
