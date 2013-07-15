@@ -14,16 +14,13 @@ ChannelMuter::ChannelMuter(QObject *parent) :
     m_ContextMenuIdToggleChannelMute(-1),
     m_ContextMenuToggleClientWhitelisted(-1)
 {
-    m_isPrintEnabled = true;
+    m_isPrintEnabled = false;
     this->setParent(parent);
     this->setObjectName("ChannelMuter");
     talkers = Talkers::instance();
     vols = new Volumes(this);
     MutedChannels = new QSet<QPair<uint64,uint64> >;
     ClientWhiteList = new QSet<QPair<uint64,anyID> >;
-
-//    m_ContextMenuIdToggleChannelMute = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CHANNEL,"Toggle Channel Mute [temp]","");
-//    m_ContextMenuToggleClientWhitelisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle ChannelMuter Whitelisting [temp]","");
 }
 
 // User Setting interaction
@@ -57,7 +54,6 @@ void ChannelMuter::onRunningStateChanged(bool value)
  */
 bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 channelID)
 {
-//    Print(QString("(toggleChannelMute) %1").arg(channelID),serverConnectionHandlerID,LogLevel_DEBUG);
 
     if (serverConnectionHandlerID == (uint64)NULL)
     {
@@ -80,7 +76,6 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
         else
         {
             uint64 targetChannelId = (channelID != (uint64)NULL)?channelID:myChannelID;
-//            Print(QString("(toggleChannelMute2) %1").arg(targetChannelId),serverConnectionHandlerID,LogLevel_DEBUG);
 
             QPair<uint64,uint64> newPair = qMakePair(serverConnectionHandlerID,targetChannelId);
             if (!(MutedChannels->contains(newPair)))
@@ -222,7 +217,6 @@ void ChannelMuter::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID cli
             else if (channelID == newChannelID) // joined
             {
                 vols->AddVolume(serverConnectionHandlerID,clientID);
-//                Print("Added Volume");
             }
         }
     }
@@ -275,7 +269,6 @@ bool ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int sta
 
 bool ChannelMuter::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type, uint64 mine, QTextStream &data)
 {
-//    Print("InfoDing");
     bool isDirty = false;
     if (type == PLUGIN_CLIENT)
     {
@@ -284,7 +277,6 @@ bool ChannelMuter::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id
 
         if ((id != mine) && isClientWhitelisted(serverConnectionHandlerID,(anyID)id))
         {
-//            Print("(onInfoDataChanged) adding info");
             data << this->objectName() << ":";
             isDirty = true;
             data << "whitelisted [temp]";
@@ -294,7 +286,6 @@ bool ChannelMuter::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id
     {
         if (isChannelMuted(serverConnectionHandlerID,id))
         {
-//            Print("(onInfoDataChanged) adding info");
             data << this->objectName() << ":";
             isDirty = true;
             data << "channel muted [temp]";
@@ -305,7 +296,6 @@ bool ChannelMuter::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id
 
 void ChannelMuter::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
 {
-//    Print("(onContextMenuEvent)",serverConnectionHandlerID,LogLevel_DEBUG);
     Q_UNUSED(type);
     if (menuItemID == m_ContextMenuIdToggleChannelMute)
         toggleChannelMute(serverConnectionHandlerID,selectedItemID);
