@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>370</width>
+    <width>470</width>
     <height>555</height>
    </rect>
   </property>
@@ -30,302 +30,11 @@
   <property name="modal">
    <bool>true</bool>
   </property>
-  <widget class="QDialogButtonBox" name="buttonBox">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>520</y>
-     <width>301</width>
-     <height>32</height>
-    </rect>
-   </property>
-   <property name="orientation">
-    <enum>Qt::Horizontal</enum>
-   </property>
-   <property name="standardButtons">
-    <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-   </property>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_SPS">
-   <property name="geometry">
-    <rect>
-     <x>30</x>
-     <y>80</y>
-     <width>310</width>
-     <height>191</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Times New Roman</family>
-     <pointsize>12</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
-   </property>
-   <property name="toolTip">
-    <string/>
-   </property>
-   <property name="whatsThis">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Stereo Position Spread&lt;/span&gt;&lt;/p&gt;&lt;p&gt;When multiple people are talking at the same time, which tends to happen, they are harder to understand than necessary.&lt;/p&gt;&lt;p&gt;First, our brain is a lot better at decyphering those noises into language if they are located at seperate positions.&lt;/p&gt;&lt;p&gt;Second, the Teamspeak client is apparently mixing down at 16 bit. In consequence, when two or more people are talking, the mixer will not have the headroom to keep things from distorting.&lt;/p&gt;&lt;p&gt;This module shall help on both of these issues.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="autoFillBackground">
-    <bool>true</bool>
-   </property>
-   <property name="styleSheet">
-    <string notr="true"/>
-   </property>
-   <property name="title">
-    <string>Stereo Position Spread</string>
-   </property>
-   <property name="flat">
-    <bool>false</bool>
-   </property>
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <widget class="QDial" name="dial_SPS">
-    <property name="geometry">
-     <rect>
-      <x>17</x>
-      <y>24</y>
-      <width>151</width>
-      <height>71</height>
-     </rect>
-    </property>
-    <property name="toolTip">
-     <string/>
-    </property>
-    <property name="whatsThis">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:10pt; text-decoration: underline;&quot;&gt;Position Spread: Width&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Use low values to keep speakers closer together, increase it to set them further apart.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="autoFillBackground">
-     <bool>false</bool>
-    </property>
-    <property name="notchesVisible">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QDoubleSpinBox" name="doubleSpinBox_SPS">
-    <property name="geometry">
-     <rect>
-      <x>170</x>
-      <y>30</y>
-      <width>62</width>
-      <height>22</height>
-     </rect>
-    </property>
-   </widget>
-   <widget class="QGroupBox" name="groupBox_SPS_expert">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>100</y>
-      <width>281</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="whatsThis">
-     <string>Reserve regions in the stereo field for specific types of incoming audio streams.</string>
-    </property>
-    <property name="title">
-     <string notr="true">Expert</string>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>20</y>
-       <width>261</width>
-       <height>60</height>
-      </rect>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <property name="horizontalSpacing">
-       <number>12</number>
-      </property>
-      <property name="verticalSpacing">
-       <number>6</number>
-      </property>
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_SPS_Home">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="whatsThis">
-         <string>Audio Stream: Clients talking on the currently active server tab.</string>
-        </property>
-        <property name="frameShape">
-         <enum>QFrame::NoFrame</enum>
-        </property>
-        <property name="text">
-         <string notr="true">Home</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLabel" name="label_SPS_Whisper">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="whatsThis">
-         <string>Audio Stream: Any incoming whispers.</string>
-        </property>
-        <property name="text">
-         <string notr="true">Whisper</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="2">
-       <widget class="QLabel" name="label_SPS_Other">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="whatsThis">
-         <string>Audio Stream: Clients talking on currently deselected server tabs.</string>
-        </property>
-        <property name="text">
-         <string notr="true">Other</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignBottom|Qt::AlignHCenter</set>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QSlider" name="slider_SPS_Home">
-        <property name="whatsThis">
-         <string>Audio Region: Left, Middle, Right</string>
-        </property>
-        <property name="maximum">
-         <number>2</number>
-        </property>
-        <property name="pageStep">
-         <number>1</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::TicksAbove</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QSlider" name="slider_SPS_Whisper">
-        <property name="whatsThis">
-         <string>Audio Region: Left, Middle, Right</string>
-        </property>
-        <property name="maximum">
-         <number>2</number>
-        </property>
-        <property name="pageStep">
-         <number>1</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::TicksAbove</enum>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="2">
-       <widget class="QSlider" name="slider_SPS_Other">
-        <property name="whatsThis">
-         <string>Audio Region: Left, Middle, Right</string>
-        </property>
-        <property name="maximum">
-         <number>2</number>
-        </property>
-        <property name="pageStep">
-         <number>1</number>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="tickPosition">
-         <enum>QSlider::TicksAbove</enum>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-  </widget>
-  <widget class="QPushButton" name="pushButton_SNT">
-   <property name="geometry">
-    <rect>
-     <x>60</x>
-     <y>517</y>
-     <width>75</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="mouseTracking">
-    <bool>false</bool>
-   </property>
-   <property name="whatsThis">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Setup:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Options-&amp;gt; Hotkeys-&amp;gt; Add -&amp;gt;&lt;/p&gt;&lt;p&gt;1) Set HotKey with &amp;quot;On key down&amp;quot; :&lt;/p&gt;&lt;p&gt;Show Advanced Options -&amp;gt; Plugins -&amp;gt; Plugin Hotkey -&amp;gt; CrossTalk -&amp;gt; Next Tab and Talk Start.&lt;/p&gt;&lt;p&gt;2) Set same HotKey with &amp;quot;On key up&amp;quot;:&lt;/p&gt;&lt;p&gt;Show Advanced Options -&amp;gt; Plugins -&amp;gt; Plugin Hotkey -&amp;gt; CrossTalk -&amp;gt; Next Tab and Talk End.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;For &lt;span style=&quot; font-weight:600;&quot;&gt;whispering&lt;/span&gt;, I've provided one often used variant, whispering to all channelcommander on all channels. Setup is equivalent. If you need a more specific whisper list, you have to use &amp;quot;Plugin Command&amp;quot; for the &amp;quot;On key down&amp;quot; action.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#008000;&quot;&gt;TS3_NEXT_TAB_AND_WHISPER_START&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#000000;&quot;&gt;is the basic command, which takes two arguments:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; color:#000000;&quot;&gt;1) &lt;/span&gt;&lt;span style=&quot; color:#800080;&quot;&gt;GroupWhisperType:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier'; color:#800080;&quot;&gt;CHANNELCOMMANDER&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; color:#000000;&quot;&gt; or &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; color:#800080;&quot;&gt;ALLCLIENTS&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier'; color:#000000;&quot;&gt;2)&lt;/span&gt;&lt;span style=&quot; color:#800080;&quot;&gt;GroupWhisperTargetMode&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier'; color:#800080;&quot;&gt;ALL CURRENTCHANNEL ALLPARENTCHANNELS SUBCHANNELS PARENTCHANNEL CHANNELFAMILYANCESTORCHANNELFAMILY&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-family:'Courier New,courier'; color:#000000;&quot;&gt;So, the equivalent for the provided hotkey would be: &lt;/span&gt;&lt;span style=&quot; color:#008000;&quot;&gt;TS3_NEXT_TAB_AND_WHISPER_START &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; color:#800080;&quot;&gt;CHANNELCOMMANDER ALL&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="text">
-    <string>Switch'n'Talk</string>
-   </property>
-  </widget>
-  <widget class="Banner" name="banner_pledgie">
-   <property name="geometry">
-    <rect>
-     <x>210</x>
-     <y>10</y>
-     <width>149</width>
-     <height>37</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.pledgie.com/campaigns/15624&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Support the author!&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-  </widget>
   <widget class="Banner" name="banner_jianji">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>10</y>
+     <x>350</x>
+     <y>480</y>
      <width>89</width>
      <height>37</height>
     </rect>
@@ -349,45 +58,14 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="Banner" name="banner_logo">
-   <property name="geometry">
-    <rect>
-     <x>107</x>
-     <y>10</y>
-     <width>97</width>
-     <height>37</height>
-    </rect>
-   </property>
-   <property name="sizePolicy">
-    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-     <horstretch>0</horstretch>
-     <verstretch>0</verstretch>
-    </sizepolicy>
-   </property>
-   <property name="text">
-    <string/>
-   </property>
-   <property name="pixmap">
-    <pixmap resource="../CrossTalkRes.qrc">:/banners/logo_deDE</pixmap>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="openExternalLinks">
-    <bool>true</bool>
-   </property>
-  </widget>
-  <widget class="QFrame" name="frame">
+  <widget class="BannerFrame" name="banner_frame">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>371</width>
-     <height>61</height>
+     <width>470</width>
+     <height>62</height>
     </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">background-color: rgb(232, 232, 232);</string>
    </property>
    <property name="frameShape">
     <enum>QFrame::Panel</enum>
@@ -396,371 +74,46 @@
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox_Ducking">
+  <widget class="QTextBrowser" name="textBrowser">
    <property name="geometry">
     <rect>
-     <x>30</x>
-     <y>280</y>
-     <width>310</width>
-     <height>231</height>
+     <x>20</x>
+     <y>81</y>
+     <width>431</width>
+     <height>451</height>
     </rect>
    </property>
-   <property name="font">
-    <font>
-     <family>Times New Roman</family>
-     <pointsize>12</pointsize>
-     <weight>50</weight>
-     <bold>false</bold>
-    </font>
+   <property name="html">
+    <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Times New Roman'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Author: Thorsten Weinz &amp;lt;&lt;/span&gt;&lt;a href=&quot;https://github.com/thorwe&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;thorwe&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Official Addon Page&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://jianji.de/crosstalk/&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;German CrossTalk site&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;, also for feedback and reports in german.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Visit the &lt;/span&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub wiki&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt; for manuals and setup examples, e.g.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Plugin-Commands&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Plugin Commands&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;,&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Positional-Audio&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Positional Audio Module&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;,&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Howto:-%22Radio-Frequencies%22-with-CrossTalk&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Howto: &amp;quot;Radio Frequencies&amp;quot;&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://github.com/thorwe/CrossTalk&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub project page&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt; for source code of the open-sourced modules.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Troubleshoot&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Known issues&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/issues/new&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Submit an issue&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/issues?state=open&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Bug Tracker and Feature Requests&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://forum.teamspeak.com/showthread.php/81565-RELEASE-CrossTalk&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Official Teamspeak forum thread&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
-   <property name="toolTip">
-    <string/>
-   </property>
-   <property name="whatsThis">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Ducking is the reduction of a target channels volume dependant on the activity on a source channel. Usually, the actual sound volume of the source channel is analyzed to modify the reduction of the target channel. Here, however, keeping in mind we don't want to either sound or reaction latency, the talk status is used as trigger, the reduction solely determined by the setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="autoFillBackground">
+   <property name="openExternalLinks">
     <bool>true</bool>
    </property>
-   <property name="title">
-    <string notr="true">Ducking</string>
-   </property>
-   <property name="checkable">
-    <bool>false</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <widget class="QGroupBox" name="groupBox_Duck_G">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>281</width>
-      <height>81</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>12</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string/>
-    </property>
-    <property name="whatsThis">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The Global (Music Bots, Very Unimportant Persons) Ducking module enables you to add global ducking targets via the clients context menu.&lt;/p&gt;&lt;p&gt;Those will get ducked by any other audio stream, no matter the origin.&lt;/p&gt;&lt;p&gt;Global Ducking Targets are ignored by the Channel Ducking module.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-    <property name="title">
-     <string notr="true">Global (music bots)</string>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-    <widget class="QSlider" name="horizontalSlider_Duck_G">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>28</y>
-       <width>191</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>ArrowCursor</cursorShape>
-     </property>
-     <property name="contextMenuPolicy">
-      <enum>Qt::NoContextMenu</enum>
-     </property>
-     <property name="minimum">
-      <number>0</number>
-     </property>
-     <property name="maximum">
-      <number>10000</number>
-     </property>
-     <property name="pageStep">
-      <number>1000</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="tickPosition">
-      <enum>QSlider::TicksBothSides</enum>
-     </property>
-     <property name="tickInterval">
-      <number>10000</number>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_Duck_G">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>30</y>
-       <width>62</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="minimum">
-      <double>-200.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>0.000000000000000</double>
-     </property>
-    </widget>
-    <widget class="QWidget" name="layoutWidget_2">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>59</y>
-       <width>191</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_G">
-      <item>
-       <widget class="QLabel" name="label_Duck_quiet_G">
-        <property name="font">
-         <font>
-          <pointsize>7</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string notr="true">quiet</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_Duck_loud_G">
-        <property name="font">
-         <font>
-          <pointsize>7</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string notr="true">loud</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </widget>
-   <widget class="QGroupBox" name="groupBox_Duck">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>100</y>
-      <width>281</width>
-      <height>121</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Times New Roman</family>
-      <pointsize>12</pointsize>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="toolTip">
-     <string/>
-    </property>
-    <property name="whatsThis">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Home Channel Ducking&lt;/span&gt;&lt;/p&gt;&lt;p&gt;To find out about Ducking, whatsThis? the Ducking module.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;In short:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Per default reduces the volume of speakers in the channel of the currently active server tab as soon as a whisper comes in or someone talks on another server tab (in common scenarios this is some kind of commander channel).&lt;/p&gt;&lt;p&gt;Target: Your &amp;quot;home&amp;quot; channel. That's what I call the channel of your currently active server tab.&lt;/p&gt;&lt;p&gt;Sources: Whispers and everything that's coming in from another server tab.&lt;/p&gt;&lt;p&gt;You can switch the target in so far, that:&lt;/p&gt;&lt;p&gt;Target: Talking on another server tab&lt;/p&gt;&lt;p&gt;Sources: Your &amp;quot;home&amp;quot; channel and any whispers&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-    </property>
-    <property name="autoFillBackground">
-     <bool>true</bool>
-    </property>
-    <property name="title">
-     <string>Channel</string>
-    </property>
-    <property name="checkable">
-     <bool>true</bool>
-    </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
-    <widget class="QSlider" name="horizontalSlider_Duck">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>69</y>
-       <width>191</width>
-       <height>31</height>
-      </rect>
-     </property>
-     <property name="cursor">
-      <cursorShape>ArrowCursor</cursorShape>
-     </property>
-     <property name="contextMenuPolicy">
-      <enum>Qt::NoContextMenu</enum>
-     </property>
-     <property name="minimum">
-      <number>0</number>
-     </property>
-     <property name="maximum">
-      <number>10000</number>
-     </property>
-     <property name="pageStep">
-      <number>1000</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="tickPosition">
-      <enum>QSlider::TicksBothSides</enum>
-     </property>
-     <property name="tickInterval">
-      <number>10000</number>
-     </property>
-    </widget>
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_Duck">
-     <property name="geometry">
-      <rect>
-       <x>210</x>
-       <y>71</y>
-       <width>62</width>
-       <height>22</height>
-      </rect>
-     </property>
-     <property name="minimum">
-      <double>-200.000000000000000</double>
-     </property>
-     <property name="maximum">
-      <double>0.000000000000000</double>
-     </property>
-    </widget>
-    <widget class="QWidget" name="layoutWidget">
-     <property name="geometry">
-      <rect>
-       <x>10</x>
-       <y>100</y>
-       <width>191</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QLabel" name="label_Duck_quiet">
-        <property name="font">
-         <font>
-          <pointsize>7</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string notr="true">quiet</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="label_Duck_loud">
-        <property name="font">
-         <font>
-          <pointsize>7</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string notr="true">loud</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-    <widget class="QSlider" name="slider_Duck_Mode">
-     <property name="geometry">
-      <rect>
-       <x>55</x>
-       <y>30</y>
-       <width>31</width>
-       <height>24</height>
-      </rect>
-     </property>
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="maximum">
-      <number>1</number>
-     </property>
-     <property name="pageStep">
-      <number>1</number>
-     </property>
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="tickPosition">
-      <enum>QSlider::TicksBelow</enum>
-     </property>
-     <property name="tickInterval">
-      <number>1</number>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_Duck_Target_Dyn">
-     <property name="geometry">
-      <rect>
-       <x>100</x>
-       <y>30</y>
-       <width>151</width>
-       <height>13</height>
-      </rect>
-     </property>
-     <property name="font">
-      <font>
-       <italic>true</italic>
-      </font>
-     </property>
-     <property name="autoFillBackground">
-      <bool>false</bool>
-     </property>
-     <property name="frameShape">
-      <enum>QFrame::NoFrame</enum>
-     </property>
-     <property name="text">
-      <string notr="true">TextLabel</string>
-     </property>
-    </widget>
-    <widget class="QLabel" name="label_Duck_Target_Fix">
-     <property name="geometry">
-      <rect>
-       <x>0</x>
-       <y>30</y>
-       <width>46</width>
-       <height>13</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>Target</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-     </property>
-    </widget>
-   </widget>
   </widget>
-  <zorder>frame</zorder>
-  <zorder>buttonBox</zorder>
-  <zorder>groupBox_SPS</zorder>
-  <zorder>pushButton_SNT</zorder>
-  <zorder>banner_pledgie</zorder>
+  <zorder>textBrowser</zorder>
   <zorder>banner_jianji</zorder>
-  <zorder>banner_logo</zorder>
-  <zorder>groupBox_Ducking</zorder>
+  <zorder>banner_frame</zorder>
  </widget>
  <customwidgets>
   <customwidget>
@@ -768,42 +121,15 @@
    <extends>QLabel</extends>
    <header>banner.h</header>
   </customwidget>
+  <customwidget>
+   <class>BannerFrame</class>
+   <extends>QFrame</extends>
+   <header>banner_frame.h</header>
+   <container>1</container>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../CrossTalkRes.qrc"/>
  </resources>
- <connections>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>accepted()</signal>
-   <receiver>Config</receiver>
-   <slot>accept()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>157</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonBox</sender>
-   <signal>rejected()</signal>
-   <receiver>Config</receiver>
-   <slot>reject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>286</x>
-     <y>274</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

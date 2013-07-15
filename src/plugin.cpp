@@ -286,19 +286,6 @@ void ts3plugin_configure(void* handle, void* qParentWidget) {
 
     qParentWidget_p = new Config();
     qParentWidget_p->SetupUi();
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetGlobalDuckerEnabled(bool)),&ducker_G,SLOT(setEnabled(bool)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetGlobalDuckerValue(float)),&ducker_G,SLOT(setValue(float)));
-
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingEnabled(bool)),&ducker_C,SLOT(setEnabled(bool)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingValue(float)),&ducker_C,SLOT(setValue(float)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetDuckingReverse(bool)),&ducker_C,SLOT(setDuckingReverse(bool)));
-
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetStereoPositionSpreadEnabled(bool)), &positionSpread,SLOT(setEnabled(bool)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetStereoPositionSpreadValue(float)), &positionSpread,SLOT(setSpreadWidth(float)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetStereoPositionSpreadExpertEnabled(bool)), &positionSpread,SLOT(setExpertModeEnabled(bool)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetStereoPositionSpreadExpertValueHome(int)),&positionSpread,SLOT(setRegionHomeTab(int)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetStereoPositionSpreadExpertValueWhisper(int)),&positionSpread, SLOT(setRegionWhisper(int)));
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(SetStereoPositionSpreadExpertValueOther(int)),&positionSpread, SLOT(setRegionOther(int)));
     qParentWidget_p->exec();
 }
 
