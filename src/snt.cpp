@@ -10,6 +10,9 @@
 #include "ts_logging_qt.h"
 #include "ts_helpers_qt.h"
 
+#include "ts_serversinfo.h"
+#include "ts_serverinfo_qt.h"
+
 //! Constructor
 /*!
  * \brief SnT::SnT Creates an instance of this class
@@ -206,6 +209,21 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             TSLogging::Error("Unsupported group whisper type.",scHandlerID,NULL);
             return;
         }
+        else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
+        {
+            TSServersInfo* serversInfo = TSServersInfo::instance();
+            if (serversInfo != NULL)
+            {
+                // Get My Channel Group
+                uint64 myChannelGroup;
+                if ((error = TSHelpers::GetClientChannelGroup(targetServer,&myChannelGroup)) != ERROR_ok)
+                    return;
+
+                TSServerInfo* serverInfo = serversInfo->GetServerInfo(targetServer);
+                if (serverInfo->getDefaultChannelGroup() == myChannelGroup)
+                    return;
+            }
+        }
 
         GroupWhisperTargetMode groupWhisperTargetMode  = GetGroupWhisperTargetMode(groupWhisperTargetModeArg);
         if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ENDMARKER)
@@ -260,6 +278,21 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         {
             TSLogging::Error("Unsupported group whisper type.",scHandlerID,NULL);
             return;
+        }
+        else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
+        {
+            TSServersInfo* serversInfo = TSServersInfo::instance();
+            if (serversInfo != NULL)
+            {
+                // Get My Channel Group
+                uint64 myChannelGroup;
+                if ((error = TSHelpers::GetClientChannelGroup(nextServer,&myChannelGroup)) != ERROR_ok)
+                    return;
+
+                TSServerInfo* serverInfo = serversInfo->GetServerInfo(nextServer);
+                if (serverInfo->getDefaultChannelGroup() == myChannelGroup)
+                    return;
+            }
         }
 
         arg_qs = args.at(1);

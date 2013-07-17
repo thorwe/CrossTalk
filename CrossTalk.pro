@@ -3,7 +3,7 @@ TEMPLATE = lib
 #CONFIG-=embed_manifest_dll
 
 #VERSION = 1.3.2
-#CONFIG += beta
+CONFIG += beta
 
 QT += sql network
 
@@ -49,7 +49,8 @@ HEADERS += \
     src/settings_position_spread.h \
     src/banner_frame.h \
     src/ts_serverinfo_qt.h \
-    src/ts_serversinfo.h
+    src/ts_serversinfo.h \
+    includes/ts_missing_definitions.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -123,6 +124,7 @@ include(src/positional_audio/PositionalAudio.pri) {
 }
 
 beta {
+    DEFINES += CONSOLE_OUTPUT
     DEFINES += CROSSTALK_BETA
 }
 

@@ -116,7 +116,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.4.1";
+    return "1.4.1.071701";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -442,8 +442,13 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                         }
                         else
                         {
+                            uint64 channelGroupId;
                             QString channelGroupName = args_qs.takeFirst();
-                            uint64 channelGroupId = centralStation->GetServerInfo(targetServer)->GetChannelGroupId(channelGroupName);
+                            if (channelGroupName == "DEFAULT_CHANNEL_GROUP")
+                                channelGroupId = centralStation->GetServerInfo(targetServer)->getDefaultChannelGroup();
+                            else
+                                channelGroupId = centralStation->GetServerInfo(targetServer)->GetChannelGroupId(channelGroupName);
+
                             if ((channelGroupId == (uint64)NULL) || (channelGroupId == myChannelGroupId))
                                 ret = 1;
                             else
@@ -631,10 +636,6 @@ void ts3plugin_onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int 
                 ts3plugin_onClientMoveEvent(serverConnectionHandlerID, myID, 0, channelID, ENTER_VISIBILITY, "");
         }
     }
-}
-
-void ts3plugin_onNewChannelEvent(uint64 serverConnectionHandlerID, uint64 channelID, uint64 channelParentID)
-{
 }
 
 void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage)

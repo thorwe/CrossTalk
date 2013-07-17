@@ -14,6 +14,7 @@ class TSServerInfo : public QObject
     Q_PROPERTY(uint64 serverConnectionHandlerID READ getServerConnectionHandlerID)
     Q_PROPERTY(QString name READ getName)
     Q_PROPERTY(QString uniqueId READ getUniqueId)
+    Q_PROPERTY(uint64 defaultChannelGroup READ getDefaultChannelGroup)
 
 public:
     explicit TSServerInfo(QObject *parent = 0, uint64 serverConnectionHandlerID = 0);
@@ -21,6 +22,7 @@ public:
     uint64 getServerConnectionHandlerID() const;
     QString getName() const;
     QString getUniqueId() const;
+    uint64 getDefaultChannelGroup() const;
 
     // forwards from plugin.cpp
     void onServerGroupListEvent(uint64 serverGroupID, const char* name, int type, int iconID, int saveDB);

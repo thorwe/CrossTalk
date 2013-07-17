@@ -1,6 +1,9 @@
 #include "ts_serverinfo_qt.h"
 
 #include "public_errors.h"
+#include "public_rare_definitions.h"
+
+#include "ts_missing_definitions.h"
 
 #include "ts_helpers_qt.h"
 #include "ts_logging_qt.h"
@@ -44,6 +47,19 @@ QString TSServerInfo::getUniqueId() const
     QString val = QString::fromUtf8(s_val);
     ts3Functions.freeMemory(s_val);
     return val;
+}
+
+uint64 TSServerInfo::getDefaultChannelGroup() const
+{
+    unsigned int error;
+    uint64 result;
+    if ((error = ts3Functions.getServerVariableAsUInt64(m_ServerConnectionHandlerID,VIRTUALSERVER_DEFAULT_CHANNEL_GROUP, &result)) != ERROR_ok)
+    {
+        TSLogging::Error("Could not get default channel group", m_ServerConnectionHandlerID, error, true);
+        return (uint64)NULL;
+    }
+    TSLogging::Print(QString("Default Channel group: %1 %2").arg(getDefaultChannelGroup()).arg(GetChannelGroupName(getDefaultChannelGroup())));
+    return result;
 }
 
 uint64 TSServerInfo::GetServerGroupId(QString name) const
@@ -120,7 +136,10 @@ void TSServerInfo::onServerGroupListFinishedEvent()
 
 void TSServerInfo::onChannelGroupListEvent(uint64 channelGroupID, const char *name, int type, int iconID, int saveDB)
 {
-    Q_UNUSED(type);
+    //Q_UNUSED(type);
+    if (type != PermGroupDBTypeRegular) // For now discard templates and Server Queries
+        return;
+
     Q_UNUSED(iconID);
     Q_UNUSED(saveDB);
 
@@ -130,12 +149,13 @@ void TSServerInfo::onChannelGroupListEvent(uint64 channelGroupID, const char *na
     m_ChannelGroups.insert(channelGroupID,name);
     m_isChannelGroupsUpdating = true;
 
-//    TSLogging::Print(QString("%1 %2").arg(channelGroupID).arg(name));
+//    TSLogging::Print(QString("id:%1 name:%2").arg(channelGroupID).arg(name));
 }
 
 void TSServerInfo::onChannelGroupListFinishedEvent()
 {
 //    TSLogging::Print("ChannelGroupList Finished");
     m_isChannelGroupsUpdating = false;
+
     emit channelGroupListUpdated(m_ServerConnectionHandlerID, m_ChannelGroups);
 }
