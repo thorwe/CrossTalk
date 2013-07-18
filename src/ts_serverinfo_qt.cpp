@@ -58,7 +58,7 @@ uint64 TSServerInfo::getDefaultChannelGroup() const
         TSLogging::Error("Could not get default channel group", m_ServerConnectionHandlerID, error, true);
         return (uint64)NULL;
     }
-    TSLogging::Print(QString("Default Channel group: %1 %2").arg(getDefaultChannelGroup()).arg(GetChannelGroupName(getDefaultChannelGroup())));
+//    TSLogging::Print(QString("Default Channel group: %1 %2").arg(result).arg(GetChannelGroupName(result)));
     return result;
 }
 

@@ -219,6 +219,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
                 if ((error = TSHelpers::GetClientChannelGroup(targetServer,&myChannelGroup)) != ERROR_ok)
                     return;
 
+//                TSLogging::Print(QString("My Channel group: %1").arg(myChannelGroup));
                 TSServerInfo* serverInfo = serversInfo->GetServerInfo(targetServer);
                 if (serverInfo->getDefaultChannelGroup() == myChannelGroup)
                     return;
