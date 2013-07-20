@@ -124,9 +124,11 @@ void TSLogging::Error(QString message, uint64 serverConnectionHandlerID, unsigne
 
 void TSLogging::Print(QString message, uint64 serverConnectionHandlerID, LogLevel logLevel)
 {
-    if (!(CONSOLE_OUTPUT))
-        return;
-
+#ifndef CONSOLE_OUTPUT
+    Q_UNUSED(message);
+    Q_UNUSED(serverConnectionHandlerID);
+    Q_UNUSED(logLevel);
+#else
     switch (logLevel)
     {
     case LogLevel_CRITICAL:
@@ -157,6 +159,7 @@ void TSLogging::Print(QString message, uint64 serverConnectionHandlerID, LogLeve
     QString styledQstr;
     QTextStream(&styledQstr) << time_qstr << ": " << ts3plugin_name() << ": " << message << "\n";
     printf(styledQstr.toLocal8Bit().constData());
+#endif
 }
 
 void TSLogging::Log(QString message, uint64 serverConnectionHandlerID, LogLevel logLevel)

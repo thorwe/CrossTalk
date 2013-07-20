@@ -56,13 +56,16 @@ void Module::setBlocked(bool value)
 
 void Module::Print(QString message, uint64 serverConnectionHandlerID, LogLevel logLevel)
 {
-    if (!(CONSOLE_OUTPUT))
-        return;
-
+#ifndef CONSOLE_OUTPUT
+    Q_UNUSED(message);
+    Q_UNUSED(serverConnectionHandlerID);
+    Q_UNUSED(logLevel);
+#else
     if (!m_isPrintEnabled)
         return;
 
     TSLogging::Print((this->objectName() + ": " + message), serverConnectionHandlerID, logLevel);
+#endif
 }
 
 void Module::Log(QString message, uint64 serverConnectionHandlerID, LogLevel logLevel)

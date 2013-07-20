@@ -116,7 +116,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.4.1.071801";
+    return "1.4.2";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -146,8 +146,9 @@ void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) {
 int ts3plugin_init() {
     TSLogging::Log("init");
 
-    if (CONSOLE_OUTPUT)
-        freopen("CONOUT$", "wb", stdout);   //Makes printf work in Release mode (shouldn't been necessary, but is...)
+#ifdef CONSOLE_OUTPUT
+    freopen("CONOUT$", "wb", stdout);   //Makes printf work in Release mode (shouldn't been necessary, but is...)
+#endif
 
     TSPtt::instance()->Init(&command_mutex);
 
@@ -479,7 +480,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                                     uint64 channelGroupIdArray[SIZE] = {channelGroupId};
                                     uint64 channelIdArray[SIZE] = {targetChannelId};
                                     uint64 clientDbIdArray[SIZE] = {myDbId};
-//                                    TSLogging::Print(QString("SET_SELF_CHANNEL_GROUP: %1 %2 %3").arg(channelGroupIdArray[0]).arg(channelIdArray[0]).arg(clientDbIdArray[0]));
+//                                    TSLogging::Log(QString("SET_SELF_CHANNEL_GROUP: %1 %2 %3").arg(channelGroupIdArray[0]).arg(channelIdArray[0]).arg(clientDbIdArray[0]));
                                     ts3Functions.requestSetClientChannelGroup(targetServer,&channelGroupIdArray[0],&channelIdArray[0],&clientDbIdArray[0],SIZE,NULL);
                                 }
                             }
