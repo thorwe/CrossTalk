@@ -10,6 +10,8 @@
 
 #include "ts_helpers_qt.h"
 
+#include "talkers.h"
+
 ChannelMuter::ChannelMuter(QObject *parent) :
     m_ContextMenuIdToggleChannelMute(-1),
     m_ContextMenuToggleClientWhitelisted(-1)
@@ -17,10 +19,9 @@ ChannelMuter::ChannelMuter(QObject *parent) :
     m_isPrintEnabled = false;
     this->setParent(parent);
     this->setObjectName("ChannelMuter");
-    talkers = Talkers::instance();
     vols = new Volumes(this);
-    MutedChannels = new QSet<QPair<uint64,uint64> >;
-    ClientWhiteList = new QSet<QPair<uint64,anyID> >;
+//    MutedChannels = new QSet<QPair<uint64,uint64> >;
+//    ClientWhiteList = new QSet<QPair<uint64,anyID> >;
 }
 
 // User Setting interaction
@@ -40,7 +41,7 @@ void ChannelMuter::onRunningStateChanged(bool value)
         m_ContextMenuToggleClientWhitelisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle ChannelMuter Whitelisting [temp]","");
 
     TSInfoData::instance()->Register(this,value,1);
-    connect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
+    connect(Talkers::instance(),SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
 
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }
@@ -78,10 +79,10 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
             uint64 targetChannelId = (channelID != (uint64)NULL)?channelID:myChannelID;
 
             QPair<uint64,uint64> newPair = qMakePair(serverConnectionHandlerID,targetChannelId);
-            if (!(MutedChannels->contains(newPair)))
-                MutedChannels->insert(newPair);
+            if (!(MutedChannels.contains(newPair)))
+                MutedChannels.insert(newPair);
             else
-                MutedChannels->remove(newPair);
+                MutedChannels.remove(newPair);
 
             if (targetChannelId == myChannelID)   // only if it's my current channel / hotkey immediate action is necessary
             {
@@ -109,7 +110,7 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
                         TSInfoData::instance()->RequestUpdate(serverConnectionHandlerID, targetChannelId, PLUGIN_CHANNEL);
                 }
             }
-            return (MutedChannels->contains(newPair));
+            return (MutedChannels.contains(newPair));
         }
     }
     return false;
@@ -125,7 +126,7 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
 bool ChannelMuter::isChannelMuted(uint64 serverConnectionHandlerID, uint64 channelID)
 {
     QPair<uint64,uint64> newPair = qMakePair(serverConnectionHandlerID,channelID);
-    return (MutedChannels->contains(newPair));
+    return (MutedChannels.contains(newPair));
 }
 
 //! toggles a client whitelist status, receiver of some user interaction
@@ -139,10 +140,10 @@ bool ChannelMuter::toggleClientWhitelisted(uint64 serverConnectionHandlerID, any
 {
     Print(QString("(toggleClientWhitelisted) %1").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
     QPair<uint64,anyID> newPair = qMakePair(serverConnectionHandlerID,clientID);
-    if (!(ClientWhiteList->contains(newPair)))
-        ClientWhiteList->insert(newPair);
+    if (!(ClientWhiteList.contains(newPair)))
+        ClientWhiteList.insert(newPair);
     else
-        ClientWhiteList->remove(newPair);
+        ClientWhiteList.remove(newPair);
 
     int talkStatus;
     int isReceivedWhisper;
@@ -152,7 +153,7 @@ bool ChannelMuter::toggleClientWhitelisted(uint64 serverConnectionHandlerID, any
     else
         onTalkStatusChanged(serverConnectionHandlerID, talkStatus, (isReceivedWhisper == 1), clientID,false);
 
-    return (ClientWhiteList->contains(newPair));
+    return (ClientWhiteList.contains(newPair));
 }
 
 //! Is a client whitelisted on a serverConnectionHandlerID?
@@ -165,7 +166,7 @@ bool ChannelMuter::toggleClientWhitelisted(uint64 serverConnectionHandlerID, any
 bool ChannelMuter::isClientWhitelisted(uint64 serverConnectionHandlerID, anyID clientID)
 {
     QPair<uint64,anyID> newPair = qMakePair(serverConnectionHandlerID,clientID);
-    return (ClientWhiteList->contains(newPair));
+    return (ClientWhiteList.contains(newPair));
 }
 
 // ts event handlers
@@ -258,7 +259,7 @@ bool ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int sta
                 SimpleVolume* vol = ChanVolumes->value(clientID);
                 QPair<uint64,uint64> channelPair = qMakePair(serverConnectionHandlerID,channelID);
                 QPair<uint64,anyID> clientPair = qMakePair(serverConnectionHandlerID,clientID);
-                vol->setMuted((MutedChannels->contains(channelPair)) && (!(ClientWhiteList->contains(clientPair))));
+                vol->setMuted((MutedChannels.contains(channelPair)) && (!(ClientWhiteList.contains(clientPair))));
                 vol->setProcessing(status==STATUS_TALKING);
                 return vol->isMuted();
             }

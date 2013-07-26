@@ -6,7 +6,6 @@
 #include "module.h"
 #include "volumes.h"
 #include "simple_volume.h"
-#include "talkers.h"
 #include "ts_infodata_qt.h"
 #include "ts_context_menu_qt.h"
 
@@ -41,11 +40,10 @@ public slots:
     void onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID);
 
 private:
-    Talkers* talkers;
     Volumes* vols;
 
-    QSet<QPair<uint64,uint64> >* MutedChannels;
-    QSet<QPair<uint64,anyID> >* ClientWhiteList;
+    QSet<QPair<uint64,uint64> > MutedChannels;
+    QSet<QPair<uint64,anyID> > ClientWhiteList;
 
     int m_ContextMenuIdToggleChannelMute;
     int m_ContextMenuToggleClientWhitelisted;
