@@ -265,7 +265,7 @@ void Ducker_Global::onRunningStateChanged(bool value)
 {
     if(m_ContextMenuToggleMusicBot == -1)
     {
-        m_ContextMenuToggleMusicBot = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle Global Ducking Target","");
+        m_ContextMenuToggleMusicBot = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle Global Ducking Target","duck_16.png");
         connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
     }
 
