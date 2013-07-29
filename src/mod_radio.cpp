@@ -51,7 +51,7 @@ void Radio::setFudgeHomeTab(double val)
     if (m_fudge_HomeTab == val)
         return;
     m_fudge_HomeTab = val;
-    Print(QString("Fudge Home: %1").arg(m_fudge_HomeTab));
+//    Print(QString("Fudge Home: %1").arg(m_fudge_HomeTab));
     emit FudgeHomeTabSet(m_fudge_HomeTab);
 }
 
@@ -130,7 +130,7 @@ void Radio::setLowFrequencyHomeTab(double val)
     emit CenterFrequencyHomeTabSet(getCenterFrequencyHomeTab());
     emit BandWidthHomeTabSet(getBandWidthHomeTab());
 
-    Print(QString("Low Frequency Home: %1").arg(m_lowFrequency_HomeTab));
+//    Print(QString("Low Frequency Home: %1").arg(m_lowFrequency_HomeTab));
     emit LowFrequencyHomeTabSet(m_lowFrequency_HomeTab);
 }
 
@@ -165,7 +165,7 @@ void Radio::setHighFrequencyHomeTab(double val)
     emit CenterFrequencyHomeTabSet(getCenterFrequencyHomeTab());
     emit BandWidthHomeTabSet(getBandWidthHomeTab());
 
-    Print(QString("High Frequency Home: %1").arg(m_highFrequency_HomeTab));
+//    Print(QString("High Frequency Home: %1").arg(m_highFrequency_HomeTab));
     emit HighFrequencyHomeTabSet(m_highFrequency_HomeTab);
 }
 
@@ -189,6 +189,32 @@ void Radio::setHighFrequencyOther(double val)
     emit CenterFrequencyOtherSet(getCenterFrequencyOther());
     emit BandWidthOtherSet(getBandWidthOther());
     emit HighFrequencyOtherSet(m_highFrequency_Other);
+}
+
+void Radio::ToggleClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID)
+{
+    if (m_ClientBlacklist.contains(serverConnectionHandlerID,clientID))
+        m_ClientBlacklist.remove(serverConnectionHandlerID,clientID);
+    else
+        m_ClientBlacklist.insert(serverConnectionHandlerID,clientID);
+
+    if (!(isRunning()))
+        return;
+
+    if (!(TalkersDspRadios->contains(serverConnectionHandlerID)))
+        return;
+
+    QMap<anyID,DspRadio*>* sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
+    if (sDspRadios->contains(clientID))
+    {
+        DspRadio* dspObj = sDspRadios->value(clientID);
+        dspObj->setEnabled(!isClientBlacklisted(serverConnectionHandlerID,clientID));
+    }
+}
+
+bool Radio::isClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID)
+{
+    return m_ClientBlacklist.contains(serverConnectionHandlerID,clientID);
 }
 
 void Radio::saveSettings(int r)

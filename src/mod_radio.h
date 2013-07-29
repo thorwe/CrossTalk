@@ -70,6 +70,8 @@ public:
     double getHighFrequencyWhisper() {return m_highFrequency_Whisper;}
     double getHighFrequencyOther() {return m_highFrequency_Other;}
 
+    bool isClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID);
+
     void onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels);
 
 signals:
@@ -114,6 +116,8 @@ public slots:
     void setHighFrequencyWhisper(double val);
     void setHighFrequencyOther(double val);
 
+    void ToggleClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID);
+
     void saveSettings(int r);
 
 private:
@@ -137,6 +141,9 @@ private:
     double m_highFrequency_HomeTab;
     double m_highFrequency_Whisper;
     double m_highFrequency_Other;
+
+    // QMultiMap is reported to be faster than QMultiHash until up to 10 entries in 4.x, oh I dunno
+    QMultiMap<uint64,uint64> m_ClientBlacklist;
 
 protected:
     void onRunningStateChanged(bool value);
