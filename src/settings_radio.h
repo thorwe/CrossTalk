@@ -6,11 +6,12 @@
 #include "ts_context_menu_qt.h"
 #include "config_radio.h"
 #include "mod_radio.h"
+#include "ts_infodata_qt.h"
 
-class SettingsRadio : public QObject, public ContextMenuInterface
+class SettingsRadio : public QObject, public InfoDataInterface, public ContextMenuInterface
 {
     Q_OBJECT
-    Q_INTERFACES(ContextMenuInterface)
+    Q_INTERFACES(InfoDataInterface ContextMenuInterface)
 
 public:
     static SettingsRadio* instance()
@@ -38,6 +39,7 @@ public:
     }
     
     void Init(Radio *radio);
+    bool onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, uint64 mine, QTextStream &data);
 
 signals:
     void HomeEnabledSet(bool);
@@ -54,6 +56,8 @@ signals:
     void OtherLowFrequencySet(double);
     void OtherHighFrequencySet(double);
     void OtherDestructionSet(double);
+
+    void ToggleClientBlacklisted(uint64,anyID);
 
     void settingsSave();
 
@@ -72,6 +76,7 @@ private:
     SettingsRadio& operator=(const SettingsRadio &);
 
     int m_ContextMenuUi;
+    int m_ContextMenuToggleClientBlacklisted;
     QPointer<ConfigRadio> config;
 
     QPointer<Radio> mP_radio;

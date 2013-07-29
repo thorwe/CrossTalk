@@ -3,6 +3,8 @@
 #include "ts_helpers_qt.h"
 #include "ts_logging_qt.h"
 
+#include "plugin.h" //pluginID
+
 SettingsRadio* SettingsRadio::m_Instance = 0;
 SettingsRadio::SettingsRadio() :
     m_ContextMenuUi(-1)
@@ -16,8 +18,11 @@ void SettingsRadio::Init(Radio *radio)
     if(m_ContextMenuUi == -1)
     {
         m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Radio FX","walkie_talkie_16.png");
+        m_ContextMenuToggleClientBlacklisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT, "Radio FX: Toggle Client Blacklisted [temp]", "walkie_talkie_16.png");
         connect(TSContextMenu::instance(),SIGNAL(MenusInitialized()),SLOT(onMenusInitialized()),Qt::AutoConnection);
         connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
+
+        TSInfoData::instance()->Register(this,true,1);
     }
 
     this->connect(this, SIGNAL(HomeEnabledSet(bool)), radio, SLOT(setEnabledHomeTab(bool)));
@@ -34,6 +39,8 @@ void SettingsRadio::Init(Radio *radio)
     this->connect(this, SIGNAL(OtherLowFrequencySet(double)), radio, SLOT(setLowFrequencyOther(double)));
     this->connect(this, SIGNAL(OtherHighFrequencySet(double)), radio, SLOT(setHighFrequencyOther(double)));
     this->connect(this, SIGNAL(OtherDestructionSet(double)), radio, SLOT(setFudgeOther(double)));
+
+    this->connect(this, SIGNAL(ToggleClientBlacklisted(uint64,anyID)), radio, SLOT(ToggleClientBlacklisted(uint64,anyID)));
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.beginGroup(radio->objectName());
@@ -65,10 +72,28 @@ void SettingsRadio::Init(Radio *radio)
     mP_radio = radio;
 }
 
+bool SettingsRadio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type, uint64 mine, QTextStream &data)
+{
+    bool isDirty = false;
+    if (type == PLUGIN_CLIENT)
+    {
+        if (m_ContextMenuToggleClientBlacklisted != -1)
+            ts3Functions.setPluginMenuEnabled(pluginID,m_ContextMenuToggleClientBlacklisted,(id != mine)?1:0);
+
+        if ((id != mine) && (mP_radio != 0) && (mP_radio.data()->isClientBlacklisted(serverConnectionHandlerID,(anyID)id)))
+        {
+            data << mP_radio.data()->objectName() << ":";
+            isDirty = true;
+            data << "blacklisted [temp]";
+        }
+    }
+    return isDirty;
+}
+
 void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
 {
-    Q_UNUSED(serverConnectionHandlerID);
-    Q_UNUSED(selectedItemID);
+//    Q_UNUSED(serverConnectionHandlerID);
+//    Q_UNUSED(selectedItemID);
 
     if (type == PLUGIN_MENU_TYPE_GLOBAL)
     {
@@ -128,12 +153,20 @@ void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginM
             }
         }
     }
+    else if (type == PLUGIN_MENU_TYPE_CLIENT)
+    {
+        if (menuItemID == m_ContextMenuToggleClientBlacklisted)
+            emit ToggleClientBlacklisted(serverConnectionHandlerID, (anyID)selectedItemID);
+    }
 }
 
 void SettingsRadio::onMenusInitialized()
 {
     if(m_ContextMenuUi == -1)
         TSLogging::Error(QString("%1: Menu wasn't registered.").arg(this->objectName()));
+
+    if(m_ContextMenuToggleClientBlacklisted == -1)
+        TSLogging::Error(QString("%1: Toggle Client Blacklisted menu item wasn't registered.").arg(this->objectName()));
 }
 
 void SettingsRadio::saveSettings(int r)
