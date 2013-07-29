@@ -41,6 +41,9 @@
 #ifdef USE_POSITIONAL_AUDIO
 #include "settings_positionalaudio.h"
 #include "mod_positionalaudio.h"
+# ifdef CROSSTALK_BETA
+#include "gw.h"
+# endif
 #endif
 
 #include "ts_ptt_qt.h"
@@ -93,7 +96,11 @@ ChannelMuter channel_Muter;
 #ifdef USE_POSITIONAL_AUDIO
 SettingsPositionalAudio* settingsPositionalAudio = SettingsPositionalAudio::instance();
 PositionalAudio positionalAudio;
+# ifdef CROSSTALK_BETA
+GW gw(&positionalAudio);
+# endif
 #endif
+
 #ifdef USE_RADIO
 SettingsRadio* settingsRadio = SettingsRadio::instance();
 Radio radio;
@@ -116,7 +123,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.4.2";
+    return "1.4.3";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -165,6 +172,9 @@ int ts3plugin_init() {
 
 #ifdef USE_POSITIONAL_AUDIO
     settingsPositionalAudio->Init(&positionalAudio);
+# ifdef CROSSTALK_BETA
+    gw.setEnabled(true);
+# endif
 #endif
 
     channel_Muter.setEnabled(true);
@@ -749,9 +759,9 @@ void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID cl
 
 int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage) {
 //    TSLogging::Print(QString("onServerErrorEvent: %1 %2 %3").arg((returnCode ? returnCode : "")).arg(error).arg(errorMessage),serverConnectionHandlerID,LogLevel_DEBUG);
-    Q_UNUSED(errorMessage);
-    Q_UNUSED(returnCode);
-    Q_UNUSED(extraMessage);
+//    Q_UNUSED(errorMessage);
+//    Q_UNUSED(returnCode);
+//    Q_UNUSED(extraMessage);
 //    if  (error== ERROR_client_is_flooding)
 //    {
 ////        TSLogging::Error("Client is flooding. Need throttle.");
@@ -782,14 +792,23 @@ int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* e
             QString sUId = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getUniqueId();
             settingsPositionalAudio->SetServerBlock(sUId,true,serverConnectionHandlerID);
         }
-//        else if (error==ERROR_channel_invalid_password)
-//        {
-//            TSLogging::Print("Invalid Password.");
-//        }
     }
+# ifdef CROSSTALK_BETA
+    isHandledError = gw.onServerError(serverConnectionHandlerID,errorMessage,error,returnCode,extraMessage);
+# endif
 #endif
 
     return isHandledError;  /* If no plugin return code was used, the return value of this function is ignored */
+}
+
+int ts3plugin_onServerPermissionErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, unsigned int failedPermissionID) {
+    int isHandledError = 0;
+#ifdef USE_POSITIONAL_AUDIO
+# ifdef CROSSTALK_BETA
+    isHandledError = gw.onServerPermissionError(serverConnectionHandlerID,errorMessage,error,returnCode,failedPermissionID);
+# endif
+#endif
+    return isHandledError;
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID)
