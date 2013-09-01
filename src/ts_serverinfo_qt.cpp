@@ -136,7 +136,6 @@ void TSServerInfo::onServerGroupListFinishedEvent()
 
 void TSServerInfo::onChannelGroupListEvent(uint64 channelGroupID, const char *name, int type, int iconID, int saveDB)
 {
-    //Q_UNUSED(type);
     if (type != PermGroupDBTypeRegular) // For now discard templates and Server Queries
         return;
 
@@ -148,14 +147,10 @@ void TSServerInfo::onChannelGroupListEvent(uint64 channelGroupID, const char *na
 
     m_ChannelGroups.insert(channelGroupID,name);
     m_isChannelGroupsUpdating = true;
-
-//    TSLogging::Print(QString("id:%1 name:%2").arg(channelGroupID).arg(name));
 }
 
 void TSServerInfo::onChannelGroupListFinishedEvent()
 {
-//    TSLogging::Print("ChannelGroupList Finished");
     m_isChannelGroupsUpdating = false;
-
     emit channelGroupListUpdated(m_ServerConnectionHandlerID, m_ChannelGroups);
 }
