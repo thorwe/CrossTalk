@@ -302,8 +302,6 @@ void ChannelMuter::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMe
         toggleChannelMute(serverConnectionHandlerID,selectedItemID);
     else if (menuItemID == m_ContextMenuToggleClientWhitelisted)
         toggleClientWhitelisted(serverConnectionHandlerID,(anyID)selectedItemID);
-//    else
-//        Error("Received bad context menu event.",serverConnectionHandlerID,NULL);
 }
 
 //! Routes the arguments of the event to the corresponding volume object
