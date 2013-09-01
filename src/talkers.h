@@ -44,9 +44,9 @@ public:
         mutex.unlock();
     }
 
-    enum TsTalker {isOther = 0x00, isMe = 0x01, isPrioritySpeaker = 0x02, isWhispering = 0x04};
-    Q_DECLARE_FLAGS(TsTalkers, TsTalker)
-    Q_FLAGS(TsTalkers)
+//    enum TsTalker {isOther = 0x00, isMe = 0x01, isPrioritySpeaker = 0x02, isWhispering = 0x04};
+//    Q_DECLARE_FLAGS(TsTalkers, TsTalker)
+//    Q_FLAGS(TsTalkers)
 
     bool onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID);
     void onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
@@ -83,10 +83,13 @@ private:
 
     QMultiMap<uint64,anyID> TalkerMap;
     QMultiMap<uint64,anyID> WhisperMap;
+
 //    QMultiMap<uint64,anyID> PrioritySpeakerMap; // commented out until I need it
 
 //    void FireTalkStatusChange(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID);
 //    QList<QPointer<QObject> > TalkStatusChangeModules;
 };
+
+//Q_DECLARE_OPERATORS_FOR_FLAGS(Talkers::TsTalkers)
 
 #endif // TALKERS_H

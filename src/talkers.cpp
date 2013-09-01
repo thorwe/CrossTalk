@@ -184,6 +184,13 @@ bool Talkers::onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int stat
 //        if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_IS_PRIORITY_SPEAKER, &isPrioritySpeaker)) != ERROR_ok)
 //            TSLogging::Error("(onTalkStatusChangeEvent)",serverConnectionHandlerID,error);
 
+//        // build enum
+//        TsTalkers talker = Talkers::isOther;
+//        if (isReceivedWhisper)
+//            talker |= Talkers::isWhispering;
+//        if (isPrioritySpeaker)
+//            talker |= Talkers::isPrioritySpeaker;
+
         if (isReceivedWhisper)
         {
             if (!WhisperMap.contains(serverConnectionHandlerID,clientID))   // pure safety measurement
