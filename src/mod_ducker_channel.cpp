@@ -12,7 +12,8 @@
 Ducker_Channel::Ducker_Channel(QObject *parent) :
     m_isActive(false),
     m_value(0.0f),
-    m_homeId(0)
+    m_homeId(0),
+    m_isDuckPrioritySpeakers(false)
 {
     m_isPrintEnabled = false;
     this->setParent(parent);
@@ -29,6 +30,11 @@ float Ducker_Channel::getValue() const
 bool Ducker_Channel::isTargetOtherTabs() const
 {
     return m_isTargetOtherTabs;
+}
+
+bool Ducker_Channel::isDuckPrioritySpeakers() const
+{
+    return m_isDuckPrioritySpeakers;
 }
 
 // User Setting interaction
@@ -112,6 +118,19 @@ void Ducker_Channel::setDuckingReverse(bool val)
         onRunningStateChanged(true);
     }
     Log(QString("isTargetOtherTabs: %1").arg((m_isTargetOtherTabs)?"true":"false"));
+}
+
+void Ducker_Channel::setDuckPrioritySpeakers(bool val)
+{
+    if (val==m_isDuckPrioritySpeakers)
+        return;
+
+    if (isRunning())  //since everything needs to be re-evaluated might as well toggle off/on
+    {
+        onRunningStateChanged(false); //setEnabled would trigger signal
+        onRunningStateChanged(true);
+    }
+    m_isDuckPrioritySpeakers = val;
 }
 
 //void Ducker_Channel::saveSettings()
@@ -256,13 +275,13 @@ bool Ducker_Channel::onTalkStatusChanged(uint64 serverConnectionHandlerID, int s
 
         //non ideal i guess
         unsigned int error;
-        int isPrioritySpeaker = 0;
-        if ((status==STATUS_TALKING) && (error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_IS_PRIORITY_SPEAKER, &isPrioritySpeaker)) != ERROR_ok)
+        int isPrioritySpeakerDuck = 0;
+        if ((!m_isDuckPrioritySpeakers) && (status==STATUS_TALKING) && ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientID, CLIENT_IS_PRIORITY_SPEAKER, &isPrioritySpeakerDuck)) != ERROR_ok))
             Error("(onTalkStatusChangeEvent)",serverConnectionHandlerID,error);
 
-        vol->setDuckBlocked(isTrigger || ((isReceivedWhisper || isPrioritySpeaker) && (status==STATUS_TALKING)));
+        vol->setDuckBlocked(isTrigger || ((isReceivedWhisper || (isPrioritySpeakerDuck)) && (status==STATUS_TALKING)));
         vol->setProcessing(status==STATUS_TALKING);
-        return ((status==STATUS_TALKING) && !(isReceivedWhisper || isPrioritySpeaker));
+        return ((status==STATUS_TALKING) && !(isReceivedWhisper || isPrioritySpeakerDuck));
     }
     return false;
 }

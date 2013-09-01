@@ -17,6 +17,7 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     this->connect(ui->wFader_gDuck,SIGNAL(valueChanged(float)),SIGNAL(globalDuckerValueChanged(float)));
     this->connect(ui->wFader_cDuck,SIGNAL(valueChanged(float)),SIGNAL(channelDuckerValueChanged(float)));
     this->connect(ui->slider_cDuck_Mode,SIGNAL(valueChanged(int)),SLOT(onChannelDuckingDuckModeSliderValueChanged(int)));
+    this->connect(ui->checkBox_cDuck_PS,SIGNAL(toggled(bool)),SIGNAL(channelDuckerDuckPSEnabledSet(bool)));
 }
 
 ConfigDucking::~ConfigDucking()
@@ -58,6 +59,13 @@ void ConfigDucking::UpdateChannelDuckerReverse(bool val)
     ui->slider_cDuck_Mode->setValue(val);
     onChannelDuckingDuckModeSliderValueChanged(val);
     this->blockSignals(false);
+}
+
+void ConfigDucking::UpdateChannelDuckerDuckPSEnabled(bool val)
+{
+    this->ui->checkBox_cDuck_PS->blockSignals(true);
+    ui->checkBox_cDuck_PS->setChecked(val);
+    this->ui->checkBox_cDuck_PS->blockSignals(false);
 }
 
 //! Retrieves ducking mode slider change, sets label, emits channelDuckerReverseSet as bool

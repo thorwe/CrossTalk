@@ -28,6 +28,7 @@ void SettingsDuck::Init(Ducker_Global* ducker_G, Ducker_Channel* ducker_C)
     this->connect(this,SIGNAL(channelDuckerEnabledSet(bool)),ducker_C, SLOT(setEnabled(bool)));
     this->connect(this,SIGNAL(channelDuckerValueChanged(float)),ducker_C,SLOT(setValue(float)));
     this->connect(this,SIGNAL(channelDuckerReverseSet(bool)), ducker_C, SLOT(setDuckingReverse(bool)));
+    this->connect(this,SIGNAL(channelDuckerDuckPSEnabledSet(bool)), ducker_C, SLOT(setDuckPrioritySpeakers(bool)));
 
 //    this->connect(this,SIGNAL(settingsSave()),ducker_G, SLOT(saveSettings()));
 //    this->connect(this,SIGNAL(settingsSave()),ducker_C, SLOT(saveSettings()));
@@ -50,6 +51,7 @@ void SettingsDuck::Init(Ducker_Global* ducker_G, Ducker_Channel* ducker_C)
     ducker_C->setEnabled(cfg.value("ducking_enabled",true).toBool());
     ducker_C->setValue(cfg.value("ducking_value",-23.0f).toFloat());
     ducker_C->setDuckingReverse(cfg.value("ducking_reverse",false).toBool());
+    ducker_C->setDuckPrioritySpeakers(cfg.value("ducking_PS",false).toBool());
 
     mP_ducker_G = ducker_G;
     mP_ducker_C = ducker_C;
@@ -79,6 +81,7 @@ void SettingsDuck::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMe
                 p_config->UpdateChannelDuckerEnabled(cfg.value("ducking_enabled",true).toBool());
                 p_config->UpdateChannelDuckerValue(cfg.value("ducking_value",-23.0).toFloat());
                 p_config->UpdateChannelDuckerReverse((cfg.value("ducking_reverse",false).toBool())?1:0);
+                p_config->UpdateChannelDuckerDuckPSEnabled(cfg.value("ducking_PS",false).toBool());
 
                 this->connect(p_config,SIGNAL(globalDuckerEnabledSet(bool)),SIGNAL(globalDuckerEnabledSet(bool)));
                 this->connect(p_config,SIGNAL(globalDuckerValueChanged(float)),SIGNAL(globalDuckerValueChanged(float)));
@@ -86,6 +89,7 @@ void SettingsDuck::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMe
                 this->connect(p_config,SIGNAL(channelDuckerEnabledSet(bool)),SIGNAL(channelDuckerEnabledSet(bool)));
                 this->connect(p_config,SIGNAL(channelDuckerValueChanged(float)),SIGNAL(channelDuckerValueChanged(float)));
                 this->connect(p_config,SIGNAL(channelDuckerReverseSet(bool)),SIGNAL(channelDuckerReverseSet(bool)));
+                this->connect(p_config,SIGNAL(channelDuckerDuckPSEnabledSet(bool)),SIGNAL(channelDuckerDuckPSEnabledSet(bool)));
 
                 connect(p_config,SIGNAL(finished(int)),this,SLOT(saveSettings(int)));
                 p_config->show();
@@ -152,6 +156,7 @@ void SettingsDuck::saveSettings(int r)
         cfg.setValue("ducking_enabled", mP_ducker_C.data()->isEnabled());
         cfg.setValue("ducking_value", mP_ducker_C.data()->getValue());
         cfg.setValue("ducking_reverse", mP_ducker_C.data()->isTargetOtherTabs());
+        cfg.setValue("ducking_PS", mP_ducker_C.data()->isDuckPrioritySpeakers());
     }
 
     emit settingsSave();

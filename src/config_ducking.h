@@ -21,6 +21,7 @@ public:
     void UpdateChannelDuckerEnabled(bool);
     void UpdateChannelDuckerValue(float);
     void UpdateChannelDuckerReverse(bool);
+    void UpdateChannelDuckerDuckPSEnabled(bool);
 
 signals:
     void globalDuckerEnabledSet(bool);
@@ -29,6 +30,7 @@ signals:
     void channelDuckerEnabledSet(bool);
     void channelDuckerValueChanged(float);
     void channelDuckerReverseSet(bool);
+    void channelDuckerDuckPSEnabledSet(bool);
 
 private slots:
     void onChannelDuckingDuckModeSliderValueChanged(int val);

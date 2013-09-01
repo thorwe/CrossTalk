@@ -25,12 +25,15 @@ class Ducker_Channel : public Module, public TalkInterface
                WRITE setHomeId)
     Q_PROPERTY(bool targetOtherTabs
                READ isTargetOtherTabs)
+    Q_PROPERTY(bool duckPrioritySpeakers
+               READ isDuckPrioritySpeakers)
 
 public:
     explicit Ducker_Channel(QObject *parent = 0);
 
     float getValue() const;
     bool isTargetOtherTabs() const;
+    bool isDuckPrioritySpeakers() const;
 
     // events forwarded from plugin.cpp
     void onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID);
@@ -49,6 +52,7 @@ private:
     float value() {return m_value;}
     float m_value;
     uint64 m_homeId;
+    bool m_isDuckPrioritySpeakers;
 
     Talkers* talkers;
     Volumes* vols;
@@ -63,6 +67,7 @@ signals:
 public slots:
     void setValue(float newValue);
     void setDuckingReverse(bool);
+    void setDuckPrioritySpeakers(bool);
 
 //    void saveSettings();
 
