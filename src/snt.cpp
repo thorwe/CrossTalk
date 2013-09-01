@@ -186,13 +186,11 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
         }
 
-        QString groupWhisperTargetModeArg = args.takeLast();
-        QString groupWhisperTypeArg = args.takeLast();
-        QString name;
-        if (args.count() == 1)
-            name = args.at(0);
-        else
-            name = args.join(" ");
+        QString name = args.at(0);
+        QString groupWhisperTypeArg = args.at(1);
+        QString groupWhisperTargetModeArg = args.at(2);
+        uint64 arg = (uint64)NULL;
+
 
         uint64 targetServer = 0;
         if ((error = TSHelpers::GetServerHandler(name,&targetServer)) != ERROR_ok)
@@ -214,15 +212,44 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             TSServersInfo* serversInfo = TSServersInfo::instance();
             if (serversInfo != NULL)
             {
-                // Get My Channel Group
-                uint64 myChannelGroup;
-                if ((error = TSHelpers::GetClientChannelGroup(targetServer,&myChannelGroup)) != ERROR_ok)
-                    return;
+                if (args.count() == 4)
+                {
+                    TSServerInfo* serverInfo = serversInfo->GetServerInfo(targetServer);
+                    if ((arg = serverInfo->GetChannelGroupId(args.at(3))) == (uint64)NULL)
+                    {
+                        TSLogging::Error("Could not find channel group.");
+                        return;
+                    }
+                }
+                else    // Get My Channel Group
+                {
+                    if ((error = TSHelpers::GetClientChannelGroup(targetServer,&arg)) != ERROR_ok)
+                        return;
 
-//                TSLogging::Print(QString("My Channel group: %1").arg(myChannelGroup));
+                    // Blacklist default channel group only with no arg
+                    TSServerInfo* serverInfo = serversInfo->GetServerInfo(targetServer);
+                    if (serverInfo->getDefaultChannelGroup() == arg)
+                        return;
+                }
+            }
+        }
+        else if (groupWhisperType == GROUPWHISPERTYPE_SERVERGROUP)
+        {
+            if (args.count() < 4)
+            {
+                TSLogging::Error("Not enough arguments.");
+                return;
+            }
+
+            TSServersInfo* serversInfo = TSServersInfo::instance();
+            if (serversInfo != NULL)
+            {
                 TSServerInfo* serverInfo = serversInfo->GetServerInfo(targetServer);
-                if (serverInfo->getDefaultChannelGroup() == myChannelGroup)
+                if ((arg = serverInfo->GetServerGroupId(args.at(3))) == (uint64)NULL)
+                {
+                    TSLogging::Error("Could not find server group.");
                     return;
+                }
             }
         }
 
@@ -277,7 +304,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         GroupWhisperType groupWhisperType = GetGroupWhisperType(arg_qs);
         if (groupWhisperType == GROUPWHISPERTYPE_ENDMARKER)
         {
-            TSLogging::Error("Unsupported group whisper type.",scHandlerID,NULL);
+            TSLogging::Error("Could not determine group whisper type.",scHandlerID,NULL);
             return;
         }
         else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
@@ -364,6 +391,8 @@ GroupWhisperType SnT::GetGroupWhisperType(QString val)
         groupWhisperType = GROUPWHISPERTYPE_CHANNELCOMMANDER;
     else if (val.contains("CHANNEL_GROUP",Qt::CaseInsensitive))
         groupWhisperType = GROUPWHISPERTYPE_CHANNELGROUP;
+    else if (val.contains("SERVER_GROUP",Qt::CaseInsensitive))
+        groupWhisperType = GROUPWHISPERTYPE_SERVERGROUP;
     else if (val.contains("ALLC",Qt::CaseInsensitive))
         groupWhisperType = GROUPWHISPERTYPE_ALLCLIENTS;
 
