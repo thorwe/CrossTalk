@@ -1,6 +1,12 @@
-// Encapsulates querying the TS3 Settings Database via QtSQL
-//
-// Author: Thorsten Weinz
+/* Encapsulates querying the TS3 Settings Database via QtSQL
+ *
+ * Author: Thorsten Weinz
+ *
+ * credits @ Jules Blok (jules@aerix.nl),
+ * see
+ * https://github.com/Armada651/g-key
+ * for the original std approach
+ */
 
 #ifndef TS_SETTINGS_QT_H
 #define TS_SETTINGS_QT_H
