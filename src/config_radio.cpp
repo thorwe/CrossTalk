@@ -2,10 +2,9 @@
 #include "ui_config_radio.h"
 
 #include "mod_radio.h"
-#include "config_radio_groupbox.h"
-#include "config_radio_channelstrip.h"
-
 #include "ts_helpers_qt.h"
+
+#include "ts_logging_qt.h"
 
 ConfigRadio::ConfigRadio(QWidget *parent) :
     QDialog(parent),
@@ -14,21 +13,6 @@ ConfigRadio::ConfigRadio(QWidget *parent) :
     ui->setupUi(this);
     this->setAttribute( Qt::WA_DeleteOnClose );
     this->setFixedSize(this->width(),this->height());
-
-    connect(ui->groupBox_Home,SIGNAL(toggled(bool)),this,SIGNAL(HomeEnabledSet(bool)));
-    connect(ui->groupBox_Home,SIGNAL(CenterFrequencySet(double)),this,SIGNAL(HomeLowFrequencySet(double)));
-    connect(ui->groupBox_Home,SIGNAL(BandWidthSet(double)),this,SIGNAL(HomeHighFrequencySet(double)));
-    connect(ui->groupBox_Home,SIGNAL(DestructionSet(double)),this,SIGNAL(HomeDestructionSet(double)));
-
-    connect(ui->groupBox_Whisper,SIGNAL(toggled(bool)),this,SIGNAL(WhisperEnabledSet(bool)));
-    connect(ui->groupBox_Whisper,SIGNAL(CenterFrequencySet(double)),this,SIGNAL(WhisperLowFrequencySet(double)));
-    connect(ui->groupBox_Whisper,SIGNAL(BandWidthSet(double)),this,SIGNAL(WhisperHighFrequencySet(double)));
-    connect(ui->groupBox_Whisper,SIGNAL(DestructionSet(double)),this,SIGNAL(WhisperDestructionSet(double)));
-
-    connect(ui->groupBox_Other,SIGNAL(toggled(bool)),this,SIGNAL(OtherEnabledSet(bool)));
-    connect(ui->groupBox_Other,SIGNAL(CenterFrequencySet(double)),this,SIGNAL(OtherLowFrequencySet(double)));
-    connect(ui->groupBox_Other,SIGNAL(BandWidthSet(double)),this,SIGNAL(OtherHighFrequencySet(double)));
-    connect(ui->groupBox_Other,SIGNAL(DestructionSet(double)),this,SIGNAL(OtherDestructionSet(double)));
 }
 
 ConfigRadio::~ConfigRadio()
@@ -36,86 +20,63 @@ ConfigRadio::~ConfigRadio()
     delete ui;
 }
 
-void ConfigRadio::UpdateHomeEnabled(bool val)
+void ConfigRadio::UpdateEnabled(QString name, bool val)
 {
-    ui->groupBox_Home->blockSignals(true);
-    ui->groupBox_Home->setChecked(val);
-    ui->groupBox_Home->blockSignals(false);
+    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    channelStrip->blockSignals(true);
+    channelStrip->setChecked(val);
+    channelStrip->blockSignals(false);
 }
 
-void ConfigRadio::UpdateHomeLowFrequency(double val)
+void ConfigRadio::UpdateBandpassLowFrequency(QString name, double val)
 {
-    ui->groupBox_Home->blockSignals(true);
-    ui->groupBox_Home->onCFValueChanged(val);
-    ui->groupBox_Home->blockSignals(false);
+    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    channelStrip->blockSignals(true);
+    channelStrip->onCFValueChanged(val);
+    channelStrip->blockSignals(false);
 }
 
-void ConfigRadio::UpdateHomeHighFrequency(double val)
+void ConfigRadio::UpdateBandpassHighFrequency(QString name, double val)
 {
-    ui->groupBox_Home->blockSignals(true);
-    ui->groupBox_Home->onBWValueChanged(val);
-    ui->groupBox_Home->blockSignals(false);
+    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    channelStrip->blockSignals(true);
+    channelStrip->onBWValueChanged(val);
+    channelStrip->blockSignals(false);
 }
 
-void ConfigRadio::UpdateHomeDestruction(double val)
+void ConfigRadio::UpdateDestruction(QString name, double val)
 {
-    ui->groupBox_Home->blockSignals(true);
-    ui->groupBox_Home->onDestrValueChanged(val);
-    ui->groupBox_Home->blockSignals(false);
+    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    channelStrip->blockSignals(true);
+    channelStrip->onDestrValueChanged(val);
+    channelStrip->blockSignals(false);
 }
 
-void ConfigRadio::UpdateWhisperEnabled(bool val)
+void ConfigRadio::UpdateRingModFrequency(QString name, double val)
 {
-    ui->groupBox_Whisper->blockSignals(true);
-    ui->groupBox_Whisper->setChecked(val);
-    ui->groupBox_Whisper->blockSignals(false);
+    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    channelStrip->blockSignals(true);
+    channelStrip->onRingModFrequencyValueChanged(val);
+    channelStrip->blockSignals(false);
 }
 
-void ConfigRadio::UpdateWhisperLowFrequency(double val)
-{
-    ui->groupBox_Whisper->blockSignals(true);
-    ui->groupBox_Whisper->onCFValueChanged(val);
-    ui->groupBox_Whisper->blockSignals(false);
-}
 
-void ConfigRadio::UpdateWhisperHighFrequency(double val)
+ConfigRadioGroupBox* ConfigRadio::GetChannelStrip(QString name)
 {
-    ui->groupBox_Whisper->blockSignals(true);
-    ui->groupBox_Whisper->onBWValueChanged(val);
-    ui->groupBox_Whisper->blockSignals(false);
-}
+    if (m_ChannelStripMap.contains(name))
+        return m_ChannelStripMap.value(name);
 
-void ConfigRadio::UpdateWhisperDestruction(double val)
-{
-    ui->groupBox_Whisper->blockSignals(true);
-    ui->groupBox_Whisper->onDestrValueChanged(val);
-    ui->groupBox_Whisper->blockSignals(false);
-}
+    ConfigRadioGroupBox* channelStrip = new ConfigRadioGroupBox(this);
+    channelStrip->setObjectName(name);
+    channelStrip->setTitle(name);
+    connect(channelStrip,SIGNAL(EnabledSet(QString,bool)),this,SIGNAL(EnabledSet(QString,bool)));
+    connect(channelStrip,SIGNAL(CenterFrequencySet(QString,double)),this,SIGNAL(LowFrequencySet(QString,double)));
+    connect(channelStrip,SIGNAL(BandWidthSet(QString,double)),this,SIGNAL(HighFrequencySet(QString,double)));
+    connect(channelStrip,SIGNAL(DestructionSet(QString,double)),this,SIGNAL(DestructionSet(QString,double)));
+    connect(channelStrip,SIGNAL(RingModFrequencySet(QString,double)),this,SIGNAL(RingModFrequencySet(QString,double)));
+    ui->horizontalLayout->addWidget(channelStrip);
+    m_ChannelStripMap.insert(name,channelStrip);
+    //TSLogging::Print(QString("Channelstrip created: %1").arg(name));
 
-void ConfigRadio::UpdateOtherEnabled(bool val)
-{
-    ui->groupBox_Other->blockSignals(true);
-    ui->groupBox_Other->setChecked(val);
-    ui->groupBox_Other->blockSignals(false);
-}
-
-void ConfigRadio::UpdateOtherLowFrequency(double val)
-{
-    ui->groupBox_Other->blockSignals(true);
-    ui->groupBox_Other->onCFValueChanged(val);
-    ui->groupBox_Other->blockSignals(false);
-}
-
-void ConfigRadio::UpdateOtherHighFrequency(double val)
-{
-    ui->groupBox_Other->blockSignals(true);
-    ui->groupBox_Other->onBWValueChanged(val);
-    ui->groupBox_Other->blockSignals(false);
-}
-
-void ConfigRadio::UpdateOtherDestruction(double val)
-{
-    ui->groupBox_Other->blockSignals(true);
-    ui->groupBox_Other->onDestrValueChanged(val);
-    ui->groupBox_Other->blockSignals(false);
+    return channelStrip;
 }

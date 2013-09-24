@@ -2,11 +2,18 @@
 
 #include <QVarLengthArray>
 
+#ifndef M_PI
+#define M_PI    3.14159265358979323846f
+#endif
+const double TWO_PI_OVER_SAMPLE_RATE = 2*M_PI/48000;
+
 DspRadio::DspRadio(QObject *parent) :
     QObject(parent),
     m_volFollow(0.0f),
     m_volFollow_r(0.0f),
-    m_Fudge(0.0f)
+    m_Fudge(0.0f),
+    m_RM_modFreq(0.0f),
+    m_RM_modAngle(0.0f)
 {
     f_m = new Dsp::SmoothedFilterDesign
             <Dsp::Butterworth::Design::BandPass <4>, 1, Dsp::DirectFormII> (1024);
@@ -26,11 +33,65 @@ DspRadio::DspRadio(QObject *parent) :
     f_s->setParams (params);
 }
 
-void DspRadio::setEnabled(bool val)
+void DspRadio::setEnabled(QString name, bool val)
 {
-    if (m_Enabled == val)
-        return;
-    m_Enabled = val;
+    if (name.isEmpty() || (name == m_ChannelType))
+    {
+        if (m_Enabled == val)
+            return;
+        m_Enabled = val;
+    }
+}
+
+void DspRadio::setFudge(QString name, double val)
+{
+    if (name.isEmpty() || (name == m_ChannelType))
+    {
+        if (m_Fudge == val)
+            return;
+
+        m_Fudge = val;
+        emit fudgeChanged(m_Fudge);
+    }
+}
+
+void DspRadio::setBandpassEqCenterFrequency(QString name, double val)
+{
+    if (name.isEmpty() || (name == m_ChannelType))
+    {
+        if (f_m != NULL)
+            f_m->setParam(2,val);
+        if (f_s != NULL)
+            f_s->setParam(2,val);
+
+        emit bandpassEqLowFrequencyChanged(val);
+    }
+}
+
+void DspRadio::setBandpassEqBandWidth(QString name, double val)
+{
+    if (name.isEmpty() || (name == m_ChannelType))
+    {
+        if (f_m != NULL)
+            f_m->setParam(3,val);
+        if (f_s != NULL)
+            f_s->setParam(3,val);
+
+        emit bandpassEqHighFrequencyChanged(val);
+    }
+}
+
+void DspRadio::setRmModFreq(QString name, double val)
+{
+    if (name.isEmpty() || (name == m_ChannelType))
+    {
+        if (m_RM_modFreq == val)
+            return;
+
+        m_RM_modFreq = val;
+
+        emit ringModFrequencyChanged(val);
+    }
 }
 
 void DspRadio::DoProcess(float *samples, int sampleCount, float &volFollow)
@@ -81,6 +142,18 @@ void DspRadio::DoProcess(float *samples, int sampleCount, float &volFollow)
     }
 }
 
+void DspRadio::DoProcessRingMod(float *samples, int sampleCount)
+{
+    if (m_RM_modFreq != 0.0f)   // RingMod
+    {
+        for(int i=0; i<sampleCount; ++i)
+        {
+            samples[i] *= sin(m_RM_modAngle);
+            m_RM_modAngle += m_RM_modFreq * TWO_PI_OVER_SAMPLE_RATE;
+        }
+    }
+}
+
 void DspRadio::Process(short *samples, int sampleCount, int channels)
 {
 //    Dsp::Filter* f = (channels==1)?f_m:f_s;
@@ -97,6 +170,8 @@ void DspRadio::Process(short *samples, int sampleCount, int channels)
         float* audioData[1];
         audioData[0] = data.data();
         f_m->process(sampleCount,audioData);
+
+        DoProcessRingMod(data.data(), sampleCount);
 
         if (getFudge() > 0.0f)
             DoProcess(data.data(),sampleCount, m_volFollow);
@@ -135,6 +210,11 @@ void DspRadio::Process(short *samples, int sampleCount, int channels)
     }
 }
 
+void DspRadio::setChannelType(QString name)
+{
+    m_ChannelType = name;
+}
+
 float DspRadio::getFudge() const
 {
     return m_Fudge;
@@ -160,27 +240,7 @@ double DspRadio::getBandpassEqBandWidth() const
         return -1;
 }
 
-void DspRadio::setFudge(double val)
+double DspRadio::getRmModFreq() const
 {
-    if (m_Fudge == val)
-        return;
-
-    m_Fudge = val;
-    emit fudgeChanged(m_Fudge);
-}
-
-void DspRadio::setBandpassEqCenterFrequency(double val)
-{
-    if (f_m != NULL)
-        f_m->setParam(2,val);
-    if (f_s != NULL)
-        f_s->setParam(2,val);
-}
-
-void DspRadio::setBandpassEqBandWidth(double val)
-{
-    if (f_m != NULL)
-        f_m->setParam(3,val);
-    if (f_s != NULL)
-        f_s->setParam(3,val);
+    return m_RM_modFreq;
 }

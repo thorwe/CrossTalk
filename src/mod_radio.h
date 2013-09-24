@@ -3,6 +3,15 @@
 
 #include <QObject>
 
+struct RadioFX_Settings {
+    QString name;
+    bool enabled;
+    double freq_low;
+    double freq_hi;
+    double fudge;
+    double rm_freq;
+};
+
 #include "module.h"
 #include "talkers.h"
 #include "dsp_radio.h"
@@ -14,7 +23,7 @@ class Radio : public Module, public TalkInterface
 
     Q_PROPERTY(uint64 homeId READ homeId WRITE setHomeId)
 
-    Q_PROPERTY(bool enabled_HomeTab READ getEnabledHomeTab WRITE setEnabledHomeTab NOTIFY EnabledHomeTabSet)
+    /*Q_PROPERTY(bool enabled_HomeTab READ getEnabledHomeTab WRITE setEnabledHomeTab NOTIFY EnabledHomeTabSet)
     Q_PROPERTY(bool enabled_Whisper READ getEnabledWhisper WRITE setEnabledWhisper NOTIFY EnabledWhisperSet)
     Q_PROPERTY(bool enabled_Other READ getEnabledOther WRITE setEnabledOther NOTIFY EnabledOtherSet)
 
@@ -36,7 +45,7 @@ class Radio : public Module, public TalkInterface
 
     Q_PROPERTY(double highFrequency_HomeTab READ getHighFrequencyHomeTab WRITE setHighFrequencyHomeTab NOTIFY HighFrequencyHomeTabSet)
     Q_PROPERTY(double highFrequency_Whisper READ getHighFrequencyWhisper WRITE setHighFrequencyWhisper NOTIFY HighFrequencyWhisperSet)
-    Q_PROPERTY(double highFrequency_Other READ getHighFrequencyOther WRITE setHighFrequencyOther NOTIFY HighFrequencyOtherSet)
+    Q_PROPERTY(double highFrequency_Other READ getHighFrequencyOther WRITE setHighFrequencyOther NOTIFY HighFrequencyOtherSet)*/
 
 public:
     explicit Radio(QObject *parent = 0);
@@ -46,7 +55,7 @@ public:
     void setHomeId(uint64 serverConnectionHandlerID);
     uint64 homeId() {return m_homeId;}
 
-    bool getEnabledHomeTab() {return m_enabled_HomeTab;}
+    /*bool getEnabledHomeTab() {return m_enabled_HomeTab;}
     bool getEnabledWhisper() {return m_enabled_Whisper;}
     bool getEnabledOther() {return m_enabled_Other;}
 
@@ -68,14 +77,16 @@ public:
 
     double getHighFrequencyHomeTab() {return m_highFrequency_HomeTab;}
     double getHighFrequencyWhisper() {return m_highFrequency_Whisper;}
-    double getHighFrequencyOther() {return m_highFrequency_Other;}
+    double getHighFrequencyOther() {return m_highFrequency_Other;}*/
 
     bool isClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID);
 
     void onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels);
 
+    QMap<QString,RadioFX_Settings> GetSettingsMap() const;
+
 signals:
-    void EnabledHomeTabSet(bool);
+    /*void EnabledHomeTabSet(bool);
     void EnabledWhisperSet(bool);
     void EnabledOtherSet(bool);
 
@@ -97,10 +108,16 @@ signals:
 
     void HighFrequencyHomeTabSet(double);
     void HighFrequencyWhisperSet(double);
-    void HighFrequencyOtherSet(double);
+    void HighFrequencyOtherSet(double);*/
+
+    void ChannelStripEnabledSet(QString, bool);
+    void FudgeChanged(QString, double);
+    void LowFrequencyChanged(QString, double);
+    void HighFrequencyChanged(QString, double);
+    void RingModFrequencyChanged(QString, double);
 
 public slots:
-    void setEnabledHomeTab(bool val);
+    /*void setEnabledHomeTab(bool val);
     void setEnabledWhisper(bool val);
     void setEnabledOther(bool val);
 
@@ -114,11 +131,17 @@ public slots:
 
     void setHighFrequencyHomeTab(double val);
     void setHighFrequencyWhisper(double val);
-    void setHighFrequencyOther(double val);
+    void setHighFrequencyOther(double val);*/
+
+    void setChannelStripEnabled(QString name, bool val);
+    void setFudge(QString name, double val);
+    void setLowFrequency(QString name, double val);
+    void setHighFrequency(QString name, double val);
+    void setRingModFrequency(QString name, double val);
 
     void ToggleClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID);
 
-    void saveSettings(int r);
+    //void saveSettings(int r);
 
 private:
     uint64 m_homeId;
@@ -126,7 +149,7 @@ private:
 
     QMap<uint64,QMap<anyID,DspRadio*>* >* TalkersDspRadios;
 
-    bool m_enabled_HomeTab;
+    /*bool m_enabled_HomeTab;
     bool m_enabled_Whisper;
     bool m_enabled_Other;
 
@@ -140,7 +163,9 @@ private:
 
     double m_highFrequency_HomeTab;
     double m_highFrequency_Whisper;
-    double m_highFrequency_Other;
+    double m_highFrequency_Other;*/
+
+    QMap<QString,RadioFX_Settings> m_SettingsMap;
 
     // QMultiMap is reported to be faster than QMultiHash until up to 10 entries in 4.x, oh I dunno
     QMultiMap<uint64,uint64> m_ClientBlacklist;

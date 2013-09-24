@@ -16,19 +16,25 @@ public:
     ~ConfigRadioGroupBox();
 
 public slots:
-    void onCFDialValueChanged(int val);
+
     void onCFValueChanged(double val);
-
-    void onBWDialValueChanged(int val);
     void onBWValueChanged(double val);
-
-    void onDestrDialValueChanged(int val);
     void onDestrValueChanged(double val);
+    void onRingModFrequencyValueChanged(double val);
 
 signals:
-    void CenterFrequencySet(double);
-    void BandWidthSet(double);
-    void DestructionSet(double);
+    void EnabledSet(QString,bool);
+    void CenterFrequencySet(QString,double);
+    void BandWidthSet(QString,double);
+    void DestructionSet(QString,double);
+    void RingModFrequencySet(QString,double);
+
+private slots:
+    void onToggled(bool val);
+    void onCFDialValueChanged(int val);
+    void onBWDialValueChanged(int val);
+    void onDestrDialValueChanged(int val);
+    void onRingModFrequencyDialValueChanged(int val);
 
 private:
     Ui::ConfigRadioGroupBox *ui;

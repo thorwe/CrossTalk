@@ -6,7 +6,7 @@ Radio::Radio(QObject *parent)
 {
     this->setParent(parent);
     this->setObjectName("Radio");
-    m_isPrintEnabled = false;
+    m_isPrintEnabled = true;
     talkers = Talkers::instance();
     TalkersDspRadios = new QMap<uint64,QMap<anyID,DspRadio*>* >;
 }
@@ -22,173 +22,114 @@ void Radio::setHomeId(uint64 serverConnectionHandlerID)
         talkers->DumpTalkStatusChanges(this,true);
 }
 
-void Radio::setEnabledHomeTab(bool val)
+void Radio::setChannelStripEnabled(QString name, bool val)
 {
-    if (m_enabled_HomeTab == val)
-        return;
-    m_enabled_HomeTab = val;
-    emit EnabledHomeTabSet(m_enabled_HomeTab);
+    if (m_SettingsMap.contains(name))
+    {
+        if (m_SettingsMap.value(name).enabled != val)
+            m_SettingsMap[name].enabled = val;
+    }
+    else
+    {
+        RadioFX_Settings setting;
+        setting.name = name;
+        setting.enabled = val;
+        setting.freq_low = 0.0f;
+        setting.freq_hi = 0.0f;
+        setting.fudge = 0.0f;
+        setting.rm_freq = 0.0f;
+        m_SettingsMap.insert(name,setting);
+    }
+    //Print(QString("%1 enabled %2").arg(name).arg(val));
+    emit ChannelStripEnabledSet(name,val);
 }
 
-void Radio::setEnabledWhisper(bool val)
+void Radio::setFudge(QString name, double val)
 {
-    if (m_enabled_Whisper == val)
-        return;
-    m_enabled_Whisper = val;
-    emit EnabledWhisperSet(m_enabled_Whisper);
+    if (m_SettingsMap.contains(name))
+    {
+        if (m_SettingsMap.value(name).fudge != val)
+            m_SettingsMap[name].fudge = val;
+    }
+    else
+    {
+        RadioFX_Settings setting;
+        setting.name = name;
+        setting.enabled = false;
+        setting.freq_low = 0.0f;
+        setting.freq_hi = 0.0f;
+        setting.fudge = val;
+        setting.rm_freq = 0.0f;
+        m_SettingsMap.insert(name,setting);
+    }
+    //Print(QString("%1 fudge %2").arg(name).arg(val));
+    emit FudgeChanged(name,val);
 }
 
-void Radio::setEnabledOther(bool val)
+void Radio::setLowFrequency(QString name, double val)
 {
-    if (m_enabled_Other == val)
-        return;
-    m_enabled_Other = val;
-    emit EnabledOtherSet(m_enabled_Other);
+    if (m_SettingsMap.contains(name))
+    {
+        if (m_SettingsMap.value(name).freq_low != val)
+            m_SettingsMap[name].freq_low = val;
+    }
+    else
+    {
+        RadioFX_Settings setting;
+        setting.name = name;
+        setting.enabled = false;
+        setting.freq_low = val;
+        setting.freq_hi = 0.0f;
+        setting.fudge = 0.0f;
+        setting.rm_freq = 0.0f;
+        m_SettingsMap.insert(name,setting);
+    }
+    //Print(QString("%1 low_freq %2").arg(name).arg(val));
+    emit LowFrequencyChanged(name,val);
 }
 
-void Radio::setFudgeHomeTab(double val)
+void Radio::setHighFrequency(QString name, double val)
 {
-    if (m_fudge_HomeTab == val)
-        return;
-    m_fudge_HomeTab = val;
-//    Print(QString("Fudge Home: %1").arg(m_fudge_HomeTab));
-    emit FudgeHomeTabSet(m_fudge_HomeTab);
+    if (m_SettingsMap.contains(name))
+    {
+        if (m_SettingsMap.value(name).freq_hi != val)
+            m_SettingsMap[name].freq_hi = val;
+    }
+    else
+    {
+        RadioFX_Settings setting;
+        setting.name = name;
+        setting.enabled = false;
+        setting.freq_low = 0.0f;
+        setting.freq_hi = val;
+        setting.fudge = 0.0f;
+        setting.rm_freq = 0.0f;
+        m_SettingsMap.insert(name,setting);
+    }
+    //Print(QString("%1 hi_freq %2").arg(name).arg(val));
+    emit HighFrequencyChanged(name,val);
 }
 
-void Radio::setFudgeWhisper(double val)
+void Radio::setRingModFrequency(QString name, double val)
 {
-    if (m_fudge_Whisper == val)
-        return;
-    m_fudge_Whisper = val;
-    emit FudgeWhisperSet(m_fudge_Whisper);
-}
-
-void Radio::setFudgeOther(double val)
-{
-    if (m_fudge_Other == val)
-        return;
-    m_fudge_Other = val;
-    emit FudgeOtherSet(m_fudge_Other);
-}
-
-/*void Radio::setCenterFrequencyHomeTab(double val)
-{
-    if (m_centerFrequency_HomeTab == val)
-        return;
-    m_centerFrequency_HomeTab = val;
-    Print(QString("Center Frequency Home: %1").arg(m_centerFrequency_HomeTab));
-    emit CenterFrequencyHomeTabSet(m_centerFrequency_HomeTab);
-}
-
-void Radio::setCenterFrequencyWhisper(double val)
-{
-    if (m_centerFrequency_Whisper == val)
-        return;
-    m_centerFrequency_Whisper = val;
-    emit CenterFrequencyWhisperSet(m_centerFrequency_Whisper);
-}
-
-void Radio::setCenterFrequencyOther(double val)
-{
-    if (m_centerFrequency_Other == val)
-        return;
-    m_centerFrequency_Other = val;
-    emit CenterFrequencyOtherSet(m_centerFrequency_Other);
-}
-
-void Radio::setBandWidthHomeTab(double val)
-{
-    if (m_bandWidth_HomeTab == val)
-        return;
-    m_bandWidth_HomeTab = val;
-    Print(QString("BandWidth Home: %1").arg(m_bandWidth_HomeTab));
-    emit BandWidthHomeTabSet(m_bandWidth_HomeTab);
-}
-
-void Radio::setBandWidthWhisper(double val)
-{
-    if (m_bandWidth_Whisper == val)
-        return;
-    m_bandWidth_Whisper = val;
-    emit BandWidthWhisperSet(m_bandWidth_Whisper);
-}
-
-void Radio::setBandWidthOther(double val)
-{
-    if (m_bandWidth_Other == val)
-        return;
-    m_bandWidth_Other = val;
-    emit BandWidthOtherSet(m_bandWidth_Other);
-}*/
-
-void Radio::setLowFrequencyHomeTab(double val)
-{
-    if (m_lowFrequency_HomeTab == val)
-        return;
-    m_lowFrequency_HomeTab = val;
-
-    emit CenterFrequencyHomeTabSet(getCenterFrequencyHomeTab());
-    emit BandWidthHomeTabSet(getBandWidthHomeTab());
-
-//    Print(QString("Low Frequency Home: %1").arg(m_lowFrequency_HomeTab));
-    emit LowFrequencyHomeTabSet(m_lowFrequency_HomeTab);
-}
-
-void Radio::setLowFrequencyWhisper(double val)
-{
-    if (m_lowFrequency_Whisper == val)
-        return;
-    m_lowFrequency_Whisper = val;
-
-    emit CenterFrequencyWhisperSet(getCenterFrequencyWhisper());
-    emit BandWidthWhisperSet(getBandWidthWhisper());
-    emit LowFrequencyWhisperSet(m_lowFrequency_Whisper);
-}
-
-void Radio::setLowFrequencyOther(double val)
-{
-    if (m_lowFrequency_Other == val)
-        return;
-    m_lowFrequency_Other = val;
-
-    emit CenterFrequencyOtherSet(getCenterFrequencyOther());
-    emit BandWidthOtherSet(getBandWidthOther());
-    emit LowFrequencyOtherSet(m_lowFrequency_Other);
-}
-
-void Radio::setHighFrequencyHomeTab(double val)
-{
-    if (m_highFrequency_HomeTab == val)
-        return;
-    m_highFrequency_HomeTab = val;
-
-    emit CenterFrequencyHomeTabSet(getCenterFrequencyHomeTab());
-    emit BandWidthHomeTabSet(getBandWidthHomeTab());
-
-//    Print(QString("High Frequency Home: %1").arg(m_highFrequency_HomeTab));
-    emit HighFrequencyHomeTabSet(m_highFrequency_HomeTab);
-}
-
-void Radio::setHighFrequencyWhisper(double val)
-{
-    if (m_highFrequency_Whisper == val)
-        return;
-    m_highFrequency_Whisper = val;
-
-    emit CenterFrequencyWhisperSet(getCenterFrequencyWhisper());
-    emit BandWidthWhisperSet(getBandWidthWhisper());
-    emit HighFrequencyWhisperSet(m_highFrequency_Whisper);
-}
-
-void Radio::setHighFrequencyOther(double val)
-{
-    if (m_highFrequency_Other == val)
-        return;
-    m_highFrequency_Other = val;
-
-    emit CenterFrequencyOtherSet(getCenterFrequencyOther());
-    emit BandWidthOtherSet(getBandWidthOther());
-    emit HighFrequencyOtherSet(m_highFrequency_Other);
+    if (m_SettingsMap.contains(name))
+    {
+        if (m_SettingsMap.value(name).rm_freq != val)
+            m_SettingsMap[name].rm_freq = val;
+    }
+    else
+    {
+        RadioFX_Settings setting;
+        setting.name = name;
+        setting.enabled = false;
+        setting.freq_low = 0.0f;
+        setting.freq_hi = 0.0f;
+        setting.fudge = 0.0f;
+        setting.rm_freq = val;
+        m_SettingsMap.insert(name,setting);
+    }
+    //Print(QString("%1 rm_freq %2").arg(name).arg(val));
+    emit RingModFrequencyChanged(name,val);
 }
 
 void Radio::ToggleClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID)
@@ -208,7 +149,7 @@ void Radio::ToggleClientBlacklisted(uint64 serverConnectionHandlerID, anyID clie
     if (sDspRadios->contains(clientID))
     {
         DspRadio* dspObj = sDspRadios->value(clientID);
-        dspObj->setEnabled(!isClientBlacklisted(serverConnectionHandlerID,clientID));
+        dspObj->setEnabled(QString::null,!isClientBlacklisted(serverConnectionHandlerID,clientID));
     }
 }
 
@@ -217,7 +158,7 @@ bool Radio::isClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID
     return m_ClientBlacklist.contains(serverConnectionHandlerID,clientID);
 }
 
-void Radio::saveSettings(int r)
+/*void Radio::saveSettings(int r)
 {
     Q_UNUSED(r);
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
@@ -245,7 +186,7 @@ void Radio::saveSettings(int r)
     cfg.endGroup();
 
     cfg.endGroup();
-}
+}*/
 
 void Radio::onRunningStateChanged(bool value)
 {
@@ -288,52 +229,25 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
         if (!isNewDspObj)
             this->disconnect(dspObj);
 
+        RadioFX_Settings settings;
         if (isReceivedWhisper)
-        {
-            dspObj->setEnabled(m_enabled_Whisper);
-            dspObj->setFudge(m_fudge_Whisper);
-            dspObj->setBandpassEqCenterFrequency(getCenterFrequencyWhisper());
-            dspObj->setBandpassEqBandWidth(getBandWidthWhisper());
-            connect(this,SIGNAL(EnabledWhisperSet(bool)),dspObj,SLOT(setEnabled(bool)),Qt::UniqueConnection);
-            connect(this,SIGNAL(FudgeWhisperSet(double)),dspObj,SLOT(setFudge(double)),Qt::UniqueConnection);
-            connect(this,SIGNAL(CenterFrequencyWhisperSet(double)),dspObj,SLOT(setBandpassEqCenterFrequency(double)),Qt::UniqueConnection);
-            connect(this,SIGNAL(BandWidthWhisperSet(double)),dspObj,SLOT(setBandpassEqBandWidth(double)),Qt::UniqueConnection);
-//            Print(QString("Received Whisper: Enabled: %1 Fudge: %2 CenterFrequency: %3 Bandwidth: %4").arg(m_enabled_Whisper).arg(m_fudge_Whisper).arg(getCenterFrequencyWhisper()).arg(getBandWidthWhisper()));
-//            test = true;
-        }
+            settings = m_SettingsMap.value("Whisper");
         else if (serverConnectionHandlerID == m_homeId)
-        {
-            dspObj->setEnabled(m_enabled_HomeTab);
-            dspObj->setFudge(m_fudge_HomeTab);
-            dspObj->setBandpassEqCenterFrequency(getCenterFrequencyHomeTab());
-            dspObj->setBandpassEqBandWidth(getBandWidthHomeTab());
-            connect(this,SIGNAL(EnabledHomeTabSet(bool)),dspObj,SLOT(setEnabled(bool)),Qt::UniqueConnection);
-            connect(this,SIGNAL(FudgeHomeTabSet(double)),dspObj,SLOT(setFudge(double)),Qt::UniqueConnection);
-            connect(this,SIGNAL(CenterFrequencyHomeTabSet(double)),dspObj,SLOT(setBandpassEqCenterFrequency(double)),Qt::UniqueConnection);
-            connect(this,SIGNAL(BandWidthHomeTabSet(double)),dspObj,SLOT(setBandpassEqBandWidth(double)),Qt::UniqueConnection);
-
-//            Print(QString("Received Talk: Enabled: %1 Fudge: %2 CenterFrequency: %3 Bandwidth: %4").arg(m_enabled_HomeTab).arg(m_fudge_HomeTab).arg(getCenterFrequencyHomeTab()).arg(getBandWidthHomeTab()));
-//            test = true;
-        }
+            settings = m_SettingsMap.value("Home");
         else
-        {
-            dspObj->setEnabled(m_enabled_Other);
-            dspObj->setFudge(m_fudge_Other);
-            dspObj->setBandpassEqCenterFrequency(getCenterFrequencyOther());
-            dspObj->setBandpassEqBandWidth(getBandWidthOther());
-            connect(this,SIGNAL(EnabledOtherSet(bool)),dspObj,SLOT(setEnabled(bool)),Qt::UniqueConnection);
-            connect(this,SIGNAL(FudgeOtherSet(double)),dspObj,SLOT(setFudge(double)),Qt::UniqueConnection);
-            connect(this,SIGNAL(CenterFrequencyOtherSet(double)),dspObj,SLOT(setBandpassEqCenterFrequency(double)),Qt::UniqueConnection);
-            connect(this,SIGNAL(BandWidthOtherSet(double)),dspObj,SLOT(setBandpassEqBandWidth(double)),Qt::UniqueConnection);
-        }
+            settings = m_SettingsMap.value("Other");
 
-//        if (TalkersDspRadios->contains(serverConnectionHandlerID))
-//        {
-//            Print("Have scHandlerId");
-//            QMap<anyID,DspRadio*>* sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
-//            if (sDspRadios->contains(clientID))
-//                Print("Have clientID");
-//        }
+        dspObj->setChannelType(settings.name);
+        dspObj->setEnabled(settings.name, settings.enabled);
+        dspObj->setBandpassEqCenterFrequency(settings.name, settings.freq_low);
+        dspObj->setBandpassEqBandWidth(settings.name, settings.freq_hi);
+        dspObj->setFudge(settings.name, settings.fudge);
+        dspObj->setRmModFreq(settings.name, settings.rm_freq);
+        connect(this,SIGNAL(ChannelStripEnabledSet(QString,bool)), dspObj, SLOT(setEnabled(QString,bool)),Qt::UniqueConnection);
+        connect(this,SIGNAL(FudgeChanged(QString,double)), dspObj, SLOT(setFudge(QString,double)),Qt::UniqueConnection);
+        connect(this,SIGNAL(LowFrequencyChanged(QString,double)), dspObj, SLOT(setBandpassEqCenterFrequency(QString,double)),Qt::UniqueConnection);
+        connect(this,SIGNAL(HighFrequencyChanged(QString,double)), dspObj, SLOT(setBandpassEqBandWidth(QString,double)),Qt::UniqueConnection);
+        connect(this,SIGNAL(RingModFrequencyChanged(QString,double)), dspObj, SLOT(setRmModFreq(QString,double)),Qt::UniqueConnection);
 
         return true;
     }
@@ -349,10 +263,8 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
 
         QMap<anyID,DspRadio*>* sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
         if (!(sDspRadios->contains(clientID)))
-        {
-            //Error("(onTalkStatusChanged) Trying to remove talker with an invalid client id.",serverConnectionHandlerID,NULL);
             return false;
-        }
+
         DspRadio* dspObj = sDspRadios->value(clientID);
 //        dspObj->setPanAdjustment(false);
         dspObj->blockSignals(true);
@@ -380,25 +292,15 @@ void Radio::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID
     if (!(TalkersDspRadios->contains(serverConnectionHandlerID)))
         return;
 
-//    if (test)
-//        Print(QString("Processing %1 %2").arg(serverConnectionHandlerID).arg(clientID));
-
     QMap<anyID,DspRadio*>* sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
     if (!(sDspRadios->contains(clientID)))
-    {
-//        if (test)
-//        {
-//            Print("Don't Have clientID");
-//            test = false;
-//        }
         return;
-    }
 
     DspRadio* dspObj = sDspRadios->value(clientID);
     dspObj->Process(samples,sampleCount,channels);
-//    if (test)
-//    {
-//        Print("Processed");
-//        test = false;
-//    }
+}
+
+QMap<QString, RadioFX_Settings> Radio::GetSettingsMap() const
+{
+    return m_SettingsMap;
 }

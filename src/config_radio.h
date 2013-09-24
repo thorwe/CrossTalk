@@ -2,6 +2,10 @@
 #define CONFIG_RADIO_H
 
 #include <QDialog>
+#include <QSignalMapper>
+#include <QMap>
+
+#include "config_radio_groupbox.h"
 
 namespace Ui {
 class ConfigRadio;
@@ -16,41 +20,25 @@ public:
     ~ConfigRadio();
 
     // For Settings initialization and updating from other sources of interaction
-    void UpdateHomeEnabled(bool val);
-    void UpdateHomeLowFrequency(double val);
-    void UpdateHomeHighFrequency(double val);
-    void UpdateHomeDestruction(double val);
-
-    void UpdateWhisperEnabled(bool val);
-    void UpdateWhisperLowFrequency(double val);
-    void UpdateWhisperHighFrequency(double val);
-    void UpdateWhisperDestruction(double val);
-
-    void UpdateOtherEnabled(bool val);
-    void UpdateOtherLowFrequency(double val);
-    void UpdateOtherHighFrequency(double val);
-    void UpdateOtherDestruction(double val);
+    void UpdateEnabled(QString name, bool val);
+    void UpdateBandpassLowFrequency(QString name, double val);
+    void UpdateBandpassHighFrequency(QString name, double val);
+    void UpdateDestruction(QString name, double val);
+    void UpdateRingModFrequency(QString name, double val);
 
 protected slots:
 
 signals:
-    void HomeEnabledSet(bool);
-    void HomeLowFrequencySet(double);
-    void HomeHighFrequencySet(double);
-    void HomeDestructionSet(double);
-
-    void WhisperEnabledSet(bool);
-    void WhisperLowFrequencySet(double);
-    void WhisperHighFrequencySet(double);
-    void WhisperDestructionSet(double);
-
-    void OtherEnabledSet(bool);
-    void OtherLowFrequencySet(double);
-    void OtherHighFrequencySet(double);
-    void OtherDestructionSet(double);
+    void EnabledSet(QString,bool);
+    void LowFrequencySet(QString,double);
+    void HighFrequencySet(QString,double);
+    void DestructionSet(QString,double);
+    void RingModFrequencySet(QString,double);
 
 private:
     Ui::ConfigRadio *ui;
+    QMap<QString,ConfigRadioGroupBox*> m_ChannelStripMap;
+    ConfigRadioGroupBox* GetChannelStrip(QString name);
 };
 
 #endif // CONFIG_RADIO_H
