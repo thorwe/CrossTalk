@@ -123,9 +123,10 @@ include(src/positional_audio/PositionalAudio.pri) {
     !build_pass:message( "Positional Audio module included." )
 }
 
+DEFINES += CONSOLE_OUTPUT
 beta {
-    DEFINES += CONSOLE_OUTPUT
     DEFINES += CROSSTALK_BETA
+    !build_pass:message( "Beta." )
 }
 
 win32 {
