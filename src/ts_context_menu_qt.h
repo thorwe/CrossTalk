@@ -11,7 +11,7 @@ class ContextMenuInterface
 public:
     virtual void onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID) = 0;
 };
-Q_DECLARE_INTERFACE(ContextMenuInterface,"net.thorwe.CrossTalk.InfoDataInterface/1.0")
+Q_DECLARE_INTERFACE(ContextMenuInterface,"net.thorwe.CrossTalk.ContextMenuInterface/1.0")
 
 class TSContextMenu : public QObject
 {
