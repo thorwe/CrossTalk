@@ -218,6 +218,16 @@ QMap<QString, PositionalAudio_ServerSettings> PositionalAudio::getServerSettings
     return m_ServerSettings;
 }
 
+bool PositionalAudio::RegisterCustomEnvironmentSupport(QObject *p)
+{
+    CustomEnvironmentSupportInterface *iCustomEnvironmentSupport = qobject_cast<CustomEnvironmentSupportInterface *>(p);
+    if (!iCustomEnvironmentSupport)
+        return false;
+
+    m_CustomEnvironmentSupportMap.insert(p->objectName(),p);
+    return true;
+}
+
 // Other
 void PositionalAudio::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID)
 {
@@ -564,64 +574,18 @@ bool PositionalAudio::fetch()
             else if (nullPos != 256)
                 m_Identity.truncate(nullPos);
 
-            if (getMyGame() == "Guild Wars 2")
+            if (m_CustomEnvironmentSupport)
             {
-                ts3Functions.printMessageToCurrentTab(m_Identity.toLocal8Bit().constData());
-
-                //name
-                QStringList stringList = m_Identity.split(",",QString::KeepEmptyParts,Qt::CaseSensitive);
-                QString string = stringList[0];
-                string.remove(0,10);
-                string.remove(string.length() - 1 , 1);
-                m_Identity = string;
-
-                //profession
-                string = stringList[1];
-                bool ok;
-                unsigned int profession = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toUInt(&ok,10);
-                if (ok)
-                    ts3Functions.printMessageToCurrentTab(QString("Profession: %1").arg(profession).toLocal8Bit().constData());
-                else
-                    Error("Could not determine profession.");
-
-                //map id
-                string = stringList[2];
-                unsigned int map_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toUInt(&ok,10);
-                if (ok)
-                    ts3Functions.printMessageToCurrentTab(QString("Map Id: %1").arg(map_id).toLocal8Bit().constData());
-                else
-                    Error("Could not determine map id.");
-
-                //world id
-                string = stringList[3];
-                unsigned long world_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toULong(&ok,10);
-                if (ok)
-                    ts3Functions.printMessageToCurrentTab(QString("World Id: %1").arg(world_id).toLocal8Bit().constData());
-                else
+                CustomEnvironmentSupportInterface *iCustomEnvironmentSupport = qobject_cast<CustomEnvironmentSupportInterface *>(m_CustomEnvironmentSupport);
+                QString ident = iCustomEnvironmentSupport->onIdentityRawDirty(m_Identity);
+                if (ident != m_Identity)
                 {
-                    Error("Could not determine world id.");
-                    ts3Functions.printMessageToCurrentTab(string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toLocal8Bit().constData());
+                    m_Identity = ident;
+                    emit myIdentityChanged(m_Identity);
                 }
-
-                //team color id
-                string = stringList[4];
-                unsigned int team_color_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toUInt(&ok,10);
-                if (ok)
-                    ts3Functions.printMessageToCurrentTab(QString("Team Color Id: %1").arg(team_color_id).toLocal8Bit().constData());
-                else
-                    Error("Could not determine team color id.");
-
-                //commander
-                string = stringList[5];
-                bool isCommander = (string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1) == "true");
-                if  (isCommander)
-                    ts3Functions.printMessageToCurrentTab("Is Commander");
-                else
-                    ts3Functions.printMessageToCurrentTab("Is not a Commander");
-
             }
-
-            emit myIdentityChanged(m_Identity);
+            else
+                emit myIdentityChanged(m_Identity);
         }
     }
     else
@@ -665,6 +629,11 @@ void PositionalAudio::UpdateMyGame()
             return;
 
         m_GameName = name;
+        if (m_CustomEnvironmentSupportMap.contains(m_GameName))
+            m_CustomEnvironmentSupport = m_CustomEnvironmentSupportMap.value(m_GameName);
+        else
+            m_CustomEnvironmentSupport = NULL;
+
         emit myGameChanged(m_GameName);
     }
     else if (!m_GameName.isEmpty())

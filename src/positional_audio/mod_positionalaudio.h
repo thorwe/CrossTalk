@@ -13,6 +13,13 @@
 #define RETURNCODE_BUFSIZE 128
 #endif
 
+class CustomEnvironmentSupportInterface
+{
+public:
+    virtual QString onIdentityRawDirty(QString rawIdentity) = 0;
+};
+Q_DECLARE_INTERFACE(CustomEnvironmentSupportInterface,"net.thorwe.CrossTalk.CustomEnvironmentSupportInterface/1.0")
+
 class PositionalAudio : public Module, public InfoDataInterface//, public ContextMenuInterface
 {
     Q_OBJECT
@@ -53,6 +60,8 @@ public:
     bool isUseCamera() const;
 
     QMap<QString,PositionalAudio_ServerSettings> getServerSettings() const;
+
+    bool RegisterCustomEnvironmentSupport(QObject *p);
 
 signals:
     void myGameChanged(QString);
@@ -139,6 +148,9 @@ private:
 
     QMap<QString,PositionalAudio_ServerSettings> m_ServerSettings;
     QHash<uint64,int> m_SendCounters;
+
+    QMap<QString,QObject*> m_CustomEnvironmentSupportMap;
+    QObject* m_CustomEnvironmentSupport;
 };
 QTextStream &operator<<(QTextStream &out, const TS3_VECTOR &ts3Vector);
 QTextStream &operator>>(QTextStream &in, TS3_VECTOR &ts3Vector);

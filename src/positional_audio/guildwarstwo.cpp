@@ -7,32 +7,42 @@ GuildWarsTwo::GuildWarsTwo(QObject *parent) :
     QObject(parent)
 {
     this->setObjectName("Guild Wars 2");
+    PositionalAudio* pa = qobject_cast<PositionalAudio *>(parent);
+    pa->RegisterCustomEnvironmentSupport(this);
 }
 
-QString GuildWarsTwo::getMyIdentity() const
+QString GuildWarsTwo::getIdentity() const
 {
     return m_Identity;
 }
 
-quint32 GuildWarsTwo::getMyProfessionId() const
+quint32 GuildWarsTwo::getProfessionId() const
 {
     return m_professionId;
 }
 
-quint32 GuildWarsTwo::getMyTeamColorId() const
+quint8 GuildWarsTwo::getMapId() const
+{
+    return m_mapId;
+}
+
+quint32 GuildWarsTwo::getWorldId() const
+{
+    return m_worldId;
+}
+
+quint32 GuildWarsTwo::getTeamColorId() const
 {
     return m_teamColorId;
 }
 
-bool GuildWarsTwo::isMeCommander() const
+bool GuildWarsTwo::isCommander() const
 {
     return m_isCommander;
 }
 
-bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
+QString GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
 {
-    bool isNeedsUpdate = false;
-
     QStringList stringList = rawIdentity.split(",",QString::KeepEmptyParts,Qt::CaseSensitive);
 
     QString string = stringList[0];
@@ -41,8 +51,8 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
     if (m_Identity != string)
     {
         m_Identity = string;
-        isNeedsUpdate = true;
-        emit myIdentityChanged(m_Identity);
+        TSLogging::Print(QString("Idendity changed: %1").arg(m_Identity));
+        emit identityChanged(m_Identity);
     }
 
     //profession
@@ -54,31 +64,44 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         if (m_professionId != profession)
         {
             m_professionId = profession;
-            isNeedsUpdate = true;
-            emit myProfessionIdChanged(m_professionId);
+            TSLogging::Print(QString("Profession changed: %1").arg(m_professionId));
+            emit professionIdChanged(m_professionId);
         }
     }
     else
         TSLogging::Error("Could not determine profession.");
 
     //map id
-//    string = stringList[2];
-//    unsigned int map_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toUInt(&ok,10);
-//    if (ok)
-//        ts3Functions.printMessageToCurrentTab(QString("Map Id: %1").arg(map_id).toLocal8Bit().constData());
-//    else
-//        Error("Could not determine map id.");
+    string = stringList[2];
+    unsigned int map_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toUInt(&ok,10);
+    if (ok)
+    {
+        if (m_mapId != map_id)
+        {
+            m_mapId = map_id;
+            TSLogging::Print(QString("Map Id changed: %1").arg(m_mapId));
+            emit mapIdChanged(m_mapId);
+        }
+    }
+    else
+        TSLogging::Error("Could not determine map id.");
 
     //world id
-//    string = stringList[3];
-//    unsigned long world_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toULong(&ok,10);
-//    if (ok)
-//        ts3Functions.printMessageToCurrentTab(QString("World Id: %1").arg(world_id).toLocal8Bit().constData());
-//    else
-//    {
-//        Error("Could not determine world id.");
-//        ts3Functions.printMessageToCurrentTab(string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toLocal8Bit().constData());
-//    }
+    string = stringList[3];
+    unsigned long world_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toULong(&ok,10);
+    if (ok)
+    {
+        if (m_worldId != world_id)
+        {
+            m_worldId = world_id;
+            TSLogging::Print(QString("World Id changed: %1").arg(m_worldId));
+            emit worldIdChanged(m_worldId);
+        }
+    }
+    else
+    {
+        TSLogging::Error("Could not determine world id.");
+    }
 
     //team color id
     string = stringList[4];
@@ -88,8 +111,8 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         if (m_teamColorId != team_color_id)
         {
             m_teamColorId = team_color_id;
-            isNeedsUpdate = true;
-            emit myTeamColorIdChanged(m_teamColorId);
+            TSLogging::Print(QString("Team color Id changed: %1").arg(team_color_id));
+            emit teamColorIdChanged(m_teamColorId);
         }
     }
     else
@@ -101,14 +124,16 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
     if (isCommander != m_isCommander)
     {
         m_isCommander = isCommander;
-        isNeedsUpdate = true;
-        emit myCommanderStatusChanged(m_isCommander);
+        TSLogging::Print(QString("isCommander changed: %1").arg(m_isCommander));
+        emit commanderStatusChanged(m_isCommander);
     }
 
-    return isNeedsUpdate;
+    return m_Identity;
 }
 
-bool GuildWarsTwo::onContextRawDirty(QByteArray rawContext)
-{
-    return false;   // TODO
-}
+// as long as this is the only occurence where a game puts known readable data in context and this data is available already,
+// let's for now stick to getting map and world id from the name string
+//bool GuildWarsTwo::onContextRawDirty(QByteArray rawContext)
+//{
+//    return false;   // TODO
+//}

@@ -41,6 +41,7 @@
 #ifdef USE_POSITIONAL_AUDIO
 #include "settings_positionalaudio.h"
 #include "mod_positionalaudio.h"
+#include "guildwarstwo.h"
 # ifdef CROSSTALK_BETA
 #include "gw.h"
 # endif
@@ -96,6 +97,7 @@ ChannelMuter channel_Muter;
 #ifdef USE_POSITIONAL_AUDIO
 SettingsPositionalAudio* settingsPositionalAudio = SettingsPositionalAudio::instance();
 PositionalAudio positionalAudio;
+GuildWarsTwo gwTwo(&positionalAudio);
 # ifdef CROSSTALK_BETA
 GW gw(&positionalAudio);
 # endif
