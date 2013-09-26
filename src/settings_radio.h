@@ -42,29 +42,14 @@ public:
     bool onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, uint64 mine, QTextStream &data);
 
 signals:
-    /*void HomeEnabledSet(bool);
-    void HomeLowFrequencySet(double);
-    void HomeHighFrequencySet(double);
-    void HomeDestructionSet(double);
-    void HomeRingModFrequencySet(double);
-
-    void WhisperEnabledSet(bool);
-    void WhisperLowFrequencySet(double);
-    void WhisperHighFrequencySet(double);
-    void WhisperDestructionSet(double);
-    void WhisperRingModFrequencySet(double);
-
-    void OtherEnabledSet(bool);
-    void OtherLowFrequencySet(double);
-    void OtherHighFrequencySet(double);
-    void OtherDestructionSet(double);
-    void OtherRingModFrequencySet(double);*/
-
     void EnabledSet(QString,bool);
-    void LowFrequencySet(QString,double);
-    void HighFrequencySet(QString,double);
+    void InLoFreqSet(QString,double);
+    void InHiFreqSet(QString,double);
     void DestructionSet(QString,double);
     void RingModFrequencySet(QString,double);
+    void RingModMixSet(QString,double);
+    void OutLoFreqSet(QString,double);
+    void OutHiFreqSet(QString,double);
 
     void ToggleClientBlacklisted(uint64,anyID);
 

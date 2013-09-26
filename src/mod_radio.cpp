@@ -31,13 +31,13 @@ void Radio::setChannelStripEnabled(QString name, bool val)
     }
     else
     {
-        RadioFX_Settings setting;
+        RadioFX_Settings setting = RadioFX_Settings();
         setting.name = name;
         setting.enabled = val;
-        setting.freq_low = 0.0f;
-        setting.freq_hi = 0.0f;
-        setting.fudge = 0.0f;
-        setting.rm_freq = 0.0f;
+//        setting.freq_low = 0.0f;
+//        setting.freq_hi = 0.0f;
+//        setting.fudge = 0.0f;
+//        setting.rm_mod_freq = 0.0f;
         m_SettingsMap.insert(name,setting);
     }
     //Print(QString("%1 enabled %2").arg(name).arg(val));
@@ -53,20 +53,20 @@ void Radio::setFudge(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting;
+        RadioFX_Settings setting = RadioFX_Settings();
         setting.name = name;
-        setting.enabled = false;
-        setting.freq_low = 0.0f;
-        setting.freq_hi = 0.0f;
+//        setting.enabled = false;
+//        setting.freq_low = 0.0f;
+//        setting.freq_hi = 0.0f;
         setting.fudge = val;
-        setting.rm_freq = 0.0f;
+//        setting.rm_mod_freq = 0.0f;
         m_SettingsMap.insert(name,setting);
     }
     //Print(QString("%1 fudge %2").arg(name).arg(val));
     emit FudgeChanged(name,val);
 }
 
-void Radio::setLowFrequency(QString name, double val)
+void Radio::setInLoFreq(QString name, double val)
 {
     if (m_SettingsMap.contains(name))
     {
@@ -75,20 +75,19 @@ void Radio::setLowFrequency(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting;
+        RadioFX_Settings setting = RadioFX_Settings();
         setting.name = name;
-        setting.enabled = false;
         setting.freq_low = val;
-        setting.freq_hi = 0.0f;
-        setting.fudge = 0.0f;
-        setting.rm_freq = 0.0f;
         m_SettingsMap.insert(name,setting);
     }
+    emit InBpCenterFreqSet(name,getCenterFrequencyIn(m_SettingsMap.value(name)));
+    emit InBpBandwidthSet(name,getBandWidthIn(m_SettingsMap.value(name)));
+
     //Print(QString("%1 low_freq %2").arg(name).arg(val));
-    emit LowFrequencyChanged(name,val);
+    emit InLoFreqSet(name,val);
 }
 
-void Radio::setHighFrequency(QString name, double val)
+void Radio::setInHiFreq(QString name, double val)
 {
     if (m_SettingsMap.contains(name))
     {
@@ -97,39 +96,97 @@ void Radio::setHighFrequency(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting;
+        RadioFX_Settings setting = RadioFX_Settings();
         setting.name = name;
-        setting.enabled = false;
-        setting.freq_low = 0.0f;
         setting.freq_hi = val;
-        setting.fudge = 0.0f;
-        setting.rm_freq = 0.0f;
         m_SettingsMap.insert(name,setting);
     }
+    emit InBpCenterFreqSet(name,getCenterFrequencyIn(m_SettingsMap.value(name)));
+    emit InBpBandwidthSet(name,getBandWidthIn(m_SettingsMap.value(name)));
+
     //Print(QString("%1 hi_freq %2").arg(name).arg(val));
-    emit HighFrequencyChanged(name,val);
+    emit InHiFreqSet(name,val);
 }
 
 void Radio::setRingModFrequency(QString name, double val)
 {
     if (m_SettingsMap.contains(name))
     {
-        if (m_SettingsMap.value(name).rm_freq != val)
-            m_SettingsMap[name].rm_freq = val;
+        if (m_SettingsMap.value(name).rm_mod_freq != val)
+            m_SettingsMap[name].rm_mod_freq = val;
     }
     else
     {
-        RadioFX_Settings setting;
+        RadioFX_Settings setting = RadioFX_Settings();
         setting.name = name;
-        setting.enabled = false;
-        setting.freq_low = 0.0f;
-        setting.freq_hi = 0.0f;
-        setting.fudge = 0.0f;
-        setting.rm_freq = val;
+//        setting.enabled = false;
+//        setting.freq_low = 0.0f;
+//        setting.freq_hi = 0.0f;
+//        setting.fudge = 0.0f;
+        setting.rm_mod_freq = val;
         m_SettingsMap.insert(name,setting);
     }
-    //Print(QString("%1 rm_freq %2").arg(name).arg(val));
+    //Print(QString("%1 rm_mod_freq %2").arg(name).arg(val));
     emit RingModFrequencyChanged(name,val);
+}
+
+void Radio::setRingModMix(QString name, double val)
+{
+    if (m_SettingsMap.contains(name))
+    {
+        if (m_SettingsMap.value(name).rm_mod_freq != val)
+            m_SettingsMap[name].rm_mod_freq = val;
+    }
+    else
+    {
+        RadioFX_Settings setting = RadioFX_Settings();
+        setting.name = name;
+        setting.rm_mix = val;
+        m_SettingsMap.insert(name,setting);
+    }
+    //Print(QString("%1 rm_mix %2").arg(name).arg(val));
+    emit RingModMixChanged(name,val);
+}
+
+void Radio::setOutLoFreq(QString name, double val)
+{
+    if (m_SettingsMap.contains(name))
+    {
+        if (m_SettingsMap.value(name).o_freq_lo != val)
+            m_SettingsMap[name].o_freq_lo = val;
+    }
+    else
+    {
+        RadioFX_Settings setting = RadioFX_Settings();
+        setting.name = name;
+        setting.o_freq_lo = val;
+        m_SettingsMap.insert(name,setting);
+    }
+    emit OutBpCenterFreqSet(name,getCenterFrequencyOut(m_SettingsMap.value(name)));
+    emit OutBpBandwidthSet(name,getBandWidthOut(m_SettingsMap.value(name)));
+
+    emit OutLoFreqSet(name,val);
+}
+
+void Radio::setOutHiFreq(QString name, double val)
+{
+    if (m_SettingsMap.contains(name))
+    {
+        if (m_SettingsMap.value(name).o_freq_hi != val)
+            m_SettingsMap[name].o_freq_hi = val;
+    }
+    else
+    {
+        RadioFX_Settings setting = RadioFX_Settings();
+        setting.name = name;
+        setting.o_freq_hi = val;
+        m_SettingsMap.insert(name,setting);
+    }
+    emit OutBpCenterFreqSet(name,getCenterFrequencyOut(m_SettingsMap.value(name)));
+    emit OutBpBandwidthSet(name,getBandWidthOut(m_SettingsMap.value(name)));
+
+    //Print(QString("%1 rm_mix %2").arg(name).arg(val));
+    emit OutHiFreqSet(name,val);
 }
 
 void Radio::ToggleClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID)
@@ -239,15 +296,19 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
 
         dspObj->setChannelType(settings.name);
         dspObj->setEnabled(settings.name, settings.enabled);
-        dspObj->setBandpassEqCenterFrequency(settings.name, settings.freq_low);
-        dspObj->setBandpassEqBandWidth(settings.name, settings.freq_hi);
+        dspObj->setBandpassEqInCenterFrequency(settings.name, getCenterFrequencyIn(settings));
+        dspObj->setBandpassEqInBandWidth(settings.name, getBandWidthIn(settings));
         dspObj->setFudge(settings.name, settings.fudge);
-        dspObj->setRmModFreq(settings.name, settings.rm_freq);
+        dspObj->setRmModFreq(settings.name, settings.rm_mod_freq);
+        dspObj->setBandpassEqOutCenterFrequency(settings.name, getCenterFrequencyOut(settings));
+        dspObj->setBandpassEqOutBandWidth(settings.name, getBandWidthOut(settings));
         connect(this,SIGNAL(ChannelStripEnabledSet(QString,bool)), dspObj, SLOT(setEnabled(QString,bool)),Qt::UniqueConnection);
         connect(this,SIGNAL(FudgeChanged(QString,double)), dspObj, SLOT(setFudge(QString,double)),Qt::UniqueConnection);
-        connect(this,SIGNAL(LowFrequencyChanged(QString,double)), dspObj, SLOT(setBandpassEqCenterFrequency(QString,double)),Qt::UniqueConnection);
-        connect(this,SIGNAL(HighFrequencyChanged(QString,double)), dspObj, SLOT(setBandpassEqBandWidth(QString,double)),Qt::UniqueConnection);
+        connect(this,SIGNAL(InBpCenterFreqSet(QString,double)), dspObj, SLOT(setBandpassEqInCenterFrequency(QString,double)),Qt::UniqueConnection);
+        connect(this,SIGNAL(InBpBandwidthSet(QString,double)), dspObj, SLOT(setBandpassEqInBandWidth(QString,double)),Qt::UniqueConnection);
         connect(this,SIGNAL(RingModFrequencyChanged(QString,double)), dspObj, SLOT(setRmModFreq(QString,double)),Qt::UniqueConnection);
+        connect(this,SIGNAL(OutBpCenterFreqSet(QString,double)), dspObj, SLOT(setBandpassEqOutCenterFrequency(QString,double)),Qt::UniqueConnection);
+        connect(this,SIGNAL(OutBpBandwidthSet(QString,double)), dspObj, SLOT(setBandpassEqOutBandWidth(QString,double)),Qt::UniqueConnection);
 
         return true;
     }

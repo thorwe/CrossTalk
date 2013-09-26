@@ -21,19 +21,25 @@ public:
 
     // For Settings initialization and updating from other sources of interaction
     void UpdateEnabled(QString name, bool val);
-    void UpdateBandpassLowFrequency(QString name, double val);
-    void UpdateBandpassHighFrequency(QString name, double val);
+    void UpdateBandpassInLowFrequency(QString name, double val);
+    void UpdateBandpassInHighFrequency(QString name, double val);
     void UpdateDestruction(QString name, double val);
     void UpdateRingModFrequency(QString name, double val);
+    void UpdateRingModMix(QString name, double val);
+    void UpdateBandpassOutLowFrequency(QString name, double val);
+    void UpdateBandpassOutHighFrequency(QString name, double val);
 
 protected slots:
 
 signals:
     void EnabledSet(QString,bool);
-    void LowFrequencySet(QString,double);
-    void HighFrequencySet(QString,double);
+    void InLoFreqSet(QString,double);
+    void InHiFreqSet(QString,double);
     void DestructionSet(QString,double);
     void RingModFrequencySet(QString,double);
+    void RingModMixSet(QString,double);
+    void OutLoFreqSet(QString,double);
+    void OutHiFreqSet(QString,double);
 
 private:
     Ui::ConfigRadio *ui;

@@ -26,10 +26,13 @@ void SettingsRadio::Init(Radio *radio)
     }
 
     this->connect(this, SIGNAL(EnabledSet(QString,bool)), radio, SLOT(setChannelStripEnabled(QString,bool)));
-    this->connect(this, SIGNAL(LowFrequencySet(QString,double)), radio, SLOT(setLowFrequency(QString,double)));
-    this->connect(this, SIGNAL(HighFrequencySet(QString,double)), radio, SLOT(setHighFrequency(QString,double)));
+    this->connect(this, SIGNAL(InLoFreqSet(QString,double)), radio, SLOT(setInLoFreq(QString,double)));
+    this->connect(this, SIGNAL(InHiFreqSet(QString,double)), radio, SLOT(setInHiFreq(QString,double)));
     this->connect(this, SIGNAL(DestructionSet(QString,double)), radio, SLOT(setFudge(QString,double)));
     this->connect(this, SIGNAL(RingModFrequencySet(QString,double)), radio, SLOT(setRingModFrequency(QString,double)));
+    this->connect(this, SIGNAL(RingModMixSet(QString,double)), radio, SLOT(setRingModMix(QString,double)));
+    this->connect(this, SIGNAL(OutLoFreqSet(QString,double)), radio, SLOT(setOutLoFreq(QString,double)));
+    this->connect(this, SIGNAL(OutHiFreqSet(QString,double)), radio, SLOT(setOutHiFreq(QString,double)));
 
     this->connect(this, SIGNAL(ToggleClientBlacklisted(uint64,anyID)), radio, SLOT(ToggleClientBlacklisted(uint64,anyID)));
 
@@ -46,12 +49,15 @@ void SettingsRadio::Init(Radio *radio)
             name = "Home";
 
         radio->setChannelStripEnabled(name,cfg.value("enabled",false).toBool());
-        radio->setLowFrequency(name,cfg.value("low_freq",300.0).toDouble());
-        radio->setHighFrequency(name,cfg.value("high_freq",3000.0).toDouble());
+        radio->setInLoFreq(name,cfg.value("low_freq",300.0).toDouble());
+        radio->setInHiFreq(name,cfg.value("high_freq",3000.0).toDouble());
         radio->setFudge(name,cfg.value("fudge",2.0).toDouble());
         cfg.beginGroup("RingMod");
-        radio->setRingModFrequency(name,cfg.value("mod_freq",0.0f).toDouble());
+        radio->setRingModFrequency(name,cfg.value("rm_mod_freq",0.0f).toDouble());
+        radio->setRingModMix(name,cfg.value("rm_mix",0.0f).toDouble());
         cfg.endGroup();
+        radio->setOutLoFreq(name,cfg.value("o_freq_lo",300.0).toDouble());
+        radio->setOutHiFreq(name,cfg.value("o_freq_hi",3000.0).toDouble());
         cfg.endGroup();
     }
 
@@ -103,20 +109,26 @@ void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginM
                         name = "Home";
 
                     p_config->UpdateEnabled(name,cfg.value("enabled",false).toBool());
-                    p_config->UpdateBandpassLowFrequency(name,cfg.value("low_freq",300.0).toDouble());
-                    p_config->UpdateBandpassHighFrequency(name,cfg.value("high_freq",3000.0).toDouble());
+                    p_config->UpdateBandpassInLowFrequency(name,cfg.value("low_freq",300.0).toDouble());
+                    p_config->UpdateBandpassInHighFrequency(name,cfg.value("high_freq",3000.0).toDouble());
                     p_config->UpdateDestruction(name,cfg.value("fudge",2.0).toDouble());
                     cfg.beginGroup("RingMod");
-                    p_config->UpdateRingModFrequency(name,cfg.value("mod_freq",0.0f).toDouble());
+                    p_config->UpdateRingModFrequency(name,cfg.value("rm_mod_freq",0.0f).toDouble());
+                    p_config->UpdateRingModMix(name,cfg.value("rm_mix",0.0f).toDouble());
                     cfg.endGroup();
+                    p_config->UpdateBandpassOutLowFrequency(name,cfg.value("o_freq_lo",300.0).toDouble());
+                    p_config->UpdateBandpassOutHighFrequency(name,cfg.value("o_freq_hi",3000.0).toDouble());
                     cfg.endGroup();
                 }
 
                 this->connect(p_config,SIGNAL(EnabledSet(QString,bool)),SIGNAL(EnabledSet(QString,bool)));
-                this->connect(p_config,SIGNAL(LowFrequencySet(QString,double)),SIGNAL(LowFrequencySet(QString,double)));
-                this->connect(p_config,SIGNAL(HighFrequencySet(QString,double)),SIGNAL(HighFrequencySet(QString,double)));
+                this->connect(p_config,SIGNAL(InLoFreqSet(QString,double)),SIGNAL(InLoFreqSet(QString,double)));
+                this->connect(p_config,SIGNAL(InHiFreqSet(QString,double)),SIGNAL(InHiFreqSet(QString,double)));
                 this->connect(p_config,SIGNAL(DestructionSet(QString,double)),SIGNAL(DestructionSet(QString,double)));
                 this->connect(p_config,SIGNAL(RingModFrequencySet(QString,double)),SIGNAL(RingModFrequencySet(QString,double)));
+                this->connect(p_config,SIGNAL(RingModMixSet(QString,double)),SIGNAL(RingModMixSet(QString,double)));
+                this->connect(p_config,SIGNAL(OutLoFreqSet(QString,double)),SIGNAL(OutLoFreqSet(QString,double)));
+                this->connect(p_config,SIGNAL(OutHiFreqSet(QString,double)),SIGNAL(OutHiFreqSet(QString,double)));
 
                 connect(p_config,SIGNAL(finished(int)),this,SLOT(saveSettings(int)));
                 p_config->show();
@@ -165,12 +177,15 @@ void SettingsRadio::saveSettings(int r)
                 cfg.setValue("enabled",settings.enabled);
                 cfg.setValue("low_freq",settings.freq_low);
                 cfg.setValue("high_freq",settings.freq_hi);
+                cfg.setValue("o_freq_lo",settings.o_freq_lo);
+                cfg.setValue("o_freq_hi",settings.o_freq_hi);
                 cfg.setValue("fudge",settings.fudge);
                 cfg.beginGroup("RingMod");
-                cfg.setValue("mod_freq",settings.rm_freq);
+                cfg.setValue("rm_mod_freq",settings.rm_mod_freq);
+                cfg.setValue("rm_mix",settings.rm_mix);
                 cfg.endGroup();
                 cfg.endGroup();
-                //TSLogging::Print(QString("enabled %1 low_freq %2 hi_freq %3 fudge %4 mod_freq %5").arg(settings.enabled).arg(settings.freq_low).arg(settings.freq_hi).arg(settings.fudge).arg(settings.rm_freq));
+                //TSLogging::Print(QString("enabled %1 low_freq %2 hi_freq %3 fudge %4 rm_mod_freq %5").arg(settings.enabled).arg(settings.freq_low).arg(settings.freq_hi).arg(settings.fudge).arg(settings.rm_mod_freq));
             }
         }
         cfg.endGroup();

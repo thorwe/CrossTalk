@@ -28,19 +28,19 @@ void ConfigRadio::UpdateEnabled(QString name, bool val)
     channelStrip->blockSignals(false);
 }
 
-void ConfigRadio::UpdateBandpassLowFrequency(QString name, double val)
+void ConfigRadio::UpdateBandpassInLowFrequency(QString name, double val)
 {
     ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
-    channelStrip->onCFValueChanged(val);
+    channelStrip->onInLoValueChanged(val);
     channelStrip->blockSignals(false);
 }
 
-void ConfigRadio::UpdateBandpassHighFrequency(QString name, double val)
+void ConfigRadio::UpdateBandpassInHighFrequency(QString name, double val)
 {
     ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
-    channelStrip->onBWValueChanged(val);
+    channelStrip->onInHiValueChanged(val);
     channelStrip->blockSignals(false);
 }
 
@@ -60,6 +60,30 @@ void ConfigRadio::UpdateRingModFrequency(QString name, double val)
     channelStrip->blockSignals(false);
 }
 
+void ConfigRadio::UpdateRingModMix(QString name, double val)
+{
+    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    channelStrip->blockSignals(true);
+    channelStrip->onRingModMixValueChanged(val);
+    channelStrip->blockSignals(false);
+}
+
+void ConfigRadio::UpdateBandpassOutLowFrequency(QString name, double val)
+{
+    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    channelStrip->blockSignals(true);
+    channelStrip->onOutLoValueChanged(val);
+    channelStrip->blockSignals(false);
+}
+
+void ConfigRadio::UpdateBandpassOutHighFrequency(QString name, double val)
+{
+    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    channelStrip->blockSignals(true);
+    channelStrip->onOutHiValueChanged(val);
+    channelStrip->blockSignals(false);
+}
+
 
 ConfigRadioGroupBox* ConfigRadio::GetChannelStrip(QString name)
 {
@@ -70,10 +94,13 @@ ConfigRadioGroupBox* ConfigRadio::GetChannelStrip(QString name)
     channelStrip->setObjectName(name);
     channelStrip->setTitle(name);
     connect(channelStrip,SIGNAL(EnabledSet(QString,bool)),this,SIGNAL(EnabledSet(QString,bool)));
-    connect(channelStrip,SIGNAL(CenterFrequencySet(QString,double)),this,SIGNAL(LowFrequencySet(QString,double)));
-    connect(channelStrip,SIGNAL(BandWidthSet(QString,double)),this,SIGNAL(HighFrequencySet(QString,double)));
+    connect(channelStrip,SIGNAL(InLoFreqSet(QString,double)),this,SIGNAL(InLoFreqSet(QString,double)));
+    connect(channelStrip,SIGNAL(InHiFreqSet(QString,double)),this,SIGNAL(InHiFreqSet(QString,double)));
     connect(channelStrip,SIGNAL(DestructionSet(QString,double)),this,SIGNAL(DestructionSet(QString,double)));
     connect(channelStrip,SIGNAL(RingModFrequencySet(QString,double)),this,SIGNAL(RingModFrequencySet(QString,double)));
+    connect(channelStrip,SIGNAL(RingModMixSet(QString,double)),this,SIGNAL(RingModMixSet(QString,double)));
+    connect(channelStrip,SIGNAL(OutLoFreqSet(QString,double)),this,SIGNAL(OutLoFreqSet(QString,double)));
+    connect(channelStrip,SIGNAL(OutHiFreqSet(QString,double)),this,SIGNAL(OutHiFreqSet(QString,double)));
     ui->horizontalLayout->addWidget(channelStrip);
     m_ChannelStripMap.insert(name,channelStrip);
     //TSLogging::Print(QString("Channelstrip created: %1").arg(name));
