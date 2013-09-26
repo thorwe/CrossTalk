@@ -224,6 +224,8 @@ void DspRadio::Process(short *samples, int sampleCount, int channels)
         if (getFudge() > 0.0f)
             DoProcess(data.data(),sampleCount, m_volFollow);
 
+        f_m_o->process(sampleCount,audioData);
+
         for(int i=0; i<sampleCount; ++i)
             samples[i] = (short)(data[i] * 32768.f);
 
@@ -253,6 +255,8 @@ void DspRadio::Process(short *samples, int sampleCount, int channels)
             DoProcess(c_data_left.data(),sampleCount, m_volFollow);
             DoProcess(c_data_right.data(),sampleCount, m_volFollow_r);
         }
+
+        f_s_o->process(sampleCount,audioData);
 
         for(int i=0; i<sampleCount; ++i)
         {

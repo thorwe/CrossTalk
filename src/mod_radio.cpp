@@ -119,10 +119,6 @@ void Radio::setRingModFrequency(QString name, double val)
     {
         RadioFX_Settings setting = RadioFX_Settings();
         setting.name = name;
-//        setting.enabled = false;
-//        setting.freq_low = 0.0f;
-//        setting.freq_hi = 0.0f;
-//        setting.fudge = 0.0f;
         setting.rm_mod_freq = val;
         m_SettingsMap.insert(name,setting);
     }
@@ -134,8 +130,8 @@ void Radio::setRingModMix(QString name, double val)
 {
     if (m_SettingsMap.contains(name))
     {
-        if (m_SettingsMap.value(name).rm_mod_freq != val)
-            m_SettingsMap[name].rm_mod_freq = val;
+        if (m_SettingsMap.value(name).rm_mix != val)
+            m_SettingsMap[name].rm_mix = val;
     }
     else
     {
@@ -300,6 +296,7 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
         dspObj->setBandpassEqInBandWidth(settings.name, getBandWidthIn(settings));
         dspObj->setFudge(settings.name, settings.fudge);
         dspObj->setRmModFreq(settings.name, settings.rm_mod_freq);
+        dspObj->setRmMix(settings.name, settings.rm_mix);
         dspObj->setBandpassEqOutCenterFrequency(settings.name, getCenterFrequencyOut(settings));
         dspObj->setBandpassEqOutBandWidth(settings.name, getBandWidthOut(settings));
         connect(this,SIGNAL(ChannelStripEnabledSet(QString,bool)), dspObj, SLOT(setEnabled(QString,bool)),Qt::UniqueConnection);
@@ -307,6 +304,7 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
         connect(this,SIGNAL(InBpCenterFreqSet(QString,double)), dspObj, SLOT(setBandpassEqInCenterFrequency(QString,double)),Qt::UniqueConnection);
         connect(this,SIGNAL(InBpBandwidthSet(QString,double)), dspObj, SLOT(setBandpassEqInBandWidth(QString,double)),Qt::UniqueConnection);
         connect(this,SIGNAL(RingModFrequencyChanged(QString,double)), dspObj, SLOT(setRmModFreq(QString,double)),Qt::UniqueConnection);
+        connect(this,SIGNAL(RingModMixChanged(QString,double)), dspObj, SLOT(setRmMix(QString,double)));
         connect(this,SIGNAL(OutBpCenterFreqSet(QString,double)), dspObj, SLOT(setBandpassEqOutCenterFrequency(QString,double)),Qt::UniqueConnection);
         connect(this,SIGNAL(OutBpBandwidthSet(QString,double)), dspObj, SLOT(setBandpassEqOutBandWidth(QString,double)),Qt::UniqueConnection);
 
