@@ -3,8 +3,8 @@
 
 #include <QObject>
 #include <QtNetwork/QtNetwork>
-#include <QAbstractButton>
-#include <QMessageBox>
+//#include <QAbstractButton>
+//#include <QMessageBox>
 
 class Updater : public QObject
 {
@@ -26,6 +26,9 @@ private:
     void ShowUpdateDialog(QString remoteVersion);
     void CheckUpdate(QUrl url);
     QUrl checkUrl;
+
+    QUrl _urlRedirectedTo;
+    QUrl redirectUrl(const QUrl& possibleRedirectUrl, const QUrl& oldRedirectUrl) const;
 };
 
 #endif // UPDATER_H

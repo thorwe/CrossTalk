@@ -4,6 +4,7 @@
 
 #include <QApplication>
 #include <QDesktopServices>
+#include <QMessageBox>
 
 #include "ts_helpers_qt.h"
 #include "ts_logging_qt.h"
@@ -36,33 +37,26 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
     }
 
     QByteArray arr = reply->readAll();
+    //TSLogging::Print(reply->url().toString());
     reply->deleteLater();
+
+    QVariant possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+
+    /* We'll deduct if the redirection is valid in the redirectUrl function */
+    _urlRedirectedTo = this->redirectUrl(possibleRedirectUrl.toUrl(), _urlRedirectedTo);
+
+    /* If the URL is not empty, we're being redirected. */
+    if(!_urlRedirectedTo.isEmpty())
+    {
+        TSLogging::Log(QString("%1: Update check forwarding to %2").arg(this->objectName()).arg(_urlRedirectedTo.toString()),LogLevel_INFO);
+        CheckUpdate(_urlRedirectedTo);
+        return;
+    }
 
     int start = arr.indexOf("Version",0);
     if (start == -1)
     {
-        if (0 == arr.indexOf("302",0))
-        {
-            TSLogging::Log("Update check forwarding to...",LogLevel_INFO);
-            start = arr.indexOf("http://",2);
-            if (start == -1)
-            {
-                TSLogging::Log("Could not find forwarding address start.",LogLevel_WARNING);
-                return;
-            }
-            int end = arr.indexOf(";",start);
-            if (end == -1)
-            {
-                TSLogging::Log("Could not find forwarding address end.",LogLevel_WARNING);
-                return;
-            }
-            arr = arr.mid(start,end-start);
-            TSLogging::Log(arr, LogLevel_INFO);
-            CheckUpdate(QString(arr));
-        }
-        else
-            TSLogging::Log((this->objectName() + ": Did not find Version."),LogLevel_WARNING);
-
+        TSLogging::Log((this->objectName() + ": Did not find Version."),LogLevel_WARNING);
         return;
     }
 
@@ -86,6 +80,7 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
     else
         TSLogging::Log(QString("%1 version %2 is up to date.").arg(ts3plugin_name()).arg(ts3plugin_version()));
 
+    _urlRedirectedTo.clear();
     m_netwManager->deleteLater();
 }
 
@@ -163,4 +158,20 @@ void Updater::ShowUpdateDialog(QString remoteVersion)
         TSLogging::Log("Update Rejected",LogLevel_INFO);
     else
         TSLogging::Print("Could not find button role");
+}
+
+QUrl Updater::redirectUrl(const QUrl& possibleRedirectUrl,
+                               const QUrl& oldRedirectUrl) const {
+    QUrl redirectUrl;
+    /*
+     * Check if the URL is empty and
+     * that we aren't being fooled into a infinite redirect loop.
+     * We could also keep track of how many redirects we have been to
+     * and set a limit to it, but we'll leave that to you.
+     */
+    if(!possibleRedirectUrl.isEmpty() &&
+       possibleRedirectUrl != oldRedirectUrl) {
+        redirectUrl = possibleRedirectUrl;
+    }
+    return redirectUrl;
 }
