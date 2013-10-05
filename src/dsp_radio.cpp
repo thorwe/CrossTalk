@@ -38,6 +38,8 @@ DspRadio::DspRadio(QObject *parent) :
     f_s->setParams (params);
     f_m_o->setParams (params);
     f_s_o->setParams (params);
+
+    m_agmu = new DspVolumeAGMU(this);
 }
 
 void DspRadio::setEnabled(QString name, bool val)
@@ -189,13 +191,13 @@ void DspRadio::DoProcess(float *samples, int sampleCount, float &volFollow)
 
 void DspRadio::DoProcessRingMod(float *samples, int sampleCount, double &modAngle)
 {
-    if (m_RM_modFreq != 0.0f)   // RingMod
+    if ((m_RM_modFreq != 0.0f) && (m_RM_mix != 0.0f))   // RingMod
     {
         for(int i=0; i<sampleCount; ++i)
         {
 //            samples[i] *= sin(m_RM_modAngle);
             float sample = samples[i];
-            sample = (sample * m_RM_mix) + ((1-m_RM_mix) * (sample * sin(modAngle)));
+            sample = (sample * (1-m_RM_mix)) + (m_RM_mix * (sample * sin(modAngle)));
             samples[i] = qBound(-1.0f,sample,1.0f);
             modAngle += m_RM_modFreq * TWO_PI_OVER_SAMPLE_RATE;
         }
@@ -263,9 +265,9 @@ void DspRadio::Process(short *samples, int sampleCount, int channels)
             samples[i*2] = (short)(c_data_left[i] * 32768.f);
             samples[1 + (i*2)] = (short)(c_data_right[i] * 32768.f);
         }
-
 //        delete[] *audioData;      // release memory
     }
+    m_agmu->process(samples,sampleCount,channels);
 }
 
 void DspRadio::setChannelType(QString name)

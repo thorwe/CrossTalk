@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "DspFilters/Dsp.h"
+#include "dsp_volume_agmu.h"
 
 class DspRadio : public QObject
 {
@@ -72,6 +73,9 @@ private:
     double m_RM_modAngle;
     double m_RM_modAngle_r;
     double m_RM_mix;
+
+    DspVolumeAGMU* m_agmu;
+
 };
 
 #endif // DSP_RADIO_H
