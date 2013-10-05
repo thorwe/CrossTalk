@@ -5,7 +5,8 @@
 #include "public_definitions.h"
 #include "module.h"
 #include "volumes.h"
-#include "simple_volume.h"
+//#include "simple_volume.h"
+#include "dsp_volume_ducker.h"
 #include "talkers.h"
 
 class Ducker_Channel : public Module, public TalkInterface
@@ -57,7 +58,7 @@ private:
     Talkers* talkers;
     Volumes* vols;
 
-    SimpleVolume *AddDuckerVolume(uint64 serverConnectionHandlerID, anyID clientID);
+    DspVolume *AddDuckerVolume(uint64 serverConnectionHandlerID, anyID clientID);
     void UpdateActive();
 
 signals:

@@ -3,7 +3,7 @@ TEMPLATE = lib
 #CONFIG-=embed_manifest_dll
 
 #VERSION = 1.3.2
-#CONFIG += beta
+CONFIG += beta
 
 QT += sql network
 
@@ -21,22 +21,28 @@ HEADERS += \
     includes/plugin_definitions.h \
     includes/db.h \
     includes/MMtoDB.h \
+    includes/ts_missing_definitions.h \
+    includes/dsp_helpers.h \
     src/ts_settings_qt.h \
     src/ts_infodata_qt.h \
     src/ts_context_menu_qt.h \
     src/ts_logging_qt.h \
     src/ts_helpers_qt.h \
     src/ts_ptt_qt.h \
+    src/ts_serverinfo_qt.h \
+    src/ts_serversinfo.h \
     src/updater.h \
     src/translator.h \
     src/banner.h \
     src/plugin.h \
     src/config.h \
-    src/simple_volume.h \
     src/snt.h \
     src/talkers.h \
     src/simplepanner.h \
     src/module.h \
+    src/dsp_volume.h \
+    src/dsp_volume_ducker.h \
+    src/dsp_volume_agmu.h \
     src/volumes.h \
     src/mod_ducker_channel.h \
     src/mod_ducker_global.h \
@@ -47,10 +53,7 @@ HEADERS += \
     src/settings_duck.h \
     src/config_position_spread.h \
     src/settings_position_spread.h \
-    src/banner_frame.h \
-    src/ts_serverinfo_qt.h \
-    src/ts_serversinfo.h \
-    includes/ts_missing_definitions.h
+    src/banner_frame.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -59,16 +62,20 @@ SOURCES += \
     src/ts_logging_qt.cpp \
     src/ts_helpers_qt.cpp \
     src/ts_ptt_qt.cpp \
+    src/ts_serverinfo_qt.cpp \
+    src/ts_serversinfo.cpp \
     src/updater.cpp \
     src/translator.cpp \
     src/banner.cpp \
     src/plugin.cpp \
     src/config.cpp \
-    src/simple_volume.cpp \
     src/snt.cpp \
     src/talkers.cpp \
     src/simplepanner.cpp \
-    src/module.cpp \
+    src/module.cpp  \
+    src/dsp_volume.cpp \
+    src/dsp_volume_ducker.cpp \
+    src/dsp_volume_agmu.cpp \
     src/volumes.cpp \
     src/mod_ducker_channel.cpp \
     src/mod_ducker_global.cpp \
@@ -79,9 +86,7 @@ SOURCES += \
     src/settings_duck.cpp \
     src/config_position_spread.cpp \
     src/settings_position_spread.cpp \
-    src/banner_frame.cpp \
-    src/ts_serverinfo_qt.cpp \
-    src/ts_serversinfo.cpp
+    src/banner_frame.cpp
 
 FORMS += \
     src/config.ui \

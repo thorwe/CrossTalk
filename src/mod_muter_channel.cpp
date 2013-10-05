@@ -19,7 +19,7 @@ ChannelMuter::ChannelMuter(QObject *parent) :
     m_isPrintEnabled = false;
     this->setParent(parent);
     this->setObjectName("ChannelMuter");
-    vols = new Volumes(this);
+    vols = new Volumes(this,VolumeTypeManual);
 //    MutedChannels = new QSet<QPair<uint64,uint64> >;
 //    ClientWhiteList = new QSet<QPair<uint64,anyID> >;
 }
@@ -242,27 +242,26 @@ bool ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int sta
     if (isMe)
         return false;
 
-    if (((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING)) && (vols->VolumesMap->contains(serverConnectionHandlerID)))
+    if ((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING))
     {
-        QMap<anyID,SimpleVolume*>* ChanVolumes = vols->VolumesMap->value(serverConnectionHandlerID);
-        if (ChanVolumes->contains(clientID))
+        DspVolume* vol = vols->GetVolume(serverConnectionHandlerID,clientID);
+        if (vol == (DspVolume*)NULL)
+            return false;
+
+        unsigned int error = ERROR_ok;
+        uint64 channelID;
+        if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,clientID,&channelID)) != ERROR_ok)
         {
-            unsigned int error = ERROR_ok;
-            uint64 channelID;
-            if((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,clientID,&channelID)) != ERROR_ok)
-            {
-                if (error!=ERROR_not_connected)
-                    Error("(onTalkStatusChanged) Error getting Client Channel Id",serverConnectionHandlerID,error);
-            }
-            else
-            {
-                SimpleVolume* vol = ChanVolumes->value(clientID);
-                QPair<uint64,uint64> channelPair = qMakePair(serverConnectionHandlerID,channelID);
-                QPair<uint64,anyID> clientPair = qMakePair(serverConnectionHandlerID,clientID);
-                vol->setMuted((MutedChannels.contains(channelPair)) && (!(ClientWhiteList.contains(clientPair))));
-                vol->setProcessing(status==STATUS_TALKING);
-                return vol->isMuted();
-            }
+            if (error!=ERROR_not_connected)
+                Error("(onTalkStatusChanged) Error getting Client Channel Id",serverConnectionHandlerID,error);
+        }
+        else
+        {
+            QPair<uint64,uint64> channelPair = qMakePair(serverConnectionHandlerID,channelID);
+            QPair<uint64,anyID> clientPair = qMakePair(serverConnectionHandlerID,clientID);
+            vol->setMuted((MutedChannels.contains(channelPair)) && (!(ClientWhiteList.contains(clientPair))));
+            vol->setProcessing(status==STATUS_TALKING);
+            return vol->isMuted();
         }
     }
     return false;
@@ -319,15 +318,11 @@ bool ChannelMuter::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID
     if (!(isRunning()))
         return false;
 
-    if (!vols->VolumesMap->contains(serverConnectionHandlerID))
+    DspVolume* vol = vols->GetVolume(serverConnectionHandlerID,clientID);
+    if (vol == NULL)
         return false;
 
-    QMap<anyID,SimpleVolume*>* ChanVolumes = vols->VolumesMap->value(serverConnectionHandlerID);
-    if (!ChanVolumes->contains(clientID))
-        return false;
-
-    SimpleVolume* vol = ChanVolumes->value(clientID);
-    vol->process(samples, sampleCount * channels);
+    vol->process(samples, sampleCount, channels);
     return vol->isMuted();
 }
 

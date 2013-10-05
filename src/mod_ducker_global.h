@@ -94,7 +94,7 @@ private:
     Talkers* talkers;
     Volumes* vols;
 
-    SimpleVolume *AddMusicBotVolume(uint64 serverConnectionHandlerID, anyID clientID);
+    DspVolume* AddMusicBotVolume(uint64 serverConnectionHandlerID, anyID clientID);
 
     void SaveDuckTargets();
     void UpdateActive();

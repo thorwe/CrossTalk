@@ -5,7 +5,7 @@
 #include "public_definitions.h"
 #include "module.h"
 #include "volumes.h"
-#include "simple_volume.h"
+//#include "simple_volume.h"
 #include "ts_infodata_qt.h"
 #include "ts_context_menu_qt.h"
 
