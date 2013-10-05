@@ -7,8 +7,8 @@ GuildWarsTwo::GuildWarsTwo(QObject *parent) :
     QObject(parent)
 {
     this->setObjectName("Guild Wars 2");
-    PositionalAudio* pa = qobject_cast<PositionalAudio *>(parent);
-    pa->RegisterCustomEnvironmentSupport(this);
+//    PositionalAudio* pa = qobject_cast<PositionalAudio *>(parent);
+//    pa->RegisterCustomEnvironmentSupport(this);
 }
 
 QString GuildWarsTwo::getIdentity() const
@@ -41,14 +41,50 @@ bool GuildWarsTwo::isCommander() const
     return m_isCommander;
 }
 
-QString GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
+bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
 {
+    if (rawIdentity.isEmpty())
+    {
+        bool isIdentityDirty = (!m_Identity.isEmpty());
+        m_Identity = QString::null;
+        emit identityChanged(m_Identity);
+
+        if (m_professionId != 0)
+        {
+            m_professionId = 0;
+            emit professionIdChanged(m_professionId);
+        }
+
+        if (m_mapId != 0)
+        {
+            m_mapId = 0;
+            emit mapIdChanged(m_mapId);
+        }
+        if (m_worldId != 0)
+        {
+            m_worldId = 0;
+            emit worldIdChanged(m_worldId);
+        }
+        if (m_teamColorId != 0)
+        {
+            m_teamColorId = 0;
+            emit teamColorIdChanged(m_teamColorId);
+        }
+        if (m_isCommander)
+        {
+            m_isCommander = false;
+            emit commanderStatusChanged(m_isCommander);
+        }
+        return isIdentityDirty;
+    }
+
     QStringList stringList = rawIdentity.split(",",QString::KeepEmptyParts,Qt::CaseSensitive);
 
     QString string = stringList[0];
     string.remove(0,10);
     string.remove(string.length() - 1 , 1);
-    if (m_Identity != string)
+    bool isIdentityDirty = (m_Identity != string);
+    if (isIdentityDirty)
     {
         m_Identity = string;
         TSLogging::Print(QString("Idendity changed: %1").arg(m_Identity));
@@ -128,7 +164,7 @@ QString GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         emit commanderStatusChanged(m_isCommander);
     }
 
-    return m_Identity;
+    return isIdentityDirty;
 }
 
 // as long as this is the only occurence where a game puts known readable data in context and this data is available already,

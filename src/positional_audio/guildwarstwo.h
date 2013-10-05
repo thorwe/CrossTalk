@@ -2,13 +2,13 @@
 #define GUILDWARSTWO_H
 
 #include <QObject>
-#include "mod_positionalaudio.h"
+#include "tsvr_definitions.h"
 
 class GuildWarsTwo : public QObject, public CustomEnvironmentSupportInterface
 {
     Q_OBJECT
     Q_INTERFACES(CustomEnvironmentSupportInterface)
-    Q_PROPERTY(QString myIdentity
+    Q_PROPERTY(QString identity
                READ getIdentity
                NOTIFY identityChanged)
     Q_PROPERTY(quint32 professionId
@@ -30,7 +30,7 @@ class GuildWarsTwo : public QObject, public CustomEnvironmentSupportInterface
 public:
     explicit GuildWarsTwo(QObject *parent = 0);
 
-    QString onIdentityRawDirty(QString rawIdentity);
+    bool onIdentityRawDirty(QString rawIdentity);
 //    bool onContextRawDirty(QByteArray rawContext);
 
     QString getIdentity() const;

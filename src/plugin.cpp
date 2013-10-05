@@ -41,7 +41,7 @@
 #ifdef USE_POSITIONAL_AUDIO
 #include "settings_positionalaudio.h"
 #include "mod_positionalaudio.h"
-#include "guildwarstwo.h"
+//#include "guildwarstwo.h"
 # ifdef CROSSTALK_BETA
 #include "gw.h"
 # endif
@@ -97,7 +97,7 @@ ChannelMuter channel_Muter;
 #ifdef USE_POSITIONAL_AUDIO
 SettingsPositionalAudio* settingsPositionalAudio = SettingsPositionalAudio::instance();
 PositionalAudio positionalAudio;
-GuildWarsTwo gwTwo(&positionalAudio);
+//GuildWarsTwo gwTwo(&positionalAudio);
 # ifdef CROSSTALK_BETA
 GW gw(&positionalAudio);
 # endif
@@ -834,7 +834,6 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 
 void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels)
 {
-//    TSLogging::Print(QString("clientID: %1").arg(clientID));
     if (clientID > 32767)
     {
         clientID = 65535 - clientID + 1;

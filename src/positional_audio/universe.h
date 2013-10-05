@@ -2,7 +2,6 @@
 #define UNIVERSE_H
 
 #include <QObject>
-#include <QObject>
 #include <QMap>
 #include "public_definitions.h"
 

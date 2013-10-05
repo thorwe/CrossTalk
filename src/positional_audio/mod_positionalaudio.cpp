@@ -20,10 +20,10 @@
 
 #include "ts_serversinfo.h"
 
-bool operator==(const TS3_VECTOR &vec, const float *arr)
-{
-    return ((vec.x == arr[0]) && (vec.y == arr[1]) && (vec.z == arr[2]));
-}
+//bool operator==(const TS3_VECTOR &vec, const float *arr)
+//{
+//    return ((vec.x == arr[0]) && (vec.y == arr[1]) && (vec.z == arr[2]));
+//}
 
 struct LinkedMem {
     quint32 uiVersion;              //win:UINT32;posix:uint32_t
@@ -50,7 +50,7 @@ PositionalAudio::PositionalAudio(QObject *parent) :
     m_sendCounter(0),
     m_silentSendCounter(2),
     m_Context_Dirty(false),
-    m_Identity_Dirty(false),
+    m_isDirty_IdentityUncleaned(false),
     m_Avatar_Dirty(false),
     m_lastCount(0),
     m_isUseCamera(true),
@@ -59,48 +59,25 @@ PositionalAudio::PositionalAudio(QObject *parent) :
     this->setParent(parent);
     this->setObjectName("PositionalAudio");
     m_isPrintEnabled = false;
-    universe = new Universe(this);
+    universe = new TsVrUniverse(this);
+    meObj = new TsVrObjSelf(this);
+    connect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)));
+    connect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)));
+    connect(meObj,SIGNAL(avatarChanged(TsVrObj*,TS3_VECTOR,TS3_VECTOR,TS3_VECTOR)),this,SLOT(onMyAvatarChanged(TsVrObj*,TS3_VECTOR,TS3_VECTOR,TS3_VECTOR)));
     NULL_VECTOR.x = 0.0f;
     NULL_VECTOR.y = 0.0f;
     NULL_VECTOR.z = 0.0f;
 }
 
 // Properties
-QString PositionalAudio::getMyGame() const
+QString PositionalAudio::getMyVr() const
 {
-    return m_GameName;
-}
-
-QString PositionalAudio::getMyGameDescription() const
-{
-    return m_GameDesc;
+    return meObj->getVr();
 }
 
 QString PositionalAudio::getMyIdentity() const
 {
-    return m_Identity;
-}
-
-QByteArray PositionalAudio::getMyContext() const
-{
-    return m_Context;
-//    if (m_Context.isEmpty())
-//    {
-//        //Error("Context is empty."); // I DON'T GET IT
-//        ts3Functions.printMessageToCurrentTab("Context is empty");
-//        return -1;
-//    }
-
-//    QByteArray arr;
-//    for (int i = 0; i<4; ++i)
-//        arr[i] = m_Context.at(i+28);
-
-//    bool ok;
-//    quint32 worldId = arr.toInt(&ok);
-//    if (!ok)
-//        ts3Functions.printMessageToCurrentTab("Could not convert");
-
-//    return (ok)?worldId:-1;
+    return meObj->getIdentity();
 }
 
 bool PositionalAudio::isUseCamera() const
@@ -213,12 +190,33 @@ void PositionalAudio::setServerSettingSendIntervalSilentInc(QString serverUnique
     m_ServerSettings[serverUniqueId].sendIntervalSilentInc = val;
 }
 
+void PositionalAudio::onMyVrChanged(TsVrObj *obj, QString val)
+{
+    Q_UNUSED(obj);
+    emit myVrChanged(val);
+}
+
+void PositionalAudio::onMyIdentityChanged(TsVrObj *obj, QString val)
+{
+    Q_UNUSED(obj);
+    emit myIdentityChanged(val);
+}
+
+void PositionalAudio::onMyAvatarChanged(TsVrObj *obj, TS3_VECTOR position, TS3_VECTOR front, TS3_VECTOR top)
+{
+    Q_UNUSED(obj);
+    Q_UNUSED(position);
+    Q_UNUSED(front);
+    Q_UNUSED(top);
+    m_Avatar_Dirty = true;
+}
+
 QMap<QString, PositionalAudio_ServerSettings> PositionalAudio::getServerSettings() const
 {
     return m_ServerSettings;
 }
 
-bool PositionalAudio::RegisterCustomEnvironmentSupport(QObject *p)
+/*bool PositionalAudio::RegisterCustomEnvironmentSupport(QObject *p)
 {
     CustomEnvironmentSupportInterface *iCustomEnvironmentSupport = qobject_cast<CustomEnvironmentSupportInterface *>(p);
     if (!iCustomEnvironmentSupport)
@@ -226,7 +224,7 @@ bool PositionalAudio::RegisterCustomEnvironmentSupport(QObject *p)
 
     m_CustomEnvironmentSupportMap.insert(p->objectName(),p);
     return true;
-}
+}*/
 
 // Other
 void PositionalAudio::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID)
@@ -268,7 +266,7 @@ void PositionalAudio::onCustom3dRolloffCalculationClientEvent(uint64 serverConne
     Q_UNUSED(serverConnectionHandlerID);
     Q_UNUSED(clientID);
     Q_UNUSED(distance);
-    if ((isRunning()) && (!m_GameName.isEmpty()))
+    if ((isRunning()) && (!meObj->getVr().isEmpty()))
         *volume = 1.0f; // Who would want low volumes on a voicecom
 }
 
@@ -282,7 +280,7 @@ bool PositionalAudio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64
     {
         if (id == mine)
         {
-            QString game = getMyGame();
+            QString game = meObj->getVr();
             if (!game.isEmpty())
             {
                 data << this->objectName() << ": ";
@@ -290,7 +288,7 @@ bool PositionalAudio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64
 
                 data << "is playing " << game;
 
-                QString id = getMyIdentity();
+                QString id = meObj->getIdentity();
                 if (!id.isEmpty())
                     data << " as " << id;
             }
@@ -299,16 +297,16 @@ bool PositionalAudio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64
         {
             if (universe->Contains(serverConnectionHandlerID,(anyID)id))
             {
-                TsVR* info = universe->Get(serverConnectionHandlerID,(anyID)id);
-                if (!info->vr.isEmpty())
+                TsVrObj* obj = universe->Get(serverConnectionHandlerID,(anyID)id);
+                if (!obj->getVr().isEmpty())
                 {
                     data << this->objectName() << ": ";
                     isDirty = true;
 
-                    data << "is playing " << info->vr;
-                    if (!info->identity.isEmpty())
+                    data << "is playing " << obj->getVr();
+                    if (!obj->getIdentity().isEmpty())
                     {
-                        data << " as " << info->identity;
+                        data << " as " << obj->getIdentity();
                         if (m_PlayersInMyContext.contains(serverConnectionHandlerID,(anyID)id))
                         {
                             data << " in my context";
@@ -341,9 +339,9 @@ bool PositionalAudio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64
 
 void PositionalAudio::onRunningStateChanged(bool value)
 {
-    m_Identity_Dirty = value;
-    m_Context_Dirty = value;
-    m_Avatar_Dirty = value;
+    m_isDirty_IdentityUncleaned = false;    // not value, we want it to be off no matter what
+    m_Context_Dirty = false;
+    m_Avatar_Dirty = false;
 
     TSInfoData::instance()->Register(this,value,1);
 
@@ -415,7 +413,7 @@ void PositionalAudio::timerEvent(QTimerEvent *event)
             // send the data
             m_sendCounter++;
             Send();
-            if (m_Identity_Dirty)
+            if (m_isDirty_IdentityUncleaned)
                 TSInfoData::instance()->RequestSelfUpdate();
         }
         else
@@ -428,20 +426,46 @@ void PositionalAudio::timerEvent(QTimerEvent *event)
         {
             if (lm->dwcount != m_lastCount)
             {
-                UpdateMyGame();
-
-                if (!m_GameName.isEmpty())
+                if (lm->description[0])
                 {
-                    Print("Found " + m_GameName);
-                    if (m_tryTimerId != 0)
-                    {
-                        this->killTimer(m_tryTimerId);
-                        m_tryTimerId = 0;
-                    }
-                    m_lastCount = lm->dwcount;
-                    m_fetchTimerElapsed = 0;
-                    m_fetchTimerId = this->startTimer(FETCH_TIMER_INTERVAL);
+                    QString vr_desc = QString::fromWCharArray(lm->description,2048);
+                    int nullPos = vr_desc.indexOf(QChar::Null,0);
+                    if (nullPos == -1)
+                        Error("(UpdateMyGame) game description Null Terminator not found.");
+                    else if (nullPos != 256)
+                        vr_desc.truncate(nullPos);
+
+                    meObj->setVrDescription(vr_desc);
                 }
+                else
+                    meObj->setVrDescription(QString::null);
+
+                if (lm->name[0])
+                {
+                    QString myVr = QString::fromWCharArray(lm->name,256);
+                    int nullPos = myVr.indexOf(QChar::Null,0);
+                    if (nullPos == -1)
+                        Error("(UpdateMyGame) game Null Terminator not found.");
+                    else if (nullPos != 256)
+                        myVr.truncate(nullPos);
+
+                    meObj->setVr(myVr);
+
+                    if (!myVr.isEmpty())
+                    {
+                        // Print("Found " + meObj->getVr());
+                        if (m_tryTimerId != 0)
+                        {
+                            this->killTimer(m_tryTimerId);
+                            m_tryTimerId = 0;
+                        }
+                        m_lastCount = lm->dwcount;
+                        m_fetchTimerElapsed = 0;
+                        m_fetchTimerId = this->startTimer(FETCH_TIMER_INTERVAL);
+                    }
+                }
+                else
+                    meObj->setVr(QString::null);
             }
         }
         m_sharedMemory->unlock();
@@ -450,10 +474,8 @@ void PositionalAudio::timerEvent(QTimerEvent *event)
 
 void PositionalAudio::unlock()
 {
-    m_GameName.clear();
-    m_GameDesc.clear();
     m_Context.clear();
-    m_ContextHex.clear();
+
     if (lm)
     {
         m_sharedMemory->lock();
@@ -472,37 +494,17 @@ void PositionalAudio::unlock()
     if (isRunning() && m_tryTimerId == 0)
         m_tryTimerId = this->startTimer(1000);
 
-    m_Avatar_Pos.x = 0.0f;
-    m_Avatar_Pos.y = 0.0f;
-    m_Avatar_Pos.z = 0.0f;
-
-    m_Avatar_Front.x = 0.0f;
-    m_Avatar_Front.y = 0.0f;
-    m_Avatar_Front.z = 0.0f;
-
-    m_Avatar_Top.x = 0.0f;
-    m_Avatar_Top.y = 0.0f;
-    m_Avatar_Top.z = 0.0f;
-
-    m_Camera_Pos.x = 0.0f;
-    m_Camera_Pos.y = 0.0f;
-    m_Camera_Pos.z = 0.0f;
-
-    m_Camera_Front.x = 0.0f;
-    m_Camera_Front.y = 0.0f;
-    m_Camera_Front.z = 0.0f;
-
-    m_Camera_Top.x = 0.0f;
-    m_Camera_Top.y = 0.0f;
-    m_Camera_Top.z = 0.0f;
+    meObj->resetAvatar();
+    meObj->resetCamera();
 
     m_PlayersInMyContext.clear();
     Update3DListenerAttributes();
 
     Send(QString::null,PluginCommandTarget_CURRENT_CHANNEL);
-    emit myIdentityChanged(QString::null);
-    emit myGameChanged(QString::null);
-    emit myGameDescriptionChanged(QString::null);
+    meObj->setIdentityRaw(QString::null);
+    meObj->setContext(QString::null);
+    meObj->setVr(QString::null);
+    meObj->setVrDescription(QString::null);
     Log("Unlocked.");
 }
 
@@ -522,34 +524,14 @@ bool PositionalAudio::fetch()
     m_fetchTimerElapsed = 0;
     m_lastCount = lm->dwcount;
 
-    m_Avatar_Dirty = (m_Avatar_Dirty || !((m_Avatar_Pos == lm->fAvatarPosition) && (m_Avatar_Front == lm->fAvatarFront) && (m_Avatar_Top == lm->fAvatarTop)));
+//    m_Avatar_Dirty = (m_Avatar_Dirty || !((meObj->getAvatarPosition() == lm->fAvatarPosition) && (meObj->getAvatarFront() == lm->fAvatarFront) && (meObj->getAvatarTop() == lm->fAvatarTop)));
 
-    m_Avatar_Pos.x = lm->fAvatarPosition[0];
-    m_Avatar_Pos.y = lm->fAvatarPosition[1];
-    m_Avatar_Pos.z = lm->fAvatarPosition[2];
-
-    m_Avatar_Front.x = lm->fAvatarFront[0];
-    m_Avatar_Front.y = lm->fAvatarFront[1];
-    m_Avatar_Front.z = lm->fAvatarFront[2];
-
-    m_Avatar_Top.x = lm->fAvatarTop[0];
-    m_Avatar_Top.y = lm->fAvatarTop[1];
-    m_Avatar_Top.z = lm->fAvatarTop[2];
+    meObj->setAvatar(lm->fAvatarPosition,lm->fAvatarFront,lm->fAvatarTop);
 
     if (lm->uiVersion == 2)
     {
         //*** Camera
-        m_Camera_Pos.x = lm->fCameraPosition[0];
-        m_Camera_Pos.y = lm->fCameraPosition[1];
-        m_Camera_Pos.z = lm->fCameraPosition[2];
-
-        m_Camera_Front.x = lm->fCameraFront[0];
-        m_Camera_Front.y = lm->fCameraFront[1];
-        m_Camera_Front.z = lm->fCameraFront[2];
-
-        m_Camera_Top.x = lm->fCameraTop[0];
-        m_Camera_Top.y = lm->fCameraTop[1];
-        m_Camera_Top.z = lm->fCameraTop[2];
+        meObj->setCamera(lm->fCameraPosition,lm->fCameraFront,lm->fCameraTop);
 
         if (lm->context_len > 255)
             lm->context_len = 255;
@@ -559,105 +541,38 @@ bool PositionalAudio::fetch()
         m_Context_Dirty = (m_Context != newContext);
         m_Context = newContext;
         if (m_Context_Dirty)
-            m_ContextHex = m_Context.toHex().data();
+            meObj->setContext(m_Context.toHex().data());    //m_ContextHex = m_Context.toHex().data();
 
         //*** Identity
         QString newIdentity = QString::fromWCharArray(lm->identity,256);
-        m_Identity_Dirty = (m_IdentityUncleaned != newIdentity);
-        if (m_Identity_Dirty)
+        m_isDirty_IdentityUncleaned = (m_IdentityUncleaned != newIdentity);
+        if (m_isDirty_IdentityUncleaned)
         {
             m_IdentityUncleaned = newIdentity;
-            m_Identity = newIdentity;
-            int nullPos = m_Identity.indexOf(QChar::Null,0);
+            int nullPos = newIdentity.indexOf(QChar::Null,0);
             if (nullPos == -1)
                 Error("identity Null Terminator not found.");
             else if (nullPos != 256)
-                m_Identity.truncate(nullPos);
+                newIdentity.truncate(nullPos);
 
-            if (m_CustomEnvironmentSupport)
-            {
-                CustomEnvironmentSupportInterface *iCustomEnvironmentSupport = qobject_cast<CustomEnvironmentSupportInterface *>(m_CustomEnvironmentSupport);
-                QString ident = iCustomEnvironmentSupport->onIdentityRawDirty(m_Identity);
-                if (ident != m_Identity)
-                {
-                    m_Identity = ident;
-                    emit myIdentityChanged(m_Identity);
-                }
-            }
-            else
-                emit myIdentityChanged(m_Identity);
+            meObj->setIdentityRaw(newIdentity);
         }
     }
-    else
+    else if (lm->uiVersion == 1)    //legacy
     {
-        m_Camera_Pos.x = lm->fAvatarPosition[0];
-        m_Camera_Pos.y = lm->fAvatarPosition[1];
-        m_Camera_Pos.z = lm->fAvatarPosition[2];
-
-        m_Camera_Front.x = lm->fAvatarFront[0];
-        m_Camera_Front.y = lm->fAvatarFront[1];
-        m_Camera_Front.z = lm->fAvatarFront[2];
-
-        m_Camera_Top.x = lm->fAvatarTop[0];
-        m_Camera_Top.y = lm->fAvatarTop[1];
-        m_Camera_Top.z = lm->fAvatarTop[2];
+        meObj->setCamera(lm->fAvatarPosition,lm->fAvatarFront,lm->fAvatarTop);
 
         m_Context.clear();
-        m_Identity.clear();
-        m_ContextHex.clear();
-        m_IdentityUncleaned.clear();
+        //m_ContextHex.clear();
         m_Context_Dirty = false;
-        m_Identity_Dirty = false;
+        meObj->setContext(QString::null);
+        m_IdentityUncleaned.clear();
+        m_isDirty_IdentityUncleaned = false;
+        meObj->setIdentityRaw(QString::null);
     }
 
     m_sharedMemory->unlock();
     return true;
-}
-
-void PositionalAudio::UpdateMyGame()
-{
-    if (lm->name[0])
-    {
-        QString name = QString::fromWCharArray(lm->name,256);
-        int nullPos = name.indexOf(QChar::Null,0);
-        if (nullPos == -1)
-            Error("(UpdateMyGame) game Null Terminator not found.");
-        else if (nullPos != 256)
-            name.truncate(nullPos);
-
-        if (m_GameName == name)
-            return;
-
-        m_GameName = name;
-        if (m_CustomEnvironmentSupportMap.contains(m_GameName))
-            m_CustomEnvironmentSupport = m_CustomEnvironmentSupportMap.value(m_GameName);
-        else
-            m_CustomEnvironmentSupport = NULL;
-
-        emit myGameChanged(m_GameName);
-    }
-    else if (!m_GameName.isEmpty())
-    {
-        m_GameName.clear();
-        emit myGameChanged(m_GameName);
-    }
-
-    if (lm->description[0])
-    {
-        m_GameDesc = QString::fromWCharArray(lm->description,2048);
-        int nullPos = m_GameDesc.indexOf(QChar::Null,0);
-        if (nullPos == -1)
-            Error("(UpdateMyGame) game description Null Terminator not found.");
-        else if (nullPos != 256)
-            m_GameDesc.truncate(nullPos);
-
-        emit myGameDescriptionChanged(m_GameDesc);
-    }
-    else if (!m_GameDesc.isEmpty())
-    {
-        m_GameDesc.clear();
-        emit myGameDescriptionChanged(m_GameDesc);
-    }
 }
 
 bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID clientID, bool isMe, QString cmd, QTextStream &args)
@@ -696,7 +611,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
 
                 QString identity = in.readAll().trimmed();
 
-                Print(QString("Received (me): cId: %1 VR: %2 CO: %3 ID: %4").arg(clientID).arg(name).arg((context == m_ContextHex)?"match":"no match -.-").arg(identity), serverConnectionHandlerID, LogLevel_DEBUG);
+                Print(QString("Received (me): cId: %1 VR: %2 CO: %3 ID: %4").arg(clientID).arg(name).arg((context == meObj->getContext())?"match":"no match -.-").arg(identity), serverConnectionHandlerID, LogLevel_DEBUG);
             }
             else    //version 1
             {
@@ -709,7 +624,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
         return true;
     }
 
-    TsVR* obj = universe->Get(serverConnectionHandlerID,clientID);
+    TsVrObjOther* obj = universe->Get(serverConnectionHandlerID,clientID);
     if (!obj)
     {
         obj = universe->Add(serverConnectionHandlerID,clientID);
@@ -718,13 +633,18 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
 
     if (args.atEnd())   // Player left vr (unlocked)
     {
-        Log(QString("%1 left %2 VR.").arg(obj->identity).arg(obj->vr));
+        Log(QString("%1 left %2 VR.").arg(obj->getIdentity()).arg(obj->getVr()));
         universe->Remove(serverConnectionHandlerID,clientID);
         m_PlayersInMyContext.remove(serverConnectionHandlerID,clientID);
         return true;
     }
 
-    args >> obj->avatarPosition >> obj->avatarFront >> obj->avatarTop;
+    //args >> obj->avatarPosition >> obj->avatarFront >> obj->avatarTop;
+    TS3_VECTOR avatarPosition;
+    TS3_VECTOR avatarFront;
+    TS3_VECTOR avatarTop;
+    args >> avatarPosition >> avatarFront >> avatarTop;
+    obj->setAvatar(avatarPosition, avatarFront, avatarTop);
 
     if (!args.atEnd())
     {
@@ -735,8 +655,8 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
         QStringList list = args_stri.split("[Ct_Delimiter]",QString::KeepEmptyParts,Qt::CaseSensitive);    // keep empty parts?
         QString name = list.at(0);
 
-        bool isDirtyName = (name != obj->vr);
-        obj->vr = name;
+        bool isDirtyName = (name != obj->getVr());
+        obj->setVr(name);
         bool isDirtyContext = false;
         bool isDirtyId = false;
 
@@ -747,20 +667,20 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
 
             QString context;
             in >> context;
-            isDirtyContext = (context != obj->context);
-            obj->context = context;
+            isDirtyContext = (context != obj->getContext());
+            obj->setContext(context);
 
             QString identity = in.readAll().trimmed();
-            isDirtyId = (identity != obj->identity);
-            obj->identity = identity;
+            isDirtyId = (identity != obj->getIdentity());
+            obj->setIdentityRaw(identity);
 
-            Log(QString("Received: VR: %2 CO: %3 ID: %4").arg(name).arg((context==m_ContextHex)?"match":"no match").arg(identity), serverConnectionHandlerID, LogLevel_DEBUG);
+            Log(QString("Received: VR: %2 CO: %3 ID: %4").arg(name).arg((context == meObj->getContext())?"match":"no match").arg(identity), serverConnectionHandlerID, LogLevel_DEBUG);
 
             if (isDirtyName || isDirtyContext)
             {
-                if (m_GameName == obj->vr)
+                if (meObj->getVr() == obj->getVr())
                 {
-                    if (obj->context == m_ContextHex)
+                    if (obj->getContext() == meObj->getContext())
                     {
                         if (!m_PlayersInMyContext.contains(serverConnectionHandlerID,clientID))
                             m_PlayersInMyContext.insert(serverConnectionHandlerID,clientID);
@@ -782,7 +702,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
     }
 
     if (m_PlayersInMyContext.contains(serverConnectionHandlerID,clientID))
-        ts3Functions.channelset3DAttributes(serverConnectionHandlerID,clientID,&obj->avatarPosition);
+        ts3Functions.channelset3DAttributes(serverConnectionHandlerID,clientID,&obj->getAvatarPosition());
 
     return true;
 }
@@ -790,21 +710,25 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
 QString PositionalAudio::GetSendString(bool isAll)
 {
     // Bulk version
-    if (m_GameName.isEmpty())
+    if (meObj->getVr().isEmpty())
         return QString::null;
 
     QString out_stri;
     QTextStream out(&out_stri);
-    out << m_Avatar_Pos << m_Avatar_Front << m_Avatar_Top;
+    out << meObj->getAvatarPosition() << meObj->getAvatarFront() << meObj->getAvatarTop();
     if (isAll)
     {
-        out << " " << m_GameName;
+//        out << " " << m_GameName;
+        out << " " << meObj->getVr();
 
         if (lm->uiVersion == 2)
         {
-            out << "[Ct_Delimiter]" << (m_ContextHex.isEmpty()?"[Ct_None]":m_ContextHex);
-            if (!m_Identity.isEmpty())
-                out << " " << m_Identity;
+//            out << "[Ct_Delimiter]" << (m_ContextHex.isEmpty()?"[Ct_None]":m_ContextHex);
+            QString myContext = meObj->getContext();
+            out << "[Ct_Delimiter]" << (myContext.isEmpty()?"[Ct_None]":myContext);
+            QString my_ident = meObj->getIdentityRaw();
+            if (!my_ident.isEmpty())
+                out << " " << my_ident;
         }
     }
     return out_stri;
@@ -932,13 +856,13 @@ void PositionalAudio::Send(QString args, int targetMode)
 
 void PositionalAudio::Send()
 {
-    if (m_Context_Dirty || m_Identity_Dirty || m_IsSendAllOverride)
+    if (m_Context_Dirty || m_isDirty_IdentityUncleaned || m_IsSendAllOverride)
     {
         if (m_Context_Dirty)
-            Log(QString("New context: %1").arg(m_ContextHex));
+            Log(QString("New context: %1").arg(meObj->getContext()));
 
-        if (m_Identity_Dirty)
-            Log("New identity: " + m_Identity);
+        if (m_isDirty_IdentityUncleaned)
+            Log("New identity: " + meObj->getIdentityRaw());
 
         m_IsSendAllOverride = false;
         QString args = GetSendString(true);
@@ -946,7 +870,7 @@ void PositionalAudio::Send()
         {
             m_Avatar_Dirty = false;
             m_Context_Dirty = false;
-            m_Identity_Dirty = false;
+            m_isDirty_IdentityUncleaned = false;
             Send(args,PluginCommandTarget_CURRENT_CHANNEL);
         }
     }
@@ -970,6 +894,8 @@ void PositionalAudio::Update3DListenerAttributes()
     uint64* servers;
     if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
     {
+        QString myVr = meObj->getVr();
+        QString myContext = meObj->getContext();
         uint64* server;
         for(server = servers; *server != (uint64)NULL; ++server)
         {
@@ -981,9 +907,9 @@ void PositionalAudio::Update3DListenerAttributes()
                 continue;
 
             if (m_isUseCamera)
-                ts3Functions.systemset3DListenerAttributes(*server,&m_Camera_Pos,&m_Camera_Front,&m_Camera_Top);
+                ts3Functions.systemset3DListenerAttributes(*server,&meObj->getCameraPosition(),&meObj->getCameraFront(),&meObj->getCameraTop());
             else
-                ts3Functions.systemset3DListenerAttributes(*server,&m_Avatar_Pos,&m_Avatar_Front,&m_Avatar_Top);
+                ts3Functions.systemset3DListenerAttributes(*server,&meObj->getAvatarPosition(),&meObj->getAvatarFront(),&meObj->getAvatarTop());
 
             unsigned int error;
             // Get My Id on this handler
@@ -1013,8 +939,8 @@ void PositionalAudio::Update3DListenerAttributes()
                             {
                                 if (universe->Contains(*server,clients[i]))
                                 {
-                                    TsVR* obj = universe->Get(*server,clients[i]);
-                                    if ((m_GameName == obj->vr) && (obj->context == m_ContextHex))
+                                    TsVrObj* obj = universe->Get(*server,clients[i]);
+                                    if ((myVr == obj->getVr()) && (myContext == obj->getContext()))
                                         m_PlayersInMyContext.insert(*server,clients[i]);
                                 }
                             }
@@ -1022,9 +948,9 @@ void PositionalAudio::Update3DListenerAttributes()
                             if (!m_PlayersInMyContext.contains(*server,clients[i]))
                             {
                                 if (m_isUseCamera)
-                                    ts3Functions.channelset3DAttributes(*server,clients[i],&m_Camera_Pos);
+                                    ts3Functions.channelset3DAttributes(*server,clients[i],&meObj->getCameraPosition());
                                 else
-                                    ts3Functions.channelset3DAttributes(*server,clients[i],&m_Avatar_Pos);
+                                    ts3Functions.channelset3DAttributes(*server,clients[i],&meObj->getAvatarPosition());
                             }
                         }
                     }

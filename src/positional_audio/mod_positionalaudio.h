@@ -4,7 +4,8 @@
 #include <QObject>
 #include <QtCore>
 #include "../module.h"
-#include "universe.h"
+#include "tsvr_universe.h"
+#include "tsvr_obj_self.h"
 #include "../ts_infodata_qt.h"
 //#include "../ts_context_menu_qt.h"
 #include "definitions_positionalaudio.h"
@@ -13,23 +14,13 @@
 #define RETURNCODE_BUFSIZE 128
 #endif
 
-class CustomEnvironmentSupportInterface
-{
-public:
-    virtual QString onIdentityRawDirty(QString rawIdentity) = 0;
-};
-Q_DECLARE_INTERFACE(CustomEnvironmentSupportInterface,"net.thorwe.CrossTalk.CustomEnvironmentSupportInterface/1.0")
-
 class PositionalAudio : public Module, public InfoDataInterface//, public ContextMenuInterface
 {
     Q_OBJECT
     Q_INTERFACES(InfoDataInterface)// ContextMenuInterface)
-    Q_PROPERTY(QString myGame
-               READ getMyGame
-               NOTIFY myGameChanged)
-    Q_PROPERTY(QString myGameDescription
-               READ getMyGameDescription
-               NOTIFY myGameDescriptionChanged)
+    Q_PROPERTY(QString myVr
+               READ getMyVr
+               NOTIFY myVrChanged)
     Q_PROPERTY(QString myIdentity
                READ getMyIdentity
                NOTIFY myIdentityChanged)
@@ -37,8 +28,7 @@ class PositionalAudio : public Module, public InfoDataInterface//, public Contex
                READ isUseCamera
                WRITE setUseCamera
                NOTIFY useCameraChanged)
-    Q_PROPERTY(QByteArray myContext
-               READ getMyContext)
+
 public:
     explicit PositionalAudio(QObject *parent = 0);
 
@@ -48,10 +38,8 @@ public:
     void onCustom3dRolloffCalculationClientEvent(uint64 serverConnectionHandlerID, anyID clientID, float distance, float* volume);
 
     //Properties
-    QString getMyGame() const;
-    QString getMyGameDescription() const;
+    QString getMyVr() const;
     QString getMyIdentity() const;
-    QByteArray getMyContext() const;
 
     bool onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, uint64 mine, QTextStream &data);
 
@@ -61,18 +49,13 @@ public:
 
     QMap<QString,PositionalAudio_ServerSettings> getServerSettings() const;
 
-    bool RegisterCustomEnvironmentSupport(QObject *p);
+    //bool RegisterCustomEnvironmentSupport(QObject *p);
+    TsVrObjSelf* meObj;
 
 signals:
-    void myGameChanged(QString);
-    void myGameDescriptionChanged(QString);
+    void myVrChanged(QString);
     void myIdentityChanged(QString);
-
-    void gameChanged(uint64 serverConnectionHandlerID, anyID clientID, QString gameName);
-    void identityChanged(uint64 serverConnectionHandlerID, anyID clientID, QString gameName);
-
     void useCameraChanged(bool val);
-
     void serverBlock(QString);
 
 public slots:
@@ -86,6 +69,10 @@ public slots:
     void setServerSettingSendInterval(QString serverUniqueId, float val);
     void setServerSettingSendIntervalSilentInc(QString serverUniqueId, float val);
 
+    void onMyVrChanged(TsVrObj* obj, QString val);
+    void onMyIdentityChanged(TsVrObj* obj, QString val);
+    void onMyAvatarChanged(TsVrObj* obj, TS3_VECTOR position, TS3_VECTOR front, TS3_VECTOR top);
+
 protected:
     void onRunningStateChanged(bool value);
     void timerEvent(QTimerEvent *event);
@@ -94,10 +81,6 @@ private:
     void unlock();
     bool trylock();
     bool fetch();
-
-    inline void UpdateMyGame();
-    QString m_GameName;
-    QString m_GameDesc;
 
     int m_tryTimerId;
 
@@ -109,25 +92,19 @@ private:
     int m_fetchTimerTimeoutMsec;
 
     // myself
-    QString m_Identity;
+    //QString m_Identity;
     QString m_IdentityUncleaned;
-    bool m_Identity_Dirty;
+    bool m_isDirty_IdentityUncleaned;
     QByteArray m_Context;
-    QString m_ContextHex;
+    //QString m_ContextHex;
     bool m_Context_Dirty;
-    TS3_VECTOR m_Avatar_Pos;
-    TS3_VECTOR m_Avatar_Front;
-    TS3_VECTOR m_Avatar_Top;
     bool m_Avatar_Dirty;
-    TS3_VECTOR m_Camera_Pos;
-    TS3_VECTOR m_Camera_Front;
-    TS3_VECTOR m_Camera_Top;
 
     ulong m_lastCount;
 
     QMultiMap<uint64,anyID> m_PlayersInMyContext;
 
-    Universe* universe;
+    TsVrUniverse* universe;
 
     void Update3DListenerAttributes();
 
@@ -148,12 +125,9 @@ private:
 
     QMap<QString,PositionalAudio_ServerSettings> m_ServerSettings;
     QHash<uint64,int> m_SendCounters;
-
-    QMap<QString,QObject*> m_CustomEnvironmentSupportMap;
-    QObject* m_CustomEnvironmentSupport;
 };
 QTextStream &operator<<(QTextStream &out, const TS3_VECTOR &ts3Vector);
 QTextStream &operator>>(QTextStream &in, TS3_VECTOR &ts3Vector);
-bool operator==(const TS3_VECTOR &vec, const float *arr);
+//bool operator==(const TS3_VECTOR &vec, const float *arr);
 
 #endif // MOD_POSITIONALAUDIO_H

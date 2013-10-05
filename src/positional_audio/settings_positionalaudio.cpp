@@ -39,7 +39,7 @@ void SettingsPositionalAudio::Init(PositionalAudio *positionalAudio)
 
     //pure display
     this->connect(positionalAudio,SIGNAL(myIdentityChanged(QString)),this, SIGNAL(UpdateUIStatusSelfName(QString)),Qt::QueuedConnection);
-    this->connect(positionalAudio,SIGNAL(myGameChanged(QString)),this,SIGNAL(UpdateUIStatusSelfGame(QString)),Qt::QueuedConnection);
+    this->connect(positionalAudio,SIGNAL(myVrChanged(QString)),this,SIGNAL(UpdateUIStatusSelfGame(QString)),Qt::QueuedConnection);
 
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
@@ -180,7 +180,7 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
                 this->connect(this,SIGNAL(UpdateUIStatusSelfName(QString)),p_config, SIGNAL(UpdateUIStatusSelfName(QString)));
                 emit UpdateUIStatusSelfName(mP_positionalAudio.data()->getMyIdentity());
                 this->connect(this,SIGNAL(UpdateUIStatusSelfGame(QString)),p_config,SIGNAL(UpdateUIStatusSelfGame(QString)));
-                emit UpdateUIStatusSelfGame(mP_positionalAudio.data()->getMyGame());
+                emit UpdateUIStatusSelfGame(mP_positionalAudio.data()->getMyVr());
 
                 p_config->show();
                 config = p_config;
