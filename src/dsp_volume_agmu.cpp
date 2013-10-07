@@ -5,6 +5,7 @@
 
 #include "dsp_helpers.h"
 #include "db.h"
+#include "ts_logging_qt.h"
 
 DspVolumeAGMU::DspVolumeAGMU(QObject *parent) :
     m_rateQuieter(120.0f),
@@ -22,12 +23,12 @@ void DspVolumeAGMU::process(short *samples, int sampleCount, int channels)
     short peak = getPeak(samples,sampleCount);
     peak = qMax(m_peak,peak);
     if (peak != m_peak)
-        emit peakChanged(peak);
-
-    m_peak = peak;
-
-    setGainDesired(lin2db(32000.f / m_peak));   //32768.f leave some headroom
-
+    {
+//        emit peakChanged(peak);
+        m_peak = peak;
+        setGainDesired(computeGainDesired());
+        TSLogging::Print(QString("Peak: %1 desired Gain: %2").arg(m_peak).arg(getGainDesired()));
+    }
     setGainCurrent(GetFadeStep(sampleCount));
     doProcess(samples, sampleCount);
 }
@@ -49,6 +50,20 @@ float DspVolumeAGMU::GetFadeStep(int sampleCount)
             current_gain = desired_gain;
 
     }
-
     return current_gain;
+}
+
+short DspVolumeAGMU::GetPeak() const
+{
+    return m_peak;
+}
+
+void DspVolumeAGMU::setPeak(short val)
+{
+    m_peak = val;
+}
+
+float DspVolumeAGMU::computeGainDesired()
+{
+    return qMin((lin2db(32768.f / m_peak)) -2, 12.0f); // leave some headroom
 }

@@ -53,7 +53,8 @@ HEADERS += \
     src/settings_duck.h \
     src/config_position_spread.h \
     src/settings_position_spread.h \
-    src/banner_frame.h
+    src/banner_frame.h \
+    src/mod_agmu.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -86,7 +87,8 @@ SOURCES += \
     src/settings_duck.cpp \
     src/config_position_spread.cpp \
     src/settings_position_spread.cpp \
-    src/banner_frame.cpp
+    src/banner_frame.cpp \
+    src/mod_agmu.cpp
 
 FORMS += \
     src/config.ui \

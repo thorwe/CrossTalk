@@ -13,15 +13,18 @@ const QUrl STABLE("http://addons.teamspeak.com/directory/plugins/miscellaneous/C
 const QUrl BETA_CHECK("http://dl.dropbox.com/u/18413693/CrossTalk-builds/package.ini");
 const QUrl BETA_DOWNLOAD("http://jianji.de/crosstalk/");
 
+
+// Note that TS doesn't ship with any ssl support, so no GitHub API etc
+
 //! Constructor
 /*!
  * \brief Config::Config create an instance of this class
  */
 Updater::Updater(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_netwManager(NULL)
 {
     this->setObjectName("Updater");
-    m_netwManager = new QNetworkAccessManager(this);
 }
 
 //! Retrieves update url
@@ -31,14 +34,20 @@ Updater::Updater(QObject *parent) :
  */
 void Updater::onNetwManagerFinished(QNetworkReply *reply)
 {
-    if (reply->error() != QNetworkReply::NoError) {
+    if (reply->error() != QNetworkReply::NoError)
+    {
         TSLogging::Log(reply->errorString(),LogLevel_WARNING);
         return;
     }
 
     QByteArray arr = reply->readAll();
-    //TSLogging::Print(reply->url().toString());
+    bool isReplyStable = reply->url().toString().contains("addons.teamspeak.com");
     reply->deleteLater();
+
+    if (!m_URLs.remove(reply->url()))
+        return;
+//    else
+//        TSLogging::Print("Removed reply url from QSet");
 
     QVariant possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
 
@@ -53,6 +62,7 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
         return;
     }
 
+
     int start = arr.indexOf("Version",0);
     if (start == -1)
     {
@@ -60,7 +70,7 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
         return;
     }
 
-    QString endStr = (checkUrl==STABLE)?ts3plugin_name():"Platforms";
+    QString endStr = (isReplyStable)?ts3plugin_name():"Platforms";
     int end = arr.indexOf(endStr,start);
     if (end == -1)
     {
@@ -75,31 +85,40 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
     if (pos > -1)
         parse = rx.cap(0);
 
-    if (parse != ts3plugin_version())
-        ShowUpdateDialog(parse);
+
+    if (isReplyStable)
+        m_VersionStable = parse;
     else
-        TSLogging::Log(QString("%1 version %2 is up to date.").arg(ts3plugin_name()).arg(ts3plugin_version()));
+        m_VersionBeta = parse;
 
     _urlRedirectedTo.clear();
-    m_netwManager->deleteLater();
+    if (m_URLs.isEmpty())
+    {
+        m_netwManager->deleteLater();
+        m_netwManager=NULL;
+        CheckTriggerUpdateDialog();
+    }
 }
 
-void Updater::CheckUpdate()
+void Updater::CheckUpdate(bool isBetaChannelEnabled)
 {
+    if (m_netwManager==NULL)
+        m_netwManager = new QNetworkAccessManager(this);
+
 //    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-//    CheckUpdate((cfg.value("beta",false).toBool())?BETA_CHECK:STABLE);
-#ifdef CROSSTALK_BETA
-    CheckUpdate(BETA_CHECK);
-#else
+//    m_isBetaChannel = cfg.value("beta",false).toBool();
+    m_isBetaChannel = isBetaChannelEnabled;
+    if (m_isBetaChannel)
+        CheckUpdate(BETA_CHECK);
+
     CheckUpdate(STABLE);
-#endif
 }
 
 void Updater::CheckUpdate(QUrl url)
 {
-    checkUrl = url;
+    m_URLs.insert(url);
     connect(m_netwManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetwManagerFinished(QNetworkReply*)),Qt::UniqueConnection);
-    QNetworkRequest request(checkUrl);
+    QNetworkRequest request(url);
     m_netwManager->get(request);
 }
 
@@ -151,7 +170,7 @@ void Updater::ShowUpdateDialog(QString remoteVersion)
     // I must be missing something for the non-blocking variant to work -.-
     if (ret == QMessageBox::Ok || ret == QMessageBox::Yes)
     {
-        QDesktopServices::openUrl((checkUrl==STABLE)?STABLE:BETA_DOWNLOAD);
+        QDesktopServices::openUrl((remoteVersion==m_VersionStable)?STABLE:BETA_DOWNLOAD);
         qApp->quit();
     }
     else if (ret == QMessageBox::Cancel || ret == QMessageBox::No)
@@ -160,8 +179,8 @@ void Updater::ShowUpdateDialog(QString remoteVersion)
         TSLogging::Print("Could not find button role");
 }
 
-QUrl Updater::redirectUrl(const QUrl& possibleRedirectUrl,
-                               const QUrl& oldRedirectUrl) const {
+QUrl Updater::redirectUrl(const QUrl& possibleRedirectUrl, const QUrl& oldRedirectUrl) const
+{
     QUrl redirectUrl;
     /*
      * Check if the URL is empty and
@@ -169,9 +188,78 @@ QUrl Updater::redirectUrl(const QUrl& possibleRedirectUrl,
      * We could also keep track of how many redirects we have been to
      * and set a limit to it, but we'll leave that to you.
      */
-    if(!possibleRedirectUrl.isEmpty() &&
-       possibleRedirectUrl != oldRedirectUrl) {
+    if(!possibleRedirectUrl.isEmpty() && possibleRedirectUrl != oldRedirectUrl)
         redirectUrl = possibleRedirectUrl;
-    }
+
     return redirectUrl;
+}
+
+void Updater::CheckTriggerUpdateDialog()
+{
+//    TSLogging::Print(QString("Stable: %1").arg(m_VersionStable));
+//    TSLogging::Print(QString("Beta: %1").arg(m_VersionBeta));
+//    TSLogging::Print(QString("Local: %1").arg(ts3plugin_version()));
+
+    if (!m_isBetaChannel)
+    {
+        if (m_VersionStable != ts3plugin_version())
+            ShowUpdateDialog(m_VersionStable);
+        else
+            TSLogging::Log(QString("%1 version %2 is up to date.").arg(ts3plugin_name()).arg(ts3plugin_version()));
+    }
+    else
+    {
+        // Is Stable newer than beta?
+        bool isStableNewer = false;
+        if (m_VersionStable.isEmpty() && m_VersionBeta.isEmpty())
+        {
+            TSLogging::Log(QString("(Updater) Could not check for updates."));
+        }
+        else if (m_VersionStable.isEmpty()) // TS site is down
+        {
+            TSLogging::Log("(Updater) Could not get stable version info. Aborting.");
+        }
+        else if (m_VersionBeta.isEmpty()) // Beta site is down
+        {
+            TSLogging::Log("(Updater) Could not get beta version info.");
+            isStableNewer = true;
+        }
+        else if (m_VersionBeta == m_VersionStable)
+            isStableNewer = true;
+        else
+        {
+            QStringList stable = m_VersionStable.split(".",QString::SkipEmptyParts);
+            QStringList beta = m_VersionBeta.split(".",QString::SkipEmptyParts);
+            bool isOk;
+            for (int i = 0; i< stable.length(); ++i)
+            {
+                int stableInt = stable[i].toInt(&isOk,10);
+                if (!isOk)
+                    break;
+
+                int betaInt = beta[i].toInt(&isOk,10);
+                if (!isOk)
+                    break;
+
+                if (stableInt > betaInt)
+                {
+                    isStableNewer = true;
+                    break;
+                }
+            }
+            if (!isOk)
+            {
+                TSLogging::Log("(Updater) Problem with version comparison.");
+                isStableNewer = true;
+            }
+            TSLogging::Print(QString("(Updater) Remote Stable is %1 than beta.").arg((isStableNewer)?"newer":"older"));
+        }
+
+        if (isStableNewer && (m_VersionStable != ts3plugin_version()))
+            ShowUpdateDialog(m_VersionStable);
+        else if (!isStableNewer && (m_VersionBeta != ts3plugin_version()))
+            ShowUpdateDialog(m_VersionBeta);
+        else
+            TSLogging::Log(QString("%1 version %2 is up to date.").arg(ts3plugin_name()).arg(ts3plugin_version()));
+    }
 }

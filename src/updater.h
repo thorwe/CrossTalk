@@ -16,7 +16,7 @@ signals:
     
 public slots:
     void onNetwManagerFinished(QNetworkReply *reply);
-    void CheckUpdate();
+    void CheckUpdate(bool isBetaChannelEnabled);
 //    void onButtonClicked(QAbstractButton * button);
 
 private:
@@ -25,10 +25,16 @@ private:
 //    QMessageBox* updateMsgBox;
     void ShowUpdateDialog(QString remoteVersion);
     void CheckUpdate(QUrl url);
-    QUrl checkUrl;
 
     QUrl _urlRedirectedTo;
     QUrl redirectUrl(const QUrl& possibleRedirectUrl, const QUrl& oldRedirectUrl) const;
+
+    void CheckTriggerUpdateDialog();
+    QSet<QUrl> m_URLs;
+    QString m_VersionStable;
+    QString m_VersionBeta;
+    QUrl m_downloadUrl;
+    bool m_isBetaChannel;
 };
 
 #endif // UPDATER_H

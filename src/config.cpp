@@ -83,7 +83,9 @@ void Config::SetupUi()
 
 //    if ((loca->translator != NULL) && !(loca->translator->isEmpty()))
 //        Translate(this);
-
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    betaChannelcheckBox->setChecked(cfg.value("beta",false).toBool());
+    connect(betaChannelcheckBox,SIGNAL(toggled(bool)),SLOT(onBetaChannelToggled(bool)));
 }
 
 //! Receives the click of the jianji banner
@@ -94,4 +96,11 @@ void Config::onJianjiClicked()
 {
     QUrl url(JIANJI_CAMPAIGN);
     QDesktopServices::openUrl(url);
+}
+
+void Config::onBetaChannelToggled(bool val)
+{
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    cfg.setValue("beta",val);
+    emit betaChannelToggled(val);
 }

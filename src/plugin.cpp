@@ -34,6 +34,7 @@
 #include "mod_ducker_global.h"
 #include "mod_muter_channel.h"
 #include "mod_position_spread.h"
+#include "mod_agmu.h"
 
 #include "settings_duck.h"
 #include "settings_position_spread.h"
@@ -94,6 +95,7 @@ PositionSpread positionSpread;
 Ducker_Global ducker_G;
 Ducker_Channel ducker_C;
 ChannelMuter channel_Muter;
+Agmu agmu;
 #ifdef USE_POSITIONAL_AUDIO
 SettingsPositionalAudio* settingsPositionalAudio = SettingsPositionalAudio::instance();
 PositionalAudio positionalAudio;
@@ -164,6 +166,8 @@ int ts3plugin_init() {
     loca->InitLocalization();
 
     contextMenu->setMainIcon("ct_16x16.png");
+
+    agmu.setEnabled(true);
 
     settingsDuck->Init(&ducker_G,&ducker_C);
     settingsPositionSpread->Init(&positionSpread);
@@ -249,7 +253,8 @@ int ts3plugin_init() {
             ts3plugin_currentServerConnectionChanged(scHandlerID);
     }
 
-    updater.CheckUpdate();
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    updater.CheckUpdate(cfg.value("beta",false).toBool());
 
     TSLogging::Log("init done");
     return 0;  /* 0 = success, 1 = failure */
@@ -299,6 +304,7 @@ void ts3plugin_configure(void* handle, void* qParentWidget) {
 
     qParentWidget_p = new Config();
     qParentWidget_p->SetupUi();
+    qParentWidget_p->connect(qParentWidget_p,SIGNAL(betaChannelToggled(bool)),&updater,SLOT(CheckUpdate(bool)),Qt::UniqueConnection);
     qParentWidget_p->exec();
 }
 
@@ -821,8 +827,11 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
         return; //Client is muted;
 
 #ifdef USE_RADIO
-    radio.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
+    bool isRadioProcessing = false;
+    isRadioProcessing = radio.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
+    agmu.setNextTalkStatusChangeForceProcessing(isRadioProcessing && (status == STATUS_TALKING));
 #endif
+    agmu.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
 
     ducker_G.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
     if (!ducker_G.isRunning() || !ducker_G.isClientMusicBotRt(serverConnectionHandlerID,clientID))
@@ -846,6 +855,8 @@ void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, an
 #ifdef USE_RADIO
     radio.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels);
 #endif
+
+    agmu.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels);
 
     if (!ducker_G.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels))
         ducker_C.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels);

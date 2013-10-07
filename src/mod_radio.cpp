@@ -247,7 +247,7 @@ void Radio::onRunningStateChanged(bool value)
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }
 
-//bool test = false;
+//! Returns true iff it will or has been an active processing
 bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe)
 {
     if (isMe || !isRunning())
@@ -308,28 +308,24 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
         connect(this,SIGNAL(OutBpCenterFreqSet(QString,double)), dspObj, SLOT(setBandpassEqOutCenterFrequency(QString,double)),Qt::UniqueConnection);
         connect(this,SIGNAL(OutBpBandwidthSet(QString,double)), dspObj, SLOT(setBandpassEqOutBandWidth(QString,double)),Qt::UniqueConnection);
 
-        return true;
+        return settings.enabled;
     }
     else if (status == STATUS_NOT_TALKING)
     {
         // Removing does not need to be robust against multiple STATUS_NOT_TALKING in a row, since that doesn't happen on user setting change
         if (!TalkersDspRadios->contains(serverConnectionHandlerID))
-        {
-            // return silent bec. of ChannelMuter implementation
-//            Error("(onTalkStatusChanged) Trying to remove talker from an invalid server connection handler id.",serverConnectionHandlerID,NULL);
-            return false;
-        }
+            return false;   // return silent bec. of ChannelMuter implementation
 
         QMap<anyID,DspRadio*>* sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
         if (!(sDspRadios->contains(clientID)))
             return false;
 
         DspRadio* dspObj = sDspRadios->value(clientID);
-//        dspObj->setPanAdjustment(false);
         dspObj->blockSignals(true);
+        bool isEnabled = dspObj->getEnabled();
         dspObj->deleteLater();
         sDspRadios->remove(clientID);
-//        Print(QString("Removed %1 %2").arg(serverConnectionHandlerID).arg(clientID));
+        return isEnabled;
     }
     return false;
 }

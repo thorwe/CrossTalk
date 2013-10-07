@@ -34,7 +34,7 @@
    <property name="geometry">
     <rect>
      <x>350</x>
-     <y>480</y>
+     <y>500</y>
      <width>89</width>
      <height>37</height>
     </rect>
@@ -80,7 +80,7 @@
      <x>20</x>
      <y>81</y>
      <width>431</width>
-     <height>451</height>
+     <height>411</height>
     </rect>
    </property>
    <property name="html">
@@ -111,9 +111,23 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
   </widget>
+  <widget class="QCheckBox" name="betaChannelcheckBox">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>520</y>
+     <width>101</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Beta Channel</string>
+   </property>
+  </widget>
   <zorder>textBrowser</zorder>
   <zorder>banner_jianji</zorder>
   <zorder>banner_frame</zorder>
+  <zorder>betaChannelcheckBox</zorder>
  </widget>
  <customwidgets>
   <customwidget>

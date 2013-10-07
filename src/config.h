@@ -18,12 +18,13 @@ public:
 
 protected slots:
     void onJianjiClicked();
+    void onBetaChannelToggled(bool val);
 
 protected:
 //    bool eventFilter(QObject *object, QEvent *ev);
 
 signals:
-
+    void betaChannelToggled(bool);
 private:
 //    Translator *loca;
 //    QNetworkAccessManager *m_netwManager;

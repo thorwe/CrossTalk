@@ -38,8 +38,6 @@ DspRadio::DspRadio(QObject *parent) :
     f_s->setParams (params);
     f_m_o->setParams (params);
     f_s_o->setParams (params);
-
-    m_agmu = new DspVolumeAGMU(this);
 }
 
 void DspRadio::setEnabled(QString name, bool val)
@@ -267,7 +265,6 @@ void DspRadio::Process(short *samples, int sampleCount, int channels)
         }
 //        delete[] *audioData;      // release memory
     }
-    m_agmu->process(samples,sampleCount,channels);
 }
 
 void DspRadio::setChannelType(QString name)

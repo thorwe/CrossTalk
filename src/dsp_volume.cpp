@@ -136,5 +136,8 @@ void DspVolume::doProcess(short *samples, int sampleCount)
 {
     float mix_gain = db2lin_alt2(m_gainCurrent);
     for ( int i_sample=0; i_sample<sampleCount; ++i_sample )
-        samples[i_sample] *= mix_gain;
+    {
+        int temp = samples[i_sample] * mix_gain;
+        samples[i_sample] = qBound(-32768, temp, 32767);
+    }
 }

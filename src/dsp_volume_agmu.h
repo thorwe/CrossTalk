@@ -15,6 +15,9 @@ public:
 
     void process(short *samples, int sampleCount, int channels);
     float GetFadeStep(int sampleCount);
+    short GetPeak() const;
+    void setPeak(short val);    //Overwrite peak; use for reinitializations with cache values etc.
+    float computeGainDesired();
 
 signals:
     void peakChanged(short);
