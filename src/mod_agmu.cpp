@@ -66,8 +66,9 @@ bool Agmu::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, boo
         }
 
         if (!isNewDspObj)
-        {
             this->disconnect(dspObj);
+        else
+        {
             //todo: move this out at a later point when cache is saved (outside of settings, with date and cleanup)
             QString clientUID;
             unsigned int error;
