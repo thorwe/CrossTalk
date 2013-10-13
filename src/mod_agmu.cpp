@@ -8,6 +8,8 @@ Agmu::Agmu(QObject *parent) :
     m_isForceProcessing(false)
 {
     this->setParent(parent);
+    this->setObjectName("Agmu");
+    m_isPrintEnabled = true;
     talkers = Talkers::instance();
     m_TalkersDSPs = new QMap<uint64,QMap<anyID,DspVolumeAGMU*>* >;
     m_PeakCache = new QHash<QString,short>;

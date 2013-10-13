@@ -87,7 +87,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
     if (isIdentityDirty)
     {
         m_Identity = string;
-        TSLogging::Print(QString("Idendity changed: %1").arg(m_Identity));
+//        TSLogging::Print(QString("Idendity changed: %1").arg(m_Identity));
         emit identityChanged(m_Identity);
     }
 
@@ -100,7 +100,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         if (m_professionId != profession)
         {
             m_professionId = profession;
-            TSLogging::Print(QString("Profession changed: %1").arg(m_professionId));
+//            TSLogging::Print(QString("Profession changed: %1").arg(m_professionId));
             emit professionIdChanged(m_professionId);
         }
     }
@@ -115,7 +115,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         if (m_mapId != map_id)
         {
             m_mapId = map_id;
-            TSLogging::Print(QString("Map Id changed: %1").arg(m_mapId));
+//            TSLogging::Print(QString("Map Id changed: %1").arg(m_mapId));
             emit mapIdChanged(m_mapId);
         }
     }
@@ -130,7 +130,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         if (m_worldId != world_id)
         {
             m_worldId = world_id;
-            TSLogging::Print(QString("World Id changed: %1").arg(m_worldId));
+//            TSLogging::Print(QString("World Id changed: %1").arg(m_worldId));
             emit worldIdChanged(m_worldId);
         }
     }
@@ -147,7 +147,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         if (m_teamColorId != team_color_id)
         {
             m_teamColorId = team_color_id;
-            TSLogging::Print(QString("Team color Id changed: %1").arg(team_color_id));
+//            TSLogging::Print(QString("Team color Id changed: %1").arg(team_color_id));
             emit teamColorIdChanged(m_teamColorId);
         }
     }
@@ -160,7 +160,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
     if (isCommander != m_isCommander)
     {
         m_isCommander = isCommander;
-        TSLogging::Print(QString("isCommander changed: %1").arg(m_isCommander));
+//        TSLogging::Print(QString("isCommander changed: %1").arg(m_isCommander));
         emit commanderStatusChanged(m_isCommander);
     }
 

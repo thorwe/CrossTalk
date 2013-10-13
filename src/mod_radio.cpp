@@ -6,7 +6,7 @@ Radio::Radio(QObject *parent)
 {
     this->setParent(parent);
     this->setObjectName("Radio");
-    m_isPrintEnabled = true;
+    m_isPrintEnabled = false;
     talkers = Talkers::instance();
     TalkersDspRadios = new QMap<uint64,QMap<anyID,DspRadio*>* >;
 }

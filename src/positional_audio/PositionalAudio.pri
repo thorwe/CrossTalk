@@ -1,6 +1,11 @@
 INCLUDEPATH += $$PWD \
     $$PWD/..
 
+#include($$PWD/sse_server/sse_server.pri) {
+#    DEFINES += USE_SSE_SERVER
+#    !build_pass:message( "Server-Sent Events Server included." )
+#}
+
 HEADERS += \
     $$PWD/tsvr_obj.h \
     $$PWD/tsvr_universe.h \
