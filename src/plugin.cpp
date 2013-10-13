@@ -127,7 +127,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.4.3";
+    return "1.4.4.101301";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -167,7 +167,7 @@ int ts3plugin_init() {
 
     contextMenu->setMainIcon("ct_16x16.png");
 
-    agmu.setEnabled(true);
+    agmu.setEnabled(false);
 
     settingsDuck->Init(&ducker_G,&ducker_C);
     settingsPositionSpread->Init(&positionSpread);
