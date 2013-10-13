@@ -12,6 +12,10 @@
 #include <string.h>
 #include <assert.h>
 
+#ifndef Q_OS_WIN
+ #include <QtSql>   // currently only required for settings.db fix on osx (linux?)
+#endif
+
 #include "public_errors.h"
 #include "public_errors_rare.h"
 #include "public_definitions.h"
@@ -159,6 +163,24 @@ int ts3plugin_init() {
 
 #ifdef CONSOLE_OUTPUT
     freopen("CONOUT$", "wb", stdout);   //Makes printf work in Release mode (shouldn't been necessary, but is...)
+#endif
+
+    // fix should work fine on any plattform. Behaviour not seen yet on windows. Conditional for curiosity/reminder.
+#ifndef Q_OS_WIN
+    // load settings.db if necessary
+    if(QSqlDatabase::connectionNames().isEmpty())
+    {
+        QSqlDatabase db;
+
+        db = QSqlDatabase::addDatabase("QSQLITE");
+        db.setDatabaseName(TSHelpers::GetConfigPath() + "settings.db");
+
+        if(!db.open())
+        {
+            TSLogging::Error("Error loading settings.db; aborting init", 0, NULL);
+            return 1;
+        }
+    }
 #endif
 
     TSPtt::instance()->Init(&command_mutex);
