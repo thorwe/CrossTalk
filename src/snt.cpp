@@ -265,7 +265,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
         }
 
-        if ((error = TSHelpers::SetWhisperList(targetServer,groupWhisperType,groupWhisperTargetMode)) != ERROR_ok)
+        if ((error = TSHelpers::SetWhisperList(targetServer,groupWhisperType,groupWhisperTargetMode,arg)) != ERROR_ok)
         {
             TSLogging::Error("Could not set whisperlist",scHandlerID,error);
             return;
