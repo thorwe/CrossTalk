@@ -252,7 +252,7 @@ void Updater::CheckTriggerUpdateDialog()
                 TSLogging::Log("(Updater) Problem with version comparison.");
                 isStableNewer = true;
             }
-            TSLogging::Print(QString("(Updater) Remote Stable is %1 than beta.").arg((isStableNewer)?"newer":"older"));
+//            TSLogging::Print(QString("(Updater) Remote Stable is %1 than beta.").arg((isStableNewer)?"newer":"older"));
         }
 
         if (isStableNewer && (m_VersionStable != ts3plugin_version()))
