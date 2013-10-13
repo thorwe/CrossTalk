@@ -10,7 +10,8 @@ TSServersInfo::~TSServersInfo(){}
 
 TSServerInfo* TSServersInfo::GetServerInfo(uint64 serverConnectionHandlerID)
 {
-    return (m_serverInfoMap.contains(serverConnectionHandlerID))?m_serverInfoMap.value(serverConnectionHandlerID):(TSServerInfo*)NULL;
+//    return (m_serverInfoMap.contains(serverConnectionHandlerID))?m_serverInfoMap.value(serverConnectionHandlerID):(const QPointer<TSServerInfo>)NULL;
+    return m_serverInfoMap.value(serverConnectionHandlerID,NULL);
 }
 
 void TSServersInfo::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber)
