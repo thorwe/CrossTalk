@@ -20,15 +20,13 @@ public:
     TS3_VECTOR getCameraFront() const;
     TS3_VECTOR getCameraTop() const;
 
+    bool setCamera(const float* position, const float* front, const float* top);
+    bool setAvatar(const float* position, const float* front, const float* top);
+
 signals:
-    void cameraPositionChanged(TS3_VECTOR);
-    void cameraFrontChanged(TS3_VECTOR);
-    void cameraTopChanged(TS3_VECTOR);
-    void cameraChanged(TS3_VECTOR,TS3_VECTOR,TS3_VECTOR);
+    void cameraChanged(bool,bool,bool);
 
 public slots:
-    void setAvatar(const float* position, const float* front, const float* top);
-    void setCamera(const float* position, const float* front, const float* top);
     void resetCamera();
 
 private:

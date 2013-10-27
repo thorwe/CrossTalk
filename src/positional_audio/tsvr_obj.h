@@ -24,12 +24,6 @@ class TsVrObj : public QObject
     Q_PROPERTY(QString identityRaw
                READ getIdentityRaw
                WRITE setIdentityRaw)
-    Q_PROPERTY(TS3_VECTOR avatarPosition
-               READ getAvatarPosition)
-    Q_PROPERTY(TS3_VECTOR avatarFront
-               READ getAvatarFront)
-    Q_PROPERTY(TS3_VECTOR avatarTop
-               READ getAvatarTop)
 
 public:
     explicit TsVrObj(QObject *parent = 0);
@@ -51,10 +45,7 @@ signals:
     void contextChanged(TsVrObj*,QString);
     void identityChanged(TsVrObj*,QString);
     void identityRawChanged(TsVrObj*,QString);
-    void avatarPositionChanged(TsVrObj*,TS3_VECTOR);
-    void avatarFrontChanged(TsVrObj*,TS3_VECTOR);
-    void avatarTopChanged(TsVrObj*,TS3_VECTOR);
-    void avatarChanged(TsVrObj*,TS3_VECTOR,TS3_VECTOR,TS3_VECTOR);
+    void avatarChanged(TsVrObj*,bool,bool,bool);
 
 public slots:
     void setVr(QString val);

@@ -17,7 +17,7 @@ public:
     uint64 getServerConnectionHandlerID() const;
     anyID getClientID() const;
 
-    void setAvatar(TS3_VECTOR position, TS3_VECTOR front, TS3_VECTOR top);
+    bool setAvatar(TS3_VECTOR position, TS3_VECTOR front, TS3_VECTOR top);
 
 signals:
     

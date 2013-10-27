@@ -71,7 +71,6 @@ public slots:
 
     void onMyVrChanged(TsVrObj* obj, QString val);
     void onMyIdentityChanged(TsVrObj* obj, QString val);
-    void onMyAvatarChanged(TsVrObj* obj, TS3_VECTOR position, TS3_VECTOR front, TS3_VECTOR top);
 
 protected:
     void onRunningStateChanged(bool value);

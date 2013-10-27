@@ -63,7 +63,6 @@ PositionalAudio::PositionalAudio(QObject *parent) :
     meObj = new TsVrObjSelf(this);
     connect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)));
     connect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)));
-    connect(meObj,SIGNAL(avatarChanged(TsVrObj*,TS3_VECTOR,TS3_VECTOR,TS3_VECTOR)),this,SLOT(onMyAvatarChanged(TsVrObj*,TS3_VECTOR,TS3_VECTOR,TS3_VECTOR)));
     NULL_VECTOR.x = 0.0f;
     NULL_VECTOR.y = 0.0f;
     NULL_VECTOR.z = 0.0f;
@@ -200,15 +199,6 @@ void PositionalAudio::onMyIdentityChanged(TsVrObj *obj, QString val)
 {
     Q_UNUSED(obj);
     emit myIdentityChanged(val);
-}
-
-void PositionalAudio::onMyAvatarChanged(TsVrObj *obj, TS3_VECTOR position, TS3_VECTOR front, TS3_VECTOR top)
-{
-    Q_UNUSED(obj);
-    Q_UNUSED(position);
-    Q_UNUSED(front);
-    Q_UNUSED(top);
-    m_Avatar_Dirty = true;
 }
 
 QMap<QString, PositionalAudio_ServerSettings> PositionalAudio::getServerSettings() const
@@ -526,7 +516,7 @@ bool PositionalAudio::fetch()
 
 //    m_Avatar_Dirty = (m_Avatar_Dirty || !((meObj->getAvatarPosition() == lm->fAvatarPosition) && (meObj->getAvatarFront() == lm->fAvatarFront) && (meObj->getAvatarTop() == lm->fAvatarTop)));
 
-    meObj->setAvatar(lm->fAvatarPosition,lm->fAvatarFront,lm->fAvatarTop);
+    m_Avatar_Dirty = (meObj->setAvatar(lm->fAvatarPosition,lm->fAvatarFront,lm->fAvatarTop) || m_Avatar_Dirty);
 
     if (lm->uiVersion == 2)
     {
