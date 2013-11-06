@@ -3,7 +3,7 @@
 
 CrossTalk is a Teamspeak 3 plugin that enhances the general audio experience and provides advanced features for commanders.
 
-[pledgie]: http://www.pledgie.com/campaigns/18898
+[pledgie]: https://www.pledgie.com/campaigns/18898
 
 ## Announcements
 
