@@ -19,12 +19,17 @@ public:
 protected slots:
     void onJianjiClicked();
     void onBetaChannelToggled(bool val);
+    void onServerEnabledToggled(bool val);
+    void onServerPortChanged(int val);
 
 protected:
 //    bool eventFilter(QObject *object, QEvent *ev);
 
 signals:
     void betaChannelToggled(bool);
+    void serverEnabledToggled(bool);
+    void serverPortChanged(quint16);
+
 private:
 //    Translator *loca;
 //    QNetworkAccessManager *m_netwManager;

@@ -31,6 +31,7 @@
 
 #include "ts_serversinfo.h"
 
+#include "plugin_qt.h"
 #include "talkers.h"
 #include "config.h"
 #include "snt.h"
@@ -64,6 +65,7 @@
 struct TS3Functions ts3Functions;
 
 Translator* loca = Translator::instance();
+PluginQt* pluginQt = PluginQt::instance();
 Talkers* talkers = Talkers::instance();
 TSContextMenu* contextMenu = TSContextMenu::instance();
 TSInfoData* infoData = TSInfoData::instance();
@@ -182,6 +184,8 @@ int ts3plugin_init() {
         }
     }
 #endif
+
+    pluginQt->Init();
 
     TSPtt::instance()->Init(&command_mutex);
 
@@ -327,6 +331,8 @@ void ts3plugin_configure(void* handle, void* qParentWidget) {
     qParentWidget_p = new Config();
     qParentWidget_p->SetupUi();
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(betaChannelToggled(bool)),&updater,SLOT(CheckUpdate(bool)),Qt::UniqueConnection);
+    qParentWidget_p->connect(qParentWidget_p,SIGNAL(serverEnabledToggled(bool)),pluginQt,SLOT(setServerEnabled(bool)),Qt::UniqueConnection);
+    qParentWidget_p->connect(qParentWidget_p,SIGNAL(serverPortChanged(quint16)),pluginQt,SLOT(setServerPort(quint16)),Qt::UniqueConnection);
     qParentWidget_p->exec();
 }
 

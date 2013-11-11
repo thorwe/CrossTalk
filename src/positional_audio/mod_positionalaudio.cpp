@@ -14,11 +14,20 @@
 
 #include "ts3_functions.h"
 #include "../plugin.h"
+#include "../plugin_qt.h"
 
 #include "../talkers.h"
 #include "../ts_helpers_qt.h"
 
 #include "ts_serversinfo.h"
+
+#ifndef M_PI
+#define M_PI    3.14159265358979323846f
+#endif
+
+#ifndef INCHTOM
+#define INCHTOM(b) (b*39.3701)
+#endif
 
 //bool operator==(const TS3_VECTOR &vec, const float *arr)
 //{
@@ -465,6 +474,7 @@ void PositionalAudio::timerEvent(QTimerEvent *event)
 void PositionalAudio::unlock()
 {
     m_Context.clear();
+    m_IdentityUncleaned.clear();
 
     if (lm)
     {
@@ -490,11 +500,12 @@ void PositionalAudio::unlock()
     m_PlayersInMyContext.clear();
     Update3DListenerAttributes();
 
-    Send(QString::null,PluginCommandTarget_CURRENT_CHANNEL);
     meObj->setIdentityRaw(QString::null);
     meObj->setContext(QString::null);
     meObj->setVr(QString::null);
     meObj->setVrDescription(QString::null);
+
+    Send(QString::null,PluginCommandTarget_CURRENT_CHANNEL);
     Log("Unlocked.");
 }
 
@@ -661,7 +672,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
             obj->setContext(context);
 
             QString identity = in.readAll().trimmed();
-            isDirtyId = (identity != obj->getIdentity());
+            isDirtyId = (identity != obj->getIdentityRaw());
             obj->setIdentityRaw(identity);
 
             Log(QString("Received: VR: %2 CO: %3 ID: %4").arg(name).arg((context == meObj->getContext())?"match":"no match").arg(identity), serverConnectionHandlerID, LogLevel_DEBUG);
@@ -694,6 +705,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
     if (m_PlayersInMyContext.contains(serverConnectionHandlerID,clientID))
         ts3Functions.channelset3DAttributes(serverConnectionHandlerID,clientID,&obj->getAvatarPosition());
 
+    PluginQt::instance()->LocalServerSend(GetSendStringJson(true,false,obj));
     return true;
 }
 
@@ -721,6 +733,85 @@ QString PositionalAudio::GetSendString(bool isAll)
                 out << " " << my_ident;
         }
     }
+    return out_stri;
+}
+
+QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
+{
+    if (isMe)
+        obj = meObj;
+    //else if (isMe.)
+
+    QString out_stri;
+    QTextStream out(&out_stri);
+    out << "{";
+    TS3_VECTOR vec = obj->getAvatarPosition();
+    out << "\"px\":" << INCHTOM(vec.x) << "," << "\"pz\":" << INCHTOM(vec.z) << ",";// << "\"ap_z\":" << vec.z << ",";
+//    Log(QString("%1 %2 %3").arg(vec.x).arg(vec.y).arg(vec.z));
+    vec = obj->getAvatarFront();
+//    Log(QString("%1 %2 %3").arg(vec.x).arg(vec.y).arg(vec.z));
+    int front = atan2(vec.z, vec.x)*180/M_PI;
+    if (front <0)
+        front += 360;
+
+    front *= -1;
+    out << "\"pa\":" << front << ",";
+//    out << "\"af_x\":" << vec.x << "," << "\"af_y\":" << vec.y << "," << "\"af_z\":" << vec.z << ",";
+//    vec = obj->getAvatarTop();
+//    out << "\"at_x\":" << vec.x << "," << "\"at_y\":" << vec.y << "," << "\"at_z\":" << vec.z << ",";
+
+    if (isMe)
+    {
+        TsVrObjSelf *iMeObj = qobject_cast<TsVrObjSelf *>(obj);
+        if (iMeObj)
+        {
+//            vec = iMeObj->getCameraPosition();
+//            out << "\"cp_x\":" << vec.x << "," << "\"cp_y\":" << vec.y << "," << "\"cp_z\":" << vec.z << ",";
+//            vec = iMeObj->getCameraFront();
+//            out << "\"cf_x\":" << vec.x << "," << "\"cf_y\":" << vec.y << "," << "\"cf_z\":" << vec.z << ",";
+//            vec = iMeObj->getCameraTop();
+//            out << "\"ct_x\":" << vec.x << "," << "\"ct_y\":" << vec.y << "," << "\"ct_z\":" << vec.z << ",";
+        }
+    }
+
+    if (isAll)
+    {
+//        out << "\"vr\":" << obj->getVr() << ",";
+//        QString context = obj->getContext();
+//        out << "\"co\":" << ((context.isEmpty())?" ":context) << ",";
+        QString ident = obj->getIdentityRaw();
+        if (ident.isEmpty())
+        {
+            Log("ident is empty!",LogLevel_INFO);   //fixed with >1.5.0
+            return QString::null;
+        }
+
+        ident.chop(1);
+        ident.remove(0,1);
+//        if (ident.isEmpty())
+//            Error("ident is now empty!");
+        //out << "\"id\":" << ident << ",";
+        out << ident << ",";
+
+        if (!isMe)
+        {
+            TsVrObjOther *iObj = qobject_cast<TsVrObjOther *>(obj);
+            if (iObj)
+            {
+                unsigned int error;
+                char name[512];
+                uint64 serverConnectionHandlerID = iObj->getServerConnectionHandlerID();
+                if((error = ts3Functions.getClientDisplayName(serverConnectionHandlerID, iObj->getClientID(), name, 512)) != ERROR_ok)
+                    Error("(GetSendStringJson) Error getting client display name",serverConnectionHandlerID,error);
+                else
+                    out << "\"vcname\":\"" << name << "\",";
+            }
+        }
+    }
+    else
+        Error("not isAll!");
+
+    out << "\"me\":" << ((isMe)?"true":"false") << "}";
     return out_stri;
 }
 
@@ -862,7 +953,13 @@ void PositionalAudio::Send()
             m_Context_Dirty = false;
             m_isDirty_IdentityUncleaned = false;
             Send(args,PluginCommandTarget_CURRENT_CHANNEL);
+
+            args = GetSendStringJson(true,true,NULL);
+            if (!args.isEmpty())
+                PluginQt::instance()->LocalServerSend(args);
         }
+
+
     }
     else if (m_sendCounter > SEND_THROTTLE_GLOBAL)    //was: 50
     {
@@ -874,6 +971,9 @@ void PositionalAudio::Send()
             {
                 m_Avatar_Dirty = false;
                 Send(args,PluginCommandTarget_CLIENT);
+                args = GetSendStringJson(true,true,NULL);
+                if (!args.isEmpty())
+                    PluginQt::instance()->LocalServerSend(args);
             }
         }
     }

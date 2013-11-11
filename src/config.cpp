@@ -86,6 +86,21 @@ void Config::SetupUi()
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     betaChannelcheckBox->setChecked(cfg.value("beta",false).toBool());
     connect(betaChannelcheckBox,SIGNAL(toggled(bool)),SLOT(onBetaChannelToggled(bool)));
+
+    bool ok;
+    quint16 port = cfg.value("server_port",8080).toUInt(&ok);
+    if (!ok)
+    {
+        TSLogging::Error("Could not read port from settings");
+        groupBox_Server->setChecked(false);
+    }
+    else
+    {
+        spinBox_Server->setValue(port);
+        connect(spinBox_Server,SIGNAL(valueChanged(int)),this,SLOT(onServerPortChanged(int)));
+        groupBox_Server->setChecked(cfg.value("server_enabled",false).toBool());
+        connect(groupBox_Server,SIGNAL(toggled(bool)),this,SLOT(onServerEnabledToggled(bool)));
+    }
 }
 
 //! Receives the click of the jianji banner
@@ -103,4 +118,18 @@ void Config::onBetaChannelToggled(bool val)
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.setValue("beta",val);
     emit betaChannelToggled(val);
+}
+
+void Config::onServerEnabledToggled(bool val)
+{
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    cfg.setValue("server_enabled",val);
+    emit serverEnabledToggled(val);
+}
+
+void Config::onServerPortChanged(int val)
+{
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    cfg.setValue("server_port",(quint16)val);
+    emit serverPortChanged((quint16)val);
 }

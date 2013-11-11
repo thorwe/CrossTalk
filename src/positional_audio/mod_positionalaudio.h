@@ -110,6 +110,7 @@ private:
     bool m_isUseCamera;
 
     QString GetSendString(bool isAll);
+    QString GetSendStringJson(bool isAll, bool isMe, TsVrObj *obj);
     void Send(uint64 serverConnectionHandlerID, QString args, int targetMode, const anyID *targetIDs, const char *returnCode);
     void Send();
     void Send(QString args, int targetMode);

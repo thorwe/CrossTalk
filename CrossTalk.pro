@@ -54,7 +54,9 @@ HEADERS += \
     src/config_position_spread.h \
     src/settings_position_spread.h \
     src/banner_frame.h \
-    src/mod_agmu.h
+    src/mod_agmu.h \
+    src/plugin_qt.h \
+    src/sse_server.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -88,7 +90,9 @@ SOURCES += \
     src/config_position_spread.cpp \
     src/settings_position_spread.cpp \
     src/banner_frame.cpp \
-    src/mod_agmu.cpp
+    src/mod_agmu.cpp \
+    src/plugin_qt.cpp \
+    src/sse_server.cpp
 
 FORMS += \
     src/config.ui \
