@@ -120,7 +120,9 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
 
         if ((error = TSHelpers::SetWhisperList(nextServer,GROUPWHISPERTYPE_CHANNELCOMMANDER,GROUPWHISPERTARGETMODE_ALL)) != ERROR_ok)
         {
-            TSLogging::Error("Could not set whisperlist",scHandlerID,error);
+            if (error != ERROR_ok_no_update)
+                TSLogging::Error("Could not set whisperlist",scHandlerID,error);
+
             return;
         }
 
@@ -267,7 +269,9 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
 
         if ((error = TSHelpers::SetWhisperList(targetServer,groupWhisperType,groupWhisperTargetMode,arg)) != ERROR_ok)
         {
-            TSLogging::Error("Could not set whisperlist",scHandlerID,error);
+            if (error != ERROR_ok_no_update)
+                TSLogging::Error("Could not set whisperlist",scHandlerID,error);
+
             return;
         }
 
@@ -338,7 +342,9 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
 
         if ((error = TSHelpers::SetWhisperList(nextServer,groupWhisperType,groupWhisperTargetMode)) != ERROR_ok)
         {
-            TSLogging::Error("Could not set whisperlist",scHandlerID,error);
+            if (error != ERROR_ok_no_update)
+                TSLogging::Error("Could not set whisperlist",scHandlerID,error);
+
             return;
         }
 

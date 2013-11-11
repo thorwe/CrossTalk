@@ -243,164 +243,6 @@ namespace TSHelpers
         return 0;
     }
 
-    /*unsigned int SetWhisperList(uint64 serverConnectionHandlerID, GroupWhisperType groupWhisperType, GroupWhisperTargetMode groupWhisperTargetMode, QString arg)
-    {
-        unsigned int error = ERROR_ok;
-
-        anyID myID;
-        if((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
-        {
-            TSLogging::Error("(TSHelpers::SetWhisperList)",serverConnectionHandlerID,error,true);
-            return error;
-        }
-
-        if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ALL)
-        {
-            //Get all visible clients
-            anyID *clientList;
-            if ((error = ts3Functions.getClientList(serverConnectionHandlerID, &clientList)) != ERROR_ok)
-                return error;
-
-            if (groupWhisperType == GROUPWHISPERTYPE_ALLCLIENTS)
-            {
-                error = ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID,NULL,NULL,clientList,NULL);
-                ts3Functions.freeMemory(clientList);
-                return error;
-            }
-            else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELCOMMANDER)
-            {
-                QList<anyID> channelCommanders;
-                for (int i=0; clientList[i]!=NULL ; ++i)
-                {
-                    int isChannelCommander;
-                    if((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientList[i], CLIENT_IS_CHANNEL_COMMANDER, &isChannelCommander)) != ERROR_ok)
-                        break;
-
-                    if (isChannelCommander == 1)
-                        channelCommanders.append(clientList[i]);
-                }
-                ts3Functions.freeMemory(clientList);
-
-                if (error == ERROR_ok)
-                    return ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID,NULL,NULL,channelCommanders.toVector().constData(),NULL);
-            }
-        }
-        else if (groupWhisperTargetMode > GROUPWHISPERTARGETMODE_ALL)
-        {
-            // get my channel
-            uint64 mychannel;
-            if ((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID,myID,&mychannel)) != ERROR_ok)
-            {
-                TSLogging::Error("(TSHelpers::SetWhisperList)",serverConnectionHandlerID,error,true);
-                return error;
-            }
-
-            QList<uint64> targetChannels;
-
-            if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_CURRENTCHANNEL)
-                targetChannels.append(mychannel);
-            else if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_PARENTCHANNEL)
-            {
-                uint64 channel;
-                if ((error = ts3Functions.getParentChannelOfChannel(serverConnectionHandlerID,mychannel,&channel)) != ERROR_ok)
-                    return error;
-
-                targetChannels.append(channel);
-            }
-            else if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ALLPARENTCHANNELS) // I assume it's a straight walk up the hierarchy?
-            {
-                uint64 sourcechannel= mychannel;
-                while(true)
-                {
-                    uint64 channel;
-                    if ((error = ts3Functions.getParentChannelOfChannel(serverConnectionHandlerID,sourcechannel,&channel)) != ERROR_ok)
-                        return error;
-
-                    if (channel == 0)
-                        break;
-
-                    sourcechannel = channel;
-                    targetChannels.append(channel);
-                }
-            }
-            else if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ANCESTORCHANNELFAMILY)    // ehr, hmm, dunno, whatever
-            {
-
-            }
-            else if ((groupWhisperTargetMode == GROUPWHISPERTARGETMODE_CHANNELFAMILY) || (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_SUBCHANNELS))
-            {
-                if ((error = TSHelpers::GetSubChannels(serverConnectionHandlerID,mychannel,&targetChannels)) != ERROR_ok)
-                    return error;
-
-                if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_CHANNELFAMILY) // channel familty: "this channel and all sub channels"
-                    targetChannels.append(mychannel);
-            }
-
-            if (groupWhisperType == GROUPWHISPERTYPE_ALLCLIENTS)
-            {
-                // Set whisper with channels and client NULL
-                //targetChannels.append(NULL); // conversion will do that methinks
-                return ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID,NULL,targetChannels.toVector().constData(),NULL,NULL);
-            }
-            else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELCOMMANDER)
-            {
-                // Set whisper with channels NULL and client list
-                QList<anyID> channelCommanders;
-                for (int i = 0; i<targetChannels.count();++i)
-                {
-                    // get clients in channel
-                    anyID *clientList;
-                    if ((error = ts3Functions.getChannelClientList(serverConnectionHandlerID,targetChannels.at(i),&clientList)) != ERROR_ok)
-                        return error;
-
-                    for (int i=0; clientList[i]!=NULL ; ++i)
-                    {
-                        int isChannelCommander;
-                        if((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, clientList[i], CLIENT_IS_CHANNEL_COMMANDER, &isChannelCommander)) != ERROR_ok)
-                            break;
-
-                        if (isChannelCommander == 1)
-                            channelCommanders.append(clientList[i]);
-                    }
-                    ts3Functions.freeMemory(clientList);
-                }
-                if (error == ERROR_ok)
-                    return ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID,NULL,NULL,channelCommanders.toVector().constData(),NULL);
-            }
-            else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
-            {
-                // Get My Channel Group
-                uint64 myChannelGroup;
-                if ((error = GetClientChannelGroup(serverConnectionHandlerID,&myChannelGroup)) != ERROR_ok)
-                    return error;
-
-                // Set whisper with channels NULL and client list
-                QList<anyID> list;
-                for (int i = 0; i<targetChannels.count();++i)
-                {
-                    // get clients in channel
-                    anyID *clientList;
-                    if ((error = ts3Functions.getChannelClientList(serverConnectionHandlerID,targetChannels.at(i),&clientList)) != ERROR_ok)
-                        return error;
-
-                    for (int i=0; clientList[i]!=NULL ; ++i)
-                    {
-                        uint64 channelGroup;
-                        if ((error = GetClientChannelGroup(serverConnectionHandlerID, &channelGroup, clientList[i])) != ERROR_ok)
-                            break;
-
-                        if (channelGroup == myChannelGroup)
-                            list.append(clientList[i]);
-                    }
-                    ts3Functions.freeMemory(clientList);
-                }
-                if (error == ERROR_ok)
-                    return ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID,NULL,NULL,list.toVector().constData(),NULL);
-            }
-        }
-        return error;
-    }*/
-
     namespace {
 
         unsigned int GetChannelsForGroupWhisperTargetMode(uint64 serverConnectionHandlerID, anyID myID, GroupWhisperTargetMode groupWhisperTargetMode, QVector<uint64>* targetChannels)
@@ -481,7 +323,10 @@ namespace TSHelpers
                 return error;
 
             for (unsigned int i = 0; clients[i] != NULL; ++i)
-                clientList.append(clients[i]);
+            {
+                if (myID != clients[i])
+                    clientList.append(clients[i]);
+            }
 
             ts3Functions.freeMemory(clients);
         }
@@ -502,7 +347,10 @@ namespace TSHelpers
                         return error;
 
                     for (int i=0; clients[i]!=NULL ; ++i)
-                        clientList.append(clients[i]);
+                    {
+                        if (myID != clients[i])
+                            clientList.append(clients[i]);
+                    }
 
                     ts3Functions.freeMemory(clients);
                 }
@@ -528,6 +376,7 @@ namespace TSHelpers
                     if (serverGroups.contains(arg))
                         filteredClients.append(clientList[i]);
 
+                    serverGroups.clear();
                 }
             }
             else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
@@ -561,9 +410,14 @@ namespace TSHelpers
                         filteredClients.append(clientList[i]);
                 }
             }
+
             clientList = filteredClients;
         }
-        return ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID, myID, (targetChannelIDs.isEmpty())?NULL:targetChannelIDs.constData(), (clientList.isEmpty())?NULL:clientList.constData(), NULL);
+
+        if (targetChannelIDs.isEmpty() && clientList.isEmpty())
+            return ERROR_ok_no_update;
+        else
+            return ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID, myID, (targetChannelIDs.isEmpty())?NULL:targetChannelIDs.constData(), (clientList.isEmpty())?NULL:clientList.constData(), NULL);
     }
 
     unsigned int GetDefaultProfile(PluginGuiProfile profile, QString &result)
