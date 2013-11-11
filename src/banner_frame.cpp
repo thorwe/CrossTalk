@@ -41,7 +41,10 @@ void BannerFrame::onNetwManagerFinished(QNetworkReply *reply)
     QByteArray jpegData = reply->readAll();
     QPixmap pixmap;
     if (!(pixmap.loadFromData(jpegData)))
-        TSLogging::Log("Error loading pledgie image.",LogLevel_WARNING);
+    {
+        // until I figure sth. out regarding the image (https not supported issue) suppress error
+        //TSLogging::Log("Error loading pledgie image.",LogLevel_WARNING);
+    }
     else if ((reply->url()) == PLEDGIE_IMAGE)
         ui->banner_pledgie->setPixmap(pixmap);
 
