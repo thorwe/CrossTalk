@@ -91,7 +91,6 @@ float DspVolumeDucker::GetFadeStep(int sampleCount)
                 current_gain -= fade_step_down;
             else
                 current_gain = desired_gain;
-
         }
         else if ((m_gainAdjustment == false) && (current_gain != VOLUME_0DB))    // is releasing
         {
