@@ -9,7 +9,8 @@ DspVolume::DspVolume(QObject *parent) :
     m_sampleRate(48000),
     m_gainCurrent(VOLUME_0DB),
     m_gainDesired(VOLUME_0DB),
-    m_isProcessing(false)
+    m_isProcessing(false),
+    m_muted(false)
 {
 }
 
@@ -94,7 +95,7 @@ bool DspVolume::isMuted() const
 void DspVolume::process(short *samples, int sampleCount, int channels)
 {
     sampleCount = sampleCount * channels;
-    m_gainCurrent = GetFadeStep(sampleCount);
+    setGainCurrent(GetFadeStep(sampleCount));
     doProcess(samples,sampleCount);
 }
 
