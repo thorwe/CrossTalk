@@ -88,7 +88,7 @@ void Config::SetupUi()
     connect(betaChannelcheckBox,SIGNAL(toggled(bool)),SLOT(onBetaChannelToggled(bool)));
 
     bool ok;
-    quint16 port = cfg.value("server_port",8080).toUInt(&ok);
+    quint16 port = cfg.value("server_port",64736).toUInt(&ok);
     if (!ok)
     {
         TSLogging::Error("Could not read port from settings");

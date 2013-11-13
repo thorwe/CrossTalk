@@ -21,7 +21,7 @@ void PluginQt::Init()
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     bool ok;
-    quint16 port = cfg.value("server_port",8080).toUInt(&ok);
+    quint16 port = cfg.value("server_port",64736).toUInt(&ok);
     if (!ok)
         TSLogging::Error("Could not read port from settings");
     else
@@ -83,7 +83,7 @@ void PluginQt::setServerPort(quint16 val)
 void PluginQt::serverStart()
 {
     m_SseServer = new SseServer(this,m_serverPort);
-    TSLogging::Log(QString("SseServer started on").arg(m_serverPort));
+    TSLogging::Log(QString("SseServer started on %1").arg(m_serverPort));
 }
 
 void PluginQt::serverStop()

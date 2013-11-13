@@ -10,7 +10,7 @@ class SseServer : public QTcpServer
 {
     Q_OBJECT
 public:
-    explicit SseServer(QObject *parent = 0, quint16 port = 8080);
+    explicit SseServer(QObject *parent = 0, quint16 port = 64736);
 //    void pause();
 //    void resume();
     void Send(QTcpSocket* socket, QString val);
