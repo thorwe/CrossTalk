@@ -159,7 +159,7 @@ void SseServer::readClient()
                     "<div id=\"result\">Waiting\n</div>\n"
                     "<script>\n"
                         "if(typeof(EventSource)!==\"undefined\") {\n"
-                            "var source=new EventSource(\"http://localhost:8080/positional_audio/stream\");\n"
+                            "var source=new EventSource(\"http://localhost:" << this->serverPort() <<"/positional_audio/stream\");\n"
                             "source.onmessage=function(event)\n"
                             "{document.getElementById(\"result\").innerHTML+=event.data + \"<br>\";};\n"
                         "}else{document.getElementById(\"result\").innerHTML=\"Sorry, your browser does not support server-sent events...\";}"
