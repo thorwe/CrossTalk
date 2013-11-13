@@ -8,6 +8,7 @@
 Volumes::Volumes(QObject *parent, VolumeType volumeType) :
     QObject(parent)
 {
+    this->setObjectName("Volumes");
     m_VolumeType = volumeType;
     VolumesMap = new QMap<uint64, QMap<anyID,DspVolume*>* >;
 }
@@ -22,11 +23,11 @@ DspVolume* Volumes::AddVolume(uint64 serverConnectionHandlerID,anyID clientID)
 {
     DspVolume* dspObj;
     if (m_VolumeType == VolumeTypeDucker)
-        dspObj = new DspVolumeDucker();
+        dspObj = new DspVolumeDucker(this);
     else if (m_VolumeType == VolumeTypeAGMU)
-        dspObj = new DspVolumeAGMU();
+        dspObj = new DspVolumeAGMU(this);
     else
-        dspObj = new DspVolume();
+        dspObj = new DspVolume(this);
 
     if (!(VolumesMap->contains(serverConnectionHandlerID)))
     {
