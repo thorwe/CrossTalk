@@ -8,7 +8,6 @@
 
 #include <QSettings>
 #include "ts_helpers_qt.h"
-#include "dsp_volume_ducker.h"
 
 //Ducker_Global* Ducker_Global::m_Instance = 0;
 
@@ -40,7 +39,7 @@ void Ducker_Global::setActive(bool value)
         return;
 
     m_isActive = value;
-//    Log(QString("setActive: %1").arg((value)?"true":"false"));
+    Print(QString("setActive: %1").arg((value)?"true":"false"));
     emit activeSet(m_isActive);
 }
 
@@ -117,10 +116,12 @@ void Ducker_Global::AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID
                 if (channelID!=my_channelID)
                     return;
 
-                DspVolume* vol = AddMusicBotVolume(serverConnectionHandlerID,clientID);
-                if (vol!=(DspVolume*)NULL)
+                DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(AddMusicBotVolume(serverConnectionHandlerID,clientID));
+                if (vol != 0)
                 {
-                    setActive(talking==STATUS_TALKING);
+                    if ((talking==STATUS_TALKING) && (!isActive()))
+                        setActive(true);
+
                     vol->setProcessing(talking==STATUS_TALKING);
                 }
             }
@@ -249,14 +250,12 @@ bool Ducker_Global::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerI
     if (!(isRunning()))
         return false;
 
-    DspVolume* vol = vols->GetVolume(serverConnectionHandlerID,clientID);
-    if (vol == NULL)
+    DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
+    if (vol == 0)
         return false;
 
-    //sampleCount = sampleCount * channels;
-
     vol->process(samples,sampleCount,channels);
-    return true;
+    return (vol->isProcessing() && vol->getGainAdjustment());
 }
 
 void Ducker_Global::onRunningStateChanged(bool value)
@@ -348,17 +347,16 @@ void Ducker_Global::onTalkStatusChanged(uint64 serverConnectionHandlerID, int st
 
     if ((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING))
     {
-        DspVolume* vol = vols->GetVolume(serverConnectionHandlerID,clientID);
-        if (vol != (DspVolume*)NULL)
+        DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
+        if (vol != 0)
             vol->setProcessing(status==STATUS_TALKING);
     }
 }
 
-DspVolume* Ducker_Global::AddMusicBotVolume(uint64 serverConnectionHandlerID, anyID clientID)
+DspVolumeDucker* Ducker_Global::AddMusicBotVolume(uint64 serverConnectionHandlerID, anyID clientID)
 {
-    //DspVolume* vol = vols->AddVolume(serverConnectionHandlerID,clientID);
-    DspVolumeDucker* vol = (DspVolumeDucker*)vols->AddVolume(serverConnectionHandlerID,clientID);
-    if (vol != (DspVolume*)NULL)
+    DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->AddVolume(serverConnectionHandlerID,clientID));
+    if (vol != 0)
     {
         vol->setGainDesired(m_value);
         connect(this,SIGNAL(valueSet(float)),vol,SLOT(setGainDesiredByGainAdjuster(float)),Qt::DirectConnection);

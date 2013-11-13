@@ -8,6 +8,7 @@
 #include "talkers.h"
 #include "ts_infodata_qt.h"
 #include "ts_context_menu_qt.h"
+#include "dsp_volume_ducker.h"
 
 class Ducker_Global : public Module, public InfoDataInterface, public ContextMenuInterface
 {
@@ -94,7 +95,7 @@ private:
     Talkers* talkers;
     Volumes* vols;
 
-    DspVolume* AddMusicBotVolume(uint64 serverConnectionHandlerID, anyID clientID);
+    DspVolumeDucker* AddMusicBotVolume(uint64 serverConnectionHandlerID, anyID clientID);
 
     void SaveDuckTargets();
     void UpdateActive();
