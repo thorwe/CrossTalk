@@ -2,7 +2,7 @@
 #define SNT_H
 
 #include <QObject>
-#include "ts_ptt_qt.h"
+#include "public_definitions.h"
 
 class SnT : public QObject
 {
@@ -23,8 +23,6 @@ private:
 
     static inline GroupWhisperTargetMode GetGroupWhisperTargetMode(QString val);
     static inline GroupWhisperType GetGroupWhisperType(QString val);
-
-    TSPtt *ptt;
 
     bool m_shallActivatePtt;
 

@@ -2,12 +2,12 @@
 
 #include "public_errors.h"
 #include "public_errors_rare.h"
-#include "public_definitions.h"
 #include "public_rare_definitions.h"
 #include "ts3_functions.h"
 
 #include "plugin.h"
 #include "ts_logging_qt.h"
+#include "ts_ptt_qt.h"
 #include "ts_helpers_qt.h"
 
 #include "ts_serversinfo.h"
@@ -21,7 +21,6 @@
 SnT::SnT(QObject *parent) :
     QObject(parent)
 {
-    ptt = TSPtt::instance();
 }
 
 //! When the input hardware gets activated, check if there's a Ptt activation scheduled and if so, turn Ptt on
@@ -40,7 +39,7 @@ void SnT::onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int 
     {
         if (m_shallActivatePtt==true)
         {
-            ptt->SetPushToTalk(serverConnectionHandlerID, PTT_ACTIVATE);
+            TSPtt::instance()->SetPushToTalk(serverConnectionHandlerID, PTT_ACTIVATE);
             m_shallActivatePtt=false;
         }
         // seems to be equal to a ts3plugin_currentServerConnectionChanged WHEN initiated by the user
@@ -60,6 +59,7 @@ void SnT::onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int 
 
 void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
 {
+    TSPtt* ptt = TSPtt::instance();
     connect(ptt,SIGNAL(PttDelayFinished()),this,SLOT(PttDelayFinished()),Qt::UniqueConnection); // UniqueConnection saving init
 
     unsigned int error = ERROR_ok;
@@ -365,7 +365,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
 void SnT::PttDelayFinished()
 {
     // Turn off PTT
-    ptt->SetPushToTalk(TSHelpers::GetActiveServerConnectionHandlerID(), false);
+    TSPtt::instance()->SetPushToTalk(TSHelpers::GetActiveServerConnectionHandlerID(), false);
 }
 
 GroupWhisperTargetMode SnT::GetGroupWhisperTargetMode(QString val)

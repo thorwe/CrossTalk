@@ -37,6 +37,7 @@ void TSPtt::Init(QMutex *mutex_cmd)
     connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()));
     timer->setSingleShot(true);
     command_mutex = mutex_cmd;
+    this->setObjectName("TSPtt");
 }
 
 int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS action)
