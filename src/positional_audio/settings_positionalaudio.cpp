@@ -29,6 +29,11 @@ void SettingsPositionalAudio::Init(PositionalAudio *positionalAudio)
 
     this->connect(this,SIGNAL(EnabledSet(bool)),positionalAudio, SLOT(setEnabled(bool)));
     this->connect(this,SIGNAL(UseCameraSet(bool)),positionalAudio,SLOT(setUseCamera(bool)));
+    this->connect(this,SIGNAL(UseAttenuationSet(bool)),positionalAudio,SLOT(setUseAttenuation(bool)));
+    this->connect(this,SIGNAL(DistanceMinChanged(int)),positionalAudio,SLOT(setDistanceMin(int)));
+    this->connect(this,SIGNAL(DistanceMaxChanged(int)),positionalAudio,SLOT(setDistanceMax(int)));
+    this->connect(this,SIGNAL(RollOffChanged(float)),positionalAudio,SLOT(setRollOff(float)));
+    this->connect(this,SIGNAL(RollOffMaxChanged(float)),positionalAudio,SLOT(setRollOffMax(float)));
 
     this->connect(this,SIGNAL(ServerSettingsAdd(QString,QString)),positionalAudio,SLOT(AddServerSetting(QString,QString)));
     this->connect(this,SIGNAL(ServerSettingsRemove(QString,QString)),positionalAudio,SLOT(RemoveServerSetting(QString,QString)));
@@ -73,6 +78,14 @@ void SettingsPositionalAudio::Init(PositionalAudio *positionalAudio)
 
     emit UseCameraSet(cfg.value("isUseCamera",true).toBool());
     emit EnabledSet(cfg.value("enabled",true).toBool());
+    cfg.beginGroup("attenuation");
+    emit UseAttenuationSet(cfg.value("enabled",false).toBool());
+    emit DistanceMinChanged(cfg.value("distance_min",0).toInt());
+    emit DistanceMaxChanged(cfg.value("distance_max",0).toInt());
+    emit RollOffChanged(cfg.value("rolloff",-6.0f).toFloat());
+    emit RollOffMaxChanged(cfg.value("rolloff_max",-200.0f).toFloat());
+
+    cfg.endGroup();
     cfg.endGroup();
 
     mP_positionalAudio = positionalAudio;
@@ -100,7 +113,19 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
                 emit UpdateUIEnabledSet(cfg.value("enabled",true).toBool());
                 this->connect(this,SIGNAL(UpdateUIUseCameraSet(bool)),p_config, SIGNAL(UpdateUIUseCameraSet(bool)));
                 emit UpdateUIUseCameraSet(cfg.value("isUseCamera",true).toBool());
-                //p_config->UpdateUIUseCameraSet(cfg.value("isUseCamera",true).toBool());
+
+                cfg.beginGroup("attenuation");
+                this->connect(this,SIGNAL(UpdateUIUseAttenuationSet(bool)),p_config, SIGNAL(UpdateUIUseAttenuationSet(bool)));
+                emit UpdateUIUseAttenuationSet(cfg.value("enabled",false).toBool());
+                this->connect(this,SIGNAL(UpdateUIDistanceMin(int)),p_config,SIGNAL(UpdateUIDistanceMin(int)));
+                emit UpdateUIDistanceMin(cfg.value("distance_min",0).toInt());
+                this->connect(this,SIGNAL(UpdateUIDistanceMax(int)),p_config,SIGNAL(UpdateUIDistanceMax(int)));
+                emit UpdateUIDistanceMax(cfg.value("distance_max",0).toInt());
+                this->connect(this,SIGNAL(UpdateUIRollOff(float)),p_config,SIGNAL(UpdateUIRollOff(float)));
+                emit UpdateUIRollOff(cfg.value("rolloff",-6.0f).toFloat());
+                this->connect(this,SIGNAL(UpdateUIRollOffMax(float)),p_config,SIGNAL(UpdateUIRollOffMax(float)));
+                emit UpdateUIRollOffMax(cfg.value("rolloff_max",-200.0f).toFloat());
+                cfg.endGroup();
 
                 this->connect(this,SIGNAL(UpdateUIServerSettingsAdd(QString,QString)), p_config, SIGNAL(UpdateUIServerAdd(QString,QString)));
                 this->connect(this,SIGNAL(UpdateUIServerSettingsRemove(QString,QString)), p_config, SIGNAL(UpdateUIServerRemove(QString,QString)));
@@ -115,13 +140,6 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
                 QMap<QString,PositionalAudio_ServerSettings> map;
                 if (groups.isEmpty())
                 {
-//                    PositionalAudio_ServerSettings setting;
-//                    setting.serverUniqueId = "default";
-//                    setting.serverName = "Default";
-//                    setting.enabled = true;
-//                    setting.isBlocked = false;
-//                    setting.sendInterval = 1.0f;
-//                    map.insert(setting.serverName,setting);
                     emit UpdateUIServerSettingsAdd("default","Default");
                     emit UpdateUIServerEnabled("default", true);
                     emit UpdateUIServerBlock("default", false);
@@ -139,13 +157,6 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
                     {
                         QString sUId = groups.at(i);
                         cfg.beginGroup(sUId);
-//                        PositionalAudio_ServerSettings setting;
-//                        setting.serverUniqueId = sUId;
-//                        setting.serverName = cfg.value("sname").toString();
-//                        setting.enabled = cfg.value("enabled").toBool();
-//                        setting.isBlocked = cfg.value("blocked",false).toBool();
-//                        setting.sendInterval = cfg.value("send_interval").toFloat();
-//                        map.insert(setting.serverName,setting);
                         emit UpdateUIServerSettingsAdd(sUId, cfg.value("sname").toString());
                         emit UpdateUIServerEnabled(sUId, cfg.value("enabled").toBool());
                         emit UpdateUIServerBlock(sUId, cfg.value("blocked",false).toBool());
@@ -165,6 +176,11 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
 
                 this->connect(p_config,SIGNAL(EnabledSet(bool)),SIGNAL(EnabledSet(bool)));
                 this->connect(p_config,SIGNAL(CameraSet(bool)),SIGNAL(UseCameraSet(bool)));
+                this->connect(p_config,SIGNAL(AttenuationSet(bool)),SIGNAL(UseAttenuationSet(bool)));
+                this->connect(p_config,SIGNAL(DistanceMinChanged(int)),SIGNAL(DistanceMinChanged(int)));
+                this->connect(p_config,SIGNAL(DistanceMaxChanged(int)),SIGNAL(DistanceMaxChanged(int)));
+                this->connect(p_config,SIGNAL(RollOffChanged(float)),SIGNAL(RollOffChanged(float)));
+                this->connect(p_config,SIGNAL(RollOffMaxChanged(float)),SIGNAL(RollOffMaxChanged(float)));
 
                 this->connect(p_config,SIGNAL(ServerEnabledSet(QString,bool)),SIGNAL(ServerEnabledSet(QString,bool)));
                 this->connect(p_config,SIGNAL(ServerSendIntervalChange(QString,float)),SIGNAL(ServerSendIntervalChange(QString,float)));
@@ -415,6 +431,14 @@ void SettingsPositionalAudio::saveSettings(int r)
     cfg.beginGroup(mP_positionalAudio.data()->objectName());
     cfg.setValue("enabled",mP_positionalAudio.data()->isEnabled());
     cfg.setValue("isUseCamera",mP_positionalAudio.data()->isUseCamera());
+
+    cfg.beginGroup("attenuation");
+    cfg.setValue("enabled",mP_positionalAudio.data()->isUseAttenuation());
+    cfg.setValue("distance_min",mP_positionalAudio.data()->getDistanceMin());
+    cfg.setValue("distance_max",mP_positionalAudio.data()->getDistanceMax());
+    cfg.setValue("rolloff",mP_positionalAudio.data()->getRollOff());
+    cfg.setValue("rolloff_max",mP_positionalAudio.data()->getRollOffMax());
+    cfg.endGroup();
 
     QMap<QString,PositionalAudio_ServerSettings> map = mP_positionalAudio.data()->getServerSettings();
     if (!map.isEmpty())

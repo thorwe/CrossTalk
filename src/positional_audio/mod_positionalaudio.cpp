@@ -21,6 +21,8 @@
 
 #include "ts_serversinfo.h"
 
+#include <db.h>
+
 #ifndef M_PI
 #define M_PI    3.14159265358979323846f
 #endif
@@ -63,6 +65,13 @@ PositionalAudio::PositionalAudio(QObject *parent) :
     m_Avatar_Dirty(false),
     m_lastCount(0),
     m_isUseCamera(true),
+    m_isUseAttenuation(false),
+    m_distanceMin(0),
+    m_distanceMax(0),
+    m_rollOff(0.0f),
+    m_rollOffMax(0.0f),
+    m_rollOff_Lin(1.0f),
+    m_rollOffMax_Lin(1.0f),
     m_IsSendAllOverride(true)
 {
     this->setParent(parent);
@@ -93,12 +102,79 @@ bool PositionalAudio::isUseCamera() const
     return m_isUseCamera;
 }
 
+bool PositionalAudio::isUseAttenuation() const
+{
+    return m_isUseAttenuation;
+}
+
+int PositionalAudio::getDistanceMin() const
+{
+    return m_distanceMin;
+}
+
+int PositionalAudio::getDistanceMax() const
+{
+    return m_distanceMax;
+}
+
+float PositionalAudio::getRollOff() const
+{
+    return m_rollOff;
+}
+
+float PositionalAudio::getRollOffMax() const
+{
+    return m_rollOffMax;
+}
+
 void PositionalAudio::setUseCamera(bool val)
 {
     if (m_isUseCamera == val)
         return;
     m_isUseCamera = val;
     emit useCameraChanged(m_isUseCamera);
+}
+
+void PositionalAudio::setUseAttenuation(bool val)
+{
+    if (m_isUseAttenuation == val)
+        return;
+    m_isUseAttenuation = val;
+    emit useAttenuationChanged(m_isUseAttenuation);
+}
+
+void PositionalAudio::setDistanceMin(int val)
+{
+    if (m_distanceMin == val)
+        return;
+    m_distanceMin = val;
+    emit distanceMinChanged(m_distanceMin);
+}
+
+void PositionalAudio::setDistanceMax(int val)
+{
+    if (m_distanceMax == val)
+        return;
+    m_distanceMax = val;
+    emit distanceMaxChanged(m_distanceMax);
+}
+
+void PositionalAudio::setRollOff(float val)
+{
+    if (m_rollOff == val)
+        return;
+    m_rollOff = val;
+    m_rollOff_Lin = db2lin_alt2(m_rollOff);
+    emit rollOffChanged(m_rollOff);
+}
+
+void PositionalAudio::setRollOffMax(float val)
+{
+    if (m_rollOffMax == val)
+        return;
+    m_rollOffMax = val;
+    m_rollOffMax_Lin = db2lin_alt2(m_rollOffMax);
+    emit rollOffMaxChanged(m_rollOffMax);
 }
 
 void PositionalAudio::AddServerSetting(QString serverUniqueId, QString serverName)
@@ -262,11 +338,32 @@ void PositionalAudio::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID 
 
 void PositionalAudio::onCustom3dRolloffCalculationClientEvent(uint64 serverConnectionHandlerID, anyID clientID, float distance, float *volume)
 {
-    Q_UNUSED(serverConnectionHandlerID);
-    Q_UNUSED(clientID);
-    Q_UNUSED(distance);
-    if ((isRunning()) && (!meObj->getVr().isEmpty()))
-        *volume = 1.0f; // Who would want low volumes on a voicecom
+    if ((!isRunning()) || (meObj->getVr().isEmpty()))
+        return;
+
+    if (!m_isUseAttenuation)
+        *volume = 1.0f;
+    else
+    {
+        if (!m_PlayersInMyContext.contains(serverConnectionHandlerID,clientID))
+            *volume = 1.0f;
+        else
+        {
+            if ((m_distanceMax > 0) && (distance >= m_distanceMax))
+                *volume = 0.0f;
+            else if (distance <= m_distanceMin)
+                *volume = 1.0f;
+            else
+            {
+                distance = distance - m_distanceMin;
+                float rollOff = distance * m_rollOff_Lin;
+                if (rollOff < m_rollOffMax_Lin)
+                    rollOff = m_rollOffMax_Lin;
+
+                *volume = rollOff;
+            }
+        }
+    }
 }
 
 bool PositionalAudio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type, uint64 mine, QTextStream &data)

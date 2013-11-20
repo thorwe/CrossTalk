@@ -44,6 +44,12 @@ public:
 signals:
     void EnabledSet(bool);
     void UseCameraSet(bool);
+    void UseAttenuationSet(bool);
+    void AttenuationSet(bool);
+    void DistanceMinChanged(int);
+    void DistanceMaxChanged(int);
+    void RollOffChanged(float);
+    void RollOffMaxChanged(float);
 
     void ServerSettingsAdd(QString,QString);
     void ServerSettingsRemove(QString,QString);
@@ -57,6 +63,11 @@ signals:
     // to UI
     void UpdateUIEnabledSet(bool);
     void UpdateUIUseCameraSet(bool);
+    void UpdateUIUseAttenuationSet(bool);
+    void UpdateUIDistanceMin(int);
+    void UpdateUIDistanceMax(int);
+    void UpdateUIRollOff(float);
+    void UpdateUIRollOffMax(float);
 
     void UpdateUIServerSettingsAdd(QString,QString);
     void UpdateUIServerSettingsRemove(QString,QString);

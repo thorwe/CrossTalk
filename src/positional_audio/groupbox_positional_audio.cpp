@@ -8,11 +8,17 @@ GroupBoxPositionalAudio::GroupBoxPositionalAudio(QWidget *parent) :
     ui->setupUi(this);
 
     ui->groupBoxVolume->setEnabled(false);
-    ui->groupBoxMisc->setEnabled(false);
-    ui->groupBoxVolume->setVisible(false);
-    ui->groupBoxMisc->setVisible(false);
+    //ui->groupBoxMisc->setEnabled(false);
+    //ui->groupBoxVolume->setVisible(false);
+    //ui->groupBoxMisc->setVisible(false);
 
     connect(ui->pushButton_Camera,SIGNAL(toggled(bool)),this,SIGNAL(cameraSet(bool)));
+    connect(ui->groupBoxVolume,SIGNAL(toggled(bool)),this,SIGNAL(attenuationSet(bool)));
+    connect(ui->spinBox_MinDistance,SIGNAL(valueChanged(int)),this,SIGNAL(distanceMinChanged(int)));
+    connect(ui->spinBox_MaxDistance,SIGNAL(valueChanged(int)),this,SIGNAL(distanceMaxChanged(int)));
+    connect(ui->doubleSpinBox_RollOff,SIGNAL(valueChanged(double)),this,SIGNAL(rollOffChanged(float))); //let's see if that works
+    connect(ui->doubleSpinBox_RollOffMax,SIGNAL(valueChanged(double)),this,SIGNAL(rollOffMaxChanged(float)));
+
     connect(ui->groupBoxServerSettings,SIGNAL(enabledSet(QString,bool)),this,SIGNAL(ServerEnabledSet(QString,bool)));
     connect(ui->groupBoxServerSettings,SIGNAL(sendIntervalChange(QString,float)),this,SIGNAL(ServerSendIntervalChange(QString,float)));
     connect(ui->groupBoxServerSettings,SIGNAL(sendIntervalSilentIncChange(QString,float)),this,SIGNAL(ServerSendIntervalSilentIncChange(QString,float)));
@@ -44,9 +50,37 @@ void GroupBoxPositionalAudio::UpdateUIUseCameraSet(bool val)
     this->blockSignals(false);
 }
 
-//void GroupBoxPositionalAudio::UpdateServerSettingsSet(QMap<QString, PositionalAudio_ServerSettings> map)
-//{
-//    this->blockSignals(true);
-//    ui->groupBoxServerSettings->UpdateServerSettings(map);
-//    this->blockSignals(false);
-//}
+void GroupBoxPositionalAudio::UpdateUIUseAttenuationSet(bool val)
+{
+    this->blockSignals(true);
+    ui->groupBoxVolume->setChecked(val);
+    this->blockSignals(false);
+}
+
+void GroupBoxPositionalAudio::UpdateUIDistanceMin(int val)
+{
+    this->blockSignals(true);
+    ui->spinBox_MinDistance->setValue(val);
+    this->blockSignals(false);
+}
+
+void GroupBoxPositionalAudio::UpdateUIDistanceMax(int val)
+{
+    this->blockSignals(true);
+    ui->spinBox_MaxDistance->setValue(val);
+    this->blockSignals(false);
+}
+
+void GroupBoxPositionalAudio::UpdateUIRollOff(float val)
+{
+    this->blockSignals(true);
+    ui->doubleSpinBox_RollOff->setValue(val);
+    this->blockSignals(false);
+}
+
+void GroupBoxPositionalAudio::UpdateUIRollOffMax(float val)
+{
+    this->blockSignals(true);
+    ui->doubleSpinBox_RollOffMax->setValue(val);
+    this->blockSignals(false);
+}

@@ -28,39 +28,16 @@
   <property name="checked">
    <bool>false</bool>
   </property>
-  <widget class="QGroupBox" name="groupBoxMisc">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>230</y>
-     <width>211</width>
-     <height>51</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Misc</string>
-   </property>
-   <widget class="QCheckBox" name="checkBox">
-    <property name="geometry">
-     <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>121</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Stay in front of me</string>
-    </property>
-   </widget>
-  </widget>
   <widget class="QGroupBox" name="groupBoxVolume">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="geometry">
     <rect>
      <x>10</x>
      <y>130</y>
      <width>211</width>
-     <height>91</height>
+     <height>151</height>
     </rect>
    </property>
    <property name="title">
@@ -78,7 +55,7 @@
       <x>10</x>
       <y>30</y>
       <width>191</width>
-      <height>51</height>
+      <height>101</height>
      </rect>
     </property>
     <layout class="QFormLayout" name="formLayout">
@@ -104,30 +81,91 @@
        </property>
       </widget>
      </item>
-     <item row="0" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox">
-       <property name="minimumSize">
-        <size>
-         <width>64</width>
-         <height>0</height>
-        </size>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
+     <item row="3" column="0">
       <widget class="QLabel" name="labelMaxDistance">
        <property name="text">
         <string>Maximum distance</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+     <item row="1" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>RollOff</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QSpinBox" name="spinBox_MinDistance">
        <property name="minimumSize">
         <size>
-         <width>64</width>
+         <width>83</width>
          <height>0</height>
         </size>
+       </property>
+       <property name="suffix">
+        <string notr="true"> m</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QSpinBox" name="spinBox_MaxDistance">
+       <property name="minimumSize">
+        <size>
+         <width>83</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="suffix">
+        <string> m</string>
+       </property>
+       <property name="maximum">
+        <number>10000</number>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_RollOffMax">
+       <property name="text">
+        <string>Maximum RollOff</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_RollOffMax">
+       <property name="minimumSize">
+        <size>
+         <width>83</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="suffix">
+        <string notr="true"> dB</string>
+       </property>
+       <property name="minimum">
+        <double>-200.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>0.000000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="doubleSpinBox_RollOff">
+       <property name="minimumSize">
+        <size>
+         <width>83</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="suffix">
+        <string notr="true"> dB/m</string>
+       </property>
+       <property name="minimum">
+        <double>-200.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>0.000000000000000</double>
        </property>
       </widget>
      </item>

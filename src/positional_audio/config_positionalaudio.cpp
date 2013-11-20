@@ -11,6 +11,13 @@ ConfigPositionalAudio::ConfigPositionalAudio(QWidget *parent) :
 
     connect(ui->groupBoxPositionalAudio,SIGNAL(enabledSet(bool)),this,SIGNAL(EnabledSet(bool)));
     connect(ui->groupBoxPositionalAudio,SIGNAL(cameraSet(bool)),this,SIGNAL(CameraSet(bool)));
+
+    connect(ui->groupBoxPositionalAudio,SIGNAL(attenuationSet(bool)),this,SIGNAL(AttenuationSet(bool)));
+    connect(ui->groupBoxPositionalAudio,SIGNAL(distanceMinChanged(int)),this,SIGNAL(DistanceMinChanged(int)));
+    connect(ui->groupBoxPositionalAudio,SIGNAL(distanceMaxChanged(int)),this,SIGNAL(DistanceMaxChanged(int)));
+    connect(ui->groupBoxPositionalAudio,SIGNAL(rollOffChanged(float)),this,SIGNAL(RollOffChanged(float)));
+    connect(ui->groupBoxPositionalAudio,SIGNAL(rollOffMaxChanged(float)),this,SIGNAL(RollOffMaxChanged(float)));
+
     connect(ui->groupBoxPositionalAudio,SIGNAL(ServerEnabledSet(QString,bool)),this,SIGNAL(ServerEnabledSet(QString,bool)));
     connect(ui->groupBoxPositionalAudio,SIGNAL(ServerSendIntervalChange(QString,float)),this,SIGNAL(ServerSendIntervalChange(QString,float)));
     connect(ui->groupBoxPositionalAudio,SIGNAL(ServerSendIntervalSilentIncChange(QString,float)),this,SIGNAL(ServerSendIntervalSilentIncChange(QString,float)));
@@ -21,6 +28,13 @@ ConfigPositionalAudio::ConfigPositionalAudio(QWidget *parent) :
     // to UI
     this->connect(this,SIGNAL(UpdateUIEnabledSet(bool)),ui->groupBoxPositionalAudio,SLOT(setChecked(bool)));
     this->connect(this,SIGNAL(UpdateUIUseCameraSet(bool)),ui->groupBoxPositionalAudio,SLOT(UpdateUIUseCameraSet(bool)));
+
+    this->connect(this,SIGNAL(UpdateUIUseAttenuationSet(bool)),ui->groupBoxPositionalAudio,SLOT(UpdateUIUseAttenuationSet(bool)));
+    this->connect(this,SIGNAL(UpdateUIDistanceMin(int)),ui->groupBoxPositionalAudio,SLOT(UpdateUIDistanceMin(int)));
+    this->connect(this,SIGNAL(UpdateUIDistanceMax(int)),ui->groupBoxPositionalAudio,SLOT(UpdateUIDistanceMax(int)));
+    this->connect(this,SIGNAL(UpdateUIRollOff(float)),ui->groupBoxPositionalAudio,SLOT(UpdateUIRollOff(float)));
+    this->connect(this,SIGNAL(UpdateUIRollOffMax(float)),ui->groupBoxPositionalAudio,SLOT(UpdateUIRollOffMax(float)));
+
 
     this->connect(this,SIGNAL(UpdateUIServerAdd(QString,QString)),ui->groupBoxPositionalAudio,SIGNAL(UpdateUIServerAdd(QString,QString)));
     this->connect(this,SIGNAL(UpdateUIServerRemove(QString,QString)),ui->groupBoxPositionalAudio,SIGNAL(UpdateUIServerRemove(QString,QString)));

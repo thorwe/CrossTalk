@@ -20,6 +20,11 @@ signals:
     // from UI
     void EnabledSet(bool);
     void CameraSet(bool);
+    void AttenuationSet(bool);
+    void DistanceMinChanged(int);
+    void DistanceMaxChanged(int);
+    void RollOffChanged(float);
+    void RollOffMaxChanged(float);
 
     void ServerEnabledSet(QString,bool);
     void ServerSendIntervalChange(QString,float);
@@ -31,6 +36,11 @@ signals:
     // to UI
     void UpdateUIEnabledSet(bool);
     void UpdateUIUseCameraSet(bool);
+    void UpdateUIUseAttenuationSet(bool);
+    void UpdateUIDistanceMin(int);
+    void UpdateUIDistanceMax(int);
+    void UpdateUIRollOff(float);
+    void UpdateUIRollOffMax(float);
 
     void UpdateUIServerAdd(QString,QString);
     void UpdateUIServerRemove(QString,QString);

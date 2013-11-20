@@ -28,6 +28,11 @@ class PositionalAudio : public Module, public InfoDataInterface//, public Contex
                READ isUseCamera
                WRITE setUseCamera
                NOTIFY useCameraChanged)
+    Q_PROPERTY(bool useAttenuation READ isUseAttenuation WRITE setUseAttenuation NOTIFY useAttenuationChanged)
+    Q_PROPERTY(int distanceMin READ getDistanceMin WRITE setDistanceMin NOTIFY distanceMinChanged)
+    Q_PROPERTY(int distanceMax READ getDistanceMax WRITE setDistanceMax NOTIFY distanceMaxChanged)
+    Q_PROPERTY(float rollOff READ getRollOff WRITE setRollOff NOTIFY rollOffChanged)
+    Q_PROPERTY(float rollOffMax READ getRollOffMax WRITE setRollOffMax NOTIFY rollOffMaxChanged)
 
 public:
     explicit PositionalAudio(QObject *parent = 0);
@@ -46,6 +51,11 @@ public:
 //    int onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage);
 
     bool isUseCamera() const;
+    bool isUseAttenuation() const;
+    int getDistanceMin() const;
+    int getDistanceMax() const;
+    float getRollOff() const;
+    float getRollOffMax() const;
 
     QMap<QString,PositionalAudio_ServerSettings> getServerSettings() const;
 
@@ -55,12 +65,22 @@ public:
 signals:
     void myVrChanged(QString);
     void myIdentityChanged(QString);
-    void useCameraChanged(bool val);
+    void useCameraChanged(bool);
+    void useAttenuationChanged(bool);
+    void distanceMinChanged(int);
+    void distanceMaxChanged(int);
+    void rollOffChanged(float);
+    void rollOffMaxChanged(float);
     void serverBlock(QString);
 
 public slots:
     void onConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
     void setUseCamera(bool val);
+    void setUseAttenuation(bool val);
+    void setDistanceMin(int val);
+    void setDistanceMax(int val);
+    void setRollOff(float val);
+    void setRollOffMax(float val);
 
     void AddServerSetting(QString serverUniqueId, QString serverName);
     void RemoveServerSetting(QString serverUniqueId, QString serverName);
@@ -108,6 +128,13 @@ private:
     void Update3DListenerAttributes();
 
     bool m_isUseCamera;
+    bool m_isUseAttenuation;
+    int m_distanceMin;
+    int m_distanceMax;
+    float m_rollOff;
+    float m_rollOffMax;
+    float m_rollOff_Lin;
+    float m_rollOffMax_Lin;
 
     QString GetSendString(bool isAll);
     QString GetSendStringJson(bool isAll, bool isMe, TsVrObj *obj);

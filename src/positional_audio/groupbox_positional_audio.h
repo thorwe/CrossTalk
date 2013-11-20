@@ -19,10 +19,20 @@ public:
 
 public slots:
     void UpdateUIUseCameraSet(bool val);
+    void UpdateUIUseAttenuationSet(bool val);
+    void UpdateUIDistanceMin(int val);
+    void UpdateUIDistanceMax(int val);
+    void UpdateUIRollOff(float val);
+    void UpdateUIRollOffMax(float val);
 
 signals:
     void enabledSet(bool);
     void cameraSet(bool);
+    void attenuationSet(bool);
+    void distanceMinChanged(int);
+    void distanceMaxChanged(int);
+    void rollOffChanged(float);
+    void rollOffMaxChanged(float);
 
     void ServerEnabledSet(QString,bool);
     void ServerSendIntervalChange(QString,float);
