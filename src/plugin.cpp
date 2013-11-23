@@ -133,7 +133,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.5.1.112001";
+    return "1.5.1.112301";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
@@ -794,32 +794,21 @@ void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID cl
 }
 
 int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage) {
-//    TSLogging::Print(QString("onServerErrorEvent: %1 %2 %3").arg((returnCode ? returnCode : "")).arg(error).arg(errorMessage),serverConnectionHandlerID,LogLevel_DEBUG);
-//    Q_UNUSED(errorMessage);
-//    Q_UNUSED(returnCode);
-//    Q_UNUSED(extraMessage);
-//    if  (error== ERROR_client_is_flooding)
-//    {
-////        TSLogging::Error("Client is flooding. Need throttle.");
-//    }
-//    if(returnCode) {
-//        TSLogging::Print("have returnCode");
+    //TSLogging::Print(QString("onServerErrorEvent: %1 %2 %3").arg((returnCode ? returnCode : "")).arg(error).arg(errorMessage),serverConnectionHandlerID,LogLevel_DEBUG);
+    int isHandledError = 0;
+    if(returnCode) {
+        //TSLogging::Print("have returnCode");
 //        /* A plugin could now check the returnCode with previously (when calling a function) remembered returnCodes and react accordingly */
 //        /* In case of using a a plugin return code, the plugin can return:
 //         * 0: Client will continue handling this error (print to chat tab)
 //         * 1: Client will ignore this error, the plugin announces it has handled it */
 
-//        if(error != ERROR_ok)
-//        {
-//            TSLogging::Print("error != ERROR_ok");
-//          #ifdef USE_POSITIONAL_AUDIO
-//            return positionalAudio.onServerErrorEvent(serverConnectionHandlerID,errorMessage,error,returnCode,extraMessage);
-//          #endif
-//        }
+        if (snt.getReturnCode() == returnCode)
+            snt.onServerError(serverConnectionHandlerID,errorMessage,error,returnCode,extraMessage);
 
-//        return 1;
-//    }
-    int isHandledError = 0;
+        return 1;
+    }
+
 #ifdef USE_POSITIONAL_AUDIO
     if (positionalAudio.isRunning())
     {

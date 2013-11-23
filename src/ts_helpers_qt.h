@@ -35,7 +35,7 @@ namespace TSHelpers
     int SetActiveServerRelative(uint64 serverConnectionHandlerID, bool next);
     inline int SetNextActiveServer(uint64 serverConnectionHandlerID) { return SetActiveServerRelative(serverConnectionHandlerID, true); }
     inline int SetPrevActiveServer(uint64 serverConnectionHandlerID) { return SetActiveServerRelative(serverConnectionHandlerID, false); }
-    unsigned int SetWhisperList(uint64 serverConnectionHandlerID, GroupWhisperType groupWhisperType, GroupWhisperTargetMode groupWhisperTargetMode, uint64 arg = (uint64)NULL);
+    unsigned int SetWhisperList(uint64 serverConnectionHandlerID, GroupWhisperType groupWhisperType, GroupWhisperTargetMode groupWhisperTargetMode, QString returnCode = QString::null, uint64 arg = (uint64)NULL);
     /**/
 
     unsigned int GetDefaultProfile(PluginGuiProfile profile, QString &result);

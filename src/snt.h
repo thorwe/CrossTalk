@@ -7,11 +7,14 @@
 class SnT : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString returnCode READ getReturnCode)
 
 public:
     explicit SnT(QObject *parent = 0);
     void ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
     void onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int flag, const char* oldValue, const char* newValue);
+    QString getReturnCode() const;
+    void onServerError(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage);
 
 signals:
     
@@ -28,6 +31,8 @@ private:
 
     uint64 m_returnToSCHandler;
     bool m_shallClearWhisper;
+    QString m_returnCode;
+    uint64 m_returnCodeScHandler;
 };
 
 #endif // SNT_H

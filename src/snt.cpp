@@ -13,13 +13,22 @@
 #include "ts_serversinfo.h"
 #include "ts_serverinfo_qt.h"
 
+#ifndef RETURNCODE_BUFSIZE
+#define RETURNCODE_BUFSIZE 128
+#endif
+
 //! Constructor
 /*!
  * \brief SnT::SnT Creates an instance of this class
  * \param parent optional Qt Object
  */
 SnT::SnT(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    m_shallActivatePtt(false),
+    m_returnToSCHandler(0),
+    m_shallClearWhisper(false),
+    m_returnCode(QString::null),
+    m_returnCodeScHandler(0)
 {
 }
 
@@ -39,7 +48,12 @@ void SnT::onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int 
     {
         if (m_shallActivatePtt==true)
         {
-            TSPtt::instance()->SetPushToTalk(serverConnectionHandlerID, PTT_ACTIVATE);
+            if (m_returnCodeScHandler == 0)
+            {
+                //TSLogging::Log("Activating Ptt from onClientSelfVariableUpdateEvent",serverConnectionHandlerID,LogLevel_DEBUG);
+                TSPtt::instance()->SetPushToTalk(serverConnectionHandlerID, PTT_ACTIVATE);
+            }
+
             m_shallActivatePtt=false;
         }
         // seems to be equal to a ts3plugin_currentServerConnectionChanged WHEN initiated by the user
@@ -47,6 +61,38 @@ void SnT::onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int 
         // (ts3plugin_currentServerConnectionChanged is not even fired when ptt-switching for whatever reason)
         // Furtunately, we like that here.
     }
+}
+
+QString SnT::getReturnCode() const
+{
+    return m_returnCode;
+}
+
+//! Note that the primary intend is NOT to handle errors, but the "reply" from set whisper
+void SnT::onServerError(uint64 serverConnectionHandlerID, const char *errorMessage, unsigned int error, const char *returnCode, const char *extraMessage)
+{
+    Q_UNUSED(errorMessage);
+    Q_UNUSED(extraMessage);
+
+    if (m_returnCode != returnCode)
+        return;
+
+    if (error != ERROR_ok)
+        TSLogging::Log("Whoops. That shouldn't happen that this is an error. But do we care? We don't.",serverConnectionHandlerID,LogLevel_DEBUG);
+
+    if (m_returnCodeScHandler != serverConnectionHandlerID)
+        TSLogging::Log("Whoops. That shouldn't happen that those don't match. But do we care? We don't.",serverConnectionHandlerID,LogLevel_DEBUG);
+
+    if (m_returnCodeScHandler == 0)
+        TSLogging::Log("Whoops. That shouldn't happen that this is 0. But do we care? We don't.",serverConnectionHandlerID,LogLevel_DEBUG);
+
+    if (!m_shallActivatePtt)
+    {
+        //TSLogging::Log("Activating Ptt from onServerReply",serverConnectionHandlerID,LogLevel_DEBUG);
+        TSPtt::instance()->SetPushToTalk(m_returnCodeScHandler,PTT_ACTIVATE);
+    }
+
+    m_returnCodeScHandler = 0;
 }
 
 //! Parse Plugin Commands for this module
@@ -59,6 +105,14 @@ void SnT::onClientSelfVariableUpdateEvent(uint64 serverConnectionHandlerID, int 
 
 void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
 {
+    if (m_returnCode.isEmpty())
+    {
+        char returnCode[RETURNCODE_BUFSIZE];
+        ts3Functions.createReturnCode(pluginID,returnCode,RETURNCODE_BUFSIZE);
+        m_returnCode = returnCode;
+        //TSLogging::Print(QString("Created SnT Return Code: %1").arg(m_returnCode));
+    }
+
     TSPtt* ptt = TSPtt::instance();
     connect(ptt,SIGNAL(PttDelayFinished()),this,SLOT(PttDelayFinished()),Qt::UniqueConnection); // UniqueConnection saving init
 
@@ -89,7 +143,6 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         ptt->SetPushToTalk(scHandlerID, PTT_TOGGLE);
     else if((cmd == "TS3_SWITCH_N_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_WHISPER_END")) // universal OnKeyUp Handler
     {
-//        TSLogging::Print("TS3_SWITCH_N_TALK_END");
         ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
         if (m_shallClearWhisper)
         {
@@ -193,7 +246,6 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         QString groupWhisperTargetModeArg = args.at(2);
         uint64 arg = (uint64)NULL;
 
-
         uint64 targetServer = 0;
         if ((error = TSHelpers::GetServerHandler(name,&targetServer)) != ERROR_ok)
         {
@@ -267,13 +319,14 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
         }
 
-        if ((error = TSHelpers::SetWhisperList(targetServer,groupWhisperType,groupWhisperTargetMode,arg)) != ERROR_ok)
+        if ((error = TSHelpers::SetWhisperList(targetServer,groupWhisperType,groupWhisperTargetMode,m_returnCode,arg)) != ERROR_ok)
         {
             if (error != ERROR_ok_no_update)
                 TSLogging::Error("Could not set whisperlist",scHandlerID,error);
 
             return;
         }
+        m_returnCodeScHandler = targetServer;
 
         if(status != STATUS_DISCONNECTED)
             ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings; maybe not as necessary as below
@@ -285,8 +338,6 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             m_returnToSCHandler=scHandlerID;
             TSHelpers::SetActiveServer(targetServer);
         }
-        else
-            ptt->SetPushToTalk(scHandlerID,true);
     }
     else if (cmd == "TS3_NEXT_TAB_AND_WHISPER_START")
     {

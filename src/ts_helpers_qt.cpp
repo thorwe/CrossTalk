@@ -11,6 +11,10 @@
 
 #include <QApplication>
 
+#ifndef RETURNCODE_BUFSIZE
+#define RETURNCODE_BUFSIZE 128
+#endif
+
 namespace TSHelpers
 {
     QString GetConfigPath()
@@ -301,7 +305,7 @@ namespace TSHelpers
         }
     }
 
-    unsigned int SetWhisperList(uint64 serverConnectionHandlerID, GroupWhisperType groupWhisperType, GroupWhisperTargetMode groupWhisperTargetMode, uint64 arg)
+    unsigned int SetWhisperList(uint64 serverConnectionHandlerID, GroupWhisperType groupWhisperType, GroupWhisperTargetMode groupWhisperTargetMode, QString returnCode, uint64 arg)
     {
         unsigned int error = ERROR_ok;
 
@@ -346,10 +350,10 @@ namespace TSHelpers
                     if ((error = ts3Functions.getChannelClientList(serverConnectionHandlerID,targetChannelIDs.at(i),&clients)) != ERROR_ok)
                         return error;
 
-                    for (int i=0; clients[i]!=NULL ; ++i)
+                    for (int j=0; clients[j]!=NULL ; ++j)
                     {
-                        if (myID != clients[i])
-                            clientList.append(clients[i]);
+                        if (myID != clients[j])
+                            clientList.append(clients[j]);
                     }
 
                     ts3Functions.freeMemory(clients);
@@ -417,7 +421,47 @@ namespace TSHelpers
         if (targetChannelIDs.isEmpty() && clientList.isEmpty())
             return ERROR_ok_no_update;
         else
-            return ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID, myID, (targetChannelIDs.isEmpty())?NULL:targetChannelIDs.constData(), (clientList.isEmpty())?NULL:clientList.constData(), NULL);
+        {
+            TSLogging::Log("CrossTalk's attempting to whisper to:",serverConnectionHandlerID, LogLevel_DEBUG);
+            if (!targetChannelIDs.isEmpty())
+            {
+                QString string = "ChannelIds: ";
+                for (int i = 0; i < targetChannelIDs.size(); ++i)
+                {
+                    string.append(QString("%1").arg(targetChannelIDs.at(i)));
+                    string.append(" ");
+                }
+
+                TSLogging::Log(string.toLocal8Bit().constData(),serverConnectionHandlerID,LogLevel_DEBUG);
+            }
+            if (!clientList.isEmpty())
+            {
+                QString string = "Clients: ";
+                for (int i = 0; i<clientList.size(); ++i)
+                {
+                    char name[512];
+                    if((error = ts3Functions.getClientDisplayName(serverConnectionHandlerID, clientList.at(i), name, 512)) != ERROR_ok)
+                        string.append("(Error getting client display name)");
+                    else
+                        string.append(name);
+
+                    string.append(" ");
+                }
+                TSLogging::Log(string.toLocal8Bit().constData(),serverConnectionHandlerID,LogLevel_DEBUG);
+            }
+
+            if (!targetChannelIDs.isEmpty())
+                targetChannelIDs.append(0);
+            if (!clientList.isEmpty())
+                clientList.append(0);
+
+            error = ts3Functions.requestClientSetWhisperList(serverConnectionHandlerID, myID, (targetChannelIDs.isEmpty())?(uint64*)NULL:targetChannelIDs.constData(), (clientList.isEmpty())?(anyID*)NULL:clientList.constData(), (returnCode.isEmpty())?NULL:returnCode.toLocal8Bit().constData());
+            if ((error != ERROR_ok) || (returnCode.isEmpty()))
+                return error;
+
+            // Bandaid for requestClientSetWhisperList NOT calling back when returnCode set. For waffle's sake!
+            return ts3Functions.requestClientVariables(serverConnectionHandlerID,myID,returnCode.toLocal8Bit().constData());
+        }
     }
 
     unsigned int GetDefaultProfile(PluginGuiProfile profile, QString &result)
