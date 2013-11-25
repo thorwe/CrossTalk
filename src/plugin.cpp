@@ -133,7 +133,7 @@ const char* ts3plugin_name() {
 
 /* Plugin version */
 const char* ts3plugin_version() {
-    return "1.5.1.112301";
+    return "1.5.2";
 }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
