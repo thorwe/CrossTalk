@@ -129,9 +129,12 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
     {
         if (m_worldId != world_id)
         {
-            m_worldId = world_id;
-//            TSLogging::Print(QString("World Id changed: %1").arg(m_worldId));
-            emit worldIdChanged(m_worldId);
+            if (world_id >= 1001 && world_id <= 2301)
+            {
+                m_worldId = world_id;
+    //            TSLogging::Print(QString("World Id changed: %1").arg(m_worldId));
+                emit worldIdChanged(m_worldId);
+            }
         }
     }
     else
