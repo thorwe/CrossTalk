@@ -44,7 +44,10 @@ void TsVrUniverse::Remove(uint64 serverConnectionHandlerID, anyID clientID)
     if (!(ConnectionHandlerUniverse->contains(clientID)))
         return;
 
-    delete ConnectionHandlerUniverse->take(clientID);
+    TsVrObjOther* removedObj = ConnectionHandlerUniverse->take(clientID);
+    QString clientUID = removedObj->getClientUID();
+    delete removedObj;
+    emit removed(clientUID);
 }
 
 //! Remove all TsVR objects of a server tab

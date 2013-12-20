@@ -1,11 +1,19 @@
 #include "tsvr_obj_other.h"
 
+#include "public_errors.h"
+#include "ts_helpers_qt.h"
+#include "ts_logging_qt.h"
+
 TsVrObjOther::TsVrObjOther(QObject *parent, uint64 serverConnectionHandlerID, anyID clientID) :
     m_serverConnectionHandlerID(serverConnectionHandlerID),
     m_clientID(clientID)
 {
     this->setParent(parent);
     resetAvatar();
+
+    unsigned int error;
+    if ((error = TSHelpers::GetClientUID(serverConnectionHandlerID,clientID,m_clientUID)) != ERROR_ok)
+        TSLogging::Error("(TsVrObjOther::TsVrObjOther)",serverConnectionHandlerID,error,true);
 }
 
 uint64 TsVrObjOther::getServerConnectionHandlerID() const

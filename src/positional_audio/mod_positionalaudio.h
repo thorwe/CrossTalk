@@ -92,6 +92,8 @@ public slots:
     void onMyVrChanged(TsVrObj* obj, QString val);
     void onMyIdentityChanged(TsVrObj* obj, QString val);
 
+    void onUniverseRemoved(QString clientUID);
+
 protected:
     void onRunningStateChanged(bool value);
     void timerEvent(QTimerEvent *event);

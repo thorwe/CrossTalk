@@ -23,7 +23,8 @@ public:
 //    QMap<QString,QObject*> m_CustomEnvironmentSupportMap;
 
 signals:
-    
+    void removed(QString);
+
 public slots:
     void onConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
 

@@ -76,11 +76,9 @@ PositionalAudio::PositionalAudio(QObject *parent) :
 {
     this->setParent(parent);
     this->setObjectName("PositionalAudio");
-    m_isPrintEnabled = false;
+    m_isPrintEnabled = true;
     universe = new TsVrUniverse(this);
     meObj = new TsVrObjSelf(this);
-    connect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)));
-    connect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)));
     NULL_VECTOR.x = 0.0f;
     NULL_VECTOR.y = 0.0f;
     NULL_VECTOR.z = 0.0f;
@@ -286,6 +284,16 @@ void PositionalAudio::onMyIdentityChanged(TsVrObj *obj, QString val)
     emit myIdentityChanged(val);
 }
 
+void PositionalAudio::onUniverseRemoved(QString clientUID)
+{
+    QString out_stri;
+    QTextStream out(&out_stri);
+    out << "{";
+    out << "\"uid\":\"" << clientUID << "\",";
+    out << "\"me\":false}";
+    PluginQt::instance()->LocalServerSend(out_stri);
+}
+
 QMap<QString, PositionalAudio_ServerSettings> PositionalAudio::getServerSettings() const
 {
     return m_ServerSettings;
@@ -451,6 +459,9 @@ void PositionalAudio::onRunningStateChanged(bool value)
 //            Print("Got returnCode: " + m_SendReturnCode);
 //        }
         connect(Talkers::instance(),SIGNAL(ConnectStatusChanged(uint64,int,uint)),this,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
+        connect(universe,SIGNAL(removed(QString)),this,SLOT(onUniverseRemoved(QString)),Qt::UniqueConnection);
+        connect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)),Qt::UniqueConnection);
+        connect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)),Qt::UniqueConnection);
 
 //        Print(QString("DWORD: %1, quint32: %2, ulong: %3").arg(sizeof(DWORD)*8).arg(sizeof(quint32)*8).arg(sizeof(ulong)*8));
 //        bool bCreated = false;
@@ -488,6 +499,9 @@ void PositionalAudio::onRunningStateChanged(bool value)
     else
     {
         disconnect(Talkers::instance(),SIGNAL(ConnectStatusChanged(uint64,int,uint)),this,SLOT(onConnectStatusChanged(uint64,int,uint)));
+        disconnect(universe,SIGNAL(removed(QString)),this,SLOT(onUniverseRemoved(QString)));
+        disconnect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)));
+        disconnect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)));
         unlock();
         m_sharedMemory->detach();
         lm = NULL;
@@ -898,10 +912,18 @@ QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
                 unsigned int error;
                 char name[512];
                 uint64 serverConnectionHandlerID = iObj->getServerConnectionHandlerID();
-                if((error = ts3Functions.getClientDisplayName(serverConnectionHandlerID, iObj->getClientID(), name, 512)) != ERROR_ok)
-                    Error("(GetSendStringJson) Error getting client display name",serverConnectionHandlerID,error);
+                anyID clientID = iObj->getClientID();
+                if((error = ts3Functions.getClientDisplayName(serverConnectionHandlerID, clientID, name, 512)) != ERROR_ok)
+                    Error("(GetSendStringJson)",serverConnectionHandlerID,error);
                 else
                     out << "\"vcname\":\"" << name << "\",";
+
+                /*QString uid;
+                if (TSHelpers::GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
+                    Error("(GetSendStringJson)",serverConnectionHandlerID,error);
+                else
+                    out << "\"uid\":\"" << uid << "\",";*/
+                out << "\"uid\":\"" << iObj->getClientUID() << "\",";
             }
         }
     }
@@ -1002,26 +1024,18 @@ void PositionalAudio::Send(QString args, int targetMode)
 //                Print(QString("count: %1; max count: %2").arg(m_SendCounters[*server]+1).arg(count_max));
                 m_SendCounters[*server] = 0;
 
-//                QList<anyID> list = m_PlayersInMyContext.values(*server);
-//                if (!list.isEmpty())
-//                {
-//                    int size = list.size();
-//                    anyID* targetIds = new anyID[size+1];
-//                    for (int i=0; i<size; ++i)
-//                        targetIds[i] = list.at(i);
+                /*QVector<anyID> vec = QVector<anyID>::fromList(m_PlayersInMyContext.values(*server));
+                if (!vec.isEmpty())
+                {
+                    // For testing purposes
+                    anyID myID;
+                    unsigned int error;
+                    if ((error = ts3Functions.getClientID(*server,&myID)) == ERROR_ok)
+                        vec.append(myID);
 
-//                    anyID myID;
-//                    unsigned int error;
-//                    if ((error = ts3Functions.getClientID(*server,&myID)) != ERROR_ok)
-//                    {
-//                        Error("(SendAV)",*server,error);
-//                        return;
-//                    }
-//                    Print(QString("(SendAV): clients: %1").arg(list.size()),*server,LogLevel_DEBUG);
-//                    targetIds[size]=myID;   //testing; when removing also change size+1 to size above
-//                    Send(*server, args, targetMode, targetIds, NULL);
-//                    delete [] targetIds;
-//                }
+                    vec.append((anyID)0);
+                    Send(*server, args, targetMode, vec.constData(), NULL);
+                }*/
                 Send(*server, args, PluginCommandTarget_CURRENT_CHANNEL, NULL, NULL);
             }
             else
