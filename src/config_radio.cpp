@@ -1,9 +1,7 @@
 #include "config_radio.h"
 #include "ui_config_radio.h"
 
-#include "mod_radio.h"
 #include "ts_helpers_qt.h"
-
 #include "ts_logging_qt.h"
 
 ConfigRadio::ConfigRadio(QWidget *parent) :

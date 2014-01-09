@@ -2,7 +2,6 @@
 #define CONFIG_RADIO_H
 
 #include <QDialog>
-#include <QSignalMapper>
 #include <QMap>
 
 #include "config_radio_groupbox.h"
