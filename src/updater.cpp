@@ -13,7 +13,6 @@ const QUrl STABLE("http://addons.teamspeak.com/directory/plugins/miscellaneous/C
 const QUrl BETA_CHECK("http://dl.dropbox.com/u/18413693/CrossTalk-builds/package.ini");
 const QUrl BETA_DOWNLOAD("http://jianji.de/crosstalk/");
 
-
 // Note that TS doesn't ship with any ssl support, so no GitHub API etc
 
 //! Constructor
@@ -34,63 +33,59 @@ Updater::Updater(QObject *parent) :
  */
 void Updater::onNetwManagerFinished(QNetworkReply *reply)
 {
+    if (!m_URLs.remove(reply->url()))
+        return;
+
+    bool isReplyStable = reply->url().toString().contains("addons.teamspeak.com");
     if (reply->error() != QNetworkReply::NoError)
     {
         TSLogging::Log(reply->errorString(),LogLevel_WARNING);
-        return;
     }
-
-    QByteArray arr = reply->readAll();
-    bool isReplyStable = reply->url().toString().contains("addons.teamspeak.com");
-    reply->deleteLater();
-
-    if (!m_URLs.remove(reply->url()))
-        return;
-//    else
-//        TSLogging::Print("Removed reply url from QSet");
-
-    QVariant possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
-
-    /* We'll deduct if the redirection is valid in the redirectUrl function */
-    _urlRedirectedTo = this->redirectUrl(possibleRedirectUrl.toUrl(), _urlRedirectedTo);
-
-    /* If the URL is not empty, we're being redirected. */
-    if(!_urlRedirectedTo.isEmpty())
-    {
-        TSLogging::Log(QString("%1: Update check forwarding to %2").arg(this->objectName()).arg(_urlRedirectedTo.toString()),LogLevel_INFO);
-        CheckUpdate(_urlRedirectedTo);
-        return;
-    }
-
-
-    int start = arr.indexOf("Version",0);
-    if (start == -1)
-    {
-        TSLogging::Log((this->objectName() + ": Did not find Version."),LogLevel_WARNING);
-        return;
-    }
-
-    QString endStr = (isReplyStable)?ts3plugin_name():"Platforms";
-    int end = arr.indexOf(endStr,start);
-    if (end == -1)
-    {
-        TSLogging::Log((this->objectName() + ": Did not find %1.").arg(endStr),LogLevel_WARNING);
-        return;
-    }
-
-    QString parse(arr.mid(start,end-start));
-    QRegExp rx("\\d+(?:\\.\\d+)+");
-
-    int pos = rx.indexIn(parse);
-    if (pos > -1)
-        parse = rx.cap(0);
-
-
-    if (isReplyStable)
-        m_VersionStable = parse;
     else
-        m_VersionBeta = parse;
+    {
+        QByteArray arr = reply->readAll();
 
+        QVariant possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+
+        /* We'll deduct if the redirection is valid in the redirectUrl function */
+        _urlRedirectedTo = this->redirectUrl(possibleRedirectUrl.toUrl(), _urlRedirectedTo);
+
+        if(!_urlRedirectedTo.isEmpty()) /* If the URL is not empty, we're being redirected. */
+        {
+            TSLogging::Log(QString("%1: Update check forwarding to %2").arg(this->objectName()).arg(_urlRedirectedTo.toString()),LogLevel_INFO);
+            CheckUpdate(_urlRedirectedTo);
+            return;
+        }
+
+        int start = arr.indexOf("Version",0);
+        if (start == -1)
+        {
+            TSLogging::Log((this->objectName() + ": Did not find Version."),LogLevel_WARNING);
+            return;
+        }
+
+        QString endStr = (isReplyStable)?ts3plugin_name():"Platforms";
+        int end = arr.indexOf(endStr,start);
+        if (end == -1)
+        {
+            TSLogging::Log((this->objectName() + ": Did not find %1.").arg(endStr),LogLevel_WARNING);
+            return;
+        }
+
+        QString parse(arr.mid(start,end-start));
+        QRegExp rx("\\d+(?:\\.\\d+)+");
+
+        int pos = rx.indexIn(parse);
+        if (pos > -1)
+            parse = rx.cap(0);
+
+        if (isReplyStable)
+            m_VersionStable = parse;
+        else
+            m_VersionBeta = parse;
+    }
+
+    reply->deleteLater();
     _urlRedirectedTo.clear();
     if (m_URLs.isEmpty())
     {
@@ -136,20 +131,6 @@ void Updater::CheckUpdate(QUrl url)
 
 void Updater::ShowUpdateDialog(QString remoteVersion)
 {
-    // Get MainWindow
-//    QList<QWidget*> candidates;
-//    foreach (QWidget *widget, QApplication::topLevelWidgets()) {
-//        if (widget->isWindow() && widget->inherits("QMainWindow") && !widget->windowTitle().isEmpty())
-//            candidates.append(widget);
-//    }
-//    QWidget* mainWindow;
-//    if (candidates.count() == 1)
-//        mainWindow = candidates.at(0);
-//    else
-//    {
-//        TSLogging::Error("Updater: Too many candidates for MainWindow. Report to the plugin developer.");
-//        return;
-//    }
     QWidget* mainWindow = TSHelpers::GetMainWindow();
     // Create Dialog
     QMessageBox updateMsgBox(mainWindow);
