@@ -15,6 +15,7 @@ class Module : public QObject
                READ isBlocked
                WRITE setEnabled
                NOTIFY blockedSet)
+
 public:
     bool isEnabled() const;
     bool isBlocked() const;
@@ -23,13 +24,12 @@ public:
 signals:
     void enabledSet(bool);
     void blockedSet(bool);
+
 public slots:
     void setEnabled(bool value);
     void setBlocked(bool value);
+
 protected:
-//    virtual void onEnabledStateChanged(bool) = 0;
-//    virtual void onBlockedStateChanged(bool) = 0;
-//    virtual void onRunningStateChanged(bool) = 0;
     virtual void onEnabledStateChanged(bool) {}
     virtual void onBlockedStateChanged(bool) {}
     virtual void onRunningStateChanged(bool) {}
