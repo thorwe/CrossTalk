@@ -55,8 +55,6 @@ public slots:
     void onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID);
     void onMenusInitialized();
 
-//    void loadSettings();
-
 private slots:
     void saveSettings(int);
 

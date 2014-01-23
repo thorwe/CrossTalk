@@ -30,10 +30,6 @@ void SettingsDuck::Init(Ducker_Global* ducker_G, Ducker_Channel* ducker_C)
     this->connect(this,SIGNAL(channelDuckerReverseSet(bool)), ducker_C, SLOT(setDuckingReverse(bool)));
     this->connect(this,SIGNAL(channelDuckerDuckPSEnabledSet(bool)), ducker_C, SLOT(setDuckPrioritySpeakers(bool)));
 
-//    this->connect(this,SIGNAL(settingsSave()),ducker_G, SLOT(saveSettings()));
-//    this->connect(this,SIGNAL(settingsSave()),ducker_C, SLOT(saveSettings()));
-
-//    loadSettings();
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
 
     cfg.beginGroup("ducker_global");
@@ -104,41 +100,6 @@ void SettingsDuck::onMenusInitialized()
     if(m_ContextMenuUi == -1)
         TSLogging::Error(QString("%1: Menu wasn't registered.").arg(this->objectName()));
 }
-
-//void SettingsDuck::loadSettings()
-//{
-//    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-
-//    cfg.beginGroup("ducker_global");
-//    int size = cfg.beginReadArray("targets");
-//    for (int i = 0; i < size; ++i)
-//    {
-//        cfg.setArrayIndex(i);
-//        ducker_G->DuckTargets->insert(cfg.value("uid").toString(),cfg.value("name").toString());
-//    }
-//    cfg.endArray();
-
-//    bool enabled = cfg.value("enabled",true).toBool();
-//    if (!enabled)
-//        emit globalDuckerEnabledSet(enabled);
-
-//    emit globalDuckerValueChanged(cfg.value("value",-23.0f).toFloat());
-
-//    if (enabled)
-//        emit globalDuckerEnabledSet(enabled);
-
-//    cfg.endGroup();
-
-//    enabled = cfg.value("ducking_enabled",true).toBool();
-//    if (!enabled)
-//        emit channelDuckerEnabledSet(enabled);
-
-//    emit channelDuckerValueChanged(cfg.value("ducking_value",-23.0f).toFloat());
-//    emit channelDuckerReverseSet(cfg.value("ducking_reverse",false).toBool());
-
-//    if (enabled)
-//        emit channelDuckerEnabledSet(enabled);
-//}
 
 void SettingsDuck::saveSettings(int r)
 {
