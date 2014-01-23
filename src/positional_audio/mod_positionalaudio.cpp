@@ -965,7 +965,7 @@ void PositionalAudio::Send(uint64 serverConnectionHandlerID, QString args, int t
 
 //    Print(QString("Sending: %1").arg(cmd),serverConnectionHandlerID,LogLevel_DEBUG);
 //    returnCode = m_SendReturnCodeC;
-    ts3Functions.sendPluginCommand(serverConnectionHandlerID,pluginID,cmd.toAscii().constData(),targetMode,targetIDs,returnCode);
+    ts3Functions.sendPluginCommand(serverConnectionHandlerID,pluginID,cmd.toLatin1().constData(),targetMode,targetIDs,returnCode);
 }
 
 void PositionalAudio::Send(QString args, int targetMode)
