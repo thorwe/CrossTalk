@@ -12,6 +12,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include <qglobal.h>
 #ifndef Q_OS_WIN
  #include <QtSql>   // currently only required for settings.db fix on osx (linux?)
 #endif
@@ -77,7 +78,11 @@ TSInfoData* infoData = TSInfoData::instance();
 #define _strcpy(dest, destSize, src) { strncpy(dest, src, destSize-1); dest[destSize-1] = '\0'; }
 #endif
 
-#define PLUGIN_API_VERSION 19
+#if QT_VERSION >= 0x050000
+  #define PLUGIN_API_VERSION 20
+#else
+  #define PLUGIN_API_VERSION 19
+#endif
 
 #define PATH_BUFSIZE 512
 #define COMMAND_BUFSIZE 128
@@ -127,24 +132,16 @@ TSServersInfo* centralStation = TSServersInfo::instance();
  */
 
 /* Unique name identifying this plugin */
-const char* ts3plugin_name() {
-    return "CrossTalk";
-}
+const char* ts3plugin_name() { return "CrossTalk"; }
 
 /* Plugin version */
-const char* ts3plugin_version() {
-    return "1.5.2.010901";
-}
+const char* ts3plugin_version() { return "1.5.2.010901"; }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
-int ts3plugin_apiVersion() {
-	return PLUGIN_API_VERSION;
-}
+int ts3plugin_apiVersion() { return PLUGIN_API_VERSION; }
 
 /* Plugin author */
-const char* ts3plugin_author() {
-    return "Thorsten Weinz";
-}
+const char* ts3plugin_author() { return "Thorsten Weinz"; }
 
 /* Plugin description */
 const char* ts3plugin_description() {
@@ -326,10 +323,11 @@ int ts3plugin_offersConfigure() {
 /* Plugin might offer a configuration window. If ts3plugin_offersConfigure returns 0, this function does not need to be implemented. */
 void ts3plugin_configure(void* handle, void* qParentWidget) {
     Q_UNUSED(handle);
-    Config* qParentWidget_p = (Config*)qParentWidget;
+    //Config* qParentWidget_p = (Config*)qParentWidget;
 
-    qParentWidget_p = new Config();
-    qParentWidget_p->SetupUi();
+    //qParentWidget_p = new Config();
+    //qParentWidget_p->SetupUi();
+    Config* qParentWidget_p = new Config((QWidget*)qParentWidget);
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(betaChannelToggled(bool)),&updater,SLOT(CheckUpdate(bool)),Qt::UniqueConnection);
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(serverEnabledToggled(bool)),pluginQt,SLOT(setServerEnabled(bool)),Qt::UniqueConnection);
     qParentWidget_p->connect(qParentWidget_p,SIGNAL(serverPortChanged(quint16)),pluginQt,SLOT(setServerPort(quint16)),Qt::UniqueConnection);
@@ -390,6 +388,58 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
 #ifdef USE_POSITIONAL_AUDIO
         ts3plugin_onServerErrorEvent(serverConnectionHandlerID,"CrossTalk Flood Test", ERROR_client_is_flooding,"CrossTalk Flood Test Return Code", "CrossTalk Flood Test Extra Message");
 #endif
+    }
+    else if (cmd_qs == "PS_TOGGLE")
+    {
+        serverConnectionHandlerID = ts3Functions.getCurrentServerConnectionHandlerID();
+        unsigned int error;
+        // Get My Id on this handler
+        anyID myID;
+        if((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
+        {
+            TSLogging::Error("(PS_TOGGLE)",serverConnectionHandlerID,error);
+            ret = 1;
+        }
+        else
+        {
+            unsigned int permId;
+            if ((error = ts3Functions.getPermissionIDByName(serverConnectionHandlerID, "b_client_is_priority_speaker", &permId)) != ERROR_ok)
+            {
+                TSLogging::Error("(PS_TOGGLE)",serverConnectionHandlerID,error);
+                ret = 1;
+            }
+            else
+            {
+                uint64 myDbId;
+                if ((error = ts3Functions.getClientVariableAsUInt64(serverConnectionHandlerID, myID, CLIENT_DATABASE_ID, &myDbId)) != ERROR_ok)
+                {
+                    TSLogging::Error("(PS_TOGGLE)",serverConnectionHandlerID,error);
+                    ret = 1;
+                }
+                else
+                {
+                    int isPrioritySpeaker;
+                    if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, myID, CLIENT_IS_PRIORITY_SPEAKER, &isPrioritySpeaker)) != ERROR_ok)
+                    {
+                        TSLogging::Error("(PS_TOGGLE)",serverConnectionHandlerID,error);
+                        ret = 1;
+                    }
+                    else
+                    {
+                        const unsigned int permissionIDArray [1] = {permId};
+
+                        if (isPrioritySpeaker == 0)
+                        {
+                            const int permissionValueArray [1] = {1};
+                            const int permissionSkipArray [1]  = {0};
+                            ts3Functions.requestClientAddPerm(serverConnectionHandlerID, myDbId, permissionIDArray, permissionValueArray, permissionSkipArray, 1, NULL);
+                        }
+                        else
+                            ts3Functions.requestClientDelPerm(serverConnectionHandlerID, myDbId, permissionIDArray, 1, NULL);
+                    }
+                }
+            }
+        }
     }
     else if (cmd_qs == "TOGGLE_SELF_SERVER_GROUP")
     {
@@ -650,11 +700,12 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 	/* Register hotkeys giving a keyword and a description.
 	 * The keyword will be later passed to ts3plugin_onHotkeyEvent to identify which hotkey was triggered.
 	 * The description is shown in the clients hotkey dialog. */
-    BEGIN_CREATE_HOTKEYS(4);  /* Create n hotkeys. Size must be correct for allocating memory. */
+    BEGIN_CREATE_HOTKEYS(5);  /* Create n hotkeys. Size must be correct for allocating memory. */
 	CREATE_HOTKEY("TS3_NEXT_TAB_AND_TALK_START", "Next Tab and Talk Start");
     CREATE_HOTKEY("TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START", "Next Tab and Whisper all Channel Commanders Start");
     CREATE_HOTKEY("TS3_SWITCH_N_TALK_END", "SnT Stop");
     CREATE_HOTKEY("CHANNEL_MUTER", "Toggle Channel Mute");
+    CREATE_HOTKEY("PS_TOGGLE", "Toggle Priority Speaker");
 	END_CREATE_HOTKEYS;
 	/* The client will call ts3plugin_freeMemory to release all allocated memory */
 }
@@ -957,16 +1008,6 @@ void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenu
         case PLUGIN_MENU_TYPE_GLOBAL:
             /* Global menu item was triggered. selectedItemID is unused and set to zero. */
             itype = PLUGIN_SERVER;   //admittedly not the same, however...
-//            switch(menuItemID) {
-//                case MENU_ID_GLOBAL_1:
-//                    /* Menu global 1 was triggered */
-//                    break;
-//                case MENU_ID_GLOBAL_2:
-//                    /* Menu global 2 was triggered */
-//                    break;
-//                default:
-//                    break;
-//            }
             break;
         case PLUGIN_MENU_TYPE_CHANNEL:
             /* Channel contextmenu item was triggered. selectedItemID is the channelID of the selected channel */
