@@ -2,7 +2,6 @@
 #include "ui_config_radio.h"
 
 #include "ts_helpers_qt.h"
-#include "ts_logging_qt.h"
 
 ConfigRadio::ConfigRadio(QWidget *parent) :
     QDialog(parent),
@@ -101,7 +100,6 @@ ConfigRadioGroupBox* ConfigRadio::GetChannelStrip(QString name)
     connect(channelStrip,SIGNAL(OutHiFreqSet(QString,double)),this,SIGNAL(OutHiFreqSet(QString,double)));
     ui->horizontalLayout->addWidget(channelStrip);
     m_ChannelStripMap.insert(name,channelStrip);
-    //TSLogging::Print(QString("Channelstrip created: %1").arg(name));
 
     return channelStrip;
 }
