@@ -77,7 +77,7 @@
     <enum>QFrame::Raised</enum>
    </property>
   </widget>
-  <widget class="QTextBrowser" name="textBrowser">
+  <widget class="QTextBrowser" name="aboutText">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -167,7 +167,7 @@ p, li { white-space: pre-wrap; }
     </property>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox">
+  <widget class="QGroupBox" name="groupBox_Updates">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -193,11 +193,11 @@ p, li { white-space: pre-wrap; }
     </property>
    </widget>
   </widget>
-  <zorder>textBrowser</zorder>
+  <zorder>aboutText</zorder>
   <zorder>banner_jianji</zorder>
   <zorder>banner_frame</zorder>
   <zorder>groupBox_Server</zorder>
-  <zorder>groupBox</zorder>
+  <zorder>groupBox_Updates</zorder>
  </widget>
  <customwidgets>
   <customwidget>
