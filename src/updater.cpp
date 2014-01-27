@@ -57,14 +57,14 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
             return;
         }
 
-        int start = arr.indexOf("Version",0);
+        int start = arr.indexOf((isReplyStable)?QString(ts3plugin_name()).append("_"):"Version",0);
         if (start == -1)
         {
             TSLogging::Log((this->objectName() + ": Did not find Version."),LogLevel_WARNING);
             return;
         }
 
-        QString endStr = (isReplyStable)?ts3plugin_name():"Platforms";
+        QString endStr = (isReplyStable)?".ts3_plugin":"Platforms";
         int end = arr.indexOf(endStr,start);
         if (end == -1)
         {
@@ -73,14 +73,21 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
         }
 
         QString parse(arr.mid(start,end-start));
-        QRegExp rx("\\d+(?:\\.\\d+)+");
+        QRegExp rx;
+        if (isReplyStable)
+            rx.setPattern("\\d+(?:\\_\\d+)+");
+        else
+            rx.setPattern("\\d+(?:\\.\\d+)+");
 
         int pos = rx.indexIn(parse);
         if (pos > -1)
             parse = rx.cap(0);
 
         if (isReplyStable)
+        {
+            parse.replace("_",".");
             m_VersionStable = parse;
+        }
         else
             m_VersionBeta = parse;
     }
