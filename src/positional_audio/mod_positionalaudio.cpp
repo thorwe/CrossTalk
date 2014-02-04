@@ -814,7 +814,11 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
     }
 
     if (m_PlayersInMyContext.contains(serverConnectionHandlerID,clientID))
-        ts3Functions.channelset3DAttributes(serverConnectionHandlerID,clientID,&obj->getAvatarPosition());
+    {
+        TS3_VECTOR vector = obj->getAvatarPosition();
+        ts3Functions.channelset3DAttributes(serverConnectionHandlerID,clientID,&vector);
+    }
+
 
     PluginQt::instance()->LocalServerSend(GetSendStringJson(true,false,obj));
     return true;
@@ -1107,10 +1111,12 @@ void PositionalAudio::Update3DListenerAttributes()
             if (status != STATUS_CONNECTION_ESTABLISHED)
                 continue;
 
-            if (m_isUseCamera)
-                ts3Functions.systemset3DListenerAttributes(*server,&meObj->getCameraPosition(),&meObj->getCameraFront(),&meObj->getCameraTop());
-            else
-                ts3Functions.systemset3DListenerAttributes(*server,&meObj->getAvatarPosition(),&meObj->getAvatarFront(),&meObj->getAvatarTop());
+            TS3_VECTOR pos   = m_isUseCamera ? meObj->getCameraPosition() : meObj->getAvatarPosition();
+            TS3_VECTOR front = m_isUseCamera ? meObj->getCameraFront() : meObj->getAvatarFront();
+            TS3_VECTOR top   = m_isUseCamera ? meObj->getCameraTop() : meObj->getAvatarTop();
+
+            ts3Functions.systemset3DListenerAttributes(*server,&pos,&front,&top);
+
 
             unsigned int error;
             // Get My Id on this handler
@@ -1147,12 +1153,7 @@ void PositionalAudio::Update3DListenerAttributes()
                             }
 
                             if (!m_PlayersInMyContext.contains(*server,clients[i]))
-                            {
-                                if (m_isUseCamera)
-                                    ts3Functions.channelset3DAttributes(*server,clients[i],&meObj->getCameraPosition());
-                                else
-                                    ts3Functions.channelset3DAttributes(*server,clients[i],&meObj->getAvatarPosition());
-                            }
+                                ts3Functions.channelset3DAttributes(*server,clients[i],&pos);
                         }
                     }
                 }
