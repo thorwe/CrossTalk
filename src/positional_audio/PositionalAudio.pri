@@ -14,7 +14,9 @@ HEADERS += \
     $$PWD/guildwarstwo.h \
     $$PWD/tsvr_definitions.h \
     $$PWD/tsvr_obj_self.h \
-    $$PWD/tsvr_obj_other.h
+    $$PWD/tsvr_obj_other.h \
+    $$PWD/gw2_world_names.h \
+    $$PWD/gw2_map_names.h
 
 SOURCES += \
     $$PWD/tsvr_obj.cpp \

@@ -1,6 +1,11 @@
 #include "guildwarstwo.h"
 
 #include <QStringList>
+#include "ts_helpers_qt.h"
+#include "gw2_world_names.h"
+#include "gw2_map_names.h"
+#include "tsvr_obj.h"
+
 #include "ts_logging_qt.h"
 
 GuildWarsTwo::GuildWarsTwo(QObject *parent) :
@@ -168,6 +173,34 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
     }
 
     return isIdentityDirty;
+}
+
+//! Add additional information for a specific game
+bool GuildWarsTwo::onInfoData(QTextStream &data)
+{
+    data << "\n";
+    data << "is commander: " << ((isCommander())?"y":"n") << "\n";
+
+    QString lang = TSHelpers::GetLanguage();
+
+    data << GW2::getMapName(getMapId(),lang) << " ( ";
+    if (m_teamColorId != 0) // WvW
+    {
+        data << "WvW Team: " << getTeamColorId();
+    }
+    else                    // Tyria
+    {
+        data << GW2::getWorldName(getWorldId(),lang);
+    }
+    data << " )\n";
+
+
+    // get the position from the game independent parent object
+    //TsVrObj* obj = (TsVrObj*)this->parent();
+    //TS3_VECTOR pos = obj->getAvatarPosition();
+    //data << "Pos: " << pos.x << "," << pos.y << "," << pos.z;
+
+    return true;
 }
 
 // as long as this is the only occurence where a game puts known readable data in context and this data is available already,

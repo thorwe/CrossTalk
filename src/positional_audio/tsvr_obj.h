@@ -2,6 +2,7 @@
 #define TSVR_OBJ_H
 
 #include <QObject>
+#include <QTextStream>
 #include "public_definitions.h"
 
 #include "tsvr_definitions.h"
@@ -36,6 +37,8 @@ public:
     TS3_VECTOR getAvatarPosition() const;
     TS3_VECTOR getAvatarFront() const;
     TS3_VECTOR getAvatarTop() const;
+
+    bool onInfoDataChanged(QTextStream &data);
 
     void setCustomEnvironmentSupport(QObject* val);
 

@@ -32,6 +32,7 @@ public:
 
     bool onIdentityRawDirty(QString rawIdentity);
 //    bool onContextRawDirty(QByteArray rawContext);
+    bool onInfoData(QTextStream &data);
 
     QString getIdentity() const;
     quint32 getProfessionId() const;
@@ -48,9 +49,7 @@ signals:
     void teamColorIdChanged(quint32);
     void commanderStatusChanged(bool);
 
-
 public slots:
-
 
 private:
     QString m_Identity;

@@ -56,6 +56,31 @@ TS3_VECTOR TsVrObj::getAvatarTop() const
     return m_Avatar_Top;
 }
 
+//! Handles the ts_infodata_qt event for this client
+bool TsVrObj::onInfoDataChanged(QTextStream &data)
+{
+    bool isDirty = false;
+    if (!m_vr.isEmpty())
+    {
+        data << "Positional Audio: ";
+        isDirty = true;
+
+        data << "\nPlaying " << getVr();
+        QString ident = getIdentity();
+        if (!ident.isEmpty())
+        {
+            data << " as " << ident;
+
+            if (m_CustomEnvironmentSupport != NULL)
+            {
+                CustomEnvironmentSupportInterface *iCustomEnvironmentSupport = qobject_cast<CustomEnvironmentSupportInterface *>(m_CustomEnvironmentSupport);
+                isDirty |= iCustomEnvironmentSupport->onInfoData(data);
+            }
+        }
+    }
+    return isDirty;
+}
+
 // Slot Setters
 
 void TsVrObj::setCustomEnvironmentSupport(QObject *val)

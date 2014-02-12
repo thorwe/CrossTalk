@@ -7,7 +7,7 @@
 #include "ts_logging_qt.h"
 
 #ifndef INFODATA_BUFSIZE
-#define INFODATA_BUFSIZE 128
+#define INFODATA_BUFSIZE 256    //128, ah, just increasing the value doesn't make anything boom
 #endif
 
 TSInfoData* TSInfoData::m_Instance = 0;
