@@ -1,0 +1,63 @@
+html, body{
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+.gw2mapfs{
+	width: 800px;
+	height: 450px;
+	background-color: #fff;
+}
+
+.gw2map{
+	width: 100%;
+	height: 100%;
+	background-color: #fff;
+}
+
+.sector_text{
+	color: #fff;
+	font-family: Menomonia,sans-serif;
+	font-style: italic;
+	font-size: 20px;
+	white-space: nowrap;
+	text-align: center;
+}
+
+.table-row{
+	display: table-row;
+}
+
+.table-cell{
+	display: table-cell;
+	vertical-align: top;
+}
+
+.linkbox{
+	overflow: scroll;
+	overflow-x: auto;
+	overflow-y: scroll;
+	padding: 0 .25em 0 .25em;
+}
+
+.linkbox > div{
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.linkbox > div.header{
+	cursor: default;
+	font-size: 200%;
+	font-weight: bold;
+	padding: 0.25em 0 0.25em 0;
+}
+
+.linkbox > div.header.sub{
+	font-size: 150%;
+	padding: 0.25em 0 0.25em 0;
+}
+
+.linkbox > div:not(.header):not(.sub):hover{
+	background-color: #ccc;
+}

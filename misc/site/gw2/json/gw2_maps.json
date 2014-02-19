@@ -1,0 +1,184 @@
+[
+	{
+		"map_id": 15,
+		"name_de": "Königintal",
+		"name_en": "Queensdale",
+		"name_es": "Valle de la Reina",
+		"name_fr": "La Vallée de la reine"
+	},
+	{
+		"map_id": 17,
+		"name_de": "Harathi-Hinterland",
+		"name_en": "Harathi Hinterlands",
+		"name_es": "Interior Harathi",
+		"name_fr": "Hinterlands harathis"
+	},
+	{
+		"map_id": 19,
+		"name_de": "Ebenen von Aschfurt",
+		"name_en": "Plains of Ashford",
+		"name_es": "Llanuras de Ashford",
+		"name_fr": "Plaines d'Ashford"
+	},
+	{
+		"map_id": 20,
+		"name_de": "Flammenkamm-Steppe",
+		"name_en": "Blazeridge Steppes",
+		"name_es": "Estepas Crestafulgurante",
+		"name_fr": "Les Steppes de la Strie flamboyante"
+	},
+	{
+		"map_id": 21,
+		"name_de": "Felder der Verwüstung",
+		"name_en": "Fields of Ruin",
+		"name_es": "Campos de la Ruina",
+		"name_fr": "Champs de Ruine"
+	},
+	{
+		"map_id": 22,
+		"name_de": "Feuerherzhügel",
+		"name_en": "Fireheart Rise",
+		"name_es": "Colina del Corazón de fuego",
+		"name_fr": "Montée de Flambecœur"
+	},
+	{
+		"map_id": 23,
+		"name_de": "Kessex-Hügel",
+		"name_en": "Kessex Hills",
+		"name_es": "Colinas Kessex",
+		"name_fr": "Collines de Kesse"
+	},
+	{
+		"map_id": 24,
+		"name_de": "Gendarran-Felder",
+		"name_en": "Gendarran Fields",
+		"name_es": "Campos de Gendarran",
+		"name_fr": "Champs de Gendarran"
+	},
+	{
+		"map_id": 25,
+		"name_de": "Eisensümpfe",
+		"name_en": "Iron Marches",
+		"name_es": "Fronteras de Hierro",
+		"name_fr": "Marais de fer"
+	},
+	{
+		"map_id": 26,
+		"name_de": "Schauflerschreck-Klippen",
+		"name_en": "Dredgehaunt Cliffs",
+		"name_es": "Acantilados de Guaridadraga",
+		"name_fr": "Falaises de Hantedraguerre"
+	},
+	{
+		"map_id": 27,
+		"name_de": "Lornars Pass",
+		"name_en": "Lornar's Pass",
+		"name_es": "Paso de Lornar",
+		"name_fr": "Passage de Lornar"
+	},
+	{
+		"map_id": 28,
+		"name_de": "Wanderer-Hügel",
+		"name_en": "Wayfarer Foothills",
+		"name_es": "Colinas del Caminante",
+		"name_fr": "Contreforts du Voyageur"
+	},
+	{
+		"map_id": 29,
+		"name_de": "Baumgrenzen-Fälle",
+		"name_en": "Timberline Falls",
+		"name_es": "Cataratas de Linarbórea",
+		"name_fr": "Chutes de la Canopée"
+	},
+	{
+		"map_id": 30,
+		"name_de": "Eisklamm-Sund",
+		"name_en": "Frostgorge Sound",
+		"name_es": "Estrecho de Forjaescarcha",
+		"name_fr": "Détroit des gorges glacées"
+	},
+	{
+		"map_id": 31,
+		"name_de": "Schneekuhlenhöhen",
+		"name_en": "Snowden Drifts",
+		"name_es": "Cúmulos de Guaridanieve",
+		"name_fr": "Congères d'Antreneige"
+	},
+	{
+		"map_id": 32,
+		"name_de": "Diessa-Plateau",
+		"name_en": "Diessa Plateau",
+		"name_es": "Meseta de Diessa",
+		"name_fr": "Plateau de Diessa"
+	},
+	{
+		"map_id": 34,
+		"name_de": "Caledon-Wald",
+		"name_en": "Caledon Forest",
+		"name_es": "Bosque de Caledon",
+		"name_fr": "Forêt de Caledon"
+	},
+	{
+		"map_id": 35,
+		"name_de": "Provinz Metrica",
+		"name_en": "Metrica Province",
+		"name_es": "Provincia de Métrica",
+		"name_fr": "Province de Metrica"
+	},
+	{
+		"map_id": 39,
+		"name_de": "Mahlstromgipfel",
+		"name_en": "Mount Maelstrom",
+		"name_es": "Monte Vorágine",
+		"name_fr": "Mont Maelström"
+	},
+	{
+		"map_id": 51,
+		"name_de": "Meerenge der Verwüstung",
+		"name_en": "Straits of Devastation",
+		"name_es": "Estrechos de la devastación",
+		"name_fr": "Détroit de la Dévastation"
+	},
+	{
+		"map_id": 53,
+		"name_de": "Funkenschwärmersumpf",
+		"name_en": "Sparkfly Fen",
+		"name_es": "Pantano de las Centellas",
+		"name_fr": "Marais de Lumillule"
+	},
+	{
+		"map_id": 54,
+		"name_de": "Brisban-Wildnis",
+		"name_en": "Brisban Wildlands",
+		"name_es": "Selvas Brisbanas",
+		"name_fr": "Terres sauvages de Brisban"
+	},
+	{
+		"map_id": 62,
+		"name_de": "Fluchküste",
+		"name_en": "Cursed Shore",
+		"name_es": "Ribera Maldita",
+		"name_fr": "Rivage maudit"
+	},
+	{
+		"map_id": 65,
+		"name_de": "Malchors Sprung",
+		"name_en": "Malchor's Leap",
+		"name_es": "Salto de Malchor",
+		"name_fr": "Saut de Malchor"
+	},
+	{
+		"map_id": 73,
+		"name_de": "Blutstrom-Küste",
+		"name_en": "Bloodtide Coast",
+		"name_es": "Costa Mareasangrienta",
+		"name_fr": "Côte de la marée sanglante"
+	},
+	{
+		"map_id": 873,
+		"name_de": "Südlicht-Bucht",
+		"name_en": "Southsun Cove",
+		"name_es": "Cala del Sol Austral",
+		"name_fr": "Crique de Sud-Soleil"
+	}
+]
