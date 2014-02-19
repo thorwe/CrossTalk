@@ -382,46 +382,6 @@ bool PositionalAudio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64
     bool isDirty = false;
     if (type == PLUGIN_CLIENT)
     {
-        /*if (id == mine)
-        {
-            QString game = meObj->getVr();
-            if (!game.isEmpty())
-            {
-                data << this->objectName() << ": ";
-                isDirty = true;
-
-                data << "is playing " << game;
-
-                QString id = meObj->getIdentity();
-                if (!id.isEmpty())
-                    data << " as " << id;
-            }
-        }
-        else
-        {
-            if (universe->Contains(serverConnectionHandlerID,(anyID)id))
-            {
-                TsVrObj* obj = universe->Get(serverConnectionHandlerID,(anyID)id);
-                if (!obj->getVr().isEmpty())
-                {
-                    data << this->objectName() << ": ";
-                    isDirty = true;
-
-                    data << "is playing " << obj->getVr();
-                    if (!obj->getIdentity().isEmpty())
-                    {
-                        data << " as " << obj->getIdentity();
-                        if (m_PlayersInMyContext.contains(serverConnectionHandlerID,(anyID)id))
-                        {
-                            data << " in my context";
-                        }
-                        else
-                            data << " outside of my context";
-                    }
-                }
-            }
-        }*/
-
         if (id == mine)
             isDirty |= meObj->onInfoDataChanged(data);
         else if (universe->Contains(serverConnectionHandlerID,(anyID)id))
@@ -873,7 +833,6 @@ QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
 {
     if (isMe)
         obj = meObj;
-    //else if (isMe.)
 
     QString out_stri;
     QTextStream out(&out_stri);
@@ -940,11 +899,6 @@ QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
                 else
                     out << "\"vcname\":\"" << name << "\",";
 
-                /*QString uid;
-                if (TSHelpers::GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
-                    Error("(GetSendStringJson)",serverConnectionHandlerID,error);
-                else
-                    out << "\"uid\":\"" << uid << "\",";*/
                 out << "\"uid\":\"" << iObj->getClientUID() << "\",";
             }
         }
