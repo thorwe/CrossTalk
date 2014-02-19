@@ -135,6 +135,11 @@ include(src/positional_audio/PositionalAudio.pri) {
     !build_pass:message( "Positional Audio module included." )
 }
 
+#greaterThan(QT_MAJOR_VERSION, 4): include(QtWebApp/QtWebApp.pri) {
+#    DEFINES += USE_QT_WEB_APP
+#    !build_pass:message( "QtWebApp included." )
+#}
+
 DEFINES += CONSOLE_OUTPUT
 beta {
     DEFINES += CROSSTALK_BETA

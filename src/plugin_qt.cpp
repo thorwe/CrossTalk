@@ -30,6 +30,11 @@ void PluginQt::Init()
         setServerEnabled(cfg.value("server_enabled",false).toBool());
     }
 
+//#ifdef USE_QT_WEB_APP
+//    m_HttpServer = new TsHttpServer();
+//    m_HttpServer->init();
+//#endif
+
     m_isInit = true;
 }
 

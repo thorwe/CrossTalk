@@ -4,6 +4,9 @@
 #include <QObject>
 #include <QMutex>
 #include "sse_server.h"
+//#ifdef USE_QT_WEB_APP
+//  #include "QtWebApp/src/ts_httpserver_qt.h"
+//#endif
 
 class PluginQt : public QObject
 {
@@ -49,6 +52,10 @@ public:
     bool isServerEnabled() const;
     quint16 getServerPort() const;
     void LocalServerSend(QString val);
+
+//#ifdef USE_QT_WEB_APP
+//    TsHttpServer* m_HttpServer;
+//#endif
 
 signals:
     // Sse-Server
