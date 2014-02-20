@@ -20,11 +20,15 @@ protected slots:
     void onBetaChannelToggled(bool val);
     void onServerEnabledToggled(bool val);
     void onServerPortChanged(int val);
+    void onSseServerEnabledToggled(bool val);
+    void onSseServerPortChanged(int val);
 
 signals:
     void betaChannelToggled(bool);
     void serverEnabledToggled(bool);
     void serverPortChanged(quint16);
+    void sseServerEnabledToggled(bool);
+    void sseServerPortChanged(quint16);
 
 private:
     Ui::Config *ui;

@@ -21,13 +21,13 @@ void PluginQt::Init()
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     bool ok;
-    quint16 port = cfg.value("server_port",64736).toUInt(&ok);
+    quint16 port = cfg.value("sse_server_port",64736).toUInt(&ok);
     if (!ok)
-        TSLogging::Error("Could not read port from settings");
+        TSLogging::Error("Could not read sse server port from settings");
     else
     {
         setServerPort(port);
-        setServerEnabled(cfg.value("server_enabled",false).toBool());
+        setServerEnabled(cfg.value("sse_server_enabled",false).toBool());
     }
 
 //#ifdef USE_QT_WEB_APP
@@ -37,8 +37,14 @@ void PluginQt::Init()
 
 #ifdef USE_WEBSOCKET
     m_WebSocketServer = new ServerThreaded();
-    m_WebSocketServer->setPort(64734);
-    m_WebSocketServer->setEnabled(true);
+    port = cfg.value("server_port",64734).toUInt(&ok);
+    if (!ok)
+        TSLogging::Error("Could not read websocket server port from settings");
+    else
+    {
+        m_WebSocketServer->setPort(port);
+        m_WebSocketServer->setEnabled(cfg.value("server_enabled",false).toBool());
+    }
 #endif
 
     m_isInit = true;

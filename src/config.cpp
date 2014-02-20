@@ -33,11 +33,28 @@ Config::Config(QWidget *parent) :
     ui->betaChannelcheckBox->setChecked(cfg.value("beta",false).toBool());
     connect(ui->betaChannelcheckBox,SIGNAL(toggled(bool)),SLOT(onBetaChannelToggled(bool)));
 
+    // WebSocket Server
     bool ok;
-    quint16 port = cfg.value("server_port",64736).toUInt(&ok);
+    quint16 port = cfg.value("server_port",64734).toUInt(&ok);
     if (!ok)
     {
-        TSLogging::Error("Could not read port from settings");
+        TSLogging::Error("Could not read websocket server port from settings");
+        ui->groupBox_WsServer->setChecked(false);
+        ui->groupBox_WsServer->setCheckable(false);
+        ui->spinBox_WsServer->setValue(0);
+    }
+    else
+    {
+        ui->spinBox_WsServer->setValue(port);
+        connect(ui->spinBox_WsServer,SIGNAL(valueChanged(int)),this,SLOT(onServerPortChanged(int)));
+        ui->groupBox_WsServer->setChecked(cfg.value("server_enabled",true).toBool());
+        connect(ui->groupBox_WsServer,SIGNAL(toggled(bool)),this,SLOT(onServerEnabledToggled(bool)));
+    }
+    // SSE-Server
+    port = cfg.value("sse_server_port",64736).toUInt(&ok);
+    if (!ok)
+    {
+        TSLogging::Error("Could not read sse server port from settings");
         ui->groupBox_Server->setChecked(false);
         ui->groupBox_Server->setCheckable(false);
         ui->spinBox_Server->setValue(0);
@@ -45,9 +62,9 @@ Config::Config(QWidget *parent) :
     else
     {
         ui->spinBox_Server->setValue(port);
-        connect(ui->spinBox_Server,SIGNAL(valueChanged(int)),this,SLOT(onServerPortChanged(int)));
-        ui->groupBox_Server->setChecked(cfg.value("server_enabled",false).toBool());
-        connect(ui->groupBox_Server,SIGNAL(toggled(bool)),this,SLOT(onServerEnabledToggled(bool)));
+        connect(ui->spinBox_Server,SIGNAL(valueChanged(int)),this,SLOT(onSseServerPortChanged(int)));
+        ui->groupBox_Server->setChecked(cfg.value("sse_server_enabled",false).toBool());
+        connect(ui->groupBox_Server,SIGNAL(toggled(bool)),this,SLOT(onSseServerEnabledToggled(bool)));
     }
 }
 
@@ -89,4 +106,18 @@ void Config::onServerPortChanged(int val)
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.setValue("server_port",(quint16)val);
     emit serverPortChanged((quint16)val);
+}
+
+void Config::onSseServerEnabledToggled(bool val)
+{
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    cfg.setValue("sse_server_enabled",val);
+    emit sseServerEnabledToggled(val);
+}
+
+void Config::onSseServerPortChanged(int val)
+{
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    cfg.setValue("sse_server_port",(quint16)val);
+    emit sseServerPortChanged((quint16)val);
 }

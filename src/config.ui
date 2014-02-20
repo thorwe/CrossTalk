@@ -33,10 +33,10 @@
   <widget class="Banner" name="banner_jianji">
    <property name="geometry">
     <rect>
-     <x>270</x>
-     <y>470</y>
-     <width>200</width>
-     <height>80</height>
+     <x>260</x>
+     <y>410</y>
+     <width>181</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -114,90 +114,139 @@ p, li { white-space: pre-wrap; }
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox_Server">
-   <property name="geometry">
-    <rect>
-     <x>140</x>
-     <y>480</y>
-     <width>111</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Local Server</string>
-   </property>
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
-   <property name="checked">
-    <bool>false</bool>
-   </property>
-   <widget class="QSpinBox" name="spinBox_Server">
-    <property name="geometry">
-     <rect>
-      <x>51</x>
-      <y>30</y>
-      <width>51</width>
-      <height>22</height>
-     </rect>
-    </property>
-    <property name="maximum">
-     <number>65535</number>
-    </property>
-    <property name="value">
-     <number>0</number>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_Server">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>41</width>
-      <height>20</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <pointsize>12</pointsize>
-     </font>
-    </property>
-    <property name="text">
-     <string>Port</string>
-    </property>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_Updates">
+  <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>480</y>
-     <width>111</width>
-     <height>61</height>
+     <width>431</width>
+     <height>71</height>
     </rect>
    </property>
-   <property name="title">
-    <string>Plugin Updates</string>
-   </property>
-   <widget class="QCheckBox" name="betaChannelcheckBox">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>30</y>
-      <width>101</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>Beta Channel</string>
-    </property>
-   </widget>
+   <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <item>
+     <widget class="QGroupBox" name="groupBox_Updates">
+      <property name="title">
+       <string>Plugin Updates</string>
+      </property>
+      <widget class="QCheckBox" name="betaChannelcheckBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>101</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Beta Channel</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_WsServer">
+      <property name="title">
+       <string>WebSockets Server</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <widget class="QSpinBox" name="spinBox_WsServer">
+       <property name="geometry">
+        <rect>
+         <x>51</x>
+         <y>30</y>
+         <width>61</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <number>65535</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_WsServer">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>41</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Port</string>
+       </property>
+      </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_Server">
+      <property name="title">
+       <string>Local SSE-Server</string>
+      </property>
+      <property name="checkable">
+       <bool>true</bool>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
+      </property>
+      <widget class="QSpinBox" name="spinBox_Server">
+       <property name="geometry">
+        <rect>
+         <x>51</x>
+         <y>30</y>
+         <width>61</width>
+         <height>22</height>
+        </rect>
+       </property>
+       <property name="maximum">
+        <number>65535</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_Server">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>41</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>12</pointsize>
+        </font>
+       </property>
+       <property name="text">
+        <string>Port</string>
+       </property>
+      </widget>
+      <zorder>spinBox_Server</zorder>
+      <zorder>label_Server</zorder>
+      <zorder>horizontalLayoutWidget</zorder>
+     </widget>
+    </item>
+   </layout>
   </widget>
   <zorder>aboutText</zorder>
   <zorder>banner_jianji</zorder>
   <zorder>banner_frame</zorder>
-  <zorder>groupBox_Server</zorder>
-  <zorder>groupBox_Updates</zorder>
+  <zorder>horizontalLayoutWidget</zorder>
  </widget>
  <customwidgets>
   <customwidget>
