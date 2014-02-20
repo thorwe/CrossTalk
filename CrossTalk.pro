@@ -106,25 +106,7 @@ RESOURCES += \
     CrossTalkRes.qrc
 
 # Radio Module
-include(DSPFilters/DSPFilters.pri) {
-    HEADERS += \
-        src/dsp_radio.h \
-        src/mod_radio.h \
-        src/config_radio.h \
-        src/config_radio_groupbox.h \
-        src/settings_radio.h
-
-    SOURCES += \
-        src/dsp_radio.cpp \
-        src/mod_radio.cpp \
-        src/config_radio.cpp \
-        src/config_radio_groupbox.cpp \
-        src/settings_radio.cpp
-
-    FORMS += \
-        src/config_radio.ui \
-        src/config_radio_groupbox.ui
-
+include(src/radio/Radio.pri) {
     DEFINES += USE_RADIO
     !build_pass:message( "Radio module included." )
 }
