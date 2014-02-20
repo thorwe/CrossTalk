@@ -16,14 +16,14 @@ class PluginQt : public QObject
     Q_OBJECT
 
     // Sse-Server
-    Q_PROPERTY(bool serverEnabled
-               READ isServerEnabled
-               WRITE setServerEnabled
-               NOTIFY serverEnabledToggled)
-    Q_PROPERTY(quint16 serverPort
-               READ getServerPort
-               WRITE setServerPort
-               NOTIFY serverPortChanged)
+    Q_PROPERTY(bool sseServerEnabled
+               READ isSseServerEnabled
+               WRITE setSseServerEnabled
+               NOTIFY sseServerEnabledToggled)
+    Q_PROPERTY(quint16 sseServerPort
+               READ getSseServerPort
+               WRITE setSseServerPort
+               NOTIFY sseServerPortChanged)
 
 public:
     static PluginQt* instance() {
@@ -52,8 +52,8 @@ public:
     // property getters
 
     // Sse-Server
-    bool isServerEnabled() const;
-    quint16 getServerPort() const;
+    bool isSseServerEnabled() const;
+    quint16 getSseServerPort() const;
     void LocalServerSend(QString val);
 
 //#ifdef USE_QT_WEB_APP
@@ -65,13 +65,13 @@ public:
 
 signals:
     // Sse-Server
-    void serverEnabledToggled(bool);
-    void serverPortChanged(quint16);
+    void sseServerEnabledToggled(bool);
+    void sseServerPortChanged(quint16);
 
 public slots:
     // Sse-Server
-    void setServerEnabled(bool val);
-    void setServerPort(quint16 val);
+    void setSseServerEnabled(bool val);
+    void setSseServerPort(quint16 val);
 
 private:
     //singleton

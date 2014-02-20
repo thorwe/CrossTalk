@@ -26,8 +26,8 @@ void PluginQt::Init()
         TSLogging::Error("Could not read sse server port from settings");
     else
     {
-        setServerPort(port);
-        setServerEnabled(cfg.value("sse_server_enabled",false).toBool());
+        setSseServerPort(port);
+        setSseServerEnabled(cfg.value("sse_server_enabled",false).toBool());
     }
 
 //#ifdef USE_QT_WEB_APP
@@ -50,12 +50,12 @@ void PluginQt::Init()
     m_isInit = true;
 }
 
-bool PluginQt::isServerEnabled() const
+bool PluginQt::isSseServerEnabled() const
 {
     return m_isServerEnabled;
 }
 
-quint16 PluginQt::getServerPort() const
+quint16 PluginQt::getSseServerPort() const
 {
     return m_serverPort;
 }
@@ -68,7 +68,7 @@ void PluginQt::LocalServerSend(QString val)
     }
 }
 
-void PluginQt::setServerEnabled(bool val)
+void PluginQt::setSseServerEnabled(bool val)
 {
     if (val == m_isServerEnabled)
         return;
@@ -83,7 +83,7 @@ void PluginQt::setServerEnabled(bool val)
         serverStop();
 }
 
-void PluginQt::setServerPort(quint16 val)
+void PluginQt::setSseServerPort(quint16 val)
 {
     if (val == m_serverPort)
         return;

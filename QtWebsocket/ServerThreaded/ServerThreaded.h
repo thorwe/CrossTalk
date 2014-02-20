@@ -45,11 +45,12 @@ public:
 	~ServerThreaded();
 
     bool isEnabled() const;
-    void setEnabled(bool val);
     quint16 getPort() const;
-    void setPort(quint16 val);
 
 public slots:
+    void setEnabled(bool val);
+    void setPort(quint16 val);
+
 	void processNewConnection();
 
 signals:
