@@ -425,14 +425,14 @@
 							source.onerror=function(event)
 							{
 								if (event.readyState == EventSource.CLOSED) {
-									console.log('websocket connection was closed.');
+									console.log('sse server connection was closed.');
 								}
 								else
 									console.log('Error:' + event.data);
 							};
 							source.onopen=function(event)
 							{
-								console.log('websocket connection opened.');
+								console.log('sse server connection opened.');
 							};
 							source.onmessage=function(event)
 							{
@@ -462,7 +462,7 @@
 						console.log("Disconnected.");
 
 						// Immediately reconnect!
-						  doConnect();
+						doWSConnect();
 					};
 
 					websocket = new WebSocket(uri);		
