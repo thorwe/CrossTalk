@@ -103,6 +103,9 @@ private:
     SettingsPositionalAudio& operator=(const SettingsPositionalAudio &);
 
     int m_ContextMenuUi;
+#ifdef Q_OS_WIN
+    int m_ContextMenuGW2Map;
+#endif
     QPointer<ConfigPositionalAudio> config;
 
     QPointer<PositionalAudio> mP_positionalAudio;

@@ -14,6 +14,19 @@
         console.log("Estimated localStorage size: " + (stringy.length * 2 / 1024 ) + "kB");
     };
 
+	var getUrlParameters = function(parameter, staticURL, decode){
+	   var currLocation = (staticURL.length)? staticURL : window.location.search,
+		   parArr = currLocation.split("?")[1].split("&")
+	   
+	   for(var i = 0; i < parArr.length; i++){
+			parr = parArr[i].split("=");
+			if(parr[0] == parameter)
+				return (decode) ? decodeURIComponent(parr[1]) : parr[1];
+	   }
+	   
+	   return false;  
+	}
+	
     document.observe('dom:loaded', function(){
         [
                 "../css/leaflet.css",
@@ -62,6 +75,13 @@
         var iconStyles = {};
         var ct_me = {};
         settings = loadFromStorage();
+		var q_port = getUrlParameters("websocket_port", "", true);
+		if (q_port)
+		{
+			settings.port = parseInt(q_port);
+			console.log("Use port from url query: " + port);
+		}
+		
         var initLanguageSelection = function(){
             var selectBox = $('language_list');
             $H({en:"english",de:"deutsch",fr:"fran&ccedil;ais",es:"español"}).each(function(e) {

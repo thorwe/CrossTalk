@@ -4,9 +4,16 @@
 #include "ts_logging_qt.h"
 #include "definitions_positionalaudio.h"
 #include "ts_serversinfo.h"
+#ifdef Q_OS_WIN
+  #include "plugin_qt.h"        //only used for gw2 map atm
+#endif
 
 #include <QSpacerItem>
 #include <QGridLayout>
+#ifdef Q_OS_WIN
+  #include <QDesktopServices>   //only used for gw2 map atm
+#endif
+
 
 SettingsPositionalAudio* SettingsPositionalAudio::m_Instance = 0;
 
@@ -23,6 +30,9 @@ void SettingsPositionalAudio::Init(PositionalAudio *positionalAudio)
     if(m_ContextMenuUi == -1)
     {
         m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Positional Audio","radar_16.png");
+#ifdef Q_OS_WIN
+        m_ContextMenuGW2Map = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Gw2 Map","");
+#endif
         connect(TSContextMenu::instance(),SIGNAL(MenusInitialized()),SLOT(onMenusInitialized()),Qt::AutoConnection);
         connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
     }
@@ -98,7 +108,14 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
 
     if (type == PLUGIN_MENU_TYPE_GLOBAL)
     {
-        if (menuItemID == m_ContextMenuUi)
+        if (menuItemID == m_ContextMenuGW2Map)
+        {
+            QUrl gwUrl("http://thorwe.github.io/CrossTalk/misc/site/gw2/html/gw2maps-leaflet.html");
+            quint16 port = PluginQt::instance()->getServerPort();
+            gwUrl.setQuery(QString("websocket_port=%1").arg(port));
+            QDesktopServices::openUrl(gwUrl);
+        }
+        else if (menuItemID == m_ContextMenuUi)
         {
             if (config)
                 config.data()->activateWindow();
