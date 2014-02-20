@@ -7,6 +7,9 @@
 //#ifdef USE_QT_WEB_APP
 //  #include "QtWebApp/src/ts_httpserver_qt.h"
 //#endif
+#ifdef USE_WEBSOCKET
+  #include "ServerThreaded/ServerThreaded.h"
+#endif
 
 class PluginQt : public QObject
 {
@@ -56,6 +59,9 @@ public:
 //#ifdef USE_QT_WEB_APP
 //    TsHttpServer* m_HttpServer;
 //#endif
+#ifdef USE_WEBSOCKET
+    ServerThreaded* m_WebSocketServer;
+#endif
 
 signals:
     // Sse-Server

@@ -292,6 +292,7 @@ void PositionalAudio::onUniverseRemoved(QString clientUID)
     out << "\"uid\":\"" << clientUID << "\",";
     out << "\"me\":false}";
     PluginQt::instance()->LocalServerSend(out_stri);
+    emit BroadcastJSON(out_stri);
 }
 
 QMap<QString, PositionalAudio_ServerSettings> PositionalAudio::getServerSettings() const
@@ -440,10 +441,9 @@ void PositionalAudio::onRunningStateChanged(bool value)
         connect(universe,SIGNAL(removed(QString)),this,SLOT(onUniverseRemoved(QString)),Qt::UniqueConnection);
         connect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)),Qt::UniqueConnection);
         connect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)),Qt::UniqueConnection);
-
-//        Print(QString("DWORD: %1, quint32: %2, ulong: %3").arg(sizeof(DWORD)*8).arg(sizeof(quint32)*8).arg(sizeof(ulong)*8));
-//        bool bCreated = false;
-
+#ifdef USE_WEBSOCKET
+        connect(this, SIGNAL(BroadcastJSON(QString)),PluginQt::instance()->m_WebSocketServer,SIGNAL(broadcastMessage(QString)), Qt::UniqueConnection);
+#endif
         m_sharedMemory = new QSharedMemory(this);
         m_sharedMemory->setNativeKey("MumbleLink");
         if (!m_sharedMemory->create(sizeof(LinkedMem),QSharedMemory::ReadWrite))
@@ -798,7 +798,9 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
     }
 
 
-    PluginQt::instance()->LocalServerSend(GetSendStringJson(true,false,obj));
+    QString sendString = GetSendStringJson(true,false,obj);
+    PluginQt::instance()->LocalServerSend(sendString);
+    emit BroadcastJSON(sendString);
     return true;
 }
 
@@ -1021,7 +1023,10 @@ void PositionalAudio::Send()
 
             args = GetSendStringJson(true,true,NULL);
             if (!args.isEmpty())
+            {
                 PluginQt::instance()->LocalServerSend(args);
+                emit BroadcastJSON(args);
+            }
         }
 
 
@@ -1038,7 +1043,10 @@ void PositionalAudio::Send()
                 Send(args,PluginCommandTarget_CLIENT);
                 args = GetSendStringJson(true,true,NULL);
                 if (!args.isEmpty())
-                    PluginQt::instance()->LocalServerSend(args);
+                {
+                    PluginQt::instance()->LocalServerSend(args);    //SSE Server
+                    emit BroadcastJSON(args);
+                }
             }
         }
     }

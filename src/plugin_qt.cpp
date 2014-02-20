@@ -35,6 +35,12 @@ void PluginQt::Init()
 //    m_HttpServer->init();
 //#endif
 
+#ifdef USE_WEBSOCKET
+    m_WebSocketServer = new ServerThreaded();
+    m_WebSocketServer->setPort(64734);
+    m_WebSocketServer->setEnabled(true);
+#endif
+
     m_isInit = true;
 }
 

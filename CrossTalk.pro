@@ -121,6 +121,10 @@ include(src/positional_audio/PositionalAudio.pri) {
 #    DEFINES += USE_QT_WEB_APP
 #    !build_pass:message( "QtWebApp included." )
 #}
+include (QtWebsocket/QtWebsocket.pri) {
+    DEFINES += USE_WEBSOCKET
+    !build_pass:message( "Websockets included." )
+}
 
 DEFINES += CONSOLE_OUTPUT
 beta {

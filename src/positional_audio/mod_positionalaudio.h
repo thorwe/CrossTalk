@@ -73,6 +73,8 @@ signals:
     void rollOffMaxChanged(float);
     void serverBlock(QString);
 
+    void BroadcastJSON(QString);
+
 public slots:
     void onConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
     void setUseCamera(bool val);

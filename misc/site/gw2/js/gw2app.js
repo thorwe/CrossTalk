@@ -15,16 +15,18 @@
     };
 
 	var getUrlParameters = function(parameter, staticURL, decode){
-	   var currLocation = (staticURL.length)? staticURL : window.location.search,
-		   parArr = currLocation.split("?")[1].split("&")
-	   
-	   for(var i = 0; i < parArr.length; i++){
-			parr = parArr[i].split("=");
-			if(parr[0] == parameter)
-				return (decode) ? decodeURIComponent(parr[1]) : parr[1];
-	   }
-	   
-	   return false;  
+		var currLocation = (staticURL.length)? staticURL : window.location.search;
+		if (currLocation)
+		{
+			var parArr = currLocation.split("?")[1].split("&");
+		   
+			for(var i = 0; i < parArr.length; i++){
+				parr = parArr[i].split("=");
+				if(parr[0] == parameter)
+					return (decode) ? decodeURIComponent(parr[1]) : parr[1];
+			}
+		}
+		return false;  
 	}
 	
     document.observe('dom:loaded', function(){
@@ -78,9 +80,15 @@
 		var q_port = getUrlParameters("websocket_port", "", true);
 		if (q_port)
 		{
-			settings.port = parseInt(q_port);
-			console.log("Use port from url query: " + q_port);
+			settings.ws_port = parseInt(q_port);
+			console.log("Use ws port from url query: " + q_port);
 		}
+		/*q_port = getUrlParameters("websocket_port", "", true);
+		if (q_port)
+		{
+			settings.sse_port = parseInt(q_port);
+			console.log("Use sse port from url query: " + q_port);
+		}*/
 		
         var initLanguageSelection = function(){
             var selectBox = $('language_list');
@@ -302,115 +310,196 @@
             // CrossTalk
             var initCrossTalk = function()
             {
-                if(typeof(EventSource)!=="undefined")
-                {
-                    //state = ["lime", "orange", "red", "gray"];// online, away, offline, unknown (css color, rgb or hex notation)
-                    // we need map data locally for local position recalculation;
-                    // Doing this in CrossTalk is trouble, Qt is compiled without ssh support so it would need to be a static file.
+				var onMessage = function(event)
+				{
+					console.log('Message received: ' + event.data);
+					var jsonObj = JSON.parse(event.data);
+					if (typeof jsonObj.world_id === "undefined")
+					{
+						for (var i = 0; i < maps.length; i++) {
+							var m = maps[i];
+							var marker = m.playermarkers[jsonObj.name];
+							marker.remove();
+							var oldPlayer = $(jsonObj.name);
+							if (oldPlayer)
+								$("players").removeChild(oldPlayer);
+						};
+						return;
+					}
 
-                    var baseurl = (settings && settings.ct_url) ? settings.ct_url : "http://localhost:64736";
-                    var source = new EventSource(baseurl + "/positional_audio/stream");
-                    source.onerror=function(event)
-                    {
-                        if (event.readyState == EventSource.CLOSED) {
-                            console.log('websocket connection was closed.');
-                        }
-                        else
-                            console.log('Error:' + event.data);
-                    };
-                    source.onopen=function(event)
-                    {
-                        console.log('websocket connection opened.');
-                    }
-                    source.onmessage=function(event)
-                    {
-                        //console.log('Message received: ' + event.data);
-                        var jsonObj = JSON.parse(event.data);
-                        if (typeof jsonObj.world_id === "undefined")
-                        {
-                            for (var i = 0; i < maps.length; i++) {
-                                var m = maps[i];
-                                var marker = m.playermarkers[jsonObj.name];
-                                marker.remove();
-                                var oldPlayer = $(jsonObj.name);
-                                if (oldPlayer)
-                                    $("players").removeChild(oldPlayer);
-                            };
-                            return;
-                        }
+					var key = jsonObj.name;
+					jsonObj.state = jsonObj.me ? 2 : 0;
+					jsonObj.time = "";
+					jsonObj.guild = {};
+					jsonObj.guild.name = "Jianji";
+					jsonObj.guild.tag = "JnJ";
 
-                        var key = jsonObj.name;
-                        jsonObj.state = jsonObj.me ? 2 : 0;
-                        jsonObj.time = "";
-                        jsonObj.guild = {};
-                        jsonObj.guild.name = "Jianji";
-                        jsonObj.guild.tag = "JnJ";
+					var mapInfo = GW2Info.data.maps[jsonObj.map_id]
+					if (!jsonObj.pos) {
+						var continent_rect = mapInfo.continent_rect;
+						var map_rect = mapInfo.map_rect;
+						var x = Math.round(continent_rect[0][0]+(continent_rect[1][0]-continent_rect[0][0])*(jsonObj.px - map_rect[0][0]) / (map_rect[1][0] - map_rect[0][0]));
+						var y = Math.round(continent_rect[0][1]+(continent_rect[1][1]-continent_rect[0][1])*(1-(jsonObj.pz - map_rect[0][1])/(map_rect[1][1] - map_rect[0][1])));
+						jsonObj.pos = [x,y];
+						//console.log("player pos: " + jsonObj.pos[0] + "," + jsonObj.pos[1]);
+					};
+					if (jsonObj.world_id < 1001 || jsonObj.world_id > 2301)
+					{
+						if (ct_players[key])
+						{
+							jsonObj.garbage_id = jsonObj.world_id
+							jsonObj.world_id = ct_players[key].world_id;
+						}
+					}
 
-                        var mapInfo = GW2Info.data.maps[jsonObj.map_id]
-                        if (!jsonObj.pos) {
-                            var continent_rect = mapInfo.continent_rect;
-                            var map_rect = mapInfo.map_rect;
-                            var x = Math.round(continent_rect[0][0]+(continent_rect[1][0]-continent_rect[0][0])*(jsonObj.px - map_rect[0][0]) / (map_rect[1][0] - map_rect[0][0]));
-                            var y = Math.round(continent_rect[0][1]+(continent_rect[1][1]-continent_rect[0][1])*(1-(jsonObj.pz - map_rect[0][1])/(map_rect[1][1] - map_rect[0][1])));
-                            jsonObj.pos = [x,y];
-                            //console.log("player pos: " + jsonObj.pos[0] + "," + jsonObj.pos[1]);
-                        };
-                        if (jsonObj.world_id < 1001 || jsonObj.world_id > 2301)
-                        {
-                            if (ct_players[key])
-                            {
-                                jsonObj.garbage_id = jsonObj.world_id
-                                jsonObj.world_id = ct_players[key].world_id;
-                            }
-                        }
+					// dispatch to maps
+					for (var i = 0; i < maps.length; i++) {
+						var m = maps[i];
+						if ((jsonObj.me) && (mapInfo.continent_id !== m.baselayer.options.continent_id))    //toggle map continent
+						{
+							console.log("MapInfo continent_id: " + mapInfo.continent_id + " BaseLayer: " + m.baselayer.options.continent_id);
+							var oldBaseLayer = m.baselayer;
+							m.map.removeLayer(oldBaseLayer);
+							m.map.addLayer(m.baselayers[mapInfo.continent_id], true);
+						};
 
-                        // dispatch to maps
-                        for (var i = 0; i < maps.length; i++) {
-                            var m = maps[i];
-                            if ((jsonObj.me) && (mapInfo.continent_id !== m.baselayer.options.continent_id))    //toggle map continent
-                            {
-                                console.log("MapInfo continent_id: " + mapInfo.continent_id + " BaseLayer: " + m.baselayer.options.continent_id);
-                                var oldBaseLayer = m.baselayer;
-                                m.map.removeLayer(oldBaseLayer);
-                                m.map.addLayer(m.baselayers[mapInfo.continent_id], true);
-                            };
+						/*if ((jsonObj.me) && (!GW2Info.data.wvw_match) && !(jsonObj.world_id < 1001 || jsonObj.world_id > 2301))
+						{
+							GW2Info.requestWvWMatches(function(wvw_matches){
+								console.log("preloaded wvw_matches");
+								if (wvw_matches)
+								{
+									var myMatch = $H(wvw_matches).values().detect(function(e){ return ((e.red_world_id === jsonObj.world_id) ||
+																			  (e.green_world_id === jsonObj.world_id) ||
+																			  (e.blue_world_id === jsonObj.world_id))});
+									if (myMatch)
+									{
+											console.log("Found my match-up");
+											GW2Info.data.wvw_match = myMatch;
+											GW2Info.registerForMatchDetails(function(match_details){
+												console.log("Match Details update.");
+												GW2Maps.parse_wvwobjectives(m,match_details);
+											},false,myMatch.wvw_match_id);
+									 }
+									else
+									{
+										console.log("Match-up not found -.-");
+									}
+								}
+							});
+						}*/
 
-                            /*if ((jsonObj.me) && (!GW2Info.data.wvw_match) && !(jsonObj.world_id < 1001 || jsonObj.world_id > 2301))
-                            {
-                                GW2Info.requestWvWMatches(function(wvw_matches){
-                                    console.log("preloaded wvw_matches");
-                                    if (wvw_matches)
-                                    {
-                                        var myMatch = $H(wvw_matches).values().detect(function(e){ return ((e.red_world_id === jsonObj.world_id) ||
-                                                                                  (e.green_world_id === jsonObj.world_id) ||
-                                                                                  (e.blue_world_id === jsonObj.world_id))});
-                                        if (myMatch)
-                                        {
-                                                console.log("Found my match-up");
-                                                GW2Info.data.wvw_match = myMatch;
-                                                GW2Info.registerForMatchDetails(function(match_details){
-                                                    console.log("Match Details update.");
-                                                    GW2Maps.parse_wvwobjectives(m,match_details);
-                                                },false,myMatch.wvw_match_id);
-                                         }
-                                        else
-                                        {
-                                            console.log("Match-up not found -.-");
-                                        }
-                                    }
-                                });
-                            }*/
+						//key, name, world_id, continent_id, map_id, pos, angle_f, profession, isCommander, c_guild, c_state, c_time
+						updatePlayer(m, key, jsonObj.name, jsonObj.world_id, mapInfo.continent_id, jsonObj.map_id, jsonObj.pos, jsonObj.pa, jsonObj.profession, jsonObj.commander, jsonObj.guild, jsonObj.state, jsonObj.time, jsonObj.vcname, jsonObj.me);
+					}
+					ct_players[key] = jsonObj;
+					if (jsonObj.me)
+						ct_me = jsonObj;
+				}
+				
+				var websocket;
+				var doWSConnect = function()
+				{
+					console.log('Connecting to server..');
+					var baseurl;
+					var port;
+					
+					if (window.MozWebSocket)
+					{
+						console.log('Info: This browser supports WebSocket using the MozWebSocket constructor');
+						window.WebSocket = window.MozWebSocket;
+					}
+					else if (!window.WebSocket)
+					{
+						console.log('Error: This browser does not have support for WebSocket');
+		                if(typeof(EventSource)!=="undefined") // fallback to sse
+						{
+							//state = ["lime", "orange", "red", "gray"];// online, away, offline, unknown (css color, rgb or hex notation)
+							// we need map data locally for local position recalculation;
+							// Doing this in CrossTalk is trouble, Qt is compiled without ssh support so it would need to be a static file.
+							baseurl = (settings && settings.sse_url) ? settings.sse_url : "http://localhost:";
+							port = (settings && settings.sse_port) ? settings.sse_port : 64736;
+							baseurl = baseurl + port;
+							
+							var source = new EventSource(baseurl + "/positional_audio/stream");
+							source.onerror=function(event)
+							{
+								if (event.readyState == EventSource.CLOSED) {
+									console.log('websocket connection was closed.');
+								}
+								else
+									console.log('Error:' + event.data);
+							};
+							source.onopen=function(event)
+							{
+								console.log('websocket connection opened.');
+							};
+							source.onmessage=function(event)
+							{
+								onMessage(event);
+							};
+						}
+						else
+							console.log("Sorry, your browser does not support server-sent events...");
+							
+						return;
+					}
 
-                            //key, name, world_id, continent_id, map_id, pos, angle_f, profession, isCommander, c_guild, c_state, c_time
-                            updatePlayer(m, key, jsonObj.name, jsonObj.world_id, mapInfo.continent_id, jsonObj.map_id, jsonObj.pos, jsonObj.pa, jsonObj.profession, jsonObj.commander, jsonObj.guild, jsonObj.state, jsonObj.time, jsonObj.vcname, jsonObj.me);
-                        }
-                        ct_players[key] = jsonObj;
-                        if (jsonObj.me)
-                            ct_me = jsonObj;
-                    };
-                }
-                else
-                    console.log("Sorry, your browser does not support server-sent events...");
+					baseurl = (settings && settings.sse_url) ? settings.sse_url : "ws://localhost:";
+					port = (settings && settings.ws_port) ? settings.ws_port : 64734;
+					baseurl = baseurl + port;
+					// prefer text messages
+					var uri = baseurl;
+					if (uri.indexOf("?") == -1) {
+						uri += "/?encoding=text";
+					} else {
+						uri += "/&encoding=text";
+					}
+
+					// Websocket Event Handlers
+					var ws_onClose = function(evt)
+					{
+						console.log("Disconnected.");
+
+						// Immediately reconnect!
+						  doConnect();
+					};
+
+					websocket = new WebSocket(uri);		
+					websocket.onopen = function(evt) { console.log("Connected."); };
+					websocket.onclose = function(evt) { ws_onClose(evt) };
+					websocket.onmessage = function(evt) { onMessage(evt) };
+					websocket.onerror = function(evt) { console.log('Error: ' + evt.data); };
+				};
+				
+				var doWSDisconnect = function()
+				{
+					//CONNECTING = 0, OPEN = 1, CLOSED = 2
+					if (websocket.readyState == 1)
+					{
+						console.log("Disconnecting...");
+						websocket.close();
+
+						//For some reason onClose is never fired, current bandaid
+						ws_onClose();
+					}
+				};
+	
+				var doWSSend = function(arg)
+				{
+					if (arg.id === 'mixer')
+					{
+						if (activeChannelId == null)
+							return;
+
+						arg.id = activeChannelId;		
+					}
+
+					arg = JSON.stringify(arg);
+					websocket.send(arg);
+				}
+				
+				doWSConnect();
             };
 
             var initMaps = function()
