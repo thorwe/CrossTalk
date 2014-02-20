@@ -111,8 +111,12 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
         if (menuItemID == m_ContextMenuGW2Map)
         {
             QUrl gwUrl("http://thorwe.github.io/CrossTalk/misc/site/gw2/html/gw2maps-leaflet.html");
-            quint16 port = PluginQt::instance()->getServerPort();
+            quint16 port;
+#ifdef USE_WEBSOCKET
+            port = PluginQt::instance()->m_WebSocketServer->getPort();
             gwUrl.setQuery(QString("websocket_port=%1").arg(port));
+#endif
+            //port = PluginQt::instance()->getServerPort(); //todo add query
             QDesktopServices::openUrl(gwUrl);
         }
         else if (menuItemID == m_ContextMenuUi)
