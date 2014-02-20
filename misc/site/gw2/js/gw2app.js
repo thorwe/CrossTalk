@@ -79,7 +79,7 @@
 		if (q_port)
 		{
 			settings.port = parseInt(q_port);
-			console.log("Use port from url query: " + port);
+			console.log("Use port from url query: " + q_port);
 		}
 		
         var initLanguageSelection = function(){
