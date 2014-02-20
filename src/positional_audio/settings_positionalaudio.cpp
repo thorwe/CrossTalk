@@ -222,6 +222,7 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
     }
 }
 
+//! Test if context menu registered properly
 void SettingsPositionalAudio::onMenusInitialized()
 {
     if(m_ContextMenuUi == -1)

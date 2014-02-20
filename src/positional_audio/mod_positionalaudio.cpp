@@ -839,38 +839,19 @@ QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
     out << "{";
     TS3_VECTOR vec = obj->getAvatarPosition();
     out << "\"px\":" << INCHTOM(vec.x) << "," << "\"pz\":" << INCHTOM(vec.z) << ",";// << "\"ap_z\":" << vec.z << ",";
-//    Log(QString("%1 %2 %3").arg(vec.x).arg(vec.y).arg(vec.z));
+
     vec = obj->getAvatarFront();
-//    Log(QString("%1 %2 %3").arg(vec.x).arg(vec.y).arg(vec.z));
+
     int front = atan2(vec.z, vec.x)*180/M_PI;
     if (front <0)
         front += 360;
 
     front *= -1;
     out << "\"pa\":" << front << ",";
-//    out << "\"af_x\":" << vec.x << "," << "\"af_y\":" << vec.y << "," << "\"af_z\":" << vec.z << ",";
-//    vec = obj->getAvatarTop();
-//    out << "\"at_x\":" << vec.x << "," << "\"at_y\":" << vec.y << "," << "\"at_z\":" << vec.z << ",";
 
-    if (isMe)
-    {
-        TsVrObjSelf *iMeObj = qobject_cast<TsVrObjSelf *>(obj);
-        if (iMeObj)
-        {
-//            vec = iMeObj->getCameraPosition();
-//            out << "\"cp_x\":" << vec.x << "," << "\"cp_y\":" << vec.y << "," << "\"cp_z\":" << vec.z << ",";
-//            vec = iMeObj->getCameraFront();
-//            out << "\"cf_x\":" << vec.x << "," << "\"cf_y\":" << vec.y << "," << "\"cf_z\":" << vec.z << ",";
-//            vec = iMeObj->getCameraTop();
-//            out << "\"ct_x\":" << vec.x << "," << "\"ct_y\":" << vec.y << "," << "\"ct_z\":" << vec.z << ",";
-        }
-    }
 
     if (isAll)
     {
-//        out << "\"vr\":" << obj->getVr() << ",";
-//        QString context = obj->getContext();
-//        out << "\"co\":" << ((context.isEmpty())?" ":context) << ",";
         QString ident = obj->getIdentityRaw();
         if (ident.isEmpty())
         {
@@ -880,9 +861,6 @@ QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
 
         ident.chop(1);
         ident.remove(0,1);
-//        if (ident.isEmpty())
-//            Error("ident is now empty!");
-        //out << "\"id\":" << ident << ",";
         out << ident << ",";
 
         if (!isMe)
