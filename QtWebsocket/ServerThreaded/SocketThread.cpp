@@ -75,6 +75,7 @@ void SocketThread::sendMessage(QString message)
 void SocketThread::processPong(quint64 elapsedTime)
 {
     //std::cout << tr("ping: %1 ms").arg(elapsedTime).toStdString() << std::endl;
+    Q_UNUSED(elapsedTime);
 }
 
 void SocketThread::socketDisconnected()
