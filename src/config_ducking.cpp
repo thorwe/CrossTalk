@@ -1,8 +1,9 @@
 #include "config_ducking.h"
 #include "ui_config_ducking.h"
 
-//#include <QSettings>
-//#include "ts_helpers_qt.h"
+#include <QVBoxLayout>
+#include <QGridLayout>
+#include <QLabel>
 
 ConfigDucking::ConfigDucking(QWidget *parent) :
     QDialog(parent),
@@ -12,12 +13,62 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     this->setAttribute( Qt::WA_DeleteOnClose );
     this->setFixedSize(this->width(),this->height());
 
-    this->connect(ui->groupBox_gDuck,SIGNAL(toggled(bool)),SIGNAL(globalDuckerEnabledSet(bool)));
-    this->connect(ui->groupBox_cDuck,SIGNAL(toggled(bool)),SIGNAL(channelDuckerEnabledSet(bool)));
-    this->connect(ui->wFader_gDuck,SIGNAL(valueChanged(float)),SIGNAL(globalDuckerValueChanged(float)));
-    this->connect(ui->wFader_cDuck,SIGNAL(valueChanged(float)),SIGNAL(channelDuckerValueChanged(float)));
-    this->connect(ui->slider_cDuck_Mode,SIGNAL(valueChanged(int)),SLOT(onChannelDuckingDuckModeSliderValueChanged(int)));
-    this->connect(ui->checkBox_cDuck_PS,SIGNAL(toggled(bool)),SIGNAL(channelDuckerDuckPSEnabledSet(bool)));
+    // Channel Ducking
+    c = new QGroupBox("Channel",this);
+    c->setCheckable(true);
+    this->connect(c,SIGNAL(toggled(bool)),SIGNAL(channelDuckerEnabledSet(bool)));
+
+    QVBoxLayout* cLayout = new QVBoxLayout();
+
+    QGridLayout* cTargetLayout = new QGridLayout();
+
+    QString text = QString("<b>%1</b>").arg(tr("Target:"));
+    QLabel* cTargetLabel = new QLabel(text);
+    cTargetLayout->addWidget(cTargetLabel,0,0,Qt::AlignCenter);
+
+    cRadioTargetCurrent = new QRadioButton(qApp->translate("HotkeyDialog","Current Server"));
+    this->connect(cRadioTargetCurrent,SIGNAL(toggled(bool)),this,SLOT(onCRadioTargetCurrentToggled(bool)));
+    cTargetLayout->addWidget(cRadioTargetCurrent,0,1,Qt::AlignLeft);
+
+    QString otherServers = qApp->translate("NotificationsSetup","Other");
+    otherServers.append(" ");
+    otherServers.append(qApp->translate("ImprovedTabBar", "Server Tabs"));
+    cRadioTargetOther = new QRadioButton(otherServers);
+    this->connect(cRadioTargetOther,SIGNAL(toggled(bool)),this,SLOT(onCRadioTargetOtherToggled(bool)));
+    cTargetLayout->addWidget(cRadioTargetOther,1,1,Qt::AlignLeft);
+
+    //cTargetLayout->setColumnStretch(0,1);
+    //cTargetLayout->setColumnStretch(1,2);
+    cTargetLayout->setColumnMinimumWidth(1,130);
+    cLayout->addLayout(cTargetLayout);
+
+    cFader = new FaderVertical();
+    this->connect(cFader,SIGNAL(valueChanged(float)),SIGNAL(channelDuckerValueChanged(float)));
+    cLayout->addWidget(cFader,0,Qt::AlignCenter);
+
+    cPS = new QCheckBox("Duck Priority Speakers");
+    this->connect(cPS,SIGNAL(toggled(bool)),SIGNAL(channelDuckerDuckPSEnabledSet(bool)));
+    cLayout->addWidget(cPS,0,Qt::AlignCenter);
+
+    c->setLayout(cLayout);
+
+    // Global Ducking
+    g = new QGroupBox("Global (music bots)",this);
+    g->setCheckable(true);
+    this->connect(g,SIGNAL(toggled(bool)),SIGNAL(globalDuckerEnabledSet(bool)));
+
+    QVBoxLayout* gLayout = new QVBoxLayout();
+    gFader = new FaderVertical();
+    this->connect(gFader,SIGNAL(valueChanged(float)),SIGNAL(globalDuckerValueChanged(float)));
+    gLayout->addWidget(gFader,0,Qt::AlignCenter);
+
+    gLayout->addStretch(1);
+    g->setLayout(gLayout);
+
+    ui->horizontalLayout->addWidget(g);
+    ui->horizontalLayout->addWidget(c);
+
+    gLayout->insertSpacing(0,46);
 }
 
 ConfigDucking::~ConfigDucking()
@@ -27,64 +78,61 @@ ConfigDucking::~ConfigDucking()
 
 void ConfigDucking::UpdateGlobalDuckerEnabled(bool val)
 {
-    this->blockSignals(true);
-    ui->groupBox_gDuck->setChecked(val);
-    this->blockSignals(false);
+    g->blockSignals(true);
+    g->setChecked(val);
+    g->blockSignals(false);
 }
 
 void ConfigDucking::UpdateGlobalDuckerValue(float val)
 {
-    this->blockSignals(true);
-    ui->wFader_gDuck->setValue(val);
-    this->blockSignals(false);
+    gFader->blockSignals(true);
+    gFader->setValue(val);
+    gFader->blockSignals(false);
 }
 
 void ConfigDucking::UpdateChannelDuckerEnabled(bool val)
 {
-    this->blockSignals(true);
-    ui->groupBox_cDuck->setChecked(val);
-    this->blockSignals(false);
+    c->blockSignals(true);
+    c->setChecked(val);
+    c->blockSignals(false);
 }
 
 void ConfigDucking::UpdateChannelDuckerValue(float val)
 {
-    this->blockSignals(true);
-    ui->wFader_cDuck->setValue(val);
-    this->blockSignals(false);
+    cFader->blockSignals(true);
+    cFader->setValue(val);
+    cFader->blockSignals(false);
 }
 
 void ConfigDucking::UpdateChannelDuckerReverse(bool val)
 {
-    this->blockSignals(true);
-    ui->slider_cDuck_Mode->setValue(val);
-    onChannelDuckingDuckModeSliderValueChanged(val);
-    this->blockSignals(false);
+    cRadioTargetOther->blockSignals(true);
+    cRadioTargetCurrent->blockSignals(true);
+    cRadioTargetOther->setChecked(val);
+    cRadioTargetCurrent->setChecked(!val);
+    cRadioTargetOther->blockSignals(false);
+    cRadioTargetCurrent->blockSignals(false);
 }
 
 void ConfigDucking::UpdateChannelDuckerDuckPSEnabled(bool val)
 {
-    this->ui->checkBox_cDuck_PS->blockSignals(true);
-    ui->checkBox_cDuck_PS->setChecked(val);
-    this->ui->checkBox_cDuck_PS->blockSignals(false);
+    cPS->blockSignals(true);
+    cPS->setChecked(val);
+    cPS->blockSignals(false);
 }
 
-//! Retrieves ducking mode slider change, sets label, emits channelDuckerReverseSet as bool
-/*!
- * \brief Config::onChannelDuckingDuckModeSliderValueChanged Retrieves ducking mode slider change, sets label, emits channelDuckerReverseSet as bool
- * \param val slider value (0-100)
- */
-void ConfigDucking::onChannelDuckingDuckModeSliderValueChanged(int val)
+void ConfigDucking::onCRadioTargetCurrentToggled(bool val)
 {
-    bool isReversed = (val==1);
-    if (isReversed)
-    {
-        QString otherServers = qApp->translate("NotificationsSetup","Other");
-        otherServers.append(" ");
-        otherServers.append(qApp->translate("ImprovedTabBar", "Server Tabs"));
-        ui->label_cDuck_Target_Dyn->setText(otherServers);
-    }
-    else
-        ui->label_cDuck_Target_Dyn->setText(qApp->translate("HotkeyDialog","Current Server"));
+    cRadioTargetOther->blockSignals(true);
+    cRadioTargetOther->setChecked(!val);
+    cRadioTargetOther->blockSignals(false);
+    emit channelDuckerReverseSet(!val);
+}
 
-    emit channelDuckerReverseSet(isReversed);
+void ConfigDucking::onCRadioTargetOtherToggled(bool val)
+{
+    cRadioTargetCurrent->blockSignals(true);
+    cRadioTargetCurrent->setChecked(!val);
+    cRadioTargetCurrent->blockSignals(false);
+    emit channelDuckerReverseSet(val);
 }

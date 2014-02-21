@@ -2,9 +2,8 @@
 #define SETTINGS_POSITION_SPREAD_H
 
 #include <QObject>
-
+#include <QDialog>
 #include "ts_context_menu_qt.h"
-#include "config_position_spread.h"
 #include "mod_position_spread.h"
 
 class SettingsPositionSpread : public QObject, public ContextMenuInterface
@@ -65,7 +64,7 @@ private:
     SettingsPositionSpread& operator=(const SettingsPositionSpread &);
 
     int m_ContextMenuUi;
-    QPointer<ConfigPositionSpread> config;
+    QPointer<QDialog> config;
 
     QPointer<PositionSpread> mP_positionSpread;
 

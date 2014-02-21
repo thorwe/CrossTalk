@@ -323,17 +323,14 @@ int ts3plugin_offersConfigure() {
 /* Plugin might offer a configuration window. If ts3plugin_offersConfigure returns 0, this function does not need to be implemented. */
 void ts3plugin_configure(void* handle, void* qParentWidget) {
     Q_UNUSED(handle);
-    //Config* qParentWidget_p = (Config*)qParentWidget;
 
-    //qParentWidget_p = new Config();
-    //qParentWidget_p->SetupUi();
-    Config* qParentWidget_p = new Config((QWidget*)qParentWidget);
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(betaChannelToggled(bool)),&updater,SLOT(CheckUpdate(bool)),Qt::UniqueConnection);
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(sseServerEnabledToggled(bool)),pluginQt,SLOT(setSseServerEnabled(bool)),Qt::UniqueConnection);
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(sseServerPortChanged(quint16)),pluginQt,SLOT(setSseServerPort(quint16)),Qt::UniqueConnection);
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(serverEnabledToggled(bool)),pluginQt->m_WebSocketServer,SLOT(setEnabled(bool)),Qt::UniqueConnection);
-    qParentWidget_p->connect(qParentWidget_p,SIGNAL(serverPortChanged(quint16)),pluginQt->m_WebSocketServer,SLOT(setPort(quint16)),Qt::UniqueConnection);
-    qParentWidget_p->exec();
+    Config* config = new Config((QWidget*)qParentWidget);
+    config->connect(config,SIGNAL(betaChannelToggled(bool)),&updater,SLOT(CheckUpdate(bool)),Qt::UniqueConnection);
+    config->connect(config,SIGNAL(sseServerEnabledToggled(bool)),pluginQt,SLOT(setSseServerEnabled(bool)),Qt::UniqueConnection);
+    config->connect(config,SIGNAL(sseServerPortChanged(quint16)),pluginQt,SLOT(setSseServerPort(quint16)),Qt::UniqueConnection);
+    config->connect(config,SIGNAL(serverEnabledToggled(bool)),pluginQt->m_WebSocketServer,SLOT(setEnabled(bool)),Qt::UniqueConnection);
+    config->connect(config,SIGNAL(serverPortChanged(quint16)),pluginQt->m_WebSocketServer,SLOT(setPort(quint16)),Qt::UniqueConnection);
+    config->exec();
 }
 
 /*

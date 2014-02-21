@@ -4,6 +4,9 @@
 #include <QtCore/QSettings>
 #include <QWhatsThis>
 #include <QDesktopServices>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QSpinBox>
 
 #include "ts_logging_qt.h"
 #include "ts_helpers_qt.h"
@@ -29,9 +32,44 @@ Config::Config(QWidget *parent) :
     if (lang != "de_DE") // outside of german locale, hide jianji banner
         ui->banner_jianji->setVisible(false);
 
+    // Create Settings UI
+    QGroupBox* groupBoxBeta = new QGroupBox(tr("Plugin Updates"),this);
+    QHBoxLayout* groupBoxBetaLayout = new QHBoxLayout;
+    QCheckBox* checkBoxBeta = new QCheckBox(tr("Beta Channel"),this);
+    groupBoxBetaLayout->addWidget(checkBoxBeta);
+    groupBoxBeta->setLayout(groupBoxBetaLayout);
+
+    QGroupBox* groupBoxWSS = new QGroupBox(tr("WebSockets Server"),this);
+    groupBoxWSS->setCheckable(true);
+    QHBoxLayout* groupBoxWSSLayout = new QHBoxLayout;
+    QLabel* wssLabel = new QLabel(tr("Port"),this);
+    groupBoxWSSLayout->addWidget(wssLabel,0,Qt::AlignRight);
+    QSpinBox* wssSpinBox = new QSpinBox(this);
+    wssSpinBox->setMaximum(65535);
+    wssSpinBox->setMinimumWidth(80);
+    groupBoxWSSLayout->addWidget(wssSpinBox,0,Qt::AlignLeft);
+    groupBoxWSS->setLayout(groupBoxWSSLayout);
+
+    QGroupBox* groupBoxSSE = new QGroupBox(tr("Local SSE-Server"),this);
+    groupBoxSSE->setCheckable(true);
+    QHBoxLayout* groupBoxSSELayout = new QHBoxLayout;
+    QLabel* sseLabel = new QLabel(tr("Port"),this);
+    groupBoxSSELayout->addWidget(sseLabel,0,Qt::AlignRight);
+    QSpinBox* sseSpinBox = new QSpinBox(this);
+    sseSpinBox->setMaximum(65535);
+    sseSpinBox->setMinimumWidth(80);
+    groupBoxSSELayout->addWidget(sseSpinBox,0,Qt::AlignLeft);
+    groupBoxSSE->setLayout(groupBoxSSELayout);
+
+    ui->horizontalLayout_Settings->addWidget(groupBoxBeta);
+    ui->horizontalLayout_Settings->addWidget(groupBoxWSS);
+    ui->horizontalLayout_Settings->addWidget(groupBoxSSE);
+
+    // Fill with settings
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    ui->betaChannelcheckBox->setChecked(cfg.value("beta",false).toBool());
-    connect(ui->betaChannelcheckBox,SIGNAL(toggled(bool)),SLOT(onBetaChannelToggled(bool)));
+
+    checkBoxBeta->setChecked(cfg.value("beta",false).toBool());
+    connect(checkBoxBeta,SIGNAL(toggled(bool)),SLOT(onBetaChannelToggled(bool)));
 
     // WebSocket Server
     bool ok;
@@ -39,32 +77,32 @@ Config::Config(QWidget *parent) :
     if (!ok)
     {
         TSLogging::Error("Could not read websocket server port from settings");
-        ui->groupBox_WsServer->setChecked(false);
-        ui->groupBox_WsServer->setCheckable(false);
-        ui->spinBox_WsServer->setValue(0);
+        groupBoxWSS->setChecked(false);
+        groupBoxWSS->setCheckable(false);
+        wssSpinBox->setValue(0);
     }
     else
     {
-        ui->spinBox_WsServer->setValue(port);
-        connect(ui->spinBox_WsServer,SIGNAL(valueChanged(int)),this,SLOT(onServerPortChanged(int)));
-        ui->groupBox_WsServer->setChecked(cfg.value("server_enabled",true).toBool());
-        connect(ui->groupBox_WsServer,SIGNAL(toggled(bool)),this,SLOT(onServerEnabledToggled(bool)));
+        wssSpinBox->setValue(port);
+        connect(wssSpinBox,SIGNAL(valueChanged(int)),this,SLOT(onServerPortChanged(int)));
+        groupBoxWSS->setChecked(cfg.value("server_enabled",true).toBool());
+        connect(groupBoxWSS,SIGNAL(toggled(bool)),this,SLOT(onServerEnabledToggled(bool)));
     }
     // SSE-Server
     port = cfg.value("sse_server_port",64736).toUInt(&ok);
     if (!ok)
     {
         TSLogging::Error("Could not read sse server port from settings");
-        ui->groupBox_Server->setChecked(false);
-        ui->groupBox_Server->setCheckable(false);
-        ui->spinBox_Server->setValue(0);
+        groupBoxSSE->setChecked(false);
+        groupBoxSSE->setCheckable(false);
+        sseSpinBox->setValue(0);
     }
     else
     {
-        ui->spinBox_Server->setValue(port);
-        connect(ui->spinBox_Server,SIGNAL(valueChanged(int)),this,SLOT(onSseServerPortChanged(int)));
-        ui->groupBox_Server->setChecked(cfg.value("sse_server_enabled",false).toBool());
-        connect(ui->groupBox_Server,SIGNAL(toggled(bool)),this,SLOT(onSseServerEnabledToggled(bool)));
+        sseSpinBox->setValue(port);
+        connect(sseSpinBox,SIGNAL(valueChanged(int)),this,SLOT(onSseServerPortChanged(int)));
+        groupBoxSSE->setChecked(cfg.value("sse_server_enabled",false).toBool());
+        connect(groupBoxSSE,SIGNAL(toggled(bool)),this,SLOT(onSseServerEnabledToggled(bool)));
     }
 }
 

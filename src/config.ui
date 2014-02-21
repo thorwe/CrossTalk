@@ -16,16 +16,8 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="font">
-   <font>
-    <family>Times New Roman</family>
-   </font>
-  </property>
   <property name="windowTitle">
    <string notr="true">CrossTalk</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true"/>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -44,9 +36,6 @@
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
-   </property>
-   <property name="text">
-    <string/>
    </property>
    <property name="pixmap">
     <pixmap resource="../CrossTalkRes.qrc">:/banners/jianji</pixmap>
@@ -90,25 +79,25 @@
     <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Times New Roman'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Author: Thorsten Weinz &amp;lt;&lt;/span&gt;&lt;a href=&quot;https://github.com/thorwe&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;thorwe&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Official Addon Page&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://jianji.de/crosstalk/&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;German CrossTalk site&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt; for feedback and reports in german.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;Visit the &lt;/span&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub wiki&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt; for manuals and setup examples, e.g.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Plugin-Commands&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Plugin Commands&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;,&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Positional-Audio&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Positional Audio Module&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt;,&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Howto:-%22Radio-Frequencies%22-with-CrossTalk&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Howto: &amp;quot;Radio Frequencies&amp;quot;&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://github.com/thorwe/CrossTalk&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub project page&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-size:12pt;&quot;&gt; for source code.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Troubleshoot&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Known issues&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/issues/new&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Submit an issue&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/issues?state=open&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Bug Tracker and Feature Requests&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://forum.teamspeak.com/showthread.php/81565-RELEASE-CrossTalk&quot;&gt;&lt;span style=&quot; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Official Teamspeak forum thread&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;Author: Thorsten Weinz &amp;lt;&lt;/span&gt;&lt;a href=&quot;https://github.com/thorwe&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;thorwe&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Official Addon Page&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://jianji.de/crosstalk/&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;German CrossTalk site&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt;&quot;&gt; for feedback and reports in german.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;Visit the &lt;/span&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub wiki&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt;&quot;&gt; for manuals and setup examples, e.g.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Plugin-Commands&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Plugin Commands&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;,&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Positional-Audio&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Positional Audio Module&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;,&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Howto:-%22Radio-Frequencies%22-with-CrossTalk&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Howto: &amp;quot;Radio Frequencies&amp;quot;&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://github.com/thorwe/CrossTalk&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;GitHub project page&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt;&quot;&gt; for source code.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/wiki/Troubleshoot&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Known issues&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/issues/new&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Submit an issue&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://github.com/thorwe/CrossTalk/issues?state=open&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Bug Tracker and Feature Requests&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;http://forum.teamspeak.com/showthread.php/81565-RELEASE-CrossTalk&quot;&gt;&lt;span style=&quot; font-family:'Times New Roman'; font-size:12pt; text-decoration: underline; color:#0000ff;&quot;&gt;Official Teamspeak forum thread&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Times New Roman'; font-size:12pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="openExternalLinks">
     <bool>true</bool>
@@ -118,130 +107,12 @@ p, li { white-space: pre-wrap; }
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>480</y>
+     <y>479</y>
      <width>431</width>
      <height>71</height>
     </rect>
    </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_2">
-    <item>
-     <widget class="QGroupBox" name="groupBox_Updates">
-      <property name="title">
-       <string>Plugin Updates</string>
-      </property>
-      <widget class="QCheckBox" name="betaChannelcheckBox">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>101</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Beta Channel</string>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox_WsServer">
-      <property name="title">
-       <string>WebSockets Server</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-      <widget class="QSpinBox" name="spinBox_WsServer">
-       <property name="geometry">
-        <rect>
-         <x>51</x>
-         <y>30</y>
-         <width>61</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>65535</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_WsServer">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>41</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Port</string>
-       </property>
-      </widget>
-     </widget>
-    </item>
-    <item>
-     <widget class="QGroupBox" name="groupBox_Server">
-      <property name="title">
-       <string>Local SSE-Server</string>
-      </property>
-      <property name="checkable">
-       <bool>true</bool>
-      </property>
-      <property name="checked">
-       <bool>false</bool>
-      </property>
-      <widget class="QSpinBox" name="spinBox_Server">
-       <property name="geometry">
-        <rect>
-         <x>51</x>
-         <y>30</y>
-         <width>61</width>
-         <height>22</height>
-        </rect>
-       </property>
-       <property name="maximum">
-        <number>65535</number>
-       </property>
-       <property name="value">
-        <number>0</number>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_Server">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>30</y>
-         <width>41</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="text">
-        <string>Port</string>
-       </property>
-      </widget>
-      <zorder>spinBox_Server</zorder>
-      <zorder>label_Server</zorder>
-      <zorder>horizontalLayoutWidget</zorder>
-     </widget>
-    </item>
-   </layout>
+   <layout class="QHBoxLayout" name="horizontalLayout_Settings"/>
   </widget>
   <zorder>aboutText</zorder>
   <zorder>banner_jianji</zorder>

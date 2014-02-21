@@ -52,12 +52,13 @@ HEADERS += \
     src/config_ducking.h \
     src/fader_vertical.h \
     src/settings_duck.h \
-    src/config_position_spread.h \
+    src/groupbox_position_spread.h \
     src/settings_position_spread.h \
     src/banner_frame.h \
     src/mod_agmu.h \
     src/plugin_qt.h \
-    src/sse_server.h
+    src/sse_server.h \
+    src/groupbox_ducking.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -88,19 +89,21 @@ SOURCES += \
     src/config_ducking.cpp \
     src/fader_vertical.cpp \
     src/settings_duck.cpp \
-    src/config_position_spread.cpp \
+    src/groupbox_position_spread.cpp \
     src/settings_position_spread.cpp \
     src/banner_frame.cpp \
     src/mod_agmu.cpp \
     src/plugin_qt.cpp \
-    src/sse_server.cpp
+    src/sse_server.cpp \
+    src/groupbox_ducking.cpp
 
 FORMS += \
     src/config.ui \
     src/config_ducking.ui \
     src/fader_vertical.ui \
-    src/config_position_spread.ui \
-    src/banner_frame.ui
+    src/groupbox_position_spread.ui \
+    src/banner_frame.ui \
+    src/groupbox_ducking.ui
 
 RESOURCES += \
     CrossTalkRes.qrc

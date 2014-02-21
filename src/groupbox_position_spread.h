@@ -1,19 +1,19 @@
-#ifndef CONFIG_POSITION_SPREAD_H
-#define CONFIG_POSITION_SPREAD_H
+#ifndef GROUPBOX_POSITION_SPREAD_H
+#define GROUPBOX_POSITION_SPREAD_H
 
-#include <QDialog>
+#include <QGroupBox>
 
 namespace Ui {
-class ConfigPositionSpread;
+class GroupBoxPositionSpread;
 }
 
-class ConfigPositionSpread : public QDialog
+class GroupBoxPositionSpread : public QGroupBox
 {
     Q_OBJECT
-    
+
 public:
-    explicit ConfigPositionSpread(QWidget *parent = 0);
-    ~ConfigPositionSpread();
+    explicit GroupBoxPositionSpread(QWidget *parent = 0);
+    ~GroupBoxPositionSpread();
 
     // For Settings initialization and updating from other sources of interaction
     void UpdateEnabledSet(bool val);
@@ -36,7 +36,7 @@ private slots:
     void onSpinBoxValueChanged(double val);
 
 private:
-    Ui::ConfigPositionSpread *ui;
+    Ui::GroupBoxPositionSpread *ui;
 };
 
-#endif // CONFIG_POSITION_SPREAD_H
+#endif // GROUPBOX_POSITION_SPREAD_H

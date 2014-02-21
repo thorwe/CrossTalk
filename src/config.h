@@ -2,6 +2,8 @@
 #define CONFIG_H
 
 #include <QDialog>
+#include <QGroupBox>
+#include <QCheckBox>
 
 namespace Ui {
 class Config;

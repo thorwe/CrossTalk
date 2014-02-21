@@ -2,6 +2,11 @@
 #define CONFIG_DUCKING_H
 
 #include <QDialog>
+#include <QGroupBox>
+#include <QCheckBox>
+#include <QRadioButton>
+
+#include "fader_vertical.h"
 
 namespace Ui {
 class ConfigDucking;
@@ -33,10 +38,19 @@ signals:
     void channelDuckerDuckPSEnabledSet(bool);
 
 private slots:
-    void onChannelDuckingDuckModeSliderValueChanged(int val);
+    void onCRadioTargetCurrentToggled(bool val);
+    void onCRadioTargetOtherToggled(bool val);
 
 private:
     Ui::ConfigDucking *ui;
+    QGroupBox* g;
+    QGroupBox* c;
+    FaderVertical* gFader;
+    FaderVertical* cFader;
+
+    QRadioButton* cRadioTargetCurrent;
+    QRadioButton* cRadioTargetOther;
+    QCheckBox* cPS;
 };
 
 #endif // CONFIG_DUCKING_H
