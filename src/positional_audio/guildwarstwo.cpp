@@ -344,6 +344,17 @@ bool GuildWarsTwo::onInfoData(QTextStream &data)
     data << "\n";
     data << "is commander: " << ((isCommander())?"y":"n") << "\n";
 
+#if QT_VERSION >= 0x050000
+    data << m_Maps.value(QString::number(getMapId())).toObject().value("map_name").toString();
+    if (m_teamColorId != 0) // WvW
+    {
+        data << "WvW Team: " << getTeamColorId();
+    }
+    else                    // Tyria
+    {
+        data << m_WorldNames.value(QString::number(getWorldId())).toObject().value("name").toString();
+    }
+#else
     QString lang = TSHelpers::GetLanguage();
 
     data << GW2::getMapName(getMapId(),lang) << " ( ";
@@ -355,6 +366,7 @@ bool GuildWarsTwo::onInfoData(QTextStream &data)
     {
         data << GW2::getWorldName(getWorldId(),lang);
     }
+#endif
     data << " )\n";
 
 
