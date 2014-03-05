@@ -8,12 +8,26 @@
 
 #include "ts_logging_qt.h"
 
+#if QT_VERSION >= 0x050000
+  const QUrl GW2_BUILD("https://api.guildwars2.com/v1/build.json");
+  const QUrl GW2_WORLD_NAMES("https://api.guildwars2.com/v1/world_names.json");
+  const QUrl GW2_CONTINENTS("https://api.guildwars2.com/v1/continents.json");
+  const QUrl GW2_MAPS("https://api.guildwars2.com/v1/maps.json");
+#endif
+
 GuildWarsTwo::GuildWarsTwo(QObject *parent) :
     QObject(parent)
 {
     this->setObjectName("Guild Wars 2");
 //    PositionalAudio* pa = qobject_cast<PositionalAudio *>(parent);
 //    pa->RegisterCustomEnvironmentSupport(this);
+
+#if QT_VERSION >= 0x050000
+    m_netwManager = new QNetworkAccessManager(this);
+    connect(m_netwManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetwManagerFinished(QNetworkReply*)));
+    QNetworkRequest request(GW2_BUILD);
+    m_netwManager->get(request);
+#endif
 }
 
 QString GuildWarsTwo::getIdentity() const
@@ -45,6 +59,155 @@ bool GuildWarsTwo::isCommander() const
 {
     return m_isCommander;
 }
+
+#if QT_VERSION >= 0x050000
+void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
+{
+    if (reply->error() != QNetworkReply::NoError)
+    {
+        TSLogging::Log(reply->errorString(),LogLevel_WARNING);
+        return;
+    }
+
+    QJsonParseError jsonError;
+    QJsonDocument doc = QJsonDocument::fromJson(reply->readAll(),&jsonError);
+    if (jsonError.error != QJsonParseError::ParseError::NoError)
+    {
+        TSLogging::Error(QString("%1: Json error: %2").arg(this->objectName()).arg(jsonError.errorString()),true);
+        return;
+    }
+    if ((reply->url()) == GW2_BUILD)
+    {
+        if (!doc.isObject())
+        {
+            TSLogging::Error(QString("%1: Build is not an object.").arg(this->objectName()),true);
+            return;
+        }
+        m_build_id = doc.object().value("build_id").toInt();
+        TSLogging::Log(QString("%1: Build Id: %2").arg(this->objectName()).arg(m_build_id),LogLevel_INFO);
+    }
+
+    // path
+    bool isPathOk = true;
+    QString path = TSHelpers::GetConfigPath();
+    QDir dir(path);
+    if (!dir.exists())
+    {
+        TSLogging::Error(QString("%1: Config Path does not exist").arg(this->objectName()));
+        isPathOk = false;
+    }
+    else
+    {
+        path = QString(ts3plugin_name()).toLower();
+        if (!dir.exists(path))
+        {
+            //TSLogging::Print("Path does not exist: " + path);
+            if (!dir.mkdir(path))
+            {
+                TSLogging::Error(QString("%1: Could not create cache folder.").arg(this->objectName()),true);
+                isPathOk = false;
+            }
+        }
+        if (isPathOk && !dir.cd(path))
+        {
+            TSLogging::Error(QString("%1: Could not enter cache folder.").arg(this->objectName()));
+            isPathOk = false;
+        }
+    }
+    // /path
+
+    if (isPathOk)
+    {
+        QString filename = reply->url().fileName();
+        //TSLogging::Print("filename: " + filename);
+
+        bool isFileExists = dir.exists(filename);
+
+        QFile file(this);
+        file.setFileName(dir.absoluteFilePath(filename));
+        if (!file.open(QIODevice::ReadWrite))
+            TSLogging::Error(QString("%1: Could not open file: %2").arg(this->objectName()).arg(file.fileName()));
+        else
+        {
+            if ((reply->url()) == GW2_BUILD)
+            {
+                if (isFileExists)
+                {
+                    QByteArray saveData = file.readAll();
+                    QJsonDocument cache_doc = QJsonDocument::fromJson(saveData,&jsonError);
+                    if (jsonError.error != QJsonParseError::ParseError::NoError)
+                    {
+                        TSLogging::Error(QString("%1: Json error: %2").arg(this->objectName()).arg(jsonError.errorString()),true);
+                        return;
+                    }
+                    if (!cache_doc.isObject())
+                    {
+                        TSLogging::Error(QString("%1: Build is not an object.").arg(this->objectName()),true);
+                        return;
+                    }
+                    quint32 cache_build_id = cache_doc.object().value("build_id").toInt();
+                    if (cache_build_id != m_build_id)
+                    {
+                        TSLogging::Log(QString("%1: Build Id: changed.").arg(this->objectName()), LogLevel_INFO);
+                        QNetworkRequest requestWorldNames(GW2_WORLD_NAMES);
+                        m_netwManager->get(requestWorldNames);
+                        QNetworkRequest requestContinents(GW2_CONTINENTS);
+                        m_netwManager->get(requestContinents);
+                        QNetworkRequest requestMaps(GW2_MAPS);
+                        m_netwManager->get(requestMaps);
+                    }
+                    else
+                        TSLogging::Log(QString("%1: Build Id: up to date.").arg(this->objectName()), LogLevel_INFO);
+                }
+                else
+                {
+                    TSLogging::Log(QString("%1: Build Id: no cached value.").arg(this->objectName()), LogLevel_INFO);
+                    QNetworkRequest requestWorldNames(GW2_WORLD_NAMES);
+                    m_netwManager->get(requestWorldNames);
+                    QNetworkRequest requestContinents(GW2_CONTINENTS);
+                    m_netwManager->get(requestContinents);
+                    QNetworkRequest requestMaps(GW2_MAPS);
+                    m_netwManager->get(requestMaps);
+                }
+            }
+            else
+            {
+                // ToDo: Sane reformating of JSON data
+                if ((reply->url()) == GW2_CONTINENTS)
+                {
+                    QJsonObject obj = doc.object();
+                    obj = obj.value("continents").toObject();
+                    doc.setObject(obj);
+                    m_Continents = obj;
+                }
+                else if ((reply->url()) == GW2_MAPS)
+                {
+                    QJsonObject obj = doc.object();
+                    obj = obj.value("maps").toObject();
+                    doc.setObject(obj);
+                    m_Maps = obj;
+                }
+                else if ((reply->url()) == GW2_WORLD_NAMES)
+                {
+                    QJsonArray arr = doc.array();
+                    QJsonObject obj;
+                    for (int i = 0; i<arr.size(); ++i)
+                    {
+                        QJsonObject val = arr.at(i).toObject();
+                        obj.insert(val.value("id").toString(), val);
+                    }
+                    doc.setObject(obj);
+                    m_WorldNames = obj;
+                }
+            }
+            file.write(doc.toJson());
+        }
+        file.close();
+
+    }
+    reply->deleteLater();
+}
+#endif
 
 bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
 {
