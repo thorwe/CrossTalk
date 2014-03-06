@@ -76,6 +76,7 @@
         var ct_players = {}; //CrossTalk
         var iconStyles = {};
         var ct_me = {};
+		var UID_ME = "_§%(%myUID%)%§_";
         settings = loadFromStorage();
 		var q_port = getUrlParameters("websocket_port", "", true);
 		if (q_port)
@@ -188,7 +189,7 @@
                 //marker = L.circleMarker(m.map.unproject(pos, m.map.getMaxZoom()));    //, <Path options> options?
                 marker = L.marker(m.map.unproject(pos, m.map.getMaxZoom()), {title: name, icon: icon});
                 marker.bindPopup(popup,{closeButton:false,closeOnClick:true,keepInView:true});
-                m.playermarkers[key] = marker;
+                m.playermarkers[key] = marker;					
                 if (isMe)
                     m.layers[m.options.i18n.avatar].addLayer(marker);
                 else if (isCommander)
@@ -314,20 +315,21 @@
 				{
 					console.log('Message received: ' + event.data);
 					var jsonObj = JSON.parse(event.data);
+					var key = (jsonObj.me)?UID_ME:jsonObj.uid;
+					
 					if (typeof jsonObj.world_id === "undefined")
 					{
 						for (var i = 0; i < maps.length; i++) {
 							var m = maps[i];
-							var marker = m.playermarkers[jsonObj.name];
+							var marker = m.playermarkers[key];
 							marker.remove();
-							var oldPlayer = $(jsonObj.name);
+							var oldPlayer = $(key);
 							if (oldPlayer)
 								$("players").removeChild(oldPlayer);
 						};
 						return;
 					}
 
-					var key = jsonObj.name;
 					jsonObj.state = jsonObj.me ? 2 : 0;
 					jsonObj.time = "";
 					jsonObj.guild = {};

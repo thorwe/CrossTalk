@@ -275,6 +275,9 @@ void PositionalAudio::setServerSettingSendIntervalSilentInc(QString serverUnique
 void PositionalAudio::onMyVrChanged(TsVrObj *obj, QString val)
 {
     Q_UNUSED(obj);
+    if (val.isEmpty())
+        emit BroadcastJSON(QStringLiteral("{\"me\":true}"));
+
     emit myVrChanged(val);
 }
 
