@@ -380,7 +380,9 @@ var GW2Maps = {
 		});
 		// eventdata
 		if(eventdata){
+			console.log("Parsing Events");
 			$H(eventdata).each(function(p){
+				console.log("Name: " + p[1][name]);
 				sort.event.push(p[1].level);
 				pois.event.push({
 					id: p[0],
