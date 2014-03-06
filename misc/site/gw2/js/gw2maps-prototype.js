@@ -388,7 +388,7 @@ var GW2Maps = {
 					if (typeof p[1]["name_en"] !== "undefined")	// fall back to english
 						eventName = p[1]["name_en"];
 					else
-						continue;
+						return true;	//continue for jquery each
 				}
 				sort.event.push(p[1].level);
 				pois.event.push({
