@@ -172,32 +172,56 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
             }
             else
             {
-                // ToDo: Sane reformating of JSON data
-                if ((reply->url()) == GW2_CONTINENTS)
+                if (reply->url().hasQuery())
                 {
-                    QJsonObject obj = doc.object();
-                    obj = obj.value("continents").toObject();
-                    doc.setObject(obj);
-                    m_Continents = obj;
+                    QUrlQuery query(reply->url());
+                    if (query.hasQueryItem("lang"))
+                        TSLogging::Print(QString("Lang Query: ").arg(query.queryItemValue("lang")));
+
+                    return;
+
                 }
-                else if ((reply->url()) == GW2_MAPS)
+                else
                 {
-                    QJsonObject obj = doc.object();
-                    obj = obj.value("maps").toObject();
-                    doc.setObject(obj);
-                    m_Maps = obj;
-                }
-                else if ((reply->url()) == GW2_WORLD_NAMES)
-                {
-                    QJsonArray arr = doc.array();
-                    QJsonObject obj;
-                    for (int i = 0; i<arr.size(); ++i)
+                    // ToDo: Sane reformating of JSON data
+                    if ((reply->url()) == GW2_CONTINENTS)
                     {
-                        QJsonObject val = arr.at(i).toObject();
-                        obj.insert(val.value("id").toString(), val);
+                        QJsonObject obj = doc.object();
+                        obj = obj.value("continents").toObject();
+                        doc.setObject(obj);
+                        m_Continents = obj;
                     }
-                    doc.setObject(obj);
-                    m_WorldNames = obj;
+                    else if ((reply->url()) == GW2_MAPS)
+                    {
+                        QJsonObject obj = doc.object();
+                        obj = obj.value("maps").toObject();
+                        doc.setObject(obj);
+                        m_Maps = obj;
+                    }
+                    else if ((reply->url()) == GW2_WORLD_NAMES)
+                    {
+                        QJsonArray arr = doc.array();
+                        QJsonObject obj;
+                        for (int i = 0; i<arr.size(); ++i)
+                        {
+                            QJsonObject val = arr.at(i).toObject();
+                            obj.insert(val.value("id").toString(), val);
+                        }
+                        doc.setObject(obj);
+                        m_WorldNames = obj;
+                    }
+
+                    // lang
+                    QUrl url = reply->url();
+                    url.setQuery("lang=de");
+                    QNetworkRequest requestDe(url);
+                    m_netwManager->get(requestDe);
+                    url.setQuery("lang=fr");
+                    QNetworkRequest requestFr(url);
+                    m_netwManager->get(requestFr);
+                    url.setQuery("lang=se");
+                    QNetworkRequest requestSe(url);
+                    m_netwManager->get(requestSe);
                 }
             }
             file.write(doc.toJson());

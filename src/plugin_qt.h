@@ -54,7 +54,6 @@ public:
     // Sse-Server
     bool isSseServerEnabled() const;
     quint16 getSseServerPort() const;
-    void LocalServerSend(QString val);
 
 //#ifdef USE_QT_WEB_APP
 //    TsHttpServer* m_HttpServer;
@@ -72,6 +71,7 @@ public slots:
     // Sse-Server
     void setSseServerEnabled(bool val);
     void setSseServerPort(quint16 val);
+    void LocalServerSend(QString val);
 
 private:
     //singleton

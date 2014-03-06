@@ -291,7 +291,6 @@ void PositionalAudio::onUniverseRemoved(QString clientUID)
     out << "{";
     out << "\"uid\":\"" << clientUID << "\",";
     out << "\"me\":false}";
-    PluginQt::instance()->LocalServerSend(out_stri);
     emit BroadcastJSON(out_stri);
 }
 
@@ -444,6 +443,7 @@ void PositionalAudio::onRunningStateChanged(bool value)
 #ifdef USE_WEBSOCKET
         connect(this, SIGNAL(BroadcastJSON(QString)),PluginQt::instance()->m_WebSocketServer,SIGNAL(broadcastMessage(QString)), Qt::UniqueConnection);
 #endif
+        connect(this,SIGNAL(BroadcastJSON(QString)),PluginQt::instance(),SLOT(LocalServerSend(QString)),Qt::UniqueConnection);
         m_sharedMemory = new QSharedMemory(this);
         m_sharedMemory->setNativeKey("MumbleLink");
         if (!m_sharedMemory->create(sizeof(LinkedMem),QSharedMemory::ReadWrite))
@@ -797,9 +797,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
         ts3Functions.channelset3DAttributes(serverConnectionHandlerID,clientID,&vector);
     }
 
-
     QString sendString = GetSendStringJson(true,false,obj);
-    PluginQt::instance()->LocalServerSend(sendString);
     emit BroadcastJSON(sendString);
     return true;
 }
@@ -1023,10 +1021,7 @@ void PositionalAudio::Send()
 
             args = GetSendStringJson(true,true,NULL);
             if (!args.isEmpty())
-            {
-                PluginQt::instance()->LocalServerSend(args);
                 emit BroadcastJSON(args);
-            }
         }
 
 
@@ -1043,10 +1038,7 @@ void PositionalAudio::Send()
                 Send(args,PluginCommandTarget_CLIENT);
                 args = GetSendStringJson(true,true,NULL);
                 if (!args.isEmpty())
-                {
-                    PluginQt::instance()->LocalServerSend(args);    //SSE Server
                     emit BroadcastJSON(args);
-                }
             }
         }
     }
