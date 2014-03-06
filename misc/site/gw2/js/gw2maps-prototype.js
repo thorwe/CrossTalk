@@ -380,17 +380,24 @@ var GW2Maps = {
 		});
 		// eventdata
 		if(eventdata){
-			console.log("Parsing Events");
 			$H(eventdata).each(function(p){
-				console.log("Name: " + p[1][name]);
+				// Apparently there either are nameless/untranslated events or I got some bug in gw2info, more likely the former
+				var eventName = p[1][name];
+				if (typeof eventName === "undefined")
+				{
+					if (typeof p[1]["name_en"] !== "undefined")	// fall back to english
+						eventName = p[1]["name_en"];
+					else
+						continue;
+				}
 				sort.event.push(p[1].level);
 				pois.event.push({
 					id: p[0],
 					type: "event",
 					coords: recalc_event_coords(map.continent_rect,map.map_rect,p[1].location.center),
-					title: p[1][name]+" ("+p[1].level+")",
-					text: "("+p[1].level+") "+p[1][name],
-					popup: '<a href="'+options.i18n.wiki+encodeURIComponent(p[1][name].replace(/\.$/, ""))+'" target="_blank">'+p[1][name]+"</a> ("+p[1].level+")<br />id:"+p[0]
+					title: eventName + " (" + p[1].level + ")",
+					text: "(" + p[1].level + ") " + eventName,
+					popup: '<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a> ("+p[1].level+")<br />id:"+p[0]
 				});
 			});
         };
