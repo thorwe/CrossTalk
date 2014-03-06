@@ -322,7 +322,8 @@
 						for (var i = 0; i < maps.length; i++) {
 							var m = maps[i];
 							var marker = m.playermarkers[key];
-							marker.remove();
+							//marker.remove();	old API or sth.
+							m.removeLayer(marker)
 							var oldPlayer = $(key);
 							if (oldPlayer)
 								$("players").removeChild(oldPlayer);
