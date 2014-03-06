@@ -719,12 +719,6 @@ var GW2Maps = {
 		de: {
 			lang: "de",
 			wiki: "http://wiki-de.guildwars2.com/wiki/",
-            /*icon_event: {link: "http://wiki-de.guildwars2.com/images/7/7a/Event_Angriff_Icon.png", size: [24,24]},
-			icon_landmark: {link: "http://wiki-de.guildwars2.com/images/0/0f/Sehenswürdigkeit_Icon.png", size: [16,16]},
-			icon_skill: {link: "http://wiki-de.guildwars2.com/images/c/c3/Fertigkeitspunkt_Icon.png", size: [20,20]},
-			icon_task: {link: "http://wiki-de.guildwars2.com/images/b/b7/Aufgabe_Icon.png", size: [20,20]},
-			icon_vista: {link: "http://wiki-de.guildwars2.com/images/9/9f/Aussichtspunkt_Icon.png", size: [20,20]},
-            icon_waypoint: {link: "http://wiki-de.guildwars2.com/images/d/df/Wegmarke_Icon.png", size: [24,24]},*/
 			errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
 			landmark: "Sehenswürdigkeiten",
@@ -754,12 +748,6 @@ var GW2Maps = {
 		en: {
 			lang: "en",
 			wiki: "http://wiki.guildwars2.com/wiki/",
-            /*icon_event: {link: "http://wiki-de.guildwars2.com/images/7/7a/Event_Angriff_Icon.png", size: [24,24]},
-			icon_landmark: {link: "http://wiki.guildwars2.com/images/f/fb/Point_of_interest.png", size: [20,20]},
-			icon_skill: {link: "http://wiki.guildwars2.com/images/8/84/Skill_point.png", size: [20,20]},
-			icon_task: {link: "http://wiki.guildwars2.com/images/f/f8/Complete_heart_(map_icon).png", size: [20,20]},
-			icon_vista: {link: "http://wiki.guildwars2.com/images/d/d9/Vista.png", size: [20,20]},
-            icon_waypoint: {link: "http://wiki.guildwars2.com/images/d/d2/Waypoint_(map_icon).png", size: [20,20]},*/
 			errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
 			landmark: "Points of Interest",
@@ -790,12 +778,6 @@ var GW2Maps = {
 		es: {
 			lang:"es",
 			wiki: "http://wiki-es.guildwars2.com/wiki/",
-            /*icon_event: {link: "http://wiki-de.guildwars2.com/images/7/7a/Event_Angriff_Icon.png", size: [24,24]},
-			icon_landmark: {link: "http://wiki.guildwars2.com/images/f/fb/Point_of_interest.png", size: [20,20]},
-			icon_skill: {link: "http://wiki.guildwars2.com/images/8/84/Skill_point.png", size: [20,20]},
-			icon_task: {link: "http://wiki.guildwars2.com/images/f/f8/Complete_heart_(map_icon).png", size: [20,20]},
-			icon_vista: {link: "http://wiki.guildwars2.com/images/d/d9/Vista.png", size: [20,20]},
-            icon_waypoint: {link: "http://wiki.guildwars2.com/images/d/d2/Waypoint_(map_icon).png", size: [20,20]},*/
 			errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "event-es",
 			landmark: "poi-es",
@@ -825,12 +807,6 @@ var GW2Maps = {
 		fr: {
 			lang: "fr",
 			wiki: "http://wiki-fr.guildwars2.com/wiki/",
-            /*icon_event: {link: "http://wiki-de.guildwars2.com/images/7/7a/Event_Angriff_Icon.png", size: [24,24]},
-			icon_landmark: {link: "http://wiki-fr.guildwars2.com/images/d/d2/Icône_site_remarquable_découvert.png", size: [20,20]},
-			icon_skill: {link: "http://wiki-fr.guildwars2.com/images/5/5c/Progression_défi.png", size: [20,20]},
-			icon_task: {link: "http://wiki-fr.guildwars2.com/images/a/af/Icône_coeur_plein.png", size: [20,20]},
-			icon_vista: {link: "http://wiki-fr.guildwars2.com/images/8/82/Icône_panorama.png", size: [20,20]},
-            icon_waypoint: {link: "http://wiki-fr.guildwars2.com/images/5/56/Progression_passage.png", size: [20,20]},*/
 			errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "event-fr",
 			landmark: "Sites remarquables",
