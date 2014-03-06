@@ -321,7 +321,7 @@
 					{
 						for (var i = 0; i < maps.length; i++) {
 							var m = maps[i];
-							var marker = m.playermarkers[key];
+							var marker = m.map.playermarkers[key];
 							//marker.remove();	old API or sth.
 							m.removeLayer(marker)
 							var oldPlayer = $(key);
