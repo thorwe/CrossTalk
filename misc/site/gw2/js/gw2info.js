@@ -66,7 +66,7 @@
     var indexedDB = indexedDB || window.indexedDB || window.webkitIndexedDB || window.mozIndexedDB || window.oIndexedDB || window.msIndexedDB,
         IDBKeyRange = IDBKeyRange || window.IDBKeyRange || window.webkitIDBKeyRange,
         IDBTransaction = IDBTransaction || window.IDBTransaction || window.webkitIDBTransaction || { READ_WRITE: "readwrite" },
-        IDBDatabase = IDBDatabase || window.IDBDatabase || window.webkitIDBDatabase || ((typeof webkitIDBDatabase !== "undefined)?webkitIDBDatabase:false);
+        IDBDatabase = IDBDatabase || window.IDBDatabase || window.webkitIDBDatabase || ((typeof webkitIDBDatabase !== "undefined")?webkitIDBDatabase:false);
 
     var deleteDatabase = function() {
        var deleteDbRequest = indexedDB.deleteDatabase('gw2info');
