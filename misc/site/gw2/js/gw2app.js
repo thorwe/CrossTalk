@@ -472,7 +472,7 @@
 					websocket.onopen = function(evt) { console.log("Connected."); };
 					websocket.onclose = function(evt) { ws_onClose(evt) };
 					websocket.onmessage = function(evt) { onMessage(evt) };
-					websocket.onerror = function(evt) { console.log('Error: ' + evt.data); };
+					websocket.onerror = function(evt) { (if typeof evt.data !== "undefined") console.log('Error: ' + evt.data); };
 				};
 				
 				var doWSDisconnect = function()
