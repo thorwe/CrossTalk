@@ -1863,9 +1863,15 @@
                         else
                         {
                             console.log(file + '_' +language + '_' + continent_id + '_' + floor_id + ' up to date.');
-                            requestFromDbByKey(file, ('' + continent_id + '_' + floor_id), function(dBresult){
+							
+							// This doesn't work with IndexedDbShim on IOS
+							// Todo: detect
+                            /*requestFromDbByKey(file, ('' + continent_id + '_' + floor_id), function(dBresult){
                                 callback(dBresult);
-                            });
+                            });*/
+							requestFromDbAll(file,function(result){
+								callback(result['' + continent_id + '_' + floor_id]);
+							}, false);  //args
                         };
                     });
 
