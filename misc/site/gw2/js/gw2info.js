@@ -1872,7 +1872,7 @@
 							requestFromDbAll(file,function(result){
 								if (typeof result === "undefined")
 									console.log("requestMapFloor: undefined db result");
-								elseif (result === false)
+								else if (result === false)
 									console.log("requestMapFloor: false db result");
 									
 								callback(result['' + continent_id + '_' + floor_id]);
