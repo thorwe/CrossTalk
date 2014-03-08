@@ -403,7 +403,7 @@
 				var websocket;
 				var doWSConnect = function()
 				{
-					console.log('Connecting to server..');
+					//console.log('Connecting to server..');
 					var baseurl;
 					var port;
 					
@@ -462,7 +462,7 @@
 					// Websocket Event Handlers
 					var ws_onClose = function(evt)
 					{
-						console.log("Disconnected.");
+						//console.log("Disconnected.");
 
 						// Immediately reconnect!
 						doWSConnect();
