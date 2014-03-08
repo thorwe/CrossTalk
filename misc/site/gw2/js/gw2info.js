@@ -1189,7 +1189,7 @@
 
                     store.get(key).onsuccess = function(event) {
                         var result = event.target.result;
-                        //console.log('Key ' + (result ? '' : 'not ') + 'found: ' + key + ' in ' + store_name);
+                        console.log('updateDbEntry: Key ' + (result ? '' : 'not ') + 'found: ' + key + ' in ' + store_name);
                         if(!result)
                             result = {};
 
@@ -1197,6 +1197,7 @@
 
                         var dbputrequest = ool_key ? (store.put(result, key)):(store.put(result));
                         dbputrequest.onsuccess = function(evt){
+							console.log('updateDbEntry: Key ' + key + 'added to '  + store_name);
                             callback(result);
                         };
                     };
