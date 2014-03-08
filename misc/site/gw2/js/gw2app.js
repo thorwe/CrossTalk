@@ -93,7 +93,7 @@
 		
         var initLanguageSelection = function(){
             var selectBox = $('language_list');
-            $H({en:"english",de:"deutsch",fr:"fran&ccedil;ais",es:"español"}).each(function(e) {
+            $H({en:"english",de:"deutsch",fr:"français",es:"español"}).each(function(e) {	//fran&ccedil;ais	//fran&#231;ais
                 selectBox.options.add( new Option(e[1], e[0], (e[0] === settings.lang), (e[0] === settings.lang) ));
             });
         };
@@ -598,7 +598,7 @@
                         console.log("Found my match-up");
 
                         var cb_func = function(match_details){
-                            console.log("Match Details update.");
+                            //console.log("Match Details update.");
                             // dispatch to maps
                             for (var i = 0, len = maps.length; i < len; i++) {
                                 var m = maps[i];
