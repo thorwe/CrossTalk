@@ -3,7 +3,7 @@
 
 // Enable XSS... errr... CORS for Prototype: http://kourge.net/node/131
 // the console will tell you: Refused to get unsafe header "X-JSON"
-Ajax.Responders.register({
+/*Ajax.Responders.register({
 	onCreate: function(response) {
 //		if (response.request.isSameOrigin())
 //			return;
@@ -14,7 +14,7 @@ Ajax.Responders.register({
 			return;
 		});
 	}
-});
+});*/
 
 (function(){
 
