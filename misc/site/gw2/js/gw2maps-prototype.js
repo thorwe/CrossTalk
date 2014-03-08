@@ -20,21 +20,7 @@
  *
  * switch floors for maps with multiple floors e.g. like Rata Sum
  */
-
-// Enable XSS... errr... CORS for Prototype: http://kourge.net/node/131
-// the console will tell you: Refused to get unsafe header "X-JSON"
-/*Ajax.Responders.register({
-	onCreate: function(response) {
-//		if (response.request.isSameOrigin())
-//			return;
-		var t = response.transport;
-		t.setRequestHeader = t.setRequestHeader.wrap(function(original, k, v) {
-			if (/^(accept|accept-language|content-language)$/i.test(k) || (/^content-type$/i.test(k) && /^(application\/x-www-form-urlencoded|multipart\/form-data|text\/plain)(;.+)?$/i.test(v)))
-				return original(k, v);
-			return;
-		});
-	}
-});*/
+// This needs prototypejs && prototype-cors.js?
 
 var isNeedFullMatchDetails = false;
 
