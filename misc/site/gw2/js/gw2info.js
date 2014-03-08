@@ -1010,7 +1010,7 @@
                 };
                 if(!db.objectStoreNames.contains('map_floor')){
                     store = db.createObjectStore('map_floor', {
-                                                     keyPath: "id"
+                                                     //keyPath: "id"
                                                  });
                 };
             }
@@ -1841,7 +1841,7 @@
                                     responseJSON = cleanup(responseJSON,language);
                                     responseJSON.continent_id = continent_id;
                                     responseJSON.floor_id = floor_id;
-                                    responseJSON.id = '' + continent_id + '_' + floor_id;
+                                    //responseJSON.id = '' + continent_id + '_' + floor_id;
 
                                     updateDbEntry(function(obj){
                                         var store = getStore('build_ids', true);
@@ -1850,7 +1850,7 @@
                                             console.log('Entry ' + evt.target.result + ' saved.');
                                             callback(obj);
                                         };
-                                    }, file, responseJSON, false);
+                                    }, file, responseJSON, ('' + continent_id + '_' + floor_id));	//false);
 
                                     //data.map_floor[continent_id][floor_id] = responseJSON;
                                     callback(responseJSON);
