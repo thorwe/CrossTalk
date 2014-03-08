@@ -934,8 +934,8 @@
 		isInit: false,
 		init: function(callback,options)
 		{
-            localStorage.clear();
-            deleteDatabase();
+            //localStorage.clear();
+            //deleteDatabase();
             console.log("GW2Info: init");
             if (typeof options === 'undefined') options = {};
             GW2Info.options = options;
