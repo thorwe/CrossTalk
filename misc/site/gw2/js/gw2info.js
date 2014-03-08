@@ -1993,8 +1993,8 @@
                                     console.log(JSON.stringify(matchDetailsDiff));
                                     response._diff = matchDetailsDiff;
                                 }
-                                else
-                                    console.log("No change.");
+                                /*else
+                                    console.log("No change.");*/
 
                                 publisher.fire(match_id,response);
                             }
