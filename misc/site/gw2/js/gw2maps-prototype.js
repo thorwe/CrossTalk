@@ -407,7 +407,7 @@ var GW2Maps = {
         //console.log(JSON.stringify(match_details.maps));
         if (!(GW2Info &&GW2Info.data && GW2Info.data.wvw_mapTypeId && GW2Info.data.wvw_objectives && mapobject.baselayer.options.continent_id === 2))
         {
-            console.log("Returning early. mapobject continent:" + mapobject.baselayer.options.continent_id);
+            //console.log("Returning early. mapobject continent:" + mapobject.baselayer.options.continent_id);
             return;
         }
         //if (!mapobject.wvw_objective_markers) mapobject.wvw_objective_markers = {};
