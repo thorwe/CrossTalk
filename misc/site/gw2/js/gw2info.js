@@ -935,7 +935,7 @@
 		init: function(callback,options)
 		{
             //localStorage.clear();
-            deleteDatabase();
+            //deleteDatabase();
             console.log("GW2Info: init");
             if (typeof options === 'undefined') options = {};
             GW2Info.options = options;
@@ -1178,7 +1178,7 @@
                     var key;
                     if (ool_key)
                         key = ool_key;
-                    else if (store.keyPath)
+                    else if (store.keyPath)	// NOTE: This apparently doesn't work with the indexedDbShim polyfill; use ool
                         key = responseJSON[store.keyPath];
                     else
                     {
@@ -1197,7 +1197,7 @@
 
                         var dbputrequest = ool_key ? (store.put(result, key)):(store.put(result));
                         dbputrequest.onsuccess = function(evt){
-							console.log('updateDbEntry: Key ' + key + 'added to '  + store_name);
+							console.log('updateDbEntry: Key ' + key + ' added to '  + store_name);
                             callback(result);
                         };
                     };
@@ -1867,10 +1867,10 @@
 							
 							// This doesn't work with IndexedDbShim on IOS
 							// Todo: detect
-                            /*requestFromDbByKey(file, ('' + continent_id + '_' + floor_id), function(dBresult){
+                            requestFromDbByKey(file, ('' + continent_id + '_' + floor_id), function(dBresult){
                                 callback(dBresult);
-                            });*/
-							requestFromDbAll(file,function(result){
+                            });
+							/*requestFromDbAll(file,function(result){
 								if (typeof result === "undefined")
 									console.log("requestMapFloor: undefined db result");
 								else if (result === false)
@@ -1878,6 +1878,7 @@
 									
 								callback(result['' + continent_id + '_' + floor_id]);
 							}, false);  //args
+							*/
                         };
                     });
 
