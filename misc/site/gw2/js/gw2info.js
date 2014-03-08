@@ -1650,13 +1650,18 @@
                         GW2Info.requestEventDetails(function(result){console.log("Event Details: Request completed.");},'en');*/
                 };
 
-                new Ajax.Request('https://api.guildwars2.com/v1/build.json', {
+				requestFromDbByKey('build_ids', '_current', function(result){
+					if (result)
+						data.build_id = result;
+						
+					new Ajax.Request('https://api.guildwars2.com/v1/build.json', {
                         method:'get',
                         requestHeaders: {Accept: 'application/json'},
                         onSuccess: function(request) {
                             var build_id = request.responseJSON.build_id;
                             console.log('GW2Info: Received build id: ' + build_id);
                             console.log('GW2Info: Build Storage: ' + ((typeof data.build_id === 'undefined') ? 'none' : data.build_id));
+		                    							
                             if (build_id !== data.build_id)
                             {
                                 status.build_id = states.updated;
@@ -1674,6 +1679,7 @@
                             checkFireInit();
                         }
                     });
+				});
 
                 /********************************************************************************/
                 // WvW Matches
