@@ -1969,14 +1969,15 @@
                                 delete e[1][f];
                         });
 
-                        if ($H(e[1]).keys().length === 1)   //{"type":"RedHome"}
+                        if ($H(e[1]).keys().length === 1)   //"type":"RedHome"
                             delete clone.maps[e[0]];        // Not sure if the iterator can handle that
                     });
 
                     if ($H(clone.maps).keys().length === 0)
                         delete clone.maps;
                 };
-                if ($H(clone).keys().length === 1)  //{"match_id":"2-2"}
+				
+                if ($H(clone).keys().length === 1)  //"match_id":"2-2"}
                     clone = false;
 
                 lastMatchDetail = responseJSON;
@@ -2003,7 +2004,7 @@
                                 var matchDetailsDiff = getDiffMatchDetail(response);
                                 if (matchDetailsDiff)
                                 {
-                                    console.log(JSON.stringify(matchDetailsDiff));
+                                    //console.log(JSON.stringify(matchDetailsDiff));
                                     response._diff = matchDetailsDiff;
                                 }
                                 /*else
@@ -2030,7 +2031,15 @@
         {
             var cleanup = function(responseJSON)
             {
-
+				// Do we want that?
+				/*var obj = {};
+                $A(responseJSON.events).each(function(e){
+					if (!obj[e.world_id]) obj[e.world_id] = {};
+					if (!obj[e.world_id][e.map_id]) obj[e.world_id][e.map_id] = {};
+					obj[e.world_id][e.map_id][e.event_id] = e.state;
+                });
+                responseJSON = obj;*/
+				responseJSON = responseJSON.events;
             };
 
             var baseUrl = 'https://api.guildwars2.com/v1/events.json'   //?world_id=2005&event_id=AFCF031A-F71D-4CEA-85E1-957179414B25';
