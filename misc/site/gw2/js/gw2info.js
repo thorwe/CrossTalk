@@ -2057,7 +2057,6 @@
                         url = url + '&' + e;
                 };
             });
-			console.log("registerForEvents url: " + url);
             publisher.on(url,callback,context);
 
             new PeriodicalExecuter( function(pe) {
@@ -2069,9 +2068,7 @@
                             pe.stop();
                         else
                         {
-							console.log("ResponseJson: ");
                             var response = request.responseJSON;
-							console.log(JSON.stringify(response));
                             cleanup(response);
                             publisher.fire(url,response);
                         }
