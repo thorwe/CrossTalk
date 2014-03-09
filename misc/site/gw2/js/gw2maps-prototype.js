@@ -72,7 +72,7 @@ var GW2Maps = {
 		
 		// set the base tiles and add a little copyright info
 		var defLayer = L.tileLayer("https://tiles.guildwars2.com/{continent_id}/{floor_id}/{z}/{x}/{y}.jpg", {
-			errorTileUrl: options.i18n.errortile,
+			errorTileUrl: "../img/errortile.png",	//options.i18n.errortile,
 			//minZoom: 0,
 			maxZoom: options.continent_id == 1 ? 7 : 6,	//set on map level actually
 			continuousWorld: true,
@@ -129,7 +129,7 @@ var GW2Maps = {
 			if (options.map_controls_continent)
 			{
 				var nondefLayer = L.tileLayer("https://tiles.guildwars2.com/{continent_id}/{floor_id}/{z}/{x}/{y}.jpg", {
-					errorTileUrl: options.i18n.errortile,
+					errorTileUrl: "../img/errortile.png",	//options.i18n.errortile,
 					//minZoom: 0,
 					maxZoom: options.continent_id == 2 ? 7 : 6,
 					continuousWorld: true,
@@ -743,7 +743,7 @@ var GW2Maps = {
 		en: {
 			lang: "en",
 			wiki: "http://wiki.guildwars2.com/wiki/",
-			errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
+			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
 			landmark: "Points of Interest",
 			players: "Players",
@@ -773,7 +773,7 @@ var GW2Maps = {
 		es: {
 			lang:"es",
 			wiki: "http://wiki-es.guildwars2.com/wiki/",
-			errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
+			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "event-es",
 			landmark: "poi-es",
 			players: "players-es",
@@ -802,7 +802,7 @@ var GW2Maps = {
 		fr: {
 			lang: "fr",
 			wiki: "http://wiki-fr.guildwars2.com/wiki/",
-			errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
+			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "event-fr",
 			landmark: "Sites remarquables",
 			players: "players-fr",
