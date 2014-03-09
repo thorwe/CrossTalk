@@ -2064,11 +2064,13 @@
                     method:'get',
                     requestHeaders: {Accept: 'application/json'},
                     onSuccess: function(request) {
+						console.log("Events update success: " + url);
                         if (Array.length(publisher.subscribers[url]) === 0)
                             pe.stop();
                         else
                         {
                             var response = request.responseJSON;
+							console.log(JSON.stringify(response));
                             cleanup(response);
                             publisher.fire(url,response);
                         }
