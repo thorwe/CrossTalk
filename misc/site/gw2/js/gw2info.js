@@ -2068,6 +2068,7 @@
 						console.log("Events update success: " + url);
 						console.log("typeof publisher.subscribers:" + typeof publisher.subscribers);
 						console.log("typeof publisher.subscribers[url]:" + typeof publisher.subscribers[url]);
+						console.log("Array length: " + Array.length(publisher.subscribers[url]));
                         if (Array.length(publisher.subscribers[url]) === 0)
 						{
 							console.log("Events: Stopping PeriodicalExecuter");
