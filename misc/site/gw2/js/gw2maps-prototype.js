@@ -531,27 +531,27 @@ var GW2Maps = {
 	parse_events: function(mapobject,events) // dynamic event updates
 	{
 		console.log("Events is an Array: " + (Array.isArray(events) ? "true" : "false"));
-		console.log("Array length: " + events.length);
-		for (var i = 0, len = events.length; i < len; i++) {
+		if (mapobject.map.hasLayer(mapobject.layers[mapobject.options.i18n.event]))
+		{
+			console.log("Array length: " + events.length);
+			for (var i = 0, len = events.length; i < len; i++) {
 
-			var world_id = events[i].world_id;		//(number) – The world on which the event is running.
-			var map_id = events[i].map_id;			//(number) – The map on which the event is running.
-			var event_id = events[i].event_id;		//(string) – The event GUID identifying the event.
-			var state = events[i].state;			//(string) – The current state of the event.
-			/*The state can be one of the following values:
-			Inactive – The event is not running.
-			Active – The event is running now.
-			Success – The event has succeeded.
-			Fail – The event has failed.
-			Warmup – The event is inactive and waiting for certain criteria to be met before becoming Active.
-			Preparation – The criteria for the event to start have been met, but certain activities (such as an NPC dialogue) have not completed yet. After the activites have been completed, the event will become Active.*/
-			
-			var marker = mapobject.markers["event"][event_id];
-			if (typeof marker === "undefined")
-				console.log("GW2Maps: parse_events: Marker is undefined. Skipping.");
-			else
-			{
-				if (mapobject.map.hasLayer(mapobject.layers[options.i18n.event]))
+				var world_id = events[i].world_id;		//(number) – The world on which the event is running.
+				var map_id = events[i].map_id;			//(number) – The map on which the event is running.
+				var event_id = events[i].event_id;		//(string) – The event GUID identifying the event.
+				var state = events[i].state;			//(string) – The current state of the event.
+				/*The state can be one of the following values:
+				Inactive – The event is not running.
+				Active – The event is running now.
+				Success – The event has succeeded.
+				Fail – The event has failed.
+				Warmup – The event is inactive and waiting for certain criteria to be met before becoming Active.
+				Preparation – The criteria for the event to start have been met, but certain activities (such as an NPC dialogue) have not completed yet. After the activites have been completed, the event will become Active.*/
+				
+				var marker = mapobject.markers["event"][event_id];
+				if (typeof marker === "undefined")
+					console.log("GW2Maps: parse_events: Marker is undefined. Skipping.");
+				else
 				{
 					if (i < 10)
 					{
@@ -562,7 +562,7 @@ var GW2Maps = {
 					}
 					marker._icon.style.display = (state === "Active") ? 'block':'none';
 				}
-			}
+			};
 		};
 	},
 	
