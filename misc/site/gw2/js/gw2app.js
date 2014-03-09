@@ -617,6 +617,13 @@
                 }
             }
             GW2Info.requestWvWMatches(updateMatchDetailsSubscription);
+			
+			var updateEvents = function(events)
+			{
+				console.log("Event update");
+			}
+			//GW2Info.registerForEvents : function(callback, context, world_id, map_id, event_id)
+			GW2Info.registerForEvents (updateEvents, false, settings.home_world_id);
         }
 
         GW2Info.init(onGW2InfoInit,{localFallbackUrl:"../json/GW2Info/"});
