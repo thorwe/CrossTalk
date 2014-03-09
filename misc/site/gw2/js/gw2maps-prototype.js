@@ -544,7 +544,7 @@ var GW2Maps = {
 			Preparation – The criteria for the event to start have been met, but certain activities (such as an NPC dialogue) have not completed yet. After the activites have been completed, the event will become Active.*/
 			
 			var marker = mapobject.markers["event"][event_id];
-			marker._icon.style.display = (state == "active") ? 'block':'none';
+			marker._icon.style.display = (state == "Active") ? 'block':'none';
 		});
 	},
 	
