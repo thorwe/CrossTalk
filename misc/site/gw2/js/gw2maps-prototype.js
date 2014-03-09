@@ -551,9 +551,9 @@ var GW2Maps = {
 				console.log("GW2Maps: parse_events: Marker is undefined. Aborting.");
 			
 			if (i < 10)
-				console.log("Setting visibility for " + marker._icon.title + " to " + ((state === "Active") ? 'block':'none'));
+				console.log("Setting visibility for " + event_id + " to " + ((state === "Active") ? 'block':'none'));
 
-			marker._icon.style.display = (state === "Active") ? 'block':'none';
+			//marker._icon.style.display = (state === "Active") ? 'block':'none';
 		};
 	},
 	
