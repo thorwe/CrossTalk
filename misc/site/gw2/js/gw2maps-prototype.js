@@ -533,13 +533,11 @@ var GW2Maps = {
 		console.log("Events is an Array: " + (Array.isArray(events) ? "true" : "false"));
 		console.log("Array length: " + events.length);
 		for (var i = 0, len = events.length; i < len; i++) {
-			console.log(events[i].event_id);
-		}
-		$A(events).each(function(e){
-			var world_id = e.world_id;		//(number) – The world on which the event is running.
-			var map_id = e.map_id;			//(number) – The map on which the event is running.
-			var event_id = e.event_id;		//(string) – The event GUID identifying the event.
-			var state = e.state;			//(string) – The current state of the event.
+			//console.log(.event_id);
+			var world_id = events[i].world_id;		//(number) – The world on which the event is running.
+			var map_id = events[i].map_id;			//(number) – The map on which the event is running.
+			var event_id = events[i].event_id;		//(string) – The event GUID identifying the event.
+			var state = events[i].state;			//(string) – The current state of the event.
 			/*The state can be one of the following values:
 			Inactive – The event is not running.
 			Active – The event is running now.
@@ -554,7 +552,7 @@ var GW2Maps = {
 			
 			console.log("Setting visibility for " + marker.title + " to " + ((state === "Active") ? 'block':'none'));
 			marker._icon.style.display = (state === "Active") ? 'block':'none';
-		});
+		};
 	},
 	
 	/**
