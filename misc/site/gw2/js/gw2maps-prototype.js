@@ -222,6 +222,14 @@ var GW2Maps = {
 
             requestMapUpdate();
 		});
+		mapobject.map.on('layeradd', function(event){
+			if (event.layer == mapobject.layers[options.i18n.event])
+				console.log("Event Layer added.");
+		});
+		mapobject.map.on('layerremove', function(event){
+			if (event.layer == mapobject.layers[options.i18n.event])
+				console.log("Event Layer removed.");
+		});
 		mapobject.map.on("click", function(event){
 //			L.popup().setLatLng(event.latlng).setContent(mapobject.map.project(event.latlng, mapobject.map.getMaxZoom()).toString()).openOn(mapobject.map);
             console.log(mapobject.map.project(event.latlng, mapobject.map.getMaxZoom()).toString());
