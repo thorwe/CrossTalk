@@ -1977,7 +1977,7 @@
                         delete clone.maps;
                 };
 				
-                if ($H(clone).keys().length === 1)  //"match_id":"2-2"}
+                if ($H(clone).keys().length === 1)  //"match_id":"2-2"
                     clone = false;
 
                 lastMatchDetail = responseJSON;
