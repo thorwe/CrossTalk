@@ -538,10 +538,10 @@ var GW2Maps = {
 
 	parse_events: function(mapobject,events) // dynamic event updates
 	{
-		console.log("Events is an Array: " + (Array.isArray(events) ? "true" : "false"));
+		//console.log("Events is an Array: " + (Array.isArray(events) ? "true" : "false"));
 		if (mapobject.map.hasLayer(mapobject.layers[mapobject.options.i18n.event]))
 		{
-			console.log("Array length: " + events.length);
+			//console.log("Array length: " + events.length);
 			for (var i = 0, len = events.length; i < len; i++) {
 
 				var world_id = events[i].world_id;		//(number) – The world on which the event is running.
@@ -561,13 +561,13 @@ var GW2Maps = {
 					console.log("GW2Maps: parse_events: Marker is undefined. Skipping.");
 				else
 				{
-					if (i < 10)
+					/*if (i < 10)
 					{
 						console.log("Setting visibility for " + event_id + " to " + ((state === "Active") ? 'block':'none'));
 						console.log("marker._icon: " + typeof marker._icon);
 						console.log("marker._icon.style: " + typeof marker._icon.style);
 						console.log("marker._icon.style.display: " + typeof marker._icon.style.display);
-					}
+					}*/
 					marker._icon.style.display = (state === "Active") ? 'block':'none';
 				}
 			};
