@@ -2029,18 +2029,16 @@
 
         registerForEvents : function(callback, context, world_id, map_id, event_id)
         {
-            var cleanup = function(responseJSON)
+            /*var cleanup = function(responseJSON)	// Do we want that?
             {
-				// Do we want that?
 				/*var obj = {};
                 $A(responseJSON.events).each(function(e){
 					if (!obj[e.world_id]) obj[e.world_id] = {};
 					if (!obj[e.world_id][e.map_id]) obj[e.world_id][e.map_id] = {};
 					obj[e.world_id][e.map_id][e.event_id] = e.state;
                 });
-                responseJSON = obj;*/
-				responseJSON = responseJSON.events;
-            };
+                responseJSON = obj;
+            };*/
 
             var baseUrl = 'https://api.guildwars2.com/v1/events.json'   //?world_id=2005&event_id=AFCF031A-F71D-4CEA-85E1-957179414B25';
             var urlOptions = [
@@ -2068,8 +2066,8 @@
                             pe.stop();
                         else
                         {
-                            var response = request.responseJSON;
-                            cleanup(response);
+                            var response = request.responseJSON.events;
+                            //cleanup(response);
                             publisher.fire(url,response);
                         }
                     },
