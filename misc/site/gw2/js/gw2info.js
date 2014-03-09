@@ -2074,10 +2074,10 @@
                         else
                         {
 							console.log("ResponseJson: ");
-                            var response = request.responseJSON;
+                            /*var response = request.responseJSON;
 							console.log(JSON.stringify(response));
                             cleanup(response);
-                            publisher.fire(url,response);
+                            publisher.fire(url,response);*/
                         }
                     },
                     onFailure: function(response) {
@@ -2086,7 +2086,7 @@
                             pe.stop();
                     }
                 });
-            }, 5);
+            }, 13);
         },
         unregisterForEvents : function(callback, context, world_id, map_id, event_id)
         {
