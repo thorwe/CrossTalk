@@ -530,6 +530,9 @@ var GW2Maps = {
 
 	parse_events: function(mapobject,events) // dynamic event updates
 	{
+		console.log("parsing events update");
+		console.log("Events type: " + typeof events);
+		console.log("Events is an Array: " + (Array.isArray(events) ? "true" : "false"));
 		$A(events).each(function(e){
 			var world_id = e.world_id;		//(number) – The world on which the event is running.
 			var map_id = e.map_id;			//(number) – The map on which the event is running.
