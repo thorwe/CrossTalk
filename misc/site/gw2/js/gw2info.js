@@ -2065,22 +2065,15 @@
                     method:'get',
                     requestHeaders: {Accept: 'application/json'},
                     onSuccess: function(request) {
-						console.log("Events update success: " + url);
-						console.log("typeof publisher.subscribers:" + typeof publisher.subscribers);
-						console.log("typeof publisher.subscribers[url]:" + typeof publisher.subscribers[url]);
-						console.log("Array length: " + Array.length(publisher.subscribers[url]));
-                        if (Array.length(publisher.subscribers[url]) === 0)
-						{
-							console.log("Events: Stopping PeriodicalExecuter");
+                        if (publisher.subscribers[url].length === 0)
                             pe.stop();
-						}
                         else
                         {
 							console.log("ResponseJson: ");
-                            /*var response = request.responseJSON;
+                            var response = request.responseJSON;
 							console.log(JSON.stringify(response));
                             cleanup(response);
-                            publisher.fire(url,response);*/
+                            publisher.fire(url,response);
                         }
                     },
                     onFailure: function(response) {
