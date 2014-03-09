@@ -44,6 +44,7 @@ var GW2Maps = {
 				}),
 				baselayers: {},
 				layers: {},
+				markers: {},	//custom cache!
 				playermarkers: {},
                 wvw_objective_markers: {},
 				linkbox: new Element("div", {"class":"linkbox"}).setStyle({"width": options.linkbox, "height": options.height}),
@@ -527,6 +528,26 @@ var GW2Maps = {
             isNeedFullMatchDetails = false;
     },
 
+	parse_events: function(mapobject,events) // dynamic event updates
+	{
+		$A(events).each(function(e){
+			var world_id = e.world_id;		//(number) – The world on which the event is running.
+			var map_id = e.map_id;			//(number) – The map on which the event is running.
+			var event_id = e.event_id;		//(string) – The event GUID identifying the event.
+			var state = e.state;			//(string) – The current state of the event.
+			/*The state can be one of the following values:
+			Inactive – The event is not running.
+			Active – The event is running now.
+			Success – The event has succeeded.
+			Fail – The event has failed.
+			Warmup – The event is inactive and waiting for certain criteria to be met before becoming Active.
+			Preparation – The criteria for the event to start have been met, but certain activities (such as an NPC dialogue) have not completed yet. After the activites have been completed, the event will become Active.*/
+			
+			var marker = mapobject.markers["event"][event_id];
+			marker._icon.style.display = (state == "active") ? 'block':'none';
+		});
+	},
+	
 	/**
 	 * @param mapobject
 	 * @param options
@@ -555,6 +576,9 @@ var GW2Maps = {
 		}
 
         var marker = L.marker(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), {title: point.title, icon: icon});
+		if ((point.type === "event") && (typeof point.id !== "undefined"))	// we need only events yet
+			mapobject.markers[point.type][point.id] = marker;
+			
 		if(point.popup){
 			marker.bindPopup(point.popup);
 		}

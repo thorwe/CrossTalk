@@ -621,6 +621,11 @@
 			var updateEvents = function(events)
 			{
 				console.log("Event update");
+				for (var i = 0, len = maps.length; i < len; i++) {
+					var m = maps[i];
+					GW2Maps.parse_events(m,events);
+				};
+				
 			}
 			GW2Info.registerForEvents (updateEvents, false, settings.home_world_id);
         }
