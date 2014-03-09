@@ -4,7 +4,7 @@
 
     var loadFromStorage = function()
     {
-        return JSON.parse(localStorage.getItem('gw2app')) || {lang:"en"};
+        return JSON.parse(localStorage.getItem('gw2app')) || {lang:"en",home_world_id:2203};
     };
 
     var saveToStorage = function()
