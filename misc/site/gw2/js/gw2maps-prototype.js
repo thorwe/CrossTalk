@@ -577,7 +577,10 @@ var GW2Maps = {
 
         var marker = L.marker(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), {title: point.title, icon: icon});
 		if ((point.type === "event") && (typeof point.id !== "undefined"))	// we need only events yet
+		{
+			if (typeof mapobject.markers[point.type] === "undefined") mapobject.markers[point.type] = {};
 			mapobject.markers[point.type][point.id] = marker;
+		}
 			
 		if(point.popup){
 			marker.bindPopup(point.popup);
