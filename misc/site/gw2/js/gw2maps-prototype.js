@@ -533,7 +533,7 @@ var GW2Maps = {
 		console.log("Events is an Array: " + (Array.isArray(events) ? "true" : "false"));
 		console.log("Array length: " + events.length);
 		for (var i = 0, len = events.length; i < len; i++) {
-			//console.log(.event_id);
+
 			var world_id = events[i].world_id;		//(number) – The world on which the event is running.
 			var map_id = events[i].map_id;			//(number) – The map on which the event is running.
 			var event_id = events[i].event_id;		//(string) – The event GUID identifying the event.
@@ -550,7 +550,9 @@ var GW2Maps = {
 			if (typeof marker === "undefined")
 				console.log("GW2Maps: parse_events: Marker is undefined. Aborting.");
 			
-			console.log("Setting visibility for " + marker.title + " to " + ((state === "Active") ? 'block':'none'));
+			if (i < 10)
+				console.log("Setting visibility for " + marker._icon.title + " to " + ((state === "Active") ? 'block':'none'));
+
 			marker._icon.style.display = (state === "Active") ? 'block':'none';
 		};
 	},
