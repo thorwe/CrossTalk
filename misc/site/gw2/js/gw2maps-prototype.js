@@ -141,7 +141,7 @@ var GW2Maps = {
 				});
                 mapobject.baselayers[nondefLayer.options.continent_id] = nondefLayer;
 
-                var staticLayers = {};
+                /*var staticLayers = {};
                 $A(["event","landmark","skill","task","vista","waypoint","sector","zone"]).each(function(a){
                     console.log(options.i18n[a]);
                     staticLayers[options.i18n[a]] = mapobject.layers[options.i18n[a]];
@@ -153,7 +153,7 @@ var GW2Maps = {
                 });
                 var otherLayers = {};
                 otherLayers[options.i18n.polyline] = mapobject.layers[options.i18n.polyline];
-                otherLayers["WvW"] = mapobject.layers["WvW"];
+                otherLayers["WvW"] = mapobject.layers["WvW"];*/
 
                 //var groupedOverlays = {};
                 //groupedOverlays["Landmarks"] = staticLayers;
