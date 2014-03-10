@@ -1777,14 +1777,14 @@
                         {
                             var regions = {};
                             $H(responseJSON.regions).each(function(e){
-                                if (e[0])
-                                    regions[parseInt(e[0])] = e[1];
+                                var regionId = parseInt(e[0]);
+                                regions[regionId] = e[1];
                                 var maps = {};
-                                $H(e[1].maps).each(function(e){
-                                    if (e[0])
-                                        maps[parseInt(e[0])] = e[1];
+                                $H(e[1].maps).each(function(f){
+                                    if (f[0])
+                                        maps[parseInt(f[0])] = f[1];
                                 });
-                                regions.maps = maps;
+                                regions[regionId].maps = maps;
                             });
                             responseJSON.regions = regions;
 
