@@ -301,11 +301,13 @@ var GW2Maps = {
 			};
 		
 		// zone name		
-		
+		var zone_coords = {};
+		zone_coords.x = 0;
+		zone_coords.y = 0;
 		pois.sector.push({
 			id: map.id,
 			type: "zone",
-			coords: map.label_coord,	// need recalc_event_coords?
+			coords: zone_coords,
 			title: map[name],
 			icon_text: map[name],
 			icon_text_class: "sector_text",
