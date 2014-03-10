@@ -100,6 +100,7 @@ var GW2Maps = {
         mapobject.layers["WvW"] = L.layerGroup();   // I don't see this requiring translation anytime soon?
         mapobject.layers["WvW"].addTo(mapobject.map);
 		mapobject.layers[options.i18n.sector] = L.layerGroup();
+		mapobject.layers[options.i18n.zone] = L.layerGroup();
 		mapobject.layers[options.i18n.commanders] = L.layerGroup();
         mapobject.layers[options.i18n.commanders].addTo(mapobject.map);
         mapobject.layers[options.i18n.avatar] = L.layerGroup();
@@ -141,7 +142,7 @@ var GW2Maps = {
                 mapobject.baselayers[nondefLayer.options.continent_id] = nondefLayer;
 
                 var staticLayers = {};
-                $A(["event","landmark","skill","task","vista","waypoint","sector"]).each(function(a){
+                $A(["event","landmark","skill","task","vista","waypoint","sector","zone"]).each(function(a){
                     console.log(options.i18n[a]);
                     staticLayers[options.i18n[a]] = mapobject.layers[options.i18n[a]];
                 });
@@ -292,12 +293,26 @@ var GW2Maps = {
 	parse_map: function(mapobject, options, map){
         var name = "name_" + options.i18n.lang,
             eventdata = (typeof GW2Info.data.event_details[map.id] !== "undefined") ? GW2Info.data.event_details[map.id] : false,
-			pois = {task: [], event: [], landmark: [], skill: [], vista: [], waypoint: [], sector: []},
+			pois = {task: [], event: [], landmark: [], skill: [], vista: [], waypoint: [], sector: [], zone: []},
 			sort = {task: [], event: [], landmark: [], skill: [], vista: [], waypoint: [], sector: []},
 			recalc_event_coords = function(cr, mr, p){
 				// don't look at it. really! it will melt your brain and make your eyes bleed!
 				return [Math.round(cr[0][0]+(cr[1][0]-cr[0][0])*(p[0]-mr[0][0])/(mr[1][0]-mr[0][0])),Math.round(cr[0][1]+(cr[1][1]-cr[0][1])*(1-(p[1]-mr [0][1])/(mr[1][1]-mr[0][1])))]
 			};
+		
+		// zone name		
+		
+		pois.sector.push({
+			id: map.id,
+			type: "zone",
+			coords: map.label_coord,	// need recalc_event_coords?
+			title: map[name],
+			icon_text: map[name],
+			icon_text_class: "sector_text",
+			text: map[name],
+			popup: false
+		});
+		
 		
 		// pois
 		map.points_of_interest.each(function(p){
@@ -772,7 +787,8 @@ var GW2Maps = {
 			players: "Spieler",
 			commanders: "Kommandeure",
 			polyline: "Polylinien",
-			sector: "Zonen",
+			sector: "Sektorennamen",
+			zone: "Zonennamen",
 			skill: "Fertigkeitspunkte",
 			task: "Aufgaben",
 			vista: "Aussichtspunkte",
@@ -802,6 +818,7 @@ var GW2Maps = {
 			commanders: "Commanders",
 			polyline: "Polylines",
 			sector: "Sector Names",
+			zone: "Zone Names",
 			skill: "Skill Challenges",
 			task: "Tasks",
 			vista: "Vistas",
@@ -826,17 +843,18 @@ var GW2Maps = {
 			lang:"es",
 			wiki: "http://wiki-es.guildwars2.com/wiki/",
 			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
-			event: "event-es",
-			landmark: "poi-es",
-			players: "players-es",
+			event: "Events",
+			landmark: "Points of Interest",
+			players: "Players",
 			commanders: "Commanders",
-			polyline: "polyline-es",
-			sector: "sector-es",
-			skill: "skill-es",
-			task: "task-es",
-			vista: "vista-es",
-			waypoint: "waypoint-es",
-			attribution: "attribution-es",
+			polyline: "Polylines",
+			sector: "Sector Names",
+			zone: "Zone Names",
+			skill: "Skill Challenges",
+			task: "Tasks",
+			vista: "Vistas",
+			waypoint: "Waypoints",
+			attribution: "Map data and imagery",
             avatar: "Avatar",
             myCommander: "Focus",
 			professions:{
@@ -855,17 +873,18 @@ var GW2Maps = {
 			lang: "fr",
 			wiki: "http://wiki-fr.guildwars2.com/wiki/",
 			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
-			event: "event-fr",
+			event: "Events",
 			landmark: "Sites remarquables",
-			players: "players-fr",
+			players: "Players",
 			commanders: "Commanders",
-			polyline: "polyline-fr",
+			polyline: "Polylines",
 			sector: "Secteurs",
+			zone: "Zone Names",
 			skill: "Défis de compétences",
 			task: "Cœurs",
 			vista: "Panoramas",
 			waypoint: "Points de passage",
-			attribution: "attribution-fr",
+			attribution: "Map data and imagery",
             avatar: "Avatar",
             myCommander: "Focus",
 			professions:{
