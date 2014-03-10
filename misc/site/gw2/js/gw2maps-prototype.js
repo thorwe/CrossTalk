@@ -300,10 +300,9 @@ var GW2Maps = {
 				return [Math.round(cr[0][0]+(cr[1][0]-cr[0][0])*(p[0]-mr[0][0])/(mr[1][0]-mr[0][0])),Math.round(cr[0][1]+(cr[1][1]-cr[0][1])*(1-(p[1]-mr [0][1])/(mr[1][1]-mr[0][1])))]
 			};
 		
-		// zone name		
-		var zone_coords = {};
-		zone_coords.x = 0;
-		zone_coords.y = 0;
+		// zone name
+		var cr = map.continent_rect;
+		var zone_coords = [(cr[0][0] + 0.5 * (cr[1][0] - cr[0][0])), (cr[0][1] + 0.5 * (cr[1][1] - cr[0][1]))];
 		pois.sector.push({
 			id: map.id,
 			type: "zone",
