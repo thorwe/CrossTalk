@@ -56,9 +56,15 @@
             }
         });
         $("ct_url").on("change", function(event) {
-            settings.ct_url = $("ct_url").value;
-            console.log("CrossTalk url changed: " + settings.ct_url);
-            saveToStorage();
+			var url = $("ct_url").value;
+			var split = url.split(":");
+			if (split.length == 2)
+			{
+				settings.ws_url = split[0];
+				settings.ws_port = split[1];
+				console.log("CrossTalk url changed: " + settings.ws_url + ":" + settings.ws_port);
+				saveToStorage();
+			}
         });
         $("language_list").on("change", function(event) {
             var element = event.element();
@@ -84,12 +90,6 @@
 			settings.ws_port = parseInt(q_port);
 			console.log("Use ws port from url query: " + q_port);
 		}
-		/*q_port = getUrlParameters("websocket_port", "", true);
-		if (q_port)
-		{
-			settings.sse_port = parseInt(q_port);
-			console.log("Use sse port from url query: " + q_port);
-		}*/
 		
         var initLanguageSelection = function(){
             var selectBox = $('language_list');
@@ -420,8 +420,8 @@
 							//state = ["lime", "orange", "red", "gray"];// online, away, offline, unknown (css color, rgb or hex notation)
 							// we need map data locally for local position recalculation;
 							// Doing this in CrossTalk is trouble, Qt is compiled without ssh support so it would need to be a static file.
-							baseurl = (settings && settings.sse_url) ? settings.sse_url : "http://localhost:";
-							port = (settings && settings.sse_port) ? settings.sse_port : 64736;
+							baseurl = (settings && settings.ws_url) ? ("http://" + settings.ws_url) : "http://localhost:";
+							port = (settings && settings.ws_port) ? settings.ws_port : 64736;
 							baseurl = baseurl + port;
 							
 							var source = new EventSource(baseurl + "/positional_audio/stream");
@@ -448,7 +448,7 @@
 						return;
 					}
 
-					baseurl = (settings && settings.sse_url) ? settings.sse_url : "ws://localhost:";
+					baseurl = (settings && settings.ws_url) ? ("ws://" + settings.ws_url) : "ws://localhost:";
 					port = (settings && settings.ws_port) ? settings.ws_port : 64734;
 					baseurl = baseurl + port;
 					// prefer text messages
