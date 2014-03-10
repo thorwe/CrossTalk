@@ -192,12 +192,12 @@ var GW2Maps = {
 
             GW2Info.requestMapFloor(function(responseJSON){
                 if (responseJSON)
-                    GW2Maps.parse_response(mapobject, options, responseJSON);
+                    GW2Maps.parse_mapfloor(mapobject, options, responseJSON);
                 else
                 {
                     // if we don't get any floordata, we try at least to render the map
                     options.region_id = false;
-                    GW2Maps.parse_response(mapobject, options, {texture_dims: mapobject.baselayer.options.continent_id === 1 ? [32768,32768] : [16384,16384], regions:[]}, {});
+                    GW2Maps.parse_mapfloor(mapobject, options, {texture_dims: mapobject.baselayer.options.continent_id === 1 ? [32768,32768] : [16384,16384], regions:[]}, {});
                     //mapobject.linkbox.append();
                 }
             }, options.i18n.lang, mapobject.baselayer.options.continent_id, mapobject.baselayer.options.floor_id);
@@ -245,8 +245,7 @@ var GW2Maps = {
 	 * @param options
 	 * @param floordata
 	 */
-	//parse_response: function(mapobject, options, floordata, eventdata){
-	parse_response: function(mapobject, options, floordata){
+	parse_mapfloor: function(mapobject, options, floordata){
 		var bounds, clamp,
 			p2ll = function(coords){
                 return mapobject.map.unproject(coords, mapobject.map.getMaxZoom());
