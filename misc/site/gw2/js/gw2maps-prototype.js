@@ -398,7 +398,7 @@ var GW2Maps = {
 					if (typeof p[1]["name_en"] !== "undefined")	// fall back to english
 						eventName = p[1]["name_en"];
 					else
-						return true;	//continue for jquery each
+						eventName = "";	//return true;	//continue for jquery each
 				}
 				sort.event.push(p[1].level);
 				pois.event.push({
@@ -407,7 +407,7 @@ var GW2Maps = {
 					coords: recalc_event_coords(map.continent_rect,map.map_rect,p[1].location.center),
 					title: eventName + " (" + p[1].level + ")",
 					text: "(" + p[1].level + ") " + eventName,
-					popup: '<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a> ("+p[1].level+")<br />id:"+p[0]
+					popup: (eventName !== "") ? ('<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a> ("+p[1].level+")<br />id:"+p[0]) : ("("+p[1].level+")<br />id:"+p[0])
 				});
 			});
         };
