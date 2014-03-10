@@ -87,6 +87,7 @@ var GW2Maps = {
 		
 		// add layergroups and show them on the map
 		mapobject.layers[options.i18n.event] = L.layerGroup();
+		mapobject.layers[options.i18n.event].addTo(mapobject.map);
 		mapobject.layers[options.i18n.landmark] = L.layerGroup();
 		mapobject.layers[options.i18n.polyline] = L.layerGroup();
 		mapobject.layers[options.i18n.players] = L.layerGroup();
@@ -95,7 +96,6 @@ var GW2Maps = {
 		mapobject.layers[options.i18n.task] = L.layerGroup();
 		mapobject.layers[options.i18n.vista] = L.layerGroup();
 		mapobject.layers[options.i18n.waypoint] = L.layerGroup();
-		mapobject.layers[options.i18n.waypoint].addTo(mapobject.map);
         mapobject.layers["WvW-Timers"] = L.layerGroup();   // I don't see this requiring translation anytime soon?
         mapobject.layers["WvW-Timers"].addTo(mapobject.map);
         mapobject.layers["WvW"] = L.layerGroup();   // I don't see this requiring translation anytime soon?
