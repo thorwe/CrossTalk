@@ -934,8 +934,12 @@
 		isInit: false,
 		init: function(callback,options)
 		{
-            //localStorage.clear();
-            //deleteDatabase();
+			GW2Info.tabularasa = function() {
+				localStorage.clear();
+				deleteDatabase();
+				console.log("Offline Storage cleared");
+			}
+            
             console.log("GW2Info: init");
             if (typeof options === 'undefined') options = {};
             GW2Info.options = options;
