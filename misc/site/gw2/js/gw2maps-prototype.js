@@ -605,10 +605,9 @@ var GW2Maps = {
 				}
 			};
 
-		if(point.type === "sector"){
+		if ((point.type === "sector") || (point.type === "zone"))
 			icon = L.divIcon({className: point.icon_text_class, html: point.icon_text});
-        }
-		else{
+		else {
             //icon = L.icon({iconUrl: i.link, iconSize: i.size, popupAnchor:[0, -i.size[1]/2]});
             //console.log("type:"+point.type);
             icon = L.icon({iconUrl: i.iconUrl, iconSize: i.iconSize, popupAnchor:[0, -i.iconSize[1]/2]});
