@@ -111,7 +111,7 @@ var GW2Maps = {
 
 		// showing all the stuff on the initial map would be confusing in most cases,
 		// so we'll show it automatically only on higher zoom levels - it's in the layer menu anyway
-		if(mapobject.map.getZoom() > 3){
+		/*if(mapobject.map.getZoom() > 3){
 			mapobject.layers[options.i18n.landmark].addTo(mapobject.map);
 			mapobject.layers[options.i18n.skill].addTo(mapobject.map);
 			mapobject.layers[options.i18n.task].addTo(mapobject.map);
@@ -119,7 +119,7 @@ var GW2Maps = {
 		}
 		if(mapobject.map.getZoom() > 4){
 			mapobject.layers[options.i18n.polyline].addTo(mapobject.map);
-		}
+		}*/
 		if(options.region_id && options.map_id || mapobject.map.getZoom() > 5){
 			mapobject.layers[options.i18n.sector].addTo(mapobject.map);
 			mapobject.layers[options.i18n.event].addTo(mapobject.map);
@@ -178,10 +178,10 @@ var GW2Maps = {
 			z > 5 ? mapobject.layers[options.i18n.event].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.event]);
 			z > 5 ? mapobject.layers[options.i18n.sector].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.sector]);
 			z > 4 ? mapobject.layers[options.i18n.polyline].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.polyline]);
-			z > 3 ? mapobject.layers[options.i18n.landmark].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.landmark]);
+			/*z > 3 ? mapobject.layers[options.i18n.landmark].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.landmark]);
 			z > 3 ? mapobject.layers[options.i18n.skill].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.skill]);
 			z > 3 ? mapobject.layers[options.i18n.task].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.task]);
-			z > 3 ? mapobject.layers[options.i18n.vista].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.vista]);
+			z > 3 ? mapobject.layers[options.i18n.vista].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.vista]);*/
 		});
 
 		// you may specify more mapevent handlers over here - for example a click handler to annoy people ;)
