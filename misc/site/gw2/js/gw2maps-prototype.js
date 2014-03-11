@@ -74,9 +74,10 @@ var GW2Maps = {
 		// set the base tiles and add a little copyright info
 		var defLayer = L.tileLayer("https://tiles.guildwars2.com/{continent_id}/{floor_id}/{z}/{x}/{y}.jpg", {
 			errorTileUrl: "../img/errortile.png",	//options.i18n.errortile,
-			//minZoom: 0,
+			minZoom: 2,
 			maxZoom: options.continent_id == 1 ? 7 : 6,	//set on map level actually
-			continuousWorld: true,
+			continuousWorld: false,
+			noWrap: true,
 			continent_id: options.continent_id,
 			continent_name: (options.continent_id == 1) ? "Tyria" : "The Mists",
 			floor_id: getDefaultFloorId(),
@@ -131,9 +132,10 @@ var GW2Maps = {
 			{
 				var nondefLayer = L.tileLayer("https://tiles.guildwars2.com/{continent_id}/{floor_id}/{z}/{x}/{y}.jpg", {
 					errorTileUrl: "../img/errortile.png",	//options.i18n.errortile,
-					//minZoom: 0,
+					minZoom: 2,
 					maxZoom: options.continent_id == 2 ? 7 : 6,
-					continuousWorld: true,
+					continuousWorld: false,
+					noWrap: true,
 					continent_id: options.continent_id == 1 ? 2 : 1,
 					continent_name: options.continent_id == 1 ? "The Mists" : "Tyria",
 					floor_id: (options.continent_id == 1) ? 1 : 2,
