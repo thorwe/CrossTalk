@@ -38,7 +38,7 @@ var GW2Maps = {
 				map: L.map(container, {
 					//minZoom: 0,
                     maxZoom: options.continent_id == 1 ? 7 : 6,	//options.max_zoom,
-					crs: L.CRS.Simple,
+					//crs: L.CRS.Simple,
 					zoomControl: options.map_controls,
 					attributionControl: options.map_controls
 				}),
