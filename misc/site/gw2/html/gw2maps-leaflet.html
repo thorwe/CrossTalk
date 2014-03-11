@@ -26,37 +26,38 @@
 <!-- specific floor within a region
 <div class="gw2map" data-language="3" data-continent_id="2" data-floor_id="3" data-width="100" data-w_percent="1"></div> -->
 <!-- full world map -->
-<div class="gw2map" data-language="1" data-width="100" data-w_percent="1" data-height="100" data-h_percent="1" data-enable_control_continent="1"></div><!--data-height="800" data-linkbox="350" -->
-<div style="position: absolute; top: 30px; right: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center;">
-	<div><a id="toggle_players" href="#">toggle playerlist</a></div>
-	<div id="players" style="overflow-y: scroll;display:block;"></div>
+<div class="gw2map" data-language="1" data-width="100" data-w_percent="1" data-height="100" data-h_percent="1" data-enable_control_continent="1"><!--data-height="800" data-linkbox="350" -->
+	<div style="position: absolute; top: 30px; right: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center;">
+		<div><a id="toggle_players" href="#">toggle playerlist</a></div>
+		<div id="players" style="overflow-y: scroll;display:block;"></div>
+	</div>
+	<div id="settings_connect" style="position: absolute; bottom: 30px; right: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center; display:none;">
+		<form>
+			<fieldset>
+				<legend>Misc</legend>
+				<p>
+					<label id="lang_l">Language</label>
+					<select id = "language_list">
+						<!--<option value = "en">english</option>
+						<option value = "de">deutsch</option>
+						<option value = "fr">français</option>
+						<option value = "es">español</option>-->
+					</select>
+				</p>
+				<p>
+					<label id="home_world_l">Home World</label>
+					<select id = "world_list"></select>
+				</p>
+			</fieldset>
+		</form>
+	</div>
+	<div id="settings_misc" style="position: absolute; bottom: 30px; left: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center; display:none;">
+		<!--<input id="key" type="text" placeholder="your channel key" value="" style="width: 15em;" />-->
+		<!--<input id="sm_url" type="url" placeholder="http://www.smiley.edu" value="" style="width: 15em;" />-->
+		<input id="ct_url" type="url" placeholder="http://localhost:64734" value="" style="width: 15em;" />
+	</div>
+	<a href="#" class="a-btn" id="btn_settings" style="position: absolute; bottom: 10px; right: 0px;"/>
 </div>
-<div id="settings_connect" style="position: absolute; bottom: 30px; right: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center; display:none;">
-	<form>
-		<fieldset>
-			<legend>Misc</legend>
-			<p>
-				<label id="lang_l">Language</label>
-				<select id = "language_list">
-					<!--<option value = "en">english</option>
-					<option value = "de">deutsch</option>
-					<option value = "fr">français</option>
-					<option value = "es">español</option>-->
-				</select>
-			</p>
-			<p>
-				<label id="home_world_l">Home World</label>
-				<select id = "world_list"></select>
-			</p>
-		</fieldset>
-	</form>
-</div>
-<div id="settings_misc" style="position: absolute; bottom: 30px; left: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center; display:none;">
-	<!--<input id="key" type="text" placeholder="your channel key" value="" style="width: 15em;" />-->
-	<!--<input id="sm_url" type="url" placeholder="http://www.smiley.edu" value="" style="width: 15em;" />-->
-	<input id="ct_url" type="url" placeholder="http://localhost:64734" value="" style="width: 15em;" />
-</div>
-<a href="#" class="a-btn" id="btn_settings" style="position: absolute; bottom: 10px; right: 0px;"/>
 
 <script src="../js/IndexedDBShim.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.1.0/prototype.js"></script>
