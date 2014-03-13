@@ -235,7 +235,7 @@ void SettingsPositionalAudio::onMenusInitialized()
 
 void SettingsPositionalAudio::AddCustomServerSettingForCurrentTab()
 {
-    uint64 scHandlerId = TSHelpers::GetActiveServerConnectionHandlerID();
+    uint64 scHandlerId = ts3Functions.getCurrentServerConnectionHandlerID();
     if (scHandlerId != (uint64)NULL)
         AddCustomServerSetting(scHandlerId);
 }
