@@ -171,7 +171,6 @@ void SettingsRadio::saveSettings(int r)
                 if (name == "Home")
                     name = "HomeTab";
 
-                //TSLogging::Print(QString("Saving %1").arg(name));
                 cfg.beginGroup(name);
                 RadioFX_Settings settings = i.value();
                 cfg.setValue("enabled",settings.enabled);
@@ -185,7 +184,6 @@ void SettingsRadio::saveSettings(int r)
                 cfg.setValue("rm_mix",settings.rm_mix);
                 cfg.endGroup();
                 cfg.endGroup();
-                //TSLogging::Print(QString("enabled %1 low_freq %2 hi_freq %3 fudge %4 rm_mod_freq %5").arg(settings.enabled).arg(settings.freq_low).arg(settings.freq_hi).arg(settings.fudge).arg(settings.rm_mod_freq));
             }
         }
         cfg.endGroup();

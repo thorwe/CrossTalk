@@ -45,8 +45,8 @@ int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS act
 //    connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()),Qt::UniqueConnection);
     if (action == PTT_ACTIVATE)
     {
-//        TSLogging::Print("PTT_ACTIVATE",serverConnectionHandlerID,LogLevel_DEBUG);
-//        TSLogging::Print(QString("Timer is running: %1").arg(timer->isActive()?"true":"false"),serverConnectionHandlerID,LogLevel_DEBUG);
+//        TSLogging::Log("PTT_ACTIVATE",serverConnectionHandlerID,LogLevel_DEBUG);
+//        TSLogging::Log(QString("Timer is running: %1").arg(timer->isActive()?"true":"false"),serverConnectionHandlerID,LogLevel_DEBUG);
         if (timer->isActive())
             timer->stop();
 
@@ -54,7 +54,7 @@ int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS act
     }
     else if (action == PTT_DEACTIVATE)
     {
-//        TSLogging::Print("PTT_DEACTIVATE",serverConnectionHandlerID,LogLevel_DEBUG);
+//        TSLogging::Log("PTT_DEACTIVATE",serverConnectionHandlerID,LogLevel_DEBUG);
         UpdatePttDelayInfo();
         if (pttDelayEnabled)
             timer->start(pttDelayMsec);
@@ -78,7 +78,7 @@ int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS act
 
 int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, bool shouldTalk)
 {
-//    TSLogging::Print(QString("SetPushToTalk: %1").arg(shouldTalk?"true":"false"),serverConnectionHandlerID,LogLevel_DEBUG);
+//    TSLogging::Log(QString("SetPushToTalk: %1").arg(shouldTalk?"true":"false"),serverConnectionHandlerID,LogLevel_DEBUG);
 //    connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()),Qt::UniqueConnection);
 
     unsigned int error;

@@ -204,12 +204,12 @@ void TSInfoData::onInfoData(uint64 serverConnectionHandlerID, uint64 id, enum Pl
     }
     if (outstr.isEmpty())
     {
-//        TSLogging::Print("(TSInfoData::onInfoData): outstr is empty.");
+//        TSLogging::Log("(TSInfoData::onInfoData): outstr is empty.");
         data = NULL;
     }
     else
     {
-//        TSLogging::Print("(TSInfoData::onInfoData)" + outstr,LogLevel_DEBUG);
+//        TSLogging::Log("(TSInfoData::onInfoData)" + outstr,LogLevel_DEBUG);
         *data = (char*)malloc(INFODATA_BUFSIZE * sizeof(char));
         if (outstr.size() > INFODATA_BUFSIZE-1)
         {

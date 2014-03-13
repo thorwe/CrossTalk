@@ -58,7 +58,6 @@ uint64 TSServerInfo::getDefaultChannelGroup() const
         TSLogging::Error("Could not get default channel group", m_ServerConnectionHandlerID, error, true);
         return (uint64)NULL;
     }
-//    TSLogging::Print(QString("Default Channel group: %1 %2").arg(result).arg(GetChannelGroupName(result)));
     return result;
 }
 
@@ -122,15 +121,6 @@ void TSServerInfo::onServerGroupListEvent(uint64 serverGroupID, const char *name
 void TSServerInfo::onServerGroupListFinishedEvent()
 {
     m_isServerGroupsUpdating = false;
-//    QString debout = "ServerGroups: ";
-//    QMapIterator<uint64,QString> i(m_ServerGroups);
-//    while(i.hasNext())
-//    {
-//        i.next();
-//        debout.append(QString("%1:%2;").arg(i.key()).arg(i.value()));
-//    }
-//    TSLogging::Print(debout);
-
     emit serverGroupListUpdated(m_ServerConnectionHandlerID, m_ServerGroups);
 }
 

@@ -516,13 +516,6 @@ namespace TSHelpers
                     return ERROR_not_implemented;
                 }
             }
-
-//            QString debOut = "Server Groups:";
-//            QSetIterator<uint64> i(*result);
-//            while (i.hasNext())
-//                debOut.append(QString("%1; ").arg(i.next()));
-
-//            TSLogging::Print(debOut);
         }
         return error;
     }

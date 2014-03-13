@@ -40,7 +40,7 @@ void Radio::setChannelStripEnabled(QString name, bool val)
 //        setting.rm_mod_freq = 0.0f;
         m_SettingsMap.insert(name,setting);
     }
-    //Print(QString("%1 enabled %2").arg(name).arg(val));
+    //Log(QString("%1 enabled %2").arg(name).arg(val),LogLevel_DEBUG);
     emit ChannelStripEnabledSet(name,val);
 }
 
@@ -62,7 +62,7 @@ void Radio::setFudge(QString name, double val)
 //        setting.rm_mod_freq = 0.0f;
         m_SettingsMap.insert(name,setting);
     }
-    //Print(QString("%1 fudge %2").arg(name).arg(val));
+    //Log(QString("%1 fudge %2").arg(name).arg(val),LogLevel_DEBUG);
     emit FudgeChanged(name,val);
 }
 
@@ -83,7 +83,7 @@ void Radio::setInLoFreq(QString name, double val)
     emit InBpCenterFreqSet(name,getCenterFrequencyIn(m_SettingsMap.value(name)));
     emit InBpBandwidthSet(name,getBandWidthIn(m_SettingsMap.value(name)));
 
-    //Print(QString("%1 low_freq %2").arg(name).arg(val));
+    //Log(QString("%1 low_freq %2").arg(name).arg(val),LogLevel_DEBUG);
     emit InLoFreqSet(name,val);
 }
 
@@ -104,7 +104,7 @@ void Radio::setInHiFreq(QString name, double val)
     emit InBpCenterFreqSet(name,getCenterFrequencyIn(m_SettingsMap.value(name)));
     emit InBpBandwidthSet(name,getBandWidthIn(m_SettingsMap.value(name)));
 
-    //Print(QString("%1 hi_freq %2").arg(name).arg(val));
+    //Log(QString("%1 hi_freq %2").arg(name).arg(val),LogLevel_DEBUG);
     emit InHiFreqSet(name,val);
 }
 
@@ -122,7 +122,7 @@ void Radio::setRingModFrequency(QString name, double val)
         setting.rm_mod_freq = val;
         m_SettingsMap.insert(name,setting);
     }
-    //Print(QString("%1 rm_mod_freq %2").arg(name).arg(val));
+    //Log(QString("%1 rm_mod_freq %2").arg(name).arg(val),LogLevel_DEBUG);
     emit RingModFrequencyChanged(name,val);
 }
 
@@ -140,7 +140,7 @@ void Radio::setRingModMix(QString name, double val)
         setting.rm_mix = val;
         m_SettingsMap.insert(name,setting);
     }
-    //Print(QString("%1 rm_mix %2").arg(name).arg(val));
+    //Log(QString("%1 rm_mix %2").arg(name).arg(val),LogLevel_DEBUG);
     emit RingModMixChanged(name,val);
 }
 
@@ -181,7 +181,7 @@ void Radio::setOutHiFreq(QString name, double val)
     emit OutBpCenterFreqSet(name,getCenterFrequencyOut(m_SettingsMap.value(name)));
     emit OutBpBandwidthSet(name,getBandWidthOut(m_SettingsMap.value(name)));
 
-    //Print(QString("%1 rm_mix %2").arg(name).arg(val));
+    //Log(QString("%1 rm_mix %2").arg(name).arg(val),LogLevel_DEBUG);
     emit OutHiFreqSet(name,val);
 }
 

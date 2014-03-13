@@ -129,7 +129,8 @@ include (QtWebsocket/QtWebsocket.pri) {
     !build_pass:message( "Websockets included." )
 }
 
-DEFINES += CONSOLE_OUTPUT
+#DEFINES += CT_VERBOSE
+#DEFINES += CONSOLE_OUTPUT
 beta {
     DEFINES += CROSSTALK_BETA
     !build_pass:message( "Beta." )

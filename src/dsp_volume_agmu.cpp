@@ -27,7 +27,7 @@ void DspVolumeAGMU::process(short *samples, int sampleCount, int channels)
 //        emit peakChanged(peak);
         m_peak = peak;
         setGainDesired(computeGainDesired());
-        TSLogging::Print(QString("Peak: %1 desired Gain: %2").arg(m_peak).arg(getGainDesired()));
+        //TSLogging::Log(QString("Peak: %1 desired Gain: %2").arg(m_peak).arg(getGainDesired()),LogLevel_DEBUG);
     }
     setGainCurrent(GetFadeStep(sampleCount));
     doProcess(samples, sampleCount);

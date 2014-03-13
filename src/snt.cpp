@@ -110,7 +110,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         char returnCode[RETURNCODE_BUFSIZE];
         ts3Functions.createReturnCode(pluginID,returnCode,RETURNCODE_BUFSIZE);
         m_returnCode = returnCode;
-        //TSLogging::Print(QString("Created SnT Return Code: %1").arg(m_returnCode));
+        //TSLogging::Log(QString("Created SnT Return Code: %1").arg(m_returnCode), LogLevel_DEBUG);
     }
 
     TSPtt* ptt = TSPtt::instance();

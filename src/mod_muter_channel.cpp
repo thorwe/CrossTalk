@@ -138,7 +138,7 @@ bool ChannelMuter::isChannelMuted(uint64 serverConnectionHandlerID, uint64 chann
  */
 bool ChannelMuter::toggleClientWhitelisted(uint64 serverConnectionHandlerID, anyID clientID)
 {
-    Print(QString("(toggleClientWhitelisted) %1").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
+    //Log(QString("(toggleClientWhitelisted) %1").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
     QPair<uint64,anyID> newPair = qMakePair(serverConnectionHandlerID,clientID);
     if (!(ClientWhiteList.contains(newPair)))
         ClientWhiteList.insert(newPair);

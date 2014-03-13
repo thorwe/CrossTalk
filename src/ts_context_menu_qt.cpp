@@ -50,12 +50,12 @@ int TSContextMenu::Register(QObject* p, PluginMenuType type, QString text, QStri
 //    if (!iContextMenu)
 //        return -1;
 
-//    TSLogging::Print(QString("TSContextMenu Registering: %1 %2").arg(p->objectName()).arg(text),LogLevel_DEBUG);
+//    TSLogging::Log(QString("TSContextMenu Registering: %1 %2").arg(p->objectName()).arg(text),LogLevel_DEBUG);
 
     QString trans = Translator::instance()->translator->translate("context_menu", text.toLatin1().constData());
 
 //    m_Callbacks.append(QPointer<QObject>(p));
-//    TSLogging::Print(QString("(TSContextMenu::Register): %1").arg(m_Callbacks.size()),LogLevel_DEBUG);
+//    TSLogging::Log(QString("(TSContextMenu::Register): %1").arg(m_Callbacks.size()),LogLevel_DEBUG);
 //    int id = m_Callbacks.size()-1;
 
     int id = m_Items.size();
@@ -83,7 +83,7 @@ void TSContextMenu::onInitMenus(PluginMenuItem*** menuItems, char **menuIcon)
      * plugin filename, without dll/so/dylib suffix
      * e.g. for "test_plugin.dll", icon "1.png" is loaded from <TeamSpeak 3 Client install dir>\plugins\test_plugin\1.png
      */
-//    TSLogging::Print(QString("(TSContextMenu::onInitMenu): %1").arg(m_Items.size()),LogLevel_DEBUG);
+//    TSLogging::Log(QString("(TSContextMenu::onInitMenu): %1").arg(m_Items.size()),LogLevel_DEBUG);
     int amount = m_Items.size();
     BEGIN_CREATE_MENUS(amount);  /* IMPORTANT: Number of menu items must be correct! */
     for (int i = 0; i < amount; ++i)
@@ -105,7 +105,7 @@ void TSContextMenu::onInitMenus(PluginMenuItem*** menuItems, char **menuIcon)
 
 void TSContextMenu::onMenuItemEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
 {
-//    TSLogging::Print("(onMenuItemEvent)");
+//    TSLogging::Log("(onMenuItemEvent)",LogLevel_DEBUG);
 //    QPointer<QObject> callbackPtr = m_Callbacks.at(menuItemID);
 //    if (callbackPtr.isNull())
 //    {
@@ -116,13 +116,13 @@ void TSContextMenu::onMenuItemEvent(uint64 serverConnectionHandlerID, PluginMenu
 //    ContextMenuInterface *iContextMenu = qobject_cast<ContextMenuInterface *>(callbackPtr.data());
 //    if (!iContextMenu)
 //    {
-//        TSLogging::Print(QString("Could not cast to interface: %1 %2").arg(menuItemID));
+//        TSLogging::Error(QString("Could not cast to interface: %1 %2").arg(menuItemID));
 //    }
 //    else
 //    {
-//        TSLogging::Print(QString("iContextMenu calling: %1").arg(callbackPtr.data()->objectName()));
+//        TSLogging::Log(QString("iContextMenu calling: %1").arg(callbackPtr.data()->objectName()),LogLevel_DEBUG);
 ////        iContextMenu->onContextMenuEvent(serverConnectionHandlerID, type, menuItemID, selectedItemID);
-//        TSLogging::Print(QString("iContextMenu calling: hang up"));
+//        TSLogging::Log(QString("iContextMenu calling: hang up"),LogLevel_DEBUG);
 //    }
     emit FireContextMenuEvent(serverConnectionHandlerID, type, menuItemID, selectedItemID);
 }

@@ -76,7 +76,7 @@ PositionalAudio::PositionalAudio(QObject *parent) :
 {
     this->setParent(parent);
     this->setObjectName("PositionalAudio");
-    m_isPrintEnabled = true;
+    m_isPrintEnabled = false;
     universe = new TsVrUniverse(this);
     meObj = new TsVrObjSelf(this);
     NULL_VECTOR.x = 0.0f;
@@ -249,7 +249,7 @@ void PositionalAudio::setServerSettingBlocked(QString serverUniqueId, bool val)
         return;
 
     m_ServerSettings[serverUniqueId].isBlocked = val;
-//    Print(QString("Block Status Changed: %1 %2").arg(m_ServerSettings.value(serverUniqueId).serverName).arg((m_ServerSettings.value(serverUniqueId).isBlocked)?"blocked":"unblocked"));
+//    Log(QString("Block Status Changed: %1 %2").arg(m_ServerSettings.value(serverUniqueId).serverName).arg((m_ServerSettings.value(serverUniqueId).isBlocked)?"blocked":"unblocked"));
 }
 
 void PositionalAudio::setServerSettingSendInterval(QString serverUniqueId, float val)
@@ -437,7 +437,7 @@ void PositionalAudio::onRunningStateChanged(bool value)
 //            m_SendReturnCodeC = new char[RETURNCODE_BUFSIZE];
 //            ts3Functions.createReturnCode(pluginID,m_SendReturnCodeC,RETURNCODE_BUFSIZE);
 //            m_SendReturnCode = QString::fromLatin1(m_SendReturnCodeC);
-//            Print("Got returnCode: " + m_SendReturnCode);
+//            Log("Got returnCode: " + m_SendReturnCode);
 //        }
         connect(Talkers::instance(),SIGNAL(ConnectStatusChanged(uint64,int,uint)),this,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
         connect(universe,SIGNAL(removed(QString)),this,SLOT(onUniverseRemoved(QString)),Qt::UniqueConnection);
@@ -544,7 +544,7 @@ void PositionalAudio::timerEvent(QTimerEvent *event)
 
                     if (!myVr.isEmpty())
                     {
-                        // Print("Found " + meObj->getVr());
+                        // Log("Found " + meObj->getVr());
                         if (m_tryTimerId != 0)
                         {
                             this->killTimer(m_tryTimerId);
@@ -610,7 +610,7 @@ bool PositionalAudio::fetch()
     if (lm->dwcount == m_lastCount)
     {
         m_fetchTimerElapsed = m_fetchTimerElapsed + FETCH_TIMER_INTERVAL;
-//        Print(QString("fetch: elapsed: %1 timeout at: %2").arg(m_fetchTimerElapsed).arg(m_fetchTimerTimeoutMsec));
+//        Log(QString("fetch: elapsed: %1 timeout at: %2").arg(m_fetchTimerElapsed).arg(m_fetchTimerTimeoutMsec));
         m_sharedMemory->unlock();
         return !(m_fetchTimerElapsed > m_fetchTimerTimeoutMsec);    // -> unlock on false
     }
@@ -677,7 +677,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
     {
         if (args.atEnd())
         {
-            Print("I left vr.");
+            //Log("I left vr.",LogLevel_INFO);
             return true;
         }
 
@@ -704,15 +704,15 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
 
                 QString identity = in.readAll().trimmed();
 
-                Print(QString("Received (me): cId: %1 VR: %2 CO: %3 ID: %4").arg(clientID).arg(name).arg((context == meObj->getContext())?"match":"no match -.-").arg(identity), serverConnectionHandlerID, LogLevel_DEBUG);
+                //Log(QString("Received (me): cId: %1 VR: %2 CO: %3 ID: %4").arg(clientID).arg(name).arg((context == meObj->getContext())?"match":"no match -.-").arg(identity), serverConnectionHandlerID, LogLevel_DEBUG);
             }
             else    //version 1
             {
-                Print(QString("Received (me): cId: %1 VR: %2").arg(clientID).arg(name), serverConnectionHandlerID, LogLevel_DEBUG);
+                //Log(QString("Received (me): cId: %1 VR: %2").arg(clientID).arg(name), serverConnectionHandlerID, LogLevel_DEBUG);
             }
         }
 //        else
-//            Print("Received(me) AV",serverConnectionHandlerID,LogLevel_DEBUG);
+//            Log("Received(me) AV",serverConnectionHandlerID,LogLevel_DEBUG);
 
         return true;
     }
@@ -787,7 +787,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
         }
         else    //version 1
         {
-            Print(QString("Received: cId: %1 VR: %2").arg(clientID).arg(name), serverConnectionHandlerID, LogLevel_DEBUG);
+            //Log(QString("Received: cId: %1 VR: %2").arg(clientID).arg(name), serverConnectionHandlerID, LogLevel_DEBUG);
         }
 
         if (isDirtyName || isDirtyContext || isDirtyId)
@@ -920,7 +920,7 @@ void PositionalAudio::Send(uint64 serverConnectionHandlerID, QString args, int t
     else
         str << myID << " 3D " << args;
 
-//    Print(QString("Sending: %1").arg(cmd),serverConnectionHandlerID,LogLevel_DEBUG);
+//    Log(QString("Sending: %1").arg(cmd),serverConnectionHandlerID,LogLevel_DEBUG);
 //    returnCode = m_SendReturnCodeC;
     ts3Functions.sendPluginCommand(serverConnectionHandlerID,pluginID,cmd.toLatin1().constData(),targetMode,targetIDs,returnCode);
 }
@@ -971,14 +971,14 @@ void PositionalAudio::Send(QString args, int targetMode)
                 int count_max = (s_settings.sendInterval) * SEND_INTERVAL_MODIFIER; // with SEND_THROTTLE_GLOBAL == 5 normalized; todo dynamic
                 if (myTalkingScHandler != *server)
                 {
-//                    Print("Adding silent interval increase");
+//                    Log("Adding silent interval increase");
                     count_max += (s_settings.sendIntervalSilentInc * SEND_INTERVAL_MODIFIER);
                 }
 
                 if (m_SendCounters[*server]++ < count_max)
                     continue;
 
-//                Print(QString("count: %1; max count: %2").arg(m_SendCounters[*server]+1).arg(count_max));
+//                Log(QString("count: %1; max count: %2").arg(m_SendCounters[*server]+1).arg(count_max));
                 m_SendCounters[*server] = 0;
 
                 /*QVector<anyID> vec = QVector<anyID>::fromList(m_PlayersInMyContext.values(*server));

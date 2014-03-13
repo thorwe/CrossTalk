@@ -101,7 +101,7 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
         path = QString(ts3plugin_name()).toLower();
         if (!dir.exists(path))
         {
-            //TSLogging::Print("Path does not exist: " + path);
+            //TSLogging::Log("Path does not exist: " + path,LogLevel_DEBUG);
             if (!dir.mkdir(path))
             {
                 TSLogging::Error(QString("%1: Could not create cache folder.").arg(this->objectName()),true);
@@ -119,7 +119,7 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
     if (isPathOk)
     {
         QString filename = reply->url().fileName();
-        //TSLogging::Print("filename: " + filename);
+        //TSLogging::Log("filename: " + filename,LogLevel_DEBUG);
 
         bool isFileExists = dir.exists(filename);
 
@@ -174,9 +174,9 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
             {
                 if (reply->url().hasQuery())
                 {
-                    QUrlQuery query(reply->url());
+                    /*QUrlQuery query(reply->url());
                     if (query.hasQueryItem("lang"))
-                        TSLogging::Print(QString("Lang Query: ").arg(query.queryItemValue("lang")));
+                        TSLogging::Log(QString("Lang Query: ").arg(query.queryItemValue("lang")),LogLevel_DEBUG);*/
 
                     return;
 
@@ -279,7 +279,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
     if (isIdentityDirty)
     {
         m_Identity = string;
-//        TSLogging::Print(QString("Idendity changed: %1").arg(m_Identity));
+//        TSLogging::Log(QString("Idendity changed: %1").arg(m_Identity),LogLevel_DEBUG);
         emit identityChanged(m_Identity);
     }
 
@@ -292,7 +292,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         if (m_professionId != profession)
         {
             m_professionId = profession;
-//            TSLogging::Print(QString("Profession changed: %1").arg(m_professionId));
+//            TSLogging::Log(QString("Profession changed: %1").arg(m_professionId),LogLevel_DEBUG);
             emit professionIdChanged(m_professionId);
         }
     }
@@ -307,7 +307,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         if (m_mapId != map_id)
         {
             m_mapId = map_id;
-//            TSLogging::Print(QString("Map Id changed: %1").arg(m_mapId));
+//            TSLogging::Log(QString("Map Id changed: %1").arg(m_mapId),LogLevel_DEBUG);
             emit mapIdChanged(m_mapId);
         }
     }
@@ -324,7 +324,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
             if (world_id >= 1001 && world_id <= 2301)
             {
                 m_worldId = world_id;
-    //            TSLogging::Print(QString("World Id changed: %1").arg(m_worldId));
+    //            TSLogging::Log(QString("World Id changed: %1").arg(m_worldId),LogLevel_DEBUG);
                 emit worldIdChanged(m_worldId);
             }
         }
@@ -342,7 +342,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
         if (m_teamColorId != team_color_id)
         {
             m_teamColorId = team_color_id;
-//            TSLogging::Print(QString("Team color Id changed: %1").arg(team_color_id));
+//            TSLogging::Log(QString("Team color Id changed: %1").arg(team_color_id),LogLevel_DEBUG);
             emit teamColorIdChanged(m_teamColorId);
         }
     }
@@ -355,7 +355,7 @@ bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
     if (isCommander != m_isCommander)
     {
         m_isCommander = isCommander;
-//        TSLogging::Print(QString("isCommander changed: %1").arg(m_isCommander));
+//        TSLogging::Log(QString("isCommander changed: %1").arg(m_isCommander),LogLevel_DEBUG);
         emit commanderStatusChanged(m_isCommander);
     }
 

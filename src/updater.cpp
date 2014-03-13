@@ -128,18 +128,6 @@ void Updater::CheckUpdate(QUrl url)
     m_netwManager->get(request);
 }
 
-//void Updater::onButtonClicked(QAbstractButton *button)
-//{
-////    if ((updateMsgBox->buttonRole(button) == QMessageBox::AcceptRole) || (updateMsgBox->buttonRole(button) == QMessageBox::YesRole))
-////        TSLogging::Print("Accepted");
-////    else if ((updateMsgBox->buttonRole(button) == QMessageBox::RejectRole) || (updateMsgBox->buttonRole(button) == QMessageBox::NoRole))
-////        TSLogging::Print("Rejected");
-////    else
-////        TSLogging::Print("Could not find button role");
-
-//    //updateMsgBox->deleteLater();
-//}
-
 void Updater::ShowUpdateDialog(QString remoteVersion)
 {
     QWidget* mainWindow = TSHelpers::GetMainWindow();
@@ -168,7 +156,7 @@ void Updater::ShowUpdateDialog(QString remoteVersion)
     else if (ret == QMessageBox::Cancel || ret == QMessageBox::No)
         TSLogging::Log("Update Rejected",LogLevel_INFO);
     else
-        TSLogging::Print("Could not find button role");
+        TSLogging::Error("Could not find button role");
 }
 
 QUrl Updater::redirectUrl(const QUrl& possibleRedirectUrl, const QUrl& oldRedirectUrl) const
@@ -188,10 +176,6 @@ QUrl Updater::redirectUrl(const QUrl& possibleRedirectUrl, const QUrl& oldRedire
 
 void Updater::CheckTriggerUpdateDialog()
 {
-//    TSLogging::Print(QString("Stable: %1").arg(m_VersionStable));
-//    TSLogging::Print(QString("Beta: %1").arg(m_VersionBeta));
-//    TSLogging::Print(QString("Local: %1").arg(ts3plugin_version()));
-
     if (!m_isBetaChannel)
     {
         if (m_VersionStable != ts3plugin_version())
@@ -244,7 +228,9 @@ void Updater::CheckTriggerUpdateDialog()
                 TSLogging::Log("(Updater) Problem with version comparison.");
                 isStableNewer = true;
             }
-//            TSLogging::Print(QString("(Updater) Remote Stable is %1 than beta.").arg((isStableNewer)?"newer":"older"));
+#ifdef CT_VERBOSE
+            TSLogging::Log(QString("(Updater) Remote Stable is %1 than beta.").arg((isStableNewer)?"newer":"older"),LogLevel_DEVEL);
+#endif
         }
 
         if (isStableNewer && (m_VersionStable != ts3plugin_version()))

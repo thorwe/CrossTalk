@@ -9,7 +9,7 @@ Agmu::Agmu(QObject *parent) :
 {
     this->setParent(parent);
     this->setObjectName("Agmu");
-    m_isPrintEnabled = true;
+    m_isPrintEnabled = false;
     talkers = Talkers::instance();
     m_TalkersDSPs = new QMap<uint64,QMap<anyID,DspVolumeAGMU*>* >;
     m_PeakCache = new QHash<QString,short>;
@@ -86,7 +86,7 @@ bool Agmu::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, boo
                     Error("(onTalkStatusChanged) Error getting client display name",serverConnectionHandlerID,error);
                     return true;
                 }
-                Print(QString("Setting dspObj from cache: %1 %2 %3").arg(name).arg(dspObj->GetPeak()).arg(dspObj->getGainCurrent()));
+                //Print(QString("Setting dspObj from cache: %1 %2 %3").arg(name).arg(dspObj->GetPeak()).arg(dspObj->getGainCurrent()));
             }
         }
 

@@ -39,7 +39,7 @@ void Ducker_Global::setActive(bool value)
         return;
 
     m_isActive = value;
-    Print(QString("setActive: %1").arg((value)?"true":"false"));
+    //Log(QString("setActive: %1").arg((value)?"true":"false"),LogLevel_DEBUG);
     emit activeSet(m_isActive);
 }
 
@@ -55,7 +55,6 @@ bool Ducker_Global::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 i
 
         if ((id != mine) && isClientMusicBot(serverConnectionHandlerID,(anyID)id))
         {
-//            Print("(onInfoDataChanged) adding info");
             data << this->objectName() << ":";
             isDirty = true;
 
@@ -77,14 +76,8 @@ bool Ducker_Global::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 i
 void Ducker_Global::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
 {
     Q_UNUSED(type);
-//    Print("(onContextMenuEvent)",serverConnectionHandlerID,LogLevel_DEBUG);
     if (menuItemID == m_ContextMenuToggleMusicBot)
-    {
         ToggleMusicBot(serverConnectionHandlerID,(anyID)selectedItemID);
-//        Print(QString("Toggle: %1").arg((anyID)selectedItemID),serverConnectionHandlerID,LogLevel_DEBUG);
-    }
-//    else
-//        Error("Received bad context menu event.",serverConnectionHandlerID,NULL);
 }
 
 void Ducker_Global::AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
@@ -141,7 +134,7 @@ void Ducker_Global::RemoveMusicBot(uint64 serverConnectionHandlerID, anyID clien
 
 void Ducker_Global::ToggleMusicBot(uint64 serverConnectionHandlerID, anyID clientID)
 {
-    Print(QString("(ToggleMusicBot) %1").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
+    //Log(QString("(ToggleMusicBot) %1").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
     unsigned int error;
 
     QString uid;
@@ -178,7 +171,6 @@ bool Ducker_Global::isClientMusicBot(uint64 serverConnectionHandlerID, anyID cli
     if (TSHelpers::GetClientUID(serverConnectionHandlerID,clientID,uid) != ERROR_ok)
         return false;
 
-//    Print(uid);
     return (DuckTargets->contains(uid));
 }
 

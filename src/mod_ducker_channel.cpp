@@ -187,7 +187,7 @@ void Ducker_Channel::setActive(bool value)
         return;
 
     m_isActive = value;
-//    Print(QString("setActive: %1").arg((value)?"true":"false"));
+//    Log(QString("setActive: %1").arg((value)?"true":"false"),LogLevel_DEBUG);
     emit activeSet(m_isActive);
 }
 
@@ -208,7 +208,7 @@ void Ducker_Channel::onClientMoveEvent(uint64 serverConnectionHandlerID, anyID c
 //        if ((oldChannelID == 0)  && (visibility == RETAIN_VISIBILITY)) // -> setHomeId clientMove
 //            return;
 
-//        Print("Refreshing volumes");
+//        Log("Refreshing volumes",LogLevel_DEBUG);
         vols->RemoveVolumes(serverConnectionHandlerID);
 
         // Get Channel Client List
@@ -328,7 +328,7 @@ DspVolumeDucker* Ducker_Channel::AddDuckerVolume(uint64 serverConnectionHandlerI
         vol->setGainAdjustment(m_isActive);
         connect(this,SIGNAL(activeSet(bool)),vol,SLOT(setGainAdjustment(bool)),Qt::DirectConnection);
     }
-//    Print(QString("Ducker: Added %1 to ServerChannelVolumes.").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
+//    Log(QString("Ducker: Added %1 to ServerChannelVolumes.").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
     return vol;
 }
 

@@ -712,6 +712,9 @@ void ts3plugin_initHotkeys(struct PluginHotkey*** hotkeys) {
 /* Show an error message if the plugin failed to load */
 void ts3plugin_onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber)
 {
+#ifdef CT_VERBOSE
+    TSLogging::Log(QString("ts3plugin_onConnectStatusChangeEvent status: %1 errorNumber: %2").arg(newStatus).arg(errorNumber), serverConnectionHandlerID, LogLevel_DEVEL);
+#endif
     centralStation->onConnectStatusChangeEvent(serverConnectionHandlerID,newStatus,errorNumber);
     talkers->onConnectStatusChangeEvent(serverConnectionHandlerID,newStatus,errorNumber);
     if (newStatus==STATUS_CONNECTION_ESTABLISHED)
@@ -738,6 +741,9 @@ void ts3plugin_onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int 
 void ts3plugin_onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, const char* moveMessage)
 {
     Q_UNUSED(moveMessage);
+#ifdef CT_VERBOSE
+    TSLogging::Log(QString("ts3plugin_onClientMoveEvent clientID: %1 oldChannelID: %2 newChannelID: %3 visibility: 4").arg(clientID).arg(oldChannelID).arg(newChannelID).arg(visibility?"true":"false"), serverConnectionHandlerID, LogLevel_DEVEL);
+#endif
 
     unsigned int error;
     if (newChannelID == 0)  // When we disconnect, we get moved to chan 0 before the connection event
