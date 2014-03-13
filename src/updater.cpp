@@ -10,11 +10,7 @@
 #include "ts_logging_qt.h"
 
 const QUrl STABLE("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html");
-#if QT_VERSION >= 0x050000
-  const QUrl BETA_CHECK("http://dl.dropbox.com/u/18413693/CrossTalk-builds/package_qt5.ini");
-#else
-  const QUrl BETA_CHECK("http://dl.dropbox.com/u/18413693/CrossTalk-builds/package.ini");
-#endif
+const QUrl BETA_CHECK("http://dl.dropbox.com/u/18413693/CrossTalk-builds/package.ini");
 const QUrl BETA_DOWNLOAD("http://jianji.de/crosstalk/");
 
 // Note that TS doesn't ship with any ssl support, so no GitHub API etc
