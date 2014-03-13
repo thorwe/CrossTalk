@@ -12,4 +12,11 @@
         <file alias="avatar">res/avatar.png</file>
         <file alias="camera">res/camera.png</file>
     </qresource>
+    <qresource prefix="/icons">
+        <file alias="add.png">res/16x16_add.png</file>
+        <file alias="delete.png">res/16x16_delete.png</file>
+        <file alias="check_update.png">res/16x16_check_update.png</file>
+        <file alias="3d_sound_me.png">res/20x20_3d_sound_me.png</file>
+        <file alias="3d_sound.png">res/24x24_3d_sound.png</file>
+    </qresource>
 </RCC>

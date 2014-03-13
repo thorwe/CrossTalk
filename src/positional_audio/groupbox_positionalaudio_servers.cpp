@@ -11,9 +11,9 @@ GroupBoxPositionalAudioServers::GroupBoxPositionalAudioServers(QWidget *parent) 
 {
     ui->setupUi(this);
 
-    QIcon addIcon("gfx/default/16x16_add.png");
+    QIcon addIcon(":/icons/add.png");    //"gfx/default/16x16_add.png"
     ui->pushButton_add->setIcon(addIcon);
-    QIcon removeIcon("gfx/default/16x16_delete.png");
+    QIcon removeIcon(":/icons/delete.png");     //"gfx/default/16x16_delete.png"
     ui->pushButton_remove->setIcon(removeIcon);
 
     connect(ui->listWidget_servers, SIGNAL(currentTextChanged(QString)), this, SLOT(changePage(QString)));

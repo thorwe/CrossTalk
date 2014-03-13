@@ -105,7 +105,7 @@ void TSLogging::Error(QString message, uint64 serverConnectionHandlerID, unsigne
     // Use a transparent underscore because a double space will be collapsed
     QString styledQstr;
 
-    QString infoIcon;
+    /*QString infoIcon;
     if (!(GetInfoIcon(infoIcon)))
     {
         //Get Error
@@ -113,7 +113,7 @@ void TSLogging::Error(QString message, uint64 serverConnectionHandlerID, unsigne
         ts3Functions.logMessage(msg.toLocal8Bit().constData(), LogLevel_ERROR, ts3plugin_name(), 0);
     }
     else
-        QTextStream(&styledQstr) << "[img]" << infoIcon << "[/img]";
+        QTextStream(&styledQstr) << "[img]" << infoIcon << "[/img]";*/
 
     QTime time = QTime::currentTime ();
     QString time_qstr = time.toString(Qt::TextDate);

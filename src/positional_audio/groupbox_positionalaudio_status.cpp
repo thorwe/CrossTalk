@@ -8,12 +8,12 @@ GroupBoxPositionalAudioStatus::GroupBoxPositionalAudioStatus(QWidget *parent) :
     ui(new Ui::GroupBoxPositionalAudioStatus)
 {
     ui->setupUi(this);
-    QPixmap threedeepixmap("gfx/default/24x24_3d_sound.png"); //also 16x16
+    QPixmap threedeepixmap(":/icons/3d_sound.png"); //"gfx/default/24x24_3d_sound.png" also 16x16
     ui->label_3DSettingStatusIcon->setPixmap(threedeepixmap);
-    QPixmap selfthreedeepixmap("gfx/default/20x20_3d_sound_me.png");
+    QPixmap selfthreedeepixmap(":/icons/3d_sound_me.png");   //"gfx/default/20x20_3d_sound_me.png"
     ui->label_SelfStatusIcon->setPixmap(selfthreedeepixmap);
     //20x20_3d_sound_user
-    QIcon threedeerefresh("gfx/default/16x16_check_update.png");
+    QIcon threedeerefresh(":/icons/check_update.png");    //"gfx/default/16x16_check_update.png"
     ui->pushButton_Refresh->setText(QString::null);
     ui->pushButton_Refresh->setIcon(threedeerefresh);
     connect(ui->pushButton_Refresh,SIGNAL(clicked()),this,SLOT(onRefreshStatus()));
