@@ -394,6 +394,18 @@ var GW2Maps = {
 			$H(eventdata).each(function(p){
 				// Apparently there either are nameless/untranslated events or I got some bug in gw2info, more likely the former
 				var eventName = p[1][name];
+				var coordinates = recalc_event_coords(map.continent_rect,map.map_rect,p[1].location.center);
+				var rec_radius;
+				if (typeof p[1].location.radius !== "undefined")
+				{
+					/*var weirdPoint = [(p[1].location.center[0] + p[1].location.radius), p[1].location.center[1] ];
+					weirdPoint = recalc_event_coords(map.continent_rect,map.map_rect,weirdPoint);
+					rec_radius = weirdPoint[0] - coordinates[0];*/
+					/*var obj = mapobject.map.unproject([p[1].location.radius,0], mapobject.map.getMaxZoom())
+					rec_radius = obj[0];*/
+					rec_radius = p[1].location.radius;
+				}
+				
 				if (typeof eventName === "undefined")
 				{
 					if (typeof p[1]["name_en"] !== "undefined")	// fall back to english
@@ -405,7 +417,9 @@ var GW2Maps = {
 				pois.event.push({
 					id: p[0],
 					type: "event",
-					coords: recalc_event_coords(map.continent_rect,map.map_rect,p[1].location.center),
+					coords: coordinates,
+					radius: rec_radius,
+					locationType: p[1].location.type,
 					title: eventName + " (" + p[1].level + ")",
 					text: "(" + p[1].level + ") " + eventName,
 					popup: (eventName !== "") ? ('<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a> ("+p[1].level+")<br />id:"+p[0]) : ("("+p[1].level+")<br />id:"+p[0])
@@ -616,7 +630,14 @@ var GW2Maps = {
             //console.log("i.iconUrl:"+i.iconUrl + " i.iconSize: " + i.iconSize[0] + "," + i.iconSize[1]);
 		}
 
-        var marker = L.marker(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), {title: point.title, icon: icon});
+        var marker;
+		if (!point.locationType)
+			marker = L.marker(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), {title: point.title, icon: icon});
+		else if (point.locationType === "poly")	// TODO
+			marker = L.marker(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), {title: point.title, icon: icon});
+		else
+			marker = L.circle(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), point.radius, {title: point.title, icon: icon});
+			
 		if ((point.type === "event") && (typeof point.id !== "undefined"))	// we need only events yet
 		{
 			if (typeof mapobject.markers[point.type] === "undefined") mapobject.markers[point.type] = {};
