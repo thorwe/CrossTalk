@@ -8,12 +8,11 @@
 
 #include "ts_logging_qt.h"
 
-#if QT_VERSION >= 0x050000
-  const QUrl GW2_BUILD("https://api.guildwars2.com/v1/build.json");
-  const QUrl GW2_WORLD_NAMES("https://api.guildwars2.com/v1/world_names.json");
-  const QUrl GW2_CONTINENTS("https://api.guildwars2.com/v1/continents.json");
-  const QUrl GW2_MAPS("https://api.guildwars2.com/v1/maps.json");
-#endif
+const QUrl GW2_BUILD("https://api.guildwars2.com/v1/build.json");
+const QUrl GW2_WORLD_NAMES("https://api.guildwars2.com/v1/world_names.json");
+const QUrl GW2_CONTINENTS("https://api.guildwars2.com/v1/continents.json");
+const QUrl GW2_MAPS("https://api.guildwars2.com/v1/maps.json");
+
 
 GuildWarsTwo::GuildWarsTwo(QObject *parent) :
     QObject(parent)
@@ -22,12 +21,10 @@ GuildWarsTwo::GuildWarsTwo(QObject *parent) :
 //    PositionalAudio* pa = qobject_cast<PositionalAudio *>(parent);
 //    pa->RegisterCustomEnvironmentSupport(this);
 
-#if QT_VERSION >= 0x050000
     m_netwManager = new QNetworkAccessManager(this);
     connect(m_netwManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetwManagerFinished(QNetworkReply*)));
     QNetworkRequest request(GW2_BUILD);
     m_netwManager->get(request);
-#endif
 }
 
 QString GuildWarsTwo::getIdentity() const
@@ -60,7 +57,6 @@ bool GuildWarsTwo::isCommander() const
     return m_isCommander;
 }
 
-#if QT_VERSION >= 0x050000
 void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
 {
     if (reply->error() != QNetworkReply::NoError)
@@ -231,7 +227,6 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
     }
     reply->deleteLater();
 }
-#endif
 
 bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
 {
@@ -368,7 +363,6 @@ bool GuildWarsTwo::onInfoData(QTextStream &data)
     data << "\n";
     data << "is commander: " << ((isCommander())?"y":"n") << "\n";
 
-#if QT_VERSION >= 0x050000
     data << m_Maps.value(QString::number(getMapId())).toObject().value("map_name").toString();
     if (m_teamColorId != 0) // WvW
     {
@@ -378,19 +372,7 @@ bool GuildWarsTwo::onInfoData(QTextStream &data)
     {
         data << m_WorldNames.value(QString::number(getWorldId())).toObject().value("name").toString();
     }
-#else
-    QString lang = TSHelpers::GetLanguage();
 
-    data << GW2::getMapName(getMapId(),lang) << " ( ";
-    if (m_teamColorId != 0) // WvW
-    {
-        data << "WvW Team: " << getTeamColorId();
-    }
-    else                    // Tyria
-    {
-        data << GW2::getWorldName(getWorldId(),lang);
-    }
-#endif
     data << " )\n";
 
 

@@ -2,11 +2,8 @@
 #define GUILDWARSTWO_H
 
 #include <QObject>
+#include <QtNetwork>
 #include "tsvr_definitions.h"
-
-#if QT_VERSION >= 0x050000
-  #include <QtNetwork>
-#endif
 
 class GuildWarsTwo : public QObject, public CustomEnvironmentSupportInterface
 {
@@ -56,9 +53,7 @@ signals:
 public slots:
 
 private slots:
-#if QT_VERSION >= 0x050000
     void onNetwManagerFinished(QNetworkReply *reply);
-#endif
 
 private:
     QString m_Identity;
@@ -68,7 +63,6 @@ private:
     quint32 m_teamColorId;
     bool m_isCommander;
 
-#if QT_VERSION >= 0x050000
     QNetworkAccessManager *m_netwManager;
 
     // GW2 API
@@ -76,8 +70,6 @@ private:
     QJsonObject m_Continents;
     QJsonObject m_WorldNames;
     QJsonObject m_Maps;
-
-#endif
 };
 
 #endif // GUILDWARSTWO_H

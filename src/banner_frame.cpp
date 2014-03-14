@@ -5,11 +5,7 @@
 
 #include "ts_logging_qt.h"
 
-#if QT_VERSION >= 0x050000
 const QUrl PLEDGIE_IMAGE("https://pledgie.com/campaigns/18898.png");
-#else
-const QUrl PLEDGIE_IMAGE("http://pledgie.com/campaigns/18898.png");
-#endif
 const QUrl PLEDGIE_CAMPAIGN("http://www.pledgie.com/campaigns/18898");
 const QUrl CROSSTALK_CAMPAING("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html");
 

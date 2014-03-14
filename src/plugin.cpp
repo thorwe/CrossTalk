@@ -78,11 +78,7 @@ TSInfoData* infoData = TSInfoData::instance();
 #define _strcpy(dest, destSize, src) { strncpy(dest, src, destSize-1); dest[destSize-1] = '\0'; }
 #endif
 
-#if QT_VERSION >= 0x050000
-  #define PLUGIN_API_VERSION 20
-#else
-  #define PLUGIN_API_VERSION 19
-#endif
+#define PLUGIN_API_VERSION 20
 
 #define PATH_BUFSIZE 512
 #define COMMAND_BUFSIZE 128
