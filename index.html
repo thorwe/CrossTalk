@@ -23,208 +23,239 @@
 	</head>
 	<body style="">
 	
-	<!-- NAVBAR
-	================================================== -->
-	
-	<div class="navbar-wrapper">
-		<div class="container">
+		<!-- NAVBAR
+		================================================== -->
+		
+		<div class="navbar-wrapper">
+			<div class="container">
 
-			<div class="navbar navbar-inverse navbar-static-top" role="navigation">
-				<div class="container">
-					<div class="navbar-header">
-						<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-							<span class="sr-only">Toggle navigation</span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-							<span class="icon-bar"></span>
-						</button>
-						<a class="navbar-brand" href="#">CrossTalk</a>
+				<div class="navbar navbar-inverse navbar-static-top" role="navigation">
+					<div class="container">
+						<div class="navbar-header">
+							<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+								<span class="sr-only">Toggle navigation</span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+								<span class="icon-bar"></span>
+							</button>
+							<a class="navbar-brand" href="#">CrossTalk</a>
+						</div>
+						<div class="navbar-collapse collapse">
+							<ul class="nav navbar-nav">
+								<li class="active"><a href="#">Home</a></li>
+								<li><a href="#about">About</a></li>
+								<li><a href="#">Contact</a></li>
+								<li class="dropdown">
+									<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+									<ul class="dropdown-menu">
+										<li><a href="#">Action</a></li>
+										<li><a href="#">Another action</a></li>
+										<li><a href="#">Something else here</a></li>
+										<li class="divider"></li>
+										<li class="dropdown-header">Nav header</li>
+										<li><a href="#">Separated link</a></li>
+										<li><a href="#">One more separated link</a></li>
+									</ul>
+								</li>
+							</ul>
+						</div>
 					</div>
-					<div class="navbar-collapse collapse">
-						<ul class="nav navbar-nav">
-							<li class="active"><a href="#">Home</a></li>
-							<li><a href="#about">About</a></li>
-							<li><a href="#">Contact</a></li>
-							<li class="dropdown">
-								<a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-								<ul class="dropdown-menu">
-									<li><a href="#">Action</a></li>
-									<li><a href="#">Another action</a></li>
-									<li><a href="#">Something else here</a></li>
-									<li class="divider"></li>
-									<li class="dropdown-header">Nav header</li>
-									<li><a href="#">Separated link</a></li>
-									<li><a href="#">One more separated link</a></li>
-								</ul>
-							</li>
-						</ul>
+				</div>
+
+			</div>
+		</div>
+		
+			<!-- Carousel
+		================================================== -->
+		<div id="myCarousel" class="carousel slide" data-ride="carousel">
+			<!-- Indicators -->
+			<ol class="carousel-indicators">
+				<li data-target="#myCarousel" data-slide-to="0" class=""></li>
+				<li data-target="#myCarousel" data-slide-to="1" class="active"></li>
+				<li data-target="#myCarousel" data-slide-to="2" class=""></li>
+			</ol>
+			<div class="carousel-inner">
+				<div class="item active">
+					<img data-src="holder.js/900x500/auto/#777:#7a7a7a/text:Update" alt="Update" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNTAwIj48cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzc3NyI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQ1MCIgeT0iMjUwIiBzdHlsZT0iZmlsbDojN2E3YTdhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjU2cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+Rmlyc3Qgc2xpZGU8L3RleHQ+PC9zdmc+">
+					<div class="container">
+						<div class="carousel-caption">
+							<h1>CrossTalk 1.6.0</h1>
+							<p>for Teamspeak 3.0.14</p>
+							<!--<p><a class="btn btn-lg btn-primary" href="#" role="button">Sign up today</a></p>-->
+						</div>
 					</div>
+				</div>
+				<!--<div class="item">
+					<img data-src="holder.js/900x500/auto/#666:#6a6a6a/text:Second slide" alt="Second slide" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNTAwIj48cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzY2NiI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQ1MCIgeT0iMjUwIiBzdHlsZT0iZmlsbDojNmE2YTZhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjU2cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+U2Vjb25kIHNsaWRlPC90ZXh0Pjwvc3ZnPg==">
+					<div class="container">
+						<div class="carousel-caption">
+							<h1>Another example headline.</h1>
+							<p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+							<p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more</a></p>
+						</div>
+					</div>
+				</div>
+				<div class="item">
+					<img data-src="holder.js/900x500/auto/#555:#5a5a5a/text:Third slide" alt="Third slide" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNTAwIj48cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzU1NSI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQ1MCIgeT0iMjUwIiBzdHlsZT0iZmlsbDojNWE1YTVhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjU2cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+VGhpcmQgc2xpZGU8L3RleHQ+PC9zdmc+">
+					<div class="container">
+						<div class="carousel-caption">
+							<h1>One more for good measure.</h1>
+							<p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
+							<p><a class="btn btn-lg btn-primary" href="#" role="button">Browse gallery</a></p>
+						</div>
+					</div>
+				</div>-->
+			</div>
+			<a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
+			<a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
+		</div><!-- /.carousel -->
+		
+		
+		<!-- Marketing messaging and featurettes
+		================================================== -->
+		<!-- Wrap the rest of the page in another container to center all the content. -->
+
+		<div class="container marketing">
+			<p>
+				<img src="https://github.com/thorwe/CrossTalk/raw/gh-pages/res/logo_320x60.png" alt="CrossTalk"></img>
+				<img src="http://www.pledgie.com/campaigns/18898.png" alt="pledgie"></img><br><br>
+				CrossTalk is a Teamspeak 3 plugin that enhances the general audio experience and provides advanced features for commanders.
+			</p>
+			
+			<!-- Three columns of text below the carousel -->
+			<!--
+			<div class="row">
+				<div class="col-lg-4">
+					<img class="img-circle" data-src="holder.js/140x140" alt="140x140" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+" style="width: 140px; height: 140px;">
+					<h2>Heading</h2>
+					<p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
+					<p><a class="btn btn-default" href="http://getbootstrap.com/examples/carousel/#" role="button">View details »</a></p>
+				</div>
+				<div class="col-lg-4">
+					<img class="img-circle" data-src="holder.js/140x140" alt="140x140" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+" style="width: 140px; height: 140px;">
+					<h2>Heading</h2>
+					<p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
+					<p><a class="btn btn-default" href="http://getbootstrap.com/examples/carousel/#" role="button">View details »</a></p>
+				</div>
+				<div class="col-lg-4">
+					<img class="img-circle" data-src="holder.js/140x140" alt="140x140" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+" style="width: 140px; height: 140px;">
+					<h2>Heading</h2>
+					<p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
+					<p><a class="btn btn-default" href="http://getbootstrap.com/examples/carousel/#" role="button">View details »</a></p>
+				</div>
+			</div>
+			-->
+
+		  <!-- START THE FEATURETTES -->
+			<h1>Features</h1>
+			<hr class="featurette-divider">
+
+			<div class="row featurette">
+				<div class="col-md-7">
+					<h2 class="featurette-heading">Positional<span class="text-muted">Audio</span></h2>
+					<p class="lead">
+						The <a href="https://github.com/thorwe/CrossTalk/wiki/Positional-Audio">"Positional Audio"</a> module enables you to hear clients from the position they are in a supported game.<br>
+					</p>
+				</div>
+				<div class="col-md-5">
+					<img class="featurette-image img-responsive" alt="Ducking" src="misc/ct_screenie_posa.png">
 				</div>
 			</div>
 
-		</div>
-	</div>
-	
-	    <!-- Carousel
-    ================================================== -->
-	<div id="myCarousel" class="carousel slide" data-ride="carousel">
-		<!-- Indicators -->
-		<ol class="carousel-indicators">
-			<li data-target="#myCarousel" data-slide-to="0" class=""></li>
-			<li data-target="#myCarousel" data-slide-to="1" class="active"></li>
-			<li data-target="#myCarousel" data-slide-to="2" class=""></li>
-		</ol>
-		<div class="carousel-inner">
-			<div class="item active">
-				<img data-src="holder.js/900x500/auto/#777:#7a7a7a/text:Update" alt="Update" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNTAwIj48cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzc3NyI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQ1MCIgeT0iMjUwIiBzdHlsZT0iZmlsbDojN2E3YTdhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjU2cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+Rmlyc3Qgc2xpZGU8L3RleHQ+PC9zdmc+">
-				<div class="container">
-					<div class="carousel-caption">
-						<h1>CrossTalk 1.6.0</h1>
-						<p>for Teamspeak 3.0.14</p>
-						<!--<p><a class="btn btn-lg btn-primary" href="#" role="button">Sign up today</a></p>-->
-					</div>
+			<hr class="featurette-divider">
+
+			<div class="row featurette">
+				<div class="col-md-5">
+					<img class="featurette-image img-responsive" alt="Ducking" src="misc/ct_screenie_ps.png">
+				</div>
+				<div class="col-md-7">
+					<h2 class="featurette-heading"><span class="text-muted">Stereo</span> Position Spread</h2>
 				</div>
 			</div>
-			<!--<div class="item">
-				<img data-src="holder.js/900x500/auto/#666:#6a6a6a/text:Second slide" alt="Second slide" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNTAwIj48cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzY2NiI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQ1MCIgeT0iMjUwIiBzdHlsZT0iZmlsbDojNmE2YTZhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjU2cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+U2Vjb25kIHNsaWRlPC90ZXh0Pjwvc3ZnPg==">
-				<div class="container">
-					<div class="carousel-caption">
-						<h1>Another example headline.</h1>
-						<p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-						<p><a class="btn btn-lg btn-primary" href="#" role="button">Learn more</a></p>
-					</div>
+
+			<hr class="featurette-divider">
+
+			<div class="row featurette">
+				<div class="col-md-7">
+					<h2 class="featurette-heading">Ducking<span class="text-muted"> *quack quack*</span></h2>
+					<p class="lead">
+						Global Ducking: Reduce the volume of musicbots when someone talks.<br>
+						Channel Ducking: Reduce the volume of home or foreign tabs when someone talks on the other one or you receive a whisper.
+					</p>
+				</div>
+				<div class="col-md-5">
+					<img class="featurette-image img-responsive" alt="Ducking" src="misc/ct_screenie_duck.png">
 				</div>
 			</div>
-			<div class="item">
-				<img data-src="holder.js/900x500/auto/#555:#5a5a5a/text:Third slide" alt="Third slide" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5MDAiIGhlaWdodD0iNTAwIj48cmVjdCB3aWR0aD0iOTAwIiBoZWlnaHQ9IjUwMCIgZmlsbD0iIzU1NSI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjQ1MCIgeT0iMjUwIiBzdHlsZT0iZmlsbDojNWE1YTVhO2ZvbnQtd2VpZ2h0OmJvbGQ7Zm9udC1zaXplOjU2cHg7Zm9udC1mYW1pbHk6QXJpYWwsSGVsdmV0aWNhLHNhbnMtc2VyaWY7ZG9taW5hbnQtYmFzZWxpbmU6Y2VudHJhbCI+VGhpcmQgc2xpZGU8L3RleHQ+PC9zdmc+">
-				<div class="container">
-					<div class="carousel-caption">
-						<h1>One more for good measure.</h1>
-						<p>Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.</p>
-						<p><a class="btn btn-lg btn-primary" href="#" role="button">Browse gallery</a></p>
-					</div>
+
+			<hr class="featurette-divider">
+
+			<div class="row featurette">
+				<div class="col-md-7">
+					<h2 class="featurette-heading">Radio<span class="text-muted"> FX</span></h2>
+					<p class="lead">
+						Walkie Talkie? Walkie Talkie.
+					</p>
 				</div>
-			</div>-->
-		</div>
-		<a class="left carousel-control" href="#myCarousel" data-slide="prev"><span class="glyphicon glyphicon-chevron-left"></span></a>
-		<a class="right carousel-control" href="#myCarousel" data-slide="next"><span class="glyphicon glyphicon-chevron-right"></span></a>
-	</div><!-- /.carousel -->
-	
-	
-	<!-- Marketing messaging and featurettes
-    ================================================== -->
-    <!-- Wrap the rest of the page in another container to center all the content. -->
-
-    <div class="container marketing">
-		<p>
-			<img src="https://github.com/thorwe/CrossTalk/raw/gh-pages/res/logo_320x60.png" alt="CrossTalk"></img>
-			<img src="http://www.pledgie.com/campaigns/18898.png" alt="pledgie"></img><br>
-			CrossTalk is a Teamspeak 3 plugin that enhances the general audio experience and provides advanced features for commanders.
-		</p>
-		
-		<!-- Three columns of text below the carousel -->
-		<!--
-		<div class="row">
-			<div class="col-lg-4">
-				<img class="img-circle" data-src="holder.js/140x140" alt="140x140" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+" style="width: 140px; height: 140px;">
-				<h2>Heading</h2>
-				<p>Donec sed odio dui. Etiam porta sem malesuada magna mollis euismod. Nullam id dolor id nibh ultricies vehicula ut id elit. Morbi leo risus, porta ac consectetur ac, vestibulum at eros. Praesent commodo cursus magna.</p>
-				<p><a class="btn btn-default" href="http://getbootstrap.com/examples/carousel/#" role="button">View details »</a></p>
+				<div class="col-md-5">
+					<img class="featurette-image img-responsive" alt="Ducking" src="misc/ct_screenie_radio.png">
+				</div>
 			</div>
-			<div class="col-lg-4">
-				<img class="img-circle" data-src="holder.js/140x140" alt="140x140" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+" style="width: 140px; height: 140px;">
-				<h2>Heading</h2>
-				<p>Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget lacinia odio sem nec elit. Cras mattis consectetur purus sit amet fermentum. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh.</p>
-				<p><a class="btn btn-default" href="http://getbootstrap.com/examples/carousel/#" role="button">View details »</a></p>
+
+			<hr class="featurette-divider">
+			
+			<div class="row featurette">
+				<div class="col-md-7">
+					<h2 class="featurette-heading"><span class="text-muted">Channel</span>Muter</h2>
+					<p class="lead">
+						You want to listen only to a few selected people in a crowded channel? Meet the ChannelMuter.
+					</p>
+				</div>
+				<div class="col-md-5">
+					<img class="featurette-image img-responsive" alt="Ducking" src="misc/ct_screenie_radio.png">
+				</div>
 			</div>
-			<div class="col-lg-4">
-				<img class="img-circle" data-src="holder.js/140x140" alt="140x140" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNDAiIGhlaWdodD0iMTQwIj48cmVjdCB3aWR0aD0iMTQwIiBoZWlnaHQ9IjE0MCIgZmlsbD0iI2VlZSI+PC9yZWN0Pjx0ZXh0IHRleHQtYW5jaG9yPSJtaWRkbGUiIHg9IjcwIiB5PSI3MCIgc3R5bGU9ImZpbGw6I2FhYTtmb250LXdlaWdodDpib2xkO2ZvbnQtc2l6ZToxMnB4O2ZvbnQtZmFtaWx5OkFyaWFsLEhlbHZldGljYSxzYW5zLXNlcmlmO2RvbWluYW50LWJhc2VsaW5lOmNlbnRyYWwiPjE0MHgxNDA8L3RleHQ+PC9zdmc+" style="width: 140px; height: 140px;">
-				<h2>Heading</h2>
-				<p>Donec sed odio dui. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Vestibulum id ligula porta felis euismod semper. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>
-				<p><a class="btn btn-default" href="http://getbootstrap.com/examples/carousel/#" role="button">View details »</a></p>
+
+			<hr class="featurette-divider">
+			
+			<div class="row featurette">
+				<div class="col-md-7">
+					<h2 class="featurette-heading">Cross-Server <span class="text-muted">Push-to-Talk & Whispering</span></h2>
+					<p class="lead">
+					</p>
+				</div>
+				<!--<div class="col-md-5">
+					<img class="featurette-image img-responsive" alt="Ducking" src="misc/ct_screenie_radio.png">
+				</div>-->
 			</div>
-		</div>
-		-->
 
-      <!-- START THE FEATURETTES -->
-		<h2>Features</h2>
-		<hr class="featurette-divider">
+			<hr class="featurette-divider">
+			
+			<!-- /END THE FEATURETTES -->
 
-		<div class="row featurette">
-			<div class="col-md-7">
-				<h2 class="featurette-heading">Positional<span class="text-muted">Audio</span></h2>
-				<p class="lead">
-					The <a href="https://github.com/thorwe/CrossTalk/wiki/Positional-Audio">"Positional Audio"</a> module enables you to hear clients from the position they are in a supported game.<br>
-				</p>
-			</div>
-			<div class="col-md-5">
-				<img class="featurette-image img-responsive" alt="Ducking" src="misc/ct_screenie_posa.png">
-			</div>
-		</div>
+			<!--<h1>Installation</h1>
 
-		<hr class="featurette-divider">
+			Head over to the official download site at Teamspeak for an [installer package](http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html).
 
-		<div class="row featurette">
-			<div class="col-md-5">
-				<img class="featurette-image img-responsive" alt="Ducking" src="misc/ct_screenie_ps.png">
-			</div>
-			<div class="col-md-7">
-				<h2 class="featurette-heading"><span class="text-muted">Stereo</span> Position Spread</h2>
-			</div>
-		</div>
+			<h1>Support</h1>
 
-		<hr class="featurette-divider">
+			If you have a question, please check this README, the wiki, and the [list of
+			known issues][troubleshoot].
 
-		<div class="row featurette">
-			<div class="col-md-7">
-				<h2 class="featurette-heading">Ducking<span class="text-muted"> *quack quack*</span></h2>
-				<p class="lead">
-					Global Ducking: Reduce the volume of musicbots when someone talks.<br>
-					Channel Ducking: Reduce the volume of home or foreign tabs when someone talks on the other one or you receive a whisper.
-				</p>
-			</div>
-			<div class="col-md-5">
-				<img class="featurette-image img-responsive" alt="Ducking" src="misc/ct_screenie_duck.png">
-			</div>
-		</div>
+			[troubleshoot]: https://github.com/thorwe/CrossTalk/wiki/Troubleshoot
 
-		<hr class="featurette-divider">
+			If you think you found a bug in CrossTalk, you can [submit an issue](https://github.com/thorwe/CrossTalk/issues/new).
+			-->
 
-		<!-- /END THE FEATURETTES -->
+			<!-- FOOTER -->
+			<footer>
+				<p class="pull-right"><a href="#">Back to top</a></p>
+				<p>Thorwe 2014</p>
+			</footer>
 
-
-		<!-- FOOTER -->
-		<footer>
-			<p class="pull-right"><a href="#">Back to top</a></p>
-			<p>Thorwe 2014</p>
-		</footer>
-
-	</div><!-- /.container marketing -->
+		</div><!-- /.container marketing -->
 	
 		
-		
-		<!--<h3>Radio FX</h3>
-		Walkie Talkie? Walkie Talkie.<br>
-
-		<img src="https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_radio.png">"Radio FX"</img>
-		
-		<h3>ChannelMuter</h3>
-		You want to listen only to a few selected people in a crowded channel? Meet the ChannelMuter.<br>
-		
-		<h3>Cross-Server Push-to-Talk & Whispering</h3>
-
-		<h2>Installation</h2>
-
-		Head over to the official download site at Teamspeak for an [installer package](http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html).
-
-		<h2>Support</h2>
-
-		If you have a question, please check this README, the wiki, and the [list of
-		known issues][troubleshoot].
-
-		[troubleshoot]: https://github.com/thorwe/CrossTalk/wiki/Troubleshoot
-
-		If you think you found a bug in CrossTalk, you can [submit an issue](https://github.com/thorwe/CrossTalk/issues/new).-->
 		
 		    <!-- Bootstrap core JavaScript
 		================================================== -->
