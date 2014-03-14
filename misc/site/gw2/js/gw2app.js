@@ -31,7 +31,7 @@
 	
     document.observe('dom:loaded', function(){
         [
-                "../css/leaflet.css",
+                "http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css",	//"../css/leaflet.css",
                 "../css/leaflet.label.css",
                 "https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/menomonia.css",
                 "https://d1h9a8s8eodvjz.cloudfront.net/fonts/menomonia/08-02-12/menomonia-italic.css",
