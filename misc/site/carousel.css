@@ -30,6 +30,10 @@ body {
   padding-right: 15px;
   padding-left: 15px;
 }
+.navbar-wrapper .navbar-right {
+  padding-right: 15px;
+}
+
 
 
 /* CUSTOMIZE THE CAROUSEL
