@@ -5,8 +5,7 @@ TEMPLATE = lib
 #VERSION = 1.3.2
 #CONFIG += beta
 
-QT += sql network
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += sql network widgets
 
 INCLUDEPATH += includes
 
