@@ -66,9 +66,11 @@
 				saveToStorage();
 			}
         });
+		var lang2Int = {de:1,en:2,es:3,fr:4};
         $("language_list").on("change", function(event) {
             var element = event.element();
             settings.lang = element.getValue();
+			$('gw2map').setAttribute('data-language', ""+lang2Int[settings.lang]);
             console.log("Language changed (UI): " + settings.lang);
             saveToStorage();
         });
@@ -98,7 +100,8 @@
             });
         };
         initLanguageSelection();
-
+		$('gw2map').setAttribute('data-language', ""+lang2Int[settings.lang]);
+		
         var getPopup = function(m, name, world_id, continent_id, map_id, pos, angle_f, profession, isCommander, c_guild, c_state, c_time, c_vcname)
         {
             var guild_tag = (c_guild.tag) ? " ["+c_guild.tag+"]" : "";
