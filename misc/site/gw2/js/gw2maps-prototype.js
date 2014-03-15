@@ -644,12 +644,12 @@ var GW2Maps = {
 		}
 
         var marker;
-		if (!point.locationType)
+		//if (!point.locationType)
 			marker = L.marker(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), {title: point.title, icon: icon});
-		else if (point.locationType === "poly")	// TODO
+		/*else if (point.locationType === "poly")	// TODO
 			marker = L.marker(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), {title: point.title, icon: icon});
 		else
-			marker = L.circle(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), point.radius, {color:"orange"});
+			marker = L.circle(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), point.radius, {color:"orange"});*/
 			
 		if ((point.type === "event") && (typeof point.id !== "undefined"))	// we need only events yet
 		{
