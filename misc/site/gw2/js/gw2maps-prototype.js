@@ -422,7 +422,7 @@ var GW2Maps = {
 					locationType: p[1].location.type,
 					title: eventName + " (" + p[1].level + ")",
 					text: "(" + p[1].level + ") " + eventName,
-					popup: (eventName !== "") ? ('<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a> ("+p[1].level+")<br />id:"+p[0]) : ("("+p[1].level+")<br />id:"+p[0])
+					popup: (eventName !== "") ? ('<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a> ("+p[1].level+")<br />id:"+p[0]) : ("("+p[1].level+")<br />id:"+p[0]+"<br />" + (p[1].location.type === "poly")?"":("radius: " + rec_radius))
 				});
 			});
         };
