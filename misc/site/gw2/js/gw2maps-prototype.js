@@ -414,6 +414,9 @@ var GW2Maps = {
 						eventName = "";	//return true;	//continue for jquery each
 				}
 				sort.event.push(p[1].level);
+				var popupStr = (eventName !== "") ? ('<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a>" : "";
+				popupStr = popupStr + " ("+p[1].level+")<br />id:"+p[0] +"<br />";
+				if (p[1].location.type !== "poly") popupStr = popupStr + ("radius: " + rec_radius);
 				pois.event.push({
 					id: p[0],
 					type: "event",
@@ -422,7 +425,7 @@ var GW2Maps = {
 					locationType: p[1].location.type,
 					title: eventName + " (" + p[1].level + ")",
 					text: "(" + p[1].level + ") " + eventName,
-					popup: (eventName !== "") ? ('<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a> ("+p[1].level+")<br />id:"+p[0] +"<br />" + (p[1].location.type === "poly")?"":("radius: " + rec_radius)) : ("("+p[1].level+")<br />id:"+p[0])
+					popup: popupStr
 				});
 			});
         };
