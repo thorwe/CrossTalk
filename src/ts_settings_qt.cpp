@@ -171,13 +171,13 @@ bool TSSettings::Is3DSoundEnabled(bool &result)
         error_qsql.setDriverText(error_qsql.driverText().prepend("(Is3DSoundEnabled) "));
         return false;
     }
-    result = (qstr_result == "true");
+    result = (qstr_result == "1");
     return true;
 }
 
 bool TSSettings::Set3DSoundEnabled(bool val)
 {
-    QSqlQuery q_query(QString("UPDATE Application SET value='%1' WHERE key='3DSoundEnabled'").arg((val)?"true":"false"));
+    QSqlQuery q_query(QString("UPDATE Application SET value='%1' WHERE key='3DSoundEnabled'").arg((val)?"1":"0"));
     if (!q_query.exec())
     {
         QSqlError sql_error = q_query.lastError();
