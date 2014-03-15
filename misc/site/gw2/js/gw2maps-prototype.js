@@ -414,7 +414,7 @@ var GW2Maps = {
 						eventName = "";	//return true;	//continue for jquery each
 				}
 				sort.event.push(p[1].level);
-				var popupStr = (eventName !== "") ? ('<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a>" : "";
+				var popupStr = (eventName !== "") ? ('<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a>") : "";
 				popupStr = popupStr + " ("+p[1].level+")<br />id:"+p[0] +"<br />";
 				if (p[1].location.type !== "poly") popupStr = popupStr + ("radius: " + rec_radius);
 				pois.event.push({
