@@ -598,7 +598,17 @@ var GW2Maps = {
 						console.log("marker._icon.style: " + typeof marker._icon.style);
 						console.log("marker._icon.style.display: " + typeof marker._icon.style.display);
 					}*/
-					marker._icon.style.display = (state === "Active") ? 'block':'none';
+					//marker._icon.style.display = (state === "Active") ? 'block':'none';
+					if (state === "Active")
+					{
+						if (!mapobject.map.hasLayer(marker))
+							mapobject.map.addLayer(marker);
+					}
+					else
+					{
+						if (mapobject.map.hasLayer(marker))
+							mapobject.map.removeLayer(marker);
+					}
 				}
 			};
 		};
