@@ -243,7 +243,7 @@ var GW2Maps = {
 		for(i = 0; i < nodes.length; i++){
 			L.marker(nodes[i], {
 				icon: node_icon
-			}).addTo(layer_nodes);
+			}).addTo(mapobject.layers[options.i18n.nodes]);
 			
 		};
 		nodes = [ [-19.65293, 0.4834], [60.93043, 91.17554], [58.03719, 115.93872], [59.44508, 139.43848], [59.17593, 124.72778], [-53.39643, 17.1936], [-55.22276, 50.33936], [-39.98554, 10.01953], [-30.14513, 30.71777] ];
@@ -251,7 +251,7 @@ var GW2Maps = {
 		for(i = 0; i < nodes.length; i++){
 			L.marker(nodes[i], {
 				icon: node_icon
-			}).addTo(layer_nodes);
+			}).addTo(mapobject.layers[options.i18n.nodes]);
 		};
 
 		// return the mapobject for later use
@@ -826,7 +826,6 @@ var GW2Maps = {
 		
 		nodes_iron: 	{iconUrl: "../img/iron_32.png",iconSize: [32, 32],iconAnchor: [16, 15]},
 		nodes_platinum: {iconUrl: "../img/platinum_32.png",iconSize: [32, 32],iconAnchor: [16, 15]},
-    });
     },
 
 	/**
