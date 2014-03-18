@@ -854,6 +854,7 @@ var GW2Maps = {
 			attribution: "Kartendaten und -bilder",
             avatar: "Avatar",
             myCommander: "Fokus",
+			nodes: "Nodes",
 			professions:{
 				0: {name: "Unbekannt", icon: "http://wiki-de.guildwars2.com/images/c/ce/Allgemein_Icon.png"},
 				1: {name: "Wächter", icon: "http://wiki-de.guildwars2.com/images/f/f4/Wächter_Icon.png"},
@@ -884,6 +885,7 @@ var GW2Maps = {
 			attribution: "Map data and imagery",
             avatar: "Avatar",
             myCommander: "Focus",
+			nodes: "Nodes",
 			professions:{
 				0: {name: "Unknown", icon: "http://wiki-de.guildwars2.com/images/c/ce/Allgemein_Icon.png"},
 				1: {name: "Guardian", icon: "http://wiki-de.guildwars2.com/images/f/f4/Wächter_Icon.png"},
@@ -915,6 +917,7 @@ var GW2Maps = {
 			attribution: "Map data and imagery",
             avatar: "Avatar",
             myCommander: "Focus",
+			nodes: "Nodes",
 			professions:{
 				0: {name: "Unknown", icon: "http://wiki-de.guildwars2.com/images/c/ce/Allgemein_Icon.png"},
 				1: {name: "Guardian", icon: "http://wiki-de.guildwars2.com/images/f/f4/Wächter_Icon.png"},
@@ -945,6 +948,7 @@ var GW2Maps = {
 			attribution: "Map data and imagery",
             avatar: "Avatar",
             myCommander: "Focus",
+			nodes: "Nodes",
 			professions:{
 				0: {name: "Unknown", icon: "http://wiki-de.guildwars2.com/images/c/ce/Allgemein_Icon.png"},
 				1: {name: "Guardian", icon: "http://wiki-de.guildwars2.com/images/f/f4/Wächter_Icon.png"},
