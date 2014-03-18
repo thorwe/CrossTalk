@@ -179,7 +179,7 @@ var GW2Maps = {
 			var z = mapobject.map.getZoom();
 			z > 5 ? mapobject.layers[options.i18n.sector].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.sector]);
 			z > 4 ? mapobject.layers[options.i18n.polyline].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.polyline]);
-			z > 3 ? mapobject.layers[options.i18n.event].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.event]);
+			//z > 3 ? mapobject.layers[options.i18n.event].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.event]);
 			/*z > 3 ? mapobject.layers[options.i18n.landmark].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.landmark]);
 			z > 3 ? mapobject.layers[options.i18n.skill].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.skill]);
 			z > 3 ? mapobject.layers[options.i18n.task].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.task]);
