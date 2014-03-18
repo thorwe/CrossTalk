@@ -108,7 +108,7 @@ var GW2Maps = {
         mapobject.layers[options.i18n.avatar].addTo(mapobject.map);
         mapobject.layers[options.i18n.myCommander] = L.layerGroup();
         mapobject.layers[options.i18n.myCommander].addTo(mapobject.map);
-
+		mapobject.layers[options.i18n.nodes] = L.layerGroup();
 
 		// showing all the stuff on the initial map would be confusing in most cases,
 		// so we'll show it automatically only on higher zoom levels - it's in the layer menu anyway
@@ -236,6 +236,25 @@ var GW2Maps = {
 //			L.popup().setLatLng(event.latlng).setContent(mapobject.map.project(event.latlng, mapobject.map.getMaxZoom()).toString()).openOn(mapobject.map);
             console.log(mapobject.map.project(event.latlng, mapobject.map.getMaxZoom()).toString());
 		});
+		
+		function addNodes()
+		{
+			var nodes = [ [14.80675, 162.23511], [14.61548, -110.45654], [37.15156, 80.91431], [7.03548, 43.59375], [-10.57422, 138.30688], [25.18506, 6.24023], [49.75998, -30.95947], [30.74184, 21.61011], [39.58029, 49.74609] ];
+			var node_icon = L.icon(GW2Maps.icons.nodes_iron);
+			for(i = 0; i < nodes.length; i++){
+				L.marker(nodes[i], {
+					icon: node_icon
+				}).addTo(layer_nodes);
+				
+			};
+			nodes = [ [-19.65293, 0.4834], [60.93043, 91.17554], [58.03719, 115.93872], [59.44508, 139.43848], [59.17593, 124.72778], [-53.39643, 17.1936], [-55.22276, 50.33936], [-39.98554, 10.01953], [-30.14513, 30.71777] ];
+			node_icon = L.icon(GW2Maps.icons.nodes_platinum);
+			for(i = 0; i < nodes.length; i++){
+				L.marker(nodes[i], {
+					icon: node_icon
+				}).addTo(layer_nodes);
+			};
+		}
 		
 
 		// return the mapobject for later use
@@ -807,6 +826,10 @@ var GW2Maps = {
         task: {iconUrl: "../img/heart.png", fallbackUrl: "http://wiki.guildwars2.com/images/f/f8/Complete_heart_(map_icon).png", iconSize: [20,20]},
         vista: {iconUrl: "../img/vista.png", fallbackUrl: "http://wiki.guildwars2.com/images/d/d9/Vista.png", iconSize: [20,20]},
         waypoint: {iconUrl: "../img/waypoint.png", fallbackUrl: "http://wiki.guildwars2.com/images/d/d2/Waypoint_(map_icon).png", iconSize: [20,20]},
+		
+		nodes_iron: 	{iconUrl: "../img/iron_32.png",iconSize: [32, 32],iconAnchor: [16, 15]},
+		nodes_platinum: {iconUrl: "../img/platinum_32.png",iconSize: [32, 32],iconAnchor: [16, 15]},
+    });
     },
 
 	/**
