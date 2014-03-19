@@ -21,6 +21,7 @@ GuildWarsTwo::GuildWarsTwo(QObject *parent) :
 
     m_netwManager = new QNetworkAccessManager(this);
     connect(m_netwManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetwManagerFinished(QNetworkReply*)));
+    connect(m_netwManager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),this,SLOT(onSslErrors(QNetworkReply*,QList<QSslError>)));
     QNetworkRequest request(GW2_BUILD);
     m_netwManager->get(request);
 }
@@ -202,6 +203,13 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
 
     }
     reply->deleteLater();
+}
+
+void GuildWarsTwo::onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
+{
+    foreach (const QSslError &error, errors) {
+        TSLogging::Error(QString("%1 SSL Error: %2").arg(this->objectName()).arg(error.errorString()),true);
+    }
 }
 
 bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)

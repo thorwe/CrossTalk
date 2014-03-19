@@ -53,6 +53,7 @@ public slots:
 
 private slots:
     void onNetwManagerFinished(QNetworkReply *reply);
+    void onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors);
 
 private:
     QNetworkAccessManager *m_netwManager;
