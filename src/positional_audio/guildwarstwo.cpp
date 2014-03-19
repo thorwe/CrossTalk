@@ -85,33 +85,8 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
     }
 
     // path
-    bool isPathOk = true;
-    QString path = TSHelpers::GetConfigPath();
-    QDir dir(path);
-    if (!dir.exists())
-    {
-        TSLogging::Error(QString("%1: Config Path does not exist").arg(this->objectName()));
-        isPathOk = false;
-    }
-    else
-    {
-        path = QString(ts3plugin_name()).toLower();
-        if (!dir.exists(path))
-        {
-            //TSLogging::Log("Path does not exist: " + path,LogLevel_DEBUG);
-            if (!dir.mkdir(path))
-            {
-                TSLogging::Error(QString("%1: Could not create cache folder.").arg(this->objectName()),true);
-                isPathOk = false;
-            }
-        }
-        if (isPathOk && !dir.cd(path))
-        {
-            TSLogging::Error(QString("%1: Could not enter cache folder.").arg(this->objectName()));
-            isPathOk = false;
-        }
-    }
-    // /path
+    QDir dir;
+    bool isPathOk = TSHelpers::GetCreatePluginConfigFolder(dir);
 
     if (isPathOk)
     {

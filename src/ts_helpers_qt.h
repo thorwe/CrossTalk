@@ -7,6 +7,7 @@
 
 #include <QString>
 #include <QWidget>
+#include <QDir>
 
 #include "public_definitions.h"
 #include "plugin_definitions.h"
@@ -45,6 +46,8 @@ namespace TSHelpers
     unsigned int GetClientServerGroups(uint64 serverConnectionHandlerID, anyID clientID, QSet<uint64> *result);
     unsigned int GetClientSelfServerGroups(uint64 serverConnectionHandlerID, QSet<uint64> *result);
     unsigned int GetClientChannelGroup(uint64 serverConnectionHandlerID, uint64* result, anyID clientId = (anyID)NULL);
+
+    bool GetCreatePluginConfigFolder(QDir &result);
 }
 
 #endif // TS_HELPERS_QT_H

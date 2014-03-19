@@ -555,4 +555,38 @@ namespace TSHelpers
 
         return error;
     }
+
+    bool GetCreatePluginConfigFolder(QDir &result)
+    {
+        bool isPathOk = true;
+        QString path = TSHelpers::GetConfigPath();
+        QDir dir(path);
+        if (!dir.exists())
+        {
+            TSLogging::Error("(GetCreatePluginConfigFolder) Config Path does not exist.",true);
+            isPathOk = false;
+        }
+        else
+        {
+            path = QString(ts3plugin_name()).toLower();
+            if (!dir.exists(path))
+            {
+                if (!dir.mkdir(path))
+                {
+                    TSLogging::Error("(GetCreatePluginConfigFolder) Could not create cache folder.",true);
+                    isPathOk = false;
+                }
+            }
+            if (isPathOk && !dir.cd(path))
+            {
+                TSLogging::Error("(GetCreatePluginConfigFolder) Could not enter cache folder.");
+                isPathOk = false;
+            }
+        }
+        if (isPathOk)
+            result = dir;
+
+        return isPathOk;
+    }
+
 }
