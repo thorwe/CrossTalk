@@ -197,6 +197,7 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
                     m_netwManager->get(requestEs);*/
                 }
             }
+            file.resize(0);
             file.write(doc.toJson());
         }
         file.close();
