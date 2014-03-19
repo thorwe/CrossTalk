@@ -32,7 +32,6 @@ public:
     explicit GuildWarsTwo(QObject *parent = 0);
 
     bool onIdentityRawDirty(QString rawIdentity);
-//    bool onContextRawDirty(QByteArray rawContext);
     bool onInfoData(QTextStream &data);
 
     QString getIdentity() const;
@@ -56,14 +55,9 @@ private slots:
     void onNetwManagerFinished(QNetworkReply *reply);
 
 private:
-    QString m_Identity;
-    quint32 m_professionId;
-    quint8 m_mapId;
-    quint32 m_worldId;
-    quint32 m_teamColorId;
-    bool m_isCommander;
-
     QNetworkAccessManager *m_netwManager;
+
+    QJsonObject m_meObj;
 
     // GW2 API
     quint32 m_build_id;

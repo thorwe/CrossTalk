@@ -29,32 +29,35 @@ GuildWarsTwo::GuildWarsTwo(QObject *parent) :
 
 QString GuildWarsTwo::getIdentity() const
 {
-    return m_Identity;
+    if (m_meObj.value("name") != QJsonValue::Undefined)
+        return m_meObj.value("name").toString(QString::null);
+
+    return QString::null;
 }
 
 quint32 GuildWarsTwo::getProfessionId() const
 {
-    return m_professionId;
+    return m_meObj.value("profession").toInt();
 }
 
 quint8 GuildWarsTwo::getMapId() const
 {
-    return m_mapId;
+    return m_meObj.value("map_id").toInt();
 }
 
 quint32 GuildWarsTwo::getWorldId() const
 {
-    return m_worldId;
+    return m_meObj.value("world_id").toInt();
 }
 
 quint32 GuildWarsTwo::getTeamColorId() const
 {
-    return m_teamColorId;
+    return m_meObj.value("team_color_id").toInt();
 }
 
 bool GuildWarsTwo::isCommander() const
 {
-    return m_isCommander;
+    return m_meObj.value("commander").toBool();
 }
 
 void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
@@ -230,128 +233,70 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
 
 bool GuildWarsTwo::onIdentityRawDirty(QString rawIdentity)
 {
+    QJsonObject oldObj = m_meObj;
+
     if (rawIdentity.isEmpty())
     {
-        bool isIdentityDirty = (!m_Identity.isEmpty());
-        m_Identity = QString::null;
-        emit identityChanged(m_Identity);
+        m_meObj.remove("name");
+        m_meObj["profession"] = 0;
+        m_meObj["map_id"] = 0;
+        m_meObj["world_id"] = 0;
+        m_meObj["team_color_id"] = 0;
+        m_meObj["commander"] = false;
 
-        if (m_professionId != 0)
-        {
-            m_professionId = 0;
-            emit professionIdChanged(m_professionId);
-        }
+        emit identityChanged(QString::null);
+        emit professionIdChanged(0);
+        emit mapIdChanged(0);
+        emit worldIdChanged(0);
 
-        if (m_mapId != 0)
-        {
-            m_mapId = 0;
-            emit mapIdChanged(m_mapId);
-        }
-        if (m_worldId != 0)
-        {
-            m_worldId = 0;
-            emit worldIdChanged(m_worldId);
-        }
-        if (m_teamColorId != 0)
-        {
-            m_teamColorId = 0;
-            emit teamColorIdChanged(m_teamColorId);
-        }
-        if (m_isCommander)
-        {
-            m_isCommander = false;
-            emit commanderStatusChanged(m_isCommander);
-        }
-        return isIdentityDirty;
+        if (oldObj.value("team_color_id").toInt() != 0)
+            emit teamColorIdChanged(0);
+        if (oldObj.value("commander").toBool() == true)
+            emit commanderStatusChanged(0);
+
+        return true;
     }
 
-    QStringList stringList = rawIdentity.split(",",QString::KeepEmptyParts,Qt::CaseSensitive);
-
-    QString string = stringList[0];
-    string.remove(0,10);
-    string.remove(string.length() - 1 , 1);
-    bool isIdentityDirty = (m_Identity != string);
-    if (isIdentityDirty)
+    QJsonParseError jsonError;
+    QJsonDocument meDoc = QJsonDocument::fromJson(rawIdentity.toUtf8(),&jsonError);
+    if (jsonError.error != QJsonParseError::ParseError::NoError)
     {
-        m_Identity = string;
-//        TSLogging::Log(QString("Idendity changed: %1").arg(m_Identity),LogLevel_DEBUG);
-        emit identityChanged(m_Identity);
+        TSLogging::Error(QString("%1: Json error: %2").arg(this->objectName()).arg(jsonError.errorString()),true);
+        return false;
     }
-
-    //profession
-    string = stringList[1];
-    bool ok;
-    unsigned int profession = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toUInt(&ok,10);
-    if (ok)
+    if (!meDoc.isObject())
     {
-        if (m_professionId != profession)
+        TSLogging::Error(QString("%1: QJsonDocument is not an object.").arg(this->objectName()),true);
+        return false;
+    }
+    m_meObj = meDoc.object();
+
+    bool isIdentityDirty = false;
+    if (oldObj.value("name") != m_meObj.value("name"))
+    {
+        isIdentityDirty = true;
+        emit identityChanged(m_meObj.value("name").toString(QString::null));
+    }
+    if (oldObj.value("profession") != m_meObj.value("profession"))
+        emit professionIdChanged(m_meObj.value("profession").toInt());
+    if (oldObj.value("map_id") != m_meObj.value("map_id"))
+        emit mapIdChanged(m_meObj.value("map_id").toInt());
+    if (oldObj.value("team_color_id") != m_meObj.value("team_color_id"))
+        emit teamColorIdChanged(m_meObj.value("team_color_id").toInt());
+    if (oldObj.value("commander") != m_meObj.value("commander"))
+        emit commanderStatusChanged(m_meObj.value("commander").toBool());
+
+    if (oldObj.value("world_id") != m_meObj.value("world_id"))
+    {
+        quint32 newWorldId = m_meObj.value("world_id").toInt();
+        if (newWorldId >= 1001 && newWorldId <= 2301)
+            emit mapIdChanged(m_meObj.value("world_id").toInt());
+        else
         {
-            m_professionId = profession;
-//            TSLogging::Log(QString("Profession changed: %1").arg(m_professionId),LogLevel_DEBUG);
-            emit professionIdChanged(m_professionId);
+            quint32 oldWorldId = oldObj.value("world_id").toInt();
+            if (oldWorldId >= 1001 && oldWorldId <= 2301)
+                m_meObj["world_id"] = oldObj.value("world_id");
         }
-    }
-    else
-        TSLogging::Error("Could not determine profession.");
-
-    //map id
-    string = stringList[2];
-    unsigned int map_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toUInt(&ok,10);
-    if (ok)
-    {
-        if (m_mapId != map_id)
-        {
-            m_mapId = map_id;
-//            TSLogging::Log(QString("Map Id changed: %1").arg(m_mapId),LogLevel_DEBUG);
-            emit mapIdChanged(m_mapId);
-        }
-    }
-    else
-        TSLogging::Error("Could not determine map id.");
-
-    //world id
-    string = stringList[3];
-    unsigned long world_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toULong(&ok,10);
-    if (ok)
-    {
-        if (m_worldId != world_id)
-        {
-            if (world_id >= 1001 && world_id <= 2301)
-            {
-                m_worldId = world_id;
-    //            TSLogging::Log(QString("World Id changed: %1").arg(m_worldId),LogLevel_DEBUG);
-                emit worldIdChanged(m_worldId);
-            }
-        }
-    }
-    else
-    {
-        TSLogging::Error("Could not determine world id.");
-    }
-
-    //team color id
-    string = stringList[4];
-    unsigned int team_color_id = string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1).toUInt(&ok,10);
-    if (ok)
-    {
-        if (m_teamColorId != team_color_id)
-        {
-            m_teamColorId = team_color_id;
-//            TSLogging::Log(QString("Team color Id changed: %1").arg(team_color_id),LogLevel_DEBUG);
-            emit teamColorIdChanged(m_teamColorId);
-        }
-    }
-    else
-        TSLogging::Error("Could not determine team color id.");
-
-    //commander
-    string = stringList[5];
-    bool isCommander = (string.split(": ",QString::KeepEmptyParts,Qt::CaseSensitive).at(1) == "true");
-    if (isCommander != m_isCommander)
-    {
-        m_isCommander = isCommander;
-//        TSLogging::Log(QString("isCommander changed: %1").arg(m_isCommander),LogLevel_DEBUG);
-        emit commanderStatusChanged(m_isCommander);
     }
 
     return isIdentityDirty;
@@ -364,9 +309,11 @@ bool GuildWarsTwo::onInfoData(QTextStream &data)
     data << "is commander: " << ((isCommander())?"y":"n") << "\n";
 
     data << m_Maps.value(QString::number(getMapId())).toObject().value("map_name").toString();
-    if (m_teamColorId != 0) // WvW
+
+    quint32 team_color_id = getTeamColorId();
+    if (team_color_id != 0) // WvW
     {
-        data << "WvW Team: " << getTeamColorId();
+        data << "WvW Team: " << team_color_id;
     }
     else                    // Tyria
     {
@@ -383,10 +330,3 @@ bool GuildWarsTwo::onInfoData(QTextStream &data)
 
     return true;
 }
-
-// as long as this is the only occurence where a game puts known readable data in context and this data is available already,
-// let's for now stick to getting map and world id from the name string
-//bool GuildWarsTwo::onContextRawDirty(QByteArray rawContext)
-//{
-//    return false;   // TODO
-//}
