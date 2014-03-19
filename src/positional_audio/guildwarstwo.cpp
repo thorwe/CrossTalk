@@ -209,16 +209,16 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
                     }
 
                     // lang
-                    QUrl url = reply->url();
+                    /*QUrl url = reply->url();
                     url.setQuery("lang=de");
                     QNetworkRequest requestDe(url);
                     m_netwManager->get(requestDe);
                     url.setQuery("lang=fr");
                     QNetworkRequest requestFr(url);
                     m_netwManager->get(requestFr);
-                    url.setQuery("lang=se");
-                    QNetworkRequest requestSe(url);
-                    m_netwManager->get(requestSe);
+                    url.setQuery("lang=es");
+                    QNetworkRequest requestEs(url);
+                    m_netwManager->get(requestEs);*/
                 }
             }
             file.write(doc.toJson());
