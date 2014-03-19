@@ -2,8 +2,6 @@
 
 #include <QStringList>
 #include "ts_helpers_qt.h"
-#include "gw2_world_names.h"
-#include "gw2_map_names.h"
 #include "tsvr_obj.h"
 
 #include "ts_logging_qt.h"
