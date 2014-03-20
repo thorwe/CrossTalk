@@ -88,6 +88,7 @@ var GW2Maps = {
 		
 		// add layergroups and show them on the map
 		mapobject.layers[options.i18n.event] = L.layerGroup();
+		mapobject.layers[options.i18n.event_group] = L.layerGroup();
 		mapobject.layers[options.i18n.landmark] = L.layerGroup();
 		mapobject.layers[options.i18n.polyline] = L.layerGroup();
 		mapobject.layers[options.i18n.players] = L.layerGroup();
@@ -837,6 +838,7 @@ var GW2Maps = {
 			wiki: "http://wiki-de.guildwars2.com/wiki/",
 			errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
+			event_group: "Gruppen-Events",
 			landmark: "Sehenswürdigkeiten",
 			players: "Spieler",
 			commanders: "Kommandeure",
@@ -868,6 +870,7 @@ var GW2Maps = {
 			wiki: "http://wiki.guildwars2.com/wiki/",
 			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
+			event_group: "Group Events",
 			landmark: "Points of Interest",
 			players: "Players",
 			commanders: "Commanders",
@@ -900,6 +903,7 @@ var GW2Maps = {
 			wiki: "http://wiki-es.guildwars2.com/wiki/",
 			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
+			event_group: "Group Events",
 			landmark: "Points of Interest",
 			players: "Players",
 			commanders: "Commanders",
@@ -931,6 +935,7 @@ var GW2Maps = {
 			wiki: "http://wiki-fr.guildwars2.com/wiki/",
 			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
+			event_group: "Group Events",
 			landmark: "Sites remarquables",
 			players: "Players",
 			commanders: "Commanders",
