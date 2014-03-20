@@ -825,7 +825,7 @@ var GW2Maps = {
 
         //event: {iconUrl: "../img/event_attack.png", fallbackUrl: "http://wiki-de.guildwars2.com/images/7/7a/Event_Angriff_Icon.png", iconSize: [24,24]},
 		event: {iconUrl: "../img/event_cog.png", fallbackUrl: "http://wiki.guildwars2.com/images/d/d4/Event_cog_%28map_icon%29.png", iconSize: [20,20]},
-		group_event: {iconUrl: "../img/event_wrench.png", fallbackUrl: "http://wiki.guildwars2.com/images/e/e2/Event_wrench_%28map_icon%29.png", iconSize: [64,64]},
+		group_event: {iconUrl: "../img/event_wrench.png", fallbackUrl: "http://wiki.guildwars2.com/images/e/e2/Event_wrench_%28map_icon%29.png", iconSize: [32,32]},
         landmark: {iconUrl: "../img/poi.png", fallbackUrl: "http://wiki.guildwars2.com/images/f/fb/Point_of_interest.png", iconSize: [20,20]},
         skill: {iconUrl: "../img/skill_point.png", fallbackUrl: "http://wiki.guildwars2.com/images/8/84/Skill_point.png", iconSize: [20,20]},
         task: {iconUrl: "../img/heart.png", fallbackUrl: "http://wiki.guildwars2.com/images/f/f8/Complete_heart_(map_icon).png", iconSize: [20,20]},
