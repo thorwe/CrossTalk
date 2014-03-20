@@ -88,7 +88,7 @@ var GW2Maps = {
 		
 		// add layergroups and show them on the map
 		mapobject.layers[options.i18n.event] = L.layerGroup();
-		mapobject.layers[options.i18n.event_group] = L.layerGroup();
+		mapobject.layers[options.i18n.group_event] = L.layerGroup();
 		mapobject.layers[options.i18n.landmark] = L.layerGroup();
 		mapobject.layers[options.i18n.polyline] = L.layerGroup();
 		mapobject.layers[options.i18n.players] = L.layerGroup();
@@ -311,8 +311,8 @@ var GW2Maps = {
 	parse_map: function(mapobject, options, map){
         var name = "name_" + options.i18n.lang,
             eventdata = (typeof GW2Info.data.event_details[map.id] !== "undefined") ? GW2Info.data.event_details[map.id] : false,
-			pois = {task: [], event: [], event_group: [], landmark: [], skill: [], vista: [], waypoint: [], sector: [], zone: []},
-			sort = {task: [], event: [], event_group: [], landmark: [], skill: [], vista: [], waypoint: [], sector: []},
+			pois = {task: [], event: [], group_event: [], landmark: [], skill: [], vista: [], waypoint: [], sector: [], zone: []},
+			sort = {task: [], event: [], group_event: [], landmark: [], skill: [], vista: [], waypoint: [], sector: []},
 			recalc_event_coords = function(cr, mr, p){
 				// don't look at it. really! it will melt your brain and make your eyes bleed!
 				return [Math.round(cr[0][0]+(cr[1][0]-cr[0][0])*(p[0]-mr[0][0])/(mr[1][0]-mr[0][0])),Math.round(cr[0][1]+(cr[1][1]-cr[0][1])*(1-(p[1]-mr [0][1])/(mr[1][1]-mr[0][1])))]
@@ -825,7 +825,7 @@ var GW2Maps = {
 
         //event: {iconUrl: "../img/event_attack.png", fallbackUrl: "http://wiki-de.guildwars2.com/images/7/7a/Event_Angriff_Icon.png", iconSize: [24,24]},
 		event: {iconUrl: "../img/event_cog.png", fallbackUrl: "http://wiki.guildwars2.com/images/d/d4/Event_cog_%28map_icon%29.png", iconSize: [20,20]},
-		event_group: {iconUrl: "../img/event_wrench.png", fallbackUrl: "http://wiki.guildwars2.com/images/e/e2/Event_wrench_%28map_icon%29.png", iconSize: [64,64]},
+		group_event: {iconUrl: "../img/event_wrench.png", fallbackUrl: "http://wiki.guildwars2.com/images/e/e2/Event_wrench_%28map_icon%29.png", iconSize: [64,64]},
         landmark: {iconUrl: "../img/poi.png", fallbackUrl: "http://wiki.guildwars2.com/images/f/fb/Point_of_interest.png", iconSize: [20,20]},
         skill: {iconUrl: "../img/skill_point.png", fallbackUrl: "http://wiki.guildwars2.com/images/8/84/Skill_point.png", iconSize: [20,20]},
         task: {iconUrl: "../img/heart.png", fallbackUrl: "http://wiki.guildwars2.com/images/f/f8/Complete_heart_(map_icon).png", iconSize: [20,20]},
@@ -845,7 +845,7 @@ var GW2Maps = {
 			wiki: "http://wiki-de.guildwars2.com/wiki/",
 			errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
-			event_group: "Gruppen-Events",
+			group_event: "Gruppen-Events",
 			landmark: "Sehenswürdigkeiten",
 			players: "Spieler",
 			commanders: "Kommandeure",
@@ -877,7 +877,7 @@ var GW2Maps = {
 			wiki: "http://wiki.guildwars2.com/wiki/",
 			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
-			event_group: "Group Events",
+			group_event: "Group Events",
 			landmark: "Points of Interest",
 			players: "Players",
 			commanders: "Commanders",
@@ -910,7 +910,7 @@ var GW2Maps = {
 			wiki: "http://wiki-es.guildwars2.com/wiki/",
 			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
-			event_group: "Group Events",
+			group_event: "Group Events",
 			landmark: "Points of Interest",
 			players: "Players",
 			commanders: "Commanders",
@@ -942,7 +942,7 @@ var GW2Maps = {
 			wiki: "http://wiki-fr.guildwars2.com/wiki/",
 			//errortile: "http://wiki-de.guildwars2.com/images/6/6f/Kartenhintergrund.png",
 			event: "Events",
-			event_group: "Group Events",
+			group_event: "Group Events",
 			landmark: "Sites remarquables",
 			players: "Players",
 			commanders: "Commanders",
