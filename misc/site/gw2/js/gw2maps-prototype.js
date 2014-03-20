@@ -311,8 +311,8 @@ var GW2Maps = {
 	parse_map: function(mapobject, options, map){
         var name = "name_" + options.i18n.lang,
             eventdata = (typeof GW2Info.data.event_details[map.id] !== "undefined") ? GW2Info.data.event_details[map.id] : false,
-			pois = {task: [], event: [], landmark: [], skill: [], vista: [], waypoint: [], sector: [], zone: []},
-			sort = {task: [], event: [], landmark: [], skill: [], vista: [], waypoint: [], sector: []},
+			pois = {task: [], event: [], event_group: [], landmark: [], skill: [], vista: [], waypoint: [], sector: [], zone: []},
+			sort = {task: [], event: [], event_group: [], landmark: [], skill: [], vista: [], waypoint: [], sector: []},
 			recalc_event_coords = function(cr, mr, p){
 				// don't look at it. really! it will melt your brain and make your eyes bleed!
 				return [Math.round(cr[0][0]+(cr[1][0]-cr[0][0])*(p[0]-mr[0][0])/(mr[1][0]-mr[0][0])),Math.round(cr[0][1]+(cr[1][1]-cr[0][1])*(1-(p[1]-mr [0][1])/(mr[1][1]-mr[0][1])))]
@@ -430,13 +430,18 @@ var GW2Maps = {
 					else
 						eventName = "";	//return true;	//continue for jquery each
 				}
-				sort.event.push(p[1].level);
+				var eventType = (p[1].flags.length == 0) ? "event" : p[1].flags[0];
+				if (eventType === "map_wide") eventType = "group_event"; //dirty, but Karka Queen hasn't exactly priority yet
+				
+				sort[eventType].push(p[1].level);
 				var popupStr = (eventName !== "") ? ('<a href="'+options.i18n.wiki+encodeURIComponent(eventName.replace(/\.$/, ""))+'" target="_blank">'+eventName+"</a>") : "";
 				popupStr = popupStr + " ("+p[1].level+")<br />id:"+p[0] +"<br />";
 				if (p[1].location.type !== "poly") popupStr = popupStr + ("radius: " + rec_radius);
-				pois.event.push({
+
+				pois[eventType].push({
 					id: p[0],
 					type: "event",
+					subType: eventType,
 					coords: coordinates,
 					radius: rec_radius,
 					locationType: p[1].location.type,
@@ -618,8 +623,8 @@ var GW2Maps = {
 						console.log("marker._icon.style: " + typeof marker._icon.style);
 						console.log("marker._icon.style.display: " + typeof marker._icon.style.display);
 					}*/
-					//marker._icon.style.display = (state === "Active") ? 'block':'none';
-					if (state === "Active")
+					marker._icon.style.display = (state === "Active") ? 'block':'none';
+					/*if (state === "Active")
 					{
 						if (!mapobject.map.hasLayer(marker))
 							mapobject.map.addLayer(marker);
@@ -628,7 +633,7 @@ var GW2Maps = {
 					{
 						if (mapobject.map.hasLayer(marker))
 							mapobject.map.removeLayer(marker);
-					}
+					}*/
 				}
 			};
 		};
@@ -641,7 +646,7 @@ var GW2Maps = {
 	 */
 	parse_point: function(mapobject, options, point){
         //var i = options.i18n["icon_"+point.type],
-        var i = GW2Maps.icons[point.type],
+        var i = GW2Maps.icons[(typeof point.subType !== "undefined")?point.subType:point.type],
 			icon,
 			pan = function(p,text){
                 var ll = mapobject.map.unproject(p, mapobject.map.getMaxZoom());
@@ -818,7 +823,9 @@ var GW2Maps = {
             8: {iconUrl: "../img/professions/necromancer_icon.png", fallbackUrl: "http://wiki-de.guildwars2.com/images/2/23/Nekromant_Icon.png"}
         },
 
-        event: {iconUrl: "../img/event_attack.png", fallbackUrl: "http://wiki-de.guildwars2.com/images/7/7a/Event_Angriff_Icon.png", iconSize: [24,24]},
+        //event: {iconUrl: "../img/event_attack.png", fallbackUrl: "http://wiki-de.guildwars2.com/images/7/7a/Event_Angriff_Icon.png", iconSize: [24,24]},
+		event: {iconUrl: "../img/event_cog.png", fallbackUrl: "http://wiki.guildwars2.com/images/d/d4/Event_cog_%28map_icon%29.png", iconSize: [20,20]},
+		event_group: {iconUrl: "../img/event_wrench.png", fallbackUrl: "http://wiki.guildwars2.com/images/e/e2/Event_wrench_%28map_icon%29.png", iconSize: [64,64]},
         landmark: {iconUrl: "../img/poi.png", fallbackUrl: "http://wiki.guildwars2.com/images/f/fb/Point_of_interest.png", iconSize: [20,20]},
         skill: {iconUrl: "../img/skill_point.png", fallbackUrl: "http://wiki.guildwars2.com/images/8/84/Skill_point.png", iconSize: [20,20]},
         task: {iconUrl: "../img/heart.png", fallbackUrl: "http://wiki.guildwars2.com/images/f/f8/Complete_heart_(map_icon).png", iconSize: [20,20]},
