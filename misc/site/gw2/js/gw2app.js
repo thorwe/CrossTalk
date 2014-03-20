@@ -55,16 +55,15 @@
                 Effect.Fade("settings_misc");
             }
         });
-        $("ct_url").on("change", function(event) {
-			var url = $("ct_url").value;
-			var split = url.split(":");
-			if (split.length == 2)
-			{
-				settings.ws_url = split[0];
-				settings.ws_port = split[1];
-				console.log("CrossTalk url changed: " + settings.ws_url + ":" + settings.ws_port);
-				saveToStorage();
-			}
+        $("ct_host").on("change", function(event) {
+			settings.ws_url = $("ct_host").value;
+			console.log("CrossTalk url changed: " + settings.ws_url);
+			saveToStorage();
+        });
+		$("ct_port").on("change", function(event) {
+			settings.ws_port = parseInt($("ct_port").value);
+			console.log("CrossTalk port changed: " + settings.ws_port);
+			saveToStorage();
         });
 		var lang2Int = {de:1,en:2,es:3,fr:4};
         $("language_list").on("change", function(event) {
