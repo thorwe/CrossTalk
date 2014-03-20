@@ -594,49 +594,49 @@ var GW2Maps = {
 	parse_events: function(mapobject,events) // dynamic event updates
 	{
 		//console.log("Events is an Array: " + (Array.isArray(events) ? "true" : "false"));
-		if (mapobject.map.hasLayer(mapobject.layers[mapobject.options.i18n.event]))
-		{
-			//console.log("Array length: " + events.length);
-			for (var i = 0, len = events.length; i < len; i++) {
+		//if (mapobject.map.hasLayer(mapobject.layers[mapobject.options.i18n.event]))
+		//{
+		//console.log("Array length: " + events.length);
+		for (var i = 0, len = events.length; i < len; i++) {
 
-				var world_id = events[i].world_id;		//(number) – The world on which the event is running.
-				var map_id = events[i].map_id;			//(number) – The map on which the event is running.
-				var event_id = events[i].event_id;		//(string) – The event GUID identifying the event.
-				var state = events[i].state;			//(string) – The current state of the event.
-				/*The state can be one of the following values:
-				Inactive – The event is not running.
-				Active – The event is running now.
-				Success – The event has succeeded.
-				Fail – The event has failed.
-				Warmup – The event is inactive and waiting for certain criteria to be met before becoming Active.
-				Preparation – The criteria for the event to start have been met, but certain activities (such as an NPC dialogue) have not completed yet. After the activites have been completed, the event will become Active.*/
-				
-				var marker = mapobject.markers["event"][event_id];
-				if (typeof marker === "undefined")
-					console.log("GW2Maps: parse_events: Marker is undefined. Skipping.");
+			var world_id = events[i].world_id;		//(number) – The world on which the event is running.
+			var map_id = events[i].map_id;			//(number) – The map on which the event is running.
+			var event_id = events[i].event_id;		//(string) – The event GUID identifying the event.
+			var state = events[i].state;			//(string) – The current state of the event.
+			/*The state can be one of the following values:
+			Inactive – The event is not running.
+			Active – The event is running now.
+			Success – The event has succeeded.
+			Fail – The event has failed.
+			Warmup – The event is inactive and waiting for certain criteria to be met before becoming Active.
+			Preparation – The criteria for the event to start have been met, but certain activities (such as an NPC dialogue) have not completed yet. After the activites have been completed, the event will become Active.*/
+			
+			var marker = mapobject.markers["event"][event_id];
+			if (typeof marker === "undefined")
+				console.log("GW2Maps: parse_events: Marker is undefined. Skipping.");
+			else
+			{
+				/*if (i < 10)
+				{
+					console.log("Setting visibility for " + event_id + " to " + ((state === "Active") ? 'block':'none'));
+					console.log("marker._icon: " + typeof marker._icon);
+					console.log("marker._icon.style: " + typeof marker._icon.style);
+					console.log("marker._icon.style.display: " + typeof marker._icon.style.display);
+				}*/
+				marker._icon.style.display = (state === "Active") ? 'block':'none';
+				/*if (state === "Active")
+				{
+					if (!mapobject.map.hasLayer(marker))
+						mapobject.map.addLayer(marker);
+				}
 				else
 				{
-					/*if (i < 10)
-					{
-						console.log("Setting visibility for " + event_id + " to " + ((state === "Active") ? 'block':'none'));
-						console.log("marker._icon: " + typeof marker._icon);
-						console.log("marker._icon.style: " + typeof marker._icon.style);
-						console.log("marker._icon.style.display: " + typeof marker._icon.style.display);
-					}*/
-					marker._icon.style.display = (state === "Active") ? 'block':'none';
-					/*if (state === "Active")
-					{
-						if (!mapobject.map.hasLayer(marker))
-							mapobject.map.addLayer(marker);
-					}
-					else
-					{
-						if (mapobject.map.hasLayer(marker))
-							mapobject.map.removeLayer(marker);
-					}*/
-				}
-			};
+					if (mapobject.map.hasLayer(marker))
+						mapobject.map.removeLayer(marker);
+				}*/
+			}
 		};
+		//};
 	},
 	
 	/**
@@ -646,7 +646,8 @@ var GW2Maps = {
 	 */
 	parse_point: function(mapobject, options, point){
         //var i = options.i18n["icon_"+point.type],
-        var i = GW2Maps.icons[(typeof point.subType !== "undefined")?point.subType:point.type],
+		var pointType = (typeof point.subType !== "undefined")?point.subType:point.type;
+        var i = GW2Maps.icons[pointType],
 			icon,
 			pan = function(p,text){
                 var ll = mapobject.map.unproject(p, mapobject.map.getMaxZoom());
@@ -682,7 +683,7 @@ var GW2Maps = {
 		if(point.popup){
 			marker.bindPopup(point.popup);
 		}
-		mapobject.layers[options.i18n[point.type]].addLayer(marker);
+		mapobject.layers[options.i18n[pointType]].addLayer(marker);
         mapobject.linkbox.insert(new Element("div").insert(i ? new Element("img", {"src":i.iconUrl}).setStyle({"width":"16px", "height":"16px"}) : '').insert(' '+point.text).observe("click", function(){
 			pan(point.coords,point.popup);
 		}));
