@@ -450,9 +450,9 @@
 						return;
 					}
 
-					baseurl = (settings && settings.ws_url) ? ("ws://" + settings.ws_url) : "ws://localhost:";
+					baseurl = (settings && settings.ws_url) ? ("ws://" + settings.ws_url) : "ws://localhost";
 					port = (settings && settings.ws_port) ? settings.ws_port : 64734;
-					baseurl = baseurl + port;
+					baseurl = baseurl + ":" + port;
 					// prefer text messages
 					var uri = baseurl;
 					if (uri.indexOf("?") == -1) {
