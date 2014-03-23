@@ -617,7 +617,7 @@ var GW2Maps = {
 			else
 			{
 				//marker._icon.style.display = (state === "Active") ? 'block':'none';
-				var eventTypelayer = mapobject.layers[options.i18n[marker.event_info.subType] ];
+				var eventTypelayer = mapobject.layers[mapobject.options.i18n[marker.event_info.subType] ];
 				if (state === "Active")
 				{
 					if (!eventTypelayer.hasLayer(marker))
