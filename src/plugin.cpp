@@ -31,7 +31,6 @@
 #include "ts_context_menu_qt.h"
 
 #include "ts_serversinfo.h"
-
 #include "plugin_qt.h"
 #include "talkers.h"
 #include "config.h"
@@ -377,8 +376,21 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
         return 1;
 
     cmd_qs = args_qs.takeFirst();
+    if (cmd_qs == "HIDE_TASKBAR")
+    {
+        QWidget* mainWindow = TSHelpers::GetMainWindow();
+        Qt::WindowType type = mainWindow->windowType();
+        TSLogging::Log(QString("type: %1").arg(type));
+        Qt::WindowFlags flags = mainWindow->windowFlags();
+        TSLogging::Log(QString("flags: %1").arg(flags));
+        if (mainWindow != NULL)
+        {
+            mainWindow->setWindowFlags(Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);   //mainWindow->windowFlags() |
+            mainWindow->setWindowFlags(flags);
+        }
 
-    if (cmd_qs == "FLOOD_TEST")
+    }
+    else if (cmd_qs == "FLOOD_TEST")
     {
 #ifdef USE_POSITIONAL_AUDIO
         ts3plugin_onServerErrorEvent(serverConnectionHandlerID,"CrossTalk Flood Test", ERROR_client_is_flooding,"CrossTalk Flood Test Return Code", "CrossTalk Flood Test Extra Message");
