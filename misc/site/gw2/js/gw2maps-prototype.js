@@ -678,7 +678,10 @@ var GW2Maps = {
 		if(point.popup){
 			marker.bindPopup(point.popup);
 		}
-		mapobject.layers[options.i18n[pointType]].addLayer(marker);
+		
+		if (point.type !== "event")	// events will be shown on next event update
+			mapobject.layers[options.i18n[pointType]].addLayer(marker);
+			
         mapobject.linkbox.insert(new Element("div").insert(i ? new Element("img", {"src":i.iconUrl}).setStyle({"width":"16px", "height":"16px"}) : '').insert(' '+point.text).observe("click", function(){
 			pan(point.coords,point.popup);
 		}));
