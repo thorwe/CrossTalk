@@ -616,17 +616,18 @@ var GW2Maps = {
 				console.log("GW2Maps: parse_events: Marker is undefined. Skipping.");
 			else
 			{
-				marker._icon.style.display = (state === "Active") ? 'block':'none';
-				/*if (state === "Active")
+				//marker._icon.style.display = (state === "Active") ? 'block':'none';
+				var eventTypelayer = mapobject.layers[options.i18n[marker.event_info.subType] ];
+				if (state === "Active")
 				{
-					if (!mapobject.map.hasLayer(marker))
-						mapobject.map.addLayer(marker);
+					if (!eventTypelayer.hasLayer(marker))
+						eventTypelayer.addLayer(marker);
 				}
 				else
 				{
-					if (mapobject.map.hasLayer(marker))
-						mapobject.map.removeLayer(marker);
-				}*/
+					if (eventTypelayer.hasLayer(marker))
+						eventTypelayer.removeLayer(marker);
+				}
 			}
 		};
 		//};
@@ -671,6 +672,7 @@ var GW2Maps = {
 		{
 			if (typeof mapobject.markers[point.type] === "undefined") mapobject.markers[point.type] = {};
 			mapobject.markers[point.type][point.id] = marker;
+			marker.event_info = point;
 		}
 			
 		if(point.popup){
