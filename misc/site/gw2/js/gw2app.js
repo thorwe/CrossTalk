@@ -405,7 +405,6 @@
 				var websocket;
 				var doWSConnect = function()
 				{
-					console.log('Connecting to server..');
 					var baseurl;
 					var port;
 					
@@ -460,6 +459,7 @@
 					} else {
 						uri += "/&encoding=text";
 					}
+					console.log('Connecting to ' + baseurl);
 
 					// Websocket Event Handlers
 					var ws_onClose = function(evt)
