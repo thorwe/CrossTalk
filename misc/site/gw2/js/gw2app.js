@@ -160,6 +160,16 @@
             return false;
         };*/
 
+		var updateEvents = function(events)
+		{
+			console.log("Event update");
+			for (var i = 0, len = maps.length; i < len; i++) {
+				var m = maps[i];
+				GW2Maps.parse_events(m,events);
+			};
+			
+		}
+			
         // is* indicates bool, *_id indicates int; c_* indicates non-API custom stuff;
         function updatePlayer (m, key, name, world_id, continent_id, map_id, pos, angle_f, profession, isCommander, c_guild, c_state, c_time, c_vcname, isMe)
         {
@@ -396,6 +406,11 @@
 
 						//key, name, world_id, continent_id, map_id, pos, angle_f, profession, isCommander, c_guild, c_state, c_time
 						updatePlayer(m, key, jsonObj.name, jsonObj.world_id, mapInfo.continent_id, jsonObj.map_id, jsonObj.pos, jsonObj.pa, jsonObj.profession, jsonObj.commander, jsonObj.guild, jsonObj.state, jsonObj.time, jsonObj.vcname, jsonObj.me);
+						if (jsonObj.world_id != ct_me.world_id || jsonObj.map_id != ct_me.map_id)
+						{
+							GW2Info.unregisterForEvents(updateEvents, false, ct_me.world_id, ct_me.map_id);
+							GW2Info.registerForEvents(updateEvents, false, jsonObj.world_id, jsonObj.map_id);
+						}
 					}
 					ct_players[key] = jsonObj;
 					if (jsonObj.me)
@@ -619,17 +634,6 @@
                 }
             }
             GW2Info.requestWvWMatches(updateMatchDetailsSubscription);
-			
-			var updateEvents = function(events)
-			{
-				console.log("Event update");
-				for (var i = 0, len = maps.length; i < len; i++) {
-					var m = maps[i];
-					GW2Maps.parse_events(m,events);
-				};
-				
-			}
-			GW2Info.registerForEvents (updateEvents, false, settings.home_world_id);
         }
 
         GW2Info.init(onGW2InfoInit,{localFallbackUrl:"../json/GW2Info/"});
