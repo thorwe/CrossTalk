@@ -163,7 +163,8 @@ var GW2Maps = {
                 //groupedOverlays["Players"] = playerLayers;
                 //groupedOverlays["Other"] = otherLayers;
 
-                L.control.layers(mapobject.baselayers, mapobject.layers).addTo(mapobject.map);
+				var namedBaseLayers = {[defLayer.options.continent_name] = defLayer, [nondefLayer.options.continent_name] = nonDefLayer};
+                L.control.layers(namedBaseLayers, mapobject.layers).addTo(mapobject.map);
                 //L.control.groupedLayers(mapobject.baselayers, groupedOverlays).addTo(mapobject.map);
 			}
 			else
