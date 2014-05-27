@@ -199,7 +199,6 @@
             // if theres no marker for the current player, create a new one
             if(typeof m.playermarkers[key] === "undefined")
             {
-				console.log("Creating new marker");
                 //marker = L.circleMarker(m.map.unproject(pos, m.map.getMaxZoom()));    //, <Path options> options?
                 marker = L.marker(m.map.unproject(pos, m.map.getMaxZoom()), {title: name, icon: icon});
                 marker.bindPopup(popup,{closeButton:false,closeOnClick:true,keepInView:true});
@@ -296,7 +295,6 @@
             // else update the existing one
             else
             {
-				console.log("Updating existing marker");
                 marker = m.playermarkers[key];
                 marker.setLatLng(m.map.unproject(pos, m.map.getMaxZoom()));
                 marker.setPopupContent(popup,{closeButton:false,closeOnClick:true,keepInView:true});
