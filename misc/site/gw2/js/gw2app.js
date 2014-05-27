@@ -111,8 +111,7 @@
                                 new Element("img", {"src": m.options.i18n.professions[profession].icon, "alt": m.options.i18n.professions[profession].name, "style": "width:32px; height: 32px;"})
                                 )
                             ).insert(
-                            //new Element("td").update(name+"<br />"+map_id+", "+world_id+"<br />"+c_time)
-                            new Element("td").update(name + "<br />" + map_id + ", " + world_id + "<br />" + ((typeof c_vcname === "undefined") ? (c_time) : (c_vcname)))
+                            new Element("td").update(name + "<br />" + map_id + "<br />" + ((typeof c_vcname === "undefined") ? (c_time) : (c_vcname)))
                             )
                         ).insert(
                         new Element("tr").insert(

@@ -87,8 +87,8 @@ var GW2Maps = {
 		mapobject.baselayer = defLayer;
 		
 		// add layergroups and show them on the map
-		mapobject.layers[options.i18n.event] = L.layerGroup();
-		mapobject.layers[options.i18n.group_event] = L.layerGroup();
+		//mapobject.layers[options.i18n.event] = L.layerGroup();
+		//mapobject.layers[options.i18n.group_event] = L.layerGroup();
 		mapobject.layers[options.i18n.landmark] = L.layerGroup();
 		mapobject.layers[options.i18n.polyline] = L.layerGroup();
 		mapobject.layers[options.i18n.players] = L.layerGroup();
