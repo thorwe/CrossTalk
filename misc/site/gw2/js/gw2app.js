@@ -337,10 +337,13 @@
 						for (var i = 0; i < maps.length; i++) {
 							var m = maps[i];
 							m.map.removeLayer(m.playermarkers[key])
+							delete m.playermarkers[key];
+							
 							var oldPlayer = $(key);
 							if (oldPlayer)
 								$("players").removeChild(oldPlayer);
 						};
+						delete ct_players[key];
 						if (jsonObj.me)
 							ct_me = {};
 						
