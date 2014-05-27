@@ -243,6 +243,14 @@ void SettingsPositionalAudio::AddCustomServerSettingForCurrentTab()
 void SettingsPositionalAudio::AddCustomServerSetting(uint64 serverConnectionHandlerID)
 {
     TSServerInfo* info = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID);
+    if (info == NULL)
+    {
+        QMessageBox msgBoxNotConnected;
+        msgBoxNotConnected.setText("You need to be connected to the server you want to add a custom seting for.");
+        msgBoxNotConnected.exec();
+        return;
+    }
+
     QString serverName = info->getName();
     if (serverName == QString::null)
         return;
