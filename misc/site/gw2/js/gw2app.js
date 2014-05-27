@@ -565,7 +565,6 @@
                 checkPreloadComplete();
             });
             GW2Info.requestWorldNames(function(world_names){
-                console.log("Request World Names test");
                 preload.world_names = true;
                 var selectBox = $('world_list');   //document.getElementById('world_list');
                 $H(world_names).each(function(e) {
@@ -578,6 +577,7 @@
                     saveToStorage();
                     GW2Info.requestWvWMatches(updateMatchDetailsSubscription);
                 });
+				console.log("Preloaded World Names");
 				checkPreloadComplete();
             },settings.lang);
             GW2Info.requestMaps(function(maps){
