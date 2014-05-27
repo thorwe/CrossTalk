@@ -334,13 +334,14 @@
 					{
 						for (var i = 0; i < maps.length; i++) {
 							var m = maps[i];
-							var marker = m.playermarkers[key];
-							//marker.remove();	old API or sth.
-							m.map.removeLayer(marker)
+							m.map.removeLayer(m.playermarkers[key])
 							var oldPlayer = $(key);
 							if (oldPlayer)
 								$("players").removeChild(oldPlayer);
 						};
+						if (jsonObj.me)
+							ct_me = {};
+						
 						return;
 					}
 
@@ -359,14 +360,6 @@
 						jsonObj.pos = [x,y];
 						//console.log("player pos: " + jsonObj.pos[0] + "," + jsonObj.pos[1]);
 					};
-					if (jsonObj.world_id < 1001 || jsonObj.world_id > 2301)
-					{
-						if (ct_players[key])
-						{
-							jsonObj.garbage_id = jsonObj.world_id
-							jsonObj.world_id = ct_players[key].world_id;
-						}
-					}
 
 					// dispatch to maps
 					for (var i = 0; i < maps.length; i++) {
@@ -539,7 +532,7 @@
             var preload = {
                 continents: false,
                 files : false,
-                //world_names:false,
+                world_names:false,
                 maps : false,
                 //event_details : false
             };
@@ -572,7 +565,6 @@
             GW2Info.requestWorldNames(function(world_names){
                 console.log("Request World Names test");
                 preload.world_names = true;
-                //checkPreloadComplete();
                 var selectBox = $('world_list');   //document.getElementById('world_list');
                 $H(world_names).each(function(e) {
                     selectBox.options.add( new Option(e[1]["name_" + settings.lang], e[1].id, (e[1].id === settings.home_world_id), (e[1].id === settings.home_world_id) ));
@@ -584,6 +576,7 @@
                     saveToStorage();
                     GW2Info.requestWvWMatches(updateMatchDetailsSubscription);
                 });
+				checkPreloadComplete();
             },settings.lang);
             GW2Info.requestMaps(function(maps){
                 preload.maps = true;
