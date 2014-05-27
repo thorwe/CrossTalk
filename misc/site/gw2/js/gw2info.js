@@ -1145,7 +1145,7 @@
 				continents : options.disable_continents ? states.invalid : states.updating,
                 //world_names : options.disable_worldnames ? states.invalid : states.updating,
 				maps : options.disable_maps ? states.invalid : states.updating,
-                event_details : options.disable_eventdetails ? states.invalid : states.updating,
+                //event_details : options.disable_eventdetails ? states.invalid : states.updating,
 				wvw_matches : options.disable_matches ? states.invalid : states.updating
 			};
 			GW2Info.status = status;
@@ -1318,8 +1318,8 @@
                 // Here we're using the build id to determine if cache needs update
                 /********************************************************************************/
 
-
-                GW2Info.requestEventDetails = function(callback,language)
+				// Events API broken by Megaserver
+                /*GW2Info.requestEventDetails = function(callback,language)
                 {
                     if (!language) language = 'en';
                     var file = 'event_details';
@@ -1388,7 +1388,7 @@
                             };
                         };
                     });
-                }
+                }*/
 
                 GW2Info.requestMaps = function(callback,language)
                 {
@@ -2031,19 +2031,9 @@
             publisher.remove(match_id,callback,context);
         },
 
-        registerForEvents : function(callback, context, world_id, map_id, event_id)
+		// Events API broken by Megaserver
+        /*registerForEvents : function(callback, context, world_id, map_id, event_id)
         {
-            /*var cleanup = function(responseJSON)	// Do we want that?
-            {
-				/*var obj = {};
-                $A(responseJSON.events).each(function(e){
-					if (!obj[e.world_id]) obj[e.world_id] = {};
-					if (!obj[e.world_id][e.map_id]) obj[e.world_id][e.map_id] = {};
-					obj[e.world_id][e.map_id][e.event_id] = e.state;
-                });
-                responseJSON = obj;
-            };*/
-
             var baseUrl = 'https://api.guildwars2.com/v1/events.json'   //?world_id=2005&event_id=AFCF031A-F71D-4CEA-85E1-957179414B25';
             var urlOptions = [
                         world_id ? ('world_id='+world_id) : false,
@@ -2101,7 +2091,7 @@
                 };
             });
             publisher.remove(url,callback,context);
-        }
+        }*/
     }
 	global.GW2Info = GW2Info;
 })();
