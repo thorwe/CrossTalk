@@ -165,7 +165,7 @@ var GW2Maps = {
 
 				var namedBaseLayers = {};
 				namedBaseLayers[defLayer.options.continent_name] = defLayer;
-				namedBaseLayers[nondefLayer.options.continent_name] = nonDefLayer;
+				namedBaseLayers[nondefLayer.options.continent_name] = nondefLayer;
                 L.control.layers(namedBaseLayers, mapobject.layers).addTo(mapobject.map);
                 //L.control.groupedLayers(mapobject.baselayers, groupedOverlays).addTo(mapobject.map);
 			}
