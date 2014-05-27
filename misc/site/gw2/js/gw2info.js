@@ -1479,7 +1479,8 @@
                         if (resultBuildId !== data.build_id)
                         {
                             console.log(file + '_' + language + ' outdated or not present.');
-                            doAjaxRequest(function(responseJSON){
+							var isFallback = false;
+							var handleAjaxResponse = function(responseJSON){
                                 if(responseJSON)
                                 {
                                     cleanup(responseJSON,language);
@@ -1495,8 +1496,17 @@
                                     }, file, responseJSON, "id");
                                 }
                                 else
-                                    callback(false);
-                            },file,language);
+								{
+									if (!isFallback)
+									{
+										isFallback = true;
+										doAjaxRequest(handleAjaxResponse,file,language, true);
+									}
+									else
+										callback(false);
+								}
+                            };
+                            doAjaxRequest(handleAjaxResponse,file,language);
                         }
                         else
                         {
