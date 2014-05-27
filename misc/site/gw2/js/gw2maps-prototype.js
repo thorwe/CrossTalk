@@ -310,9 +310,9 @@ var GW2Maps = {
 	 */
 	parse_map: function(mapobject, options, map){
         var name = "name_" + options.i18n.lang,
-            eventdata = (typeof GW2Info.data.event_details[map.id] !== "undefined") ? GW2Info.data.event_details[map.id] : false,
-			pois = {task: [], event: [], group_event: [], landmark: [], skill: [], vista: [], waypoint: [], sector: [], zone: []},
-			sort = {task: [], event: [], group_event: [], landmark: [], skill: [], vista: [], waypoint: [], sector: []},
+            //eventdata = (typeof GW2Info.data.event_details[map.id] !== "undefined") ? GW2Info.data.event_details[map.id] : false,
+			pois = {task: [], landmark: [], skill: [], vista: [], waypoint: [], sector: [], zone: []},	//event: [], group_event: [],
+			sort = {task: [], landmark: [], skill: [], vista: [], waypoint: [], sector: []}, //event: [], group_event: [],
 			recalc_event_coords = function(cr, mr, p){
 				// don't look at it. really! it will melt your brain and make your eyes bleed!
 				return [Math.round(cr[0][0]+(cr[1][0]-cr[0][0])*(p[0]-mr[0][0])/(mr[1][0]-mr[0][0])),Math.round(cr[0][1]+(cr[1][1]-cr[0][1])*(1-(p[1]-mr [0][1])/(mr[1][1]-mr[0][1])))]
@@ -331,7 +331,6 @@ var GW2Maps = {
 			text: map[name],
 			popup: false
 		});
-		
 		
 		// pois
 		map.points_of_interest.each(function(p){
@@ -407,7 +406,8 @@ var GW2Maps = {
 			});
 		});
 		// eventdata
-		if(eventdata){
+		// Events API broken by Megaserver
+		/*if(eventdata){
 			$H(eventdata).each(function(p){
 				// Apparently there either are nameless/untranslated events or I got some bug in gw2info, more likely the former
 				var eventName = p[1][name];
@@ -415,12 +415,12 @@ var GW2Maps = {
 				var rec_radius;
 				if (typeof p[1].location.radius !== "undefined")
 				{
-					/*var weirdPoint = [(p[1].location.center[0] + p[1].location.radius), p[1].location.center[1] ];
-					weirdPoint = recalc_event_coords(map.continent_rect,map.map_rect,weirdPoint);
-					rec_radius = weirdPoint[0] - coordinates[0];*/
-					/*var obj = mapobject.map.unproject([p[1].location.radius,0], mapobject.map.getMaxZoom())
-					rec_radius = obj[0];*/
-					rec_radius = p[1].location.radius;
+					//var weirdPoint = [(p[1].location.center[0] + p[1].location.radius), p[1].location.center[1] ];
+					//weirdPoint = recalc_event_coords(map.continent_rect,map.map_rect,weirdPoint);
+					//rec_radius = weirdPoint[0] - coordinates[0];
+					//var obj = mapobject.map.unproject([p[1].location.radius,0], mapobject.map.getMaxZoom())
+					//rec_radius = obj[0];
+					//rec_radius = p[1].location.radius;
 				}
 				
 				if (typeof eventName === "undefined")
@@ -450,7 +450,7 @@ var GW2Maps = {
 					popup: popupStr
 				});
 			});
-        };
+        };*/
 
 		// loop out the map points
         mapobject.linkbox.insert(new Element("div", {"class":"header"}).update(map[name]));
@@ -591,7 +591,8 @@ var GW2Maps = {
             isNeedFullMatchDetails = false;
     },
 
-	parse_events: function(mapobject,events) // dynamic event updates
+	//Events API broken by Megaserver
+	/*parse_events: function(mapobject,events) // dynamic event updates
 	{
 		//console.log("Events is an Array: " + (Array.isArray(events) ? "true" : "false"));
 		//if (mapobject.map.hasLayer(mapobject.layers[mapobject.options.i18n.event]))
@@ -603,13 +604,13 @@ var GW2Maps = {
 			var map_id = events[i].map_id;			//(number) – The map on which the event is running.
 			var event_id = events[i].event_id;		//(string) – The event GUID identifying the event.
 			var state = events[i].state;			//(string) – The current state of the event.
-			/*The state can be one of the following values:
-			Inactive – The event is not running.
-			Active – The event is running now.
-			Success – The event has succeeded.
-			Fail – The event has failed.
-			Warmup – The event is inactive and waiting for certain criteria to be met before becoming Active.
-			Preparation – The criteria for the event to start have been met, but certain activities (such as an NPC dialogue) have not completed yet. After the activites have been completed, the event will become Active.*/
+			//The state can be one of the following values:
+			//Inactive – The event is not running.
+			//Active – The event is running now.
+			//Success – The event has succeeded.
+			//Fail – The event has failed.
+			//Warmup – The event is inactive and waiting for certain criteria to be met before becoming Active.
+			//Preparation – The criteria for the event to start have been met, but certain activities (such as an NPC dialogue) have not completed yet. After the activites have been completed, the event will become Active.
 			
 			var marker = mapobject.markers["event"][event_id];
 			if (typeof marker === "undefined")
@@ -631,7 +632,7 @@ var GW2Maps = {
 			}
 		};
 		//};
-	},
+	},*/
 	
 	/**
 	 * @param mapobject
@@ -668,18 +669,20 @@ var GW2Maps = {
 		else
 			marker = L.circle(mapobject.map.unproject(point.coords, mapobject.map.getMaxZoom()), point.radius, {color:"orange"});*/
 			
-		if ((point.type === "event") && (typeof point.id !== "undefined"))	// we need only events yet
+		// Events API broken by Megaserver
+		/*if ((point.type === "event") && (typeof point.id !== "undefined"))	// we need only events yet
 		{
 			if (typeof mapobject.markers[point.type] === "undefined") mapobject.markers[point.type] = {};
 			mapobject.markers[point.type][point.id] = marker;
 			marker.event_info = point;
-		}
+		}*/
 			
 		if(point.popup){
 			marker.bindPopup(point.popup);
 		}
 		
-		if (point.type !== "event")	// events will be shown on next event update
+		//Events API broken by Megaserver
+		//if (point.type !== "event")	// events will be shown on next event update
 			mapobject.layers[options.i18n[pointType]].addLayer(marker);
 			
         mapobject.linkbox.insert(new Element("div").insert(i ? new Element("img", {"src":i.iconUrl}).setStyle({"width":"16px", "height":"16px"}) : '').insert(' '+point.text).observe("click", function(){
