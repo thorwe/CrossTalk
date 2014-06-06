@@ -13,9 +13,9 @@
 #include <assert.h>
 
 #include <qglobal.h>
-#ifndef Q_OS_WIN
- #include <QtSql>   // currently only required for settings.db fix on osx (linux?)
-#endif
+//#ifndef Q_OS_WIN
+// #include <QtSql>   // currently only required for settings.db fix on osx (linux?)
+//#endif
 
 #include "public_errors.h"
 #include "public_errors_rare.h"
@@ -25,6 +25,7 @@
 #include "plugin.h"
 
 #include "ts_logging_qt.h"
+#include "ts_settings_qt.h"
 #include "ts_helpers_qt.h"
 #include "translator.h"
 
@@ -130,7 +131,7 @@ TSServersInfo* centralStation = TSServersInfo::instance();
 const char* ts3plugin_name() { return "CrossTalk"; }
 
 /* Plugin version */
-const char* ts3plugin_version() { return "1.6.0.031901"; }
+const char* ts3plugin_version() { return "1.6.0.060601"; }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
 int ts3plugin_apiVersion() { return PLUGIN_API_VERSION; }
@@ -158,24 +159,30 @@ int ts3plugin_init() {
 #ifdef CONSOLE_OUTPUT
     freopen("CONOUT$", "wb", stdout);   //Makes printf work in Release mode (shouldn't been necessary, but is...)
 #endif
-
+    TSSettings::instance()->Init(TSHelpers::GetConfigPath());
     // fix should work fine on any plattform. Behaviour not seen yet on windows. Conditional for curiosity/reminder.
-#ifndef Q_OS_WIN
+//#ifndef Q_OS_WIN
     // load settings.db if necessary
-    if(QSqlDatabase::connectionNames().isEmpty())
+    /*if(QSqlDatabase::connectionNames().isEmpty())
     {
+        TSLogging::Log("Loading Database...");
         QSqlDatabase db;
 
         db = QSqlDatabase::addDatabase("QSQLITE");
         db.setDatabaseName(TSHelpers::GetConfigPath() + "settings.db");
+
+        if (db.isValid())
+            TSLogging::Log("Database is valid.");
+        else
+            TSLogging::Log("Database is not valid.");
 
         if(!db.open())
         {
             TSLogging::Error("Error loading settings.db; aborting init", 0, NULL);
             return 1;
         }
-    }
-#endif
+    }*/
+//#endif
 
     pluginQt->Init();
 

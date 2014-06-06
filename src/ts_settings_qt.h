@@ -40,6 +40,8 @@ public:
         mutex.unlock();
     }
 
+    void Init(QString tsConfigPath);
+
     bool GetSoundPack(QString& result);
     bool GetIconPack(QString& result);
     bool GetDefaultCaptureProfile(QString& result);
@@ -70,6 +72,8 @@ private:
     bool GetValuesFromQuery(QString query, QStringList &result);
     void SetError(QString in);   //create Custom SQL Error Helper
     QSqlError error_qsql;
+
+    QSqlDatabase m_SettingsDb;
 };
 
 #endif // TS_SETTINGS_QT_H

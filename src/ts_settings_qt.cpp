@@ -1,9 +1,22 @@
 #include "ts_settings_qt.h"
+#include "ts_logging_qt.h"
 
 TSSettings* TSSettings::m_Instance = 0;
 
 TSSettings::TSSettings(){}
 TSSettings::~TSSettings(){}
+
+void TSSettings::Init(QString tsConfigPath)
+{
+    m_SettingsDb = QSqlDatabase::addDatabase("QSQLITE","CrossTalk_SetDbConn");
+    m_SettingsDb.setDatabaseName(tsConfigPath + "settings.db");
+
+    if (!m_SettingsDb.isValid())
+        TSLogging::Log("Database is not valid.");
+
+    if(!m_SettingsDb.open())
+        TSLogging::Error("Error loading settings.db; aborting init", 0, NULL);
+}
 
 //! Find out which Sound Pack the user is currently using
 /*!
@@ -150,10 +163,11 @@ bool TSSettings::GetContacts(QStringList &result)
  */
 bool TSSettings::GetLanguage(QString &result)
 {
-    QString query("Select value FROM Application WHERE key='Language'"); //"","enUS","deDE"...
+    QString query("SELECT value FROM Application WHERE key='Language'"); //"","enUS","deDE"...
     if (!(GetValueFromQuery(query, result,true)))
     {
         error_qsql.setDriverText(error_qsql.driverText().prepend("(GetLanguage) "));
+        result = QLocale::system().name();
         return false;
     }
     if (result.isEmpty())
@@ -165,19 +179,19 @@ bool TSSettings::GetLanguage(QString &result)
 bool TSSettings::Is3DSoundEnabled(bool &result)
 {
     QString qstr_result;
-    QString query("Select value FROM Application WHERE key='3DSoundEnabled'");
+    QString query("SELECT value FROM Application WHERE key='3DSoundEnabled'");
     if (!(GetValueFromQuery(query, qstr_result,false)))
     {
         error_qsql.setDriverText(error_qsql.driverText().prepend("(Is3DSoundEnabled) "));
         return false;
     }
-    result = (qstr_result == "1");
+    result = (qstr_result == "1" || qstr_result == "true");
     return true;
 }
 
 bool TSSettings::Set3DSoundEnabled(bool val)
 {
-    QSqlQuery q_query(QString("UPDATE Application SET value='%1' WHERE key='3DSoundEnabled'").arg((val)?"1":"0"));
+    QSqlQuery q_query(QString("UPDATE Application SET value='%1' WHERE key='3DSoundEnabled'").arg((val)?"1":"0"), m_SettingsDb);
     if (!q_query.exec())
     {
         QSqlError sql_error = q_query.lastError();
@@ -231,13 +245,14 @@ QMap<QString, QString> TSSettings::GetMapFromValue(QString value)
  */
 bool TSSettings::GetValueFromQuery(QString query, QString &result, bool isEmptyValid) // provides first valid
 {
-    QSqlQuery q_query(query);
+    QSqlQuery q_query(query, m_SettingsDb);
     if(!q_query.exec())
     {
         QSqlError sql_error = q_query.lastError();
         if (sql_error.isValid())
         {
             error_qsql=sql_error;
+            error_qsql.setDriverText(error_qsql.driverText().prepend("(q_query.exec()) "));
         }
         else
         {
@@ -253,6 +268,7 @@ bool TSSettings::GetValueFromQuery(QString query, QString &result, bool isEmptyV
             if (sql_error.isValid())
             {
                 error_qsql=sql_error;
+                error_qsql.setDriverText(error_qsql.driverText().prepend("(q_query.isSelect()) "));
             }
             else
             {
@@ -266,6 +282,7 @@ bool TSSettings::GetValueFromQuery(QString query, QString &result, bool isEmptyV
             if (sql_error.isValid())
             {
                 error_qsql=sql_error;
+                error_qsql.setDriverText(error_qsql.driverText().prepend("(q_query.isActive()) "));
             }
             else
             {
@@ -283,6 +300,7 @@ bool TSSettings::GetValueFromQuery(QString query, QString &result, bool isEmptyV
                 if (sql_error.isValid())
                 {
                     error_qsql=sql_error;
+                    error_qsql.setDriverText(error_qsql.driverText().prepend("(q_query.isValid()) "));
                 }
                 else
                 {
@@ -322,7 +340,7 @@ bool TSSettings::GetValueFromQuery(QString query, QString &result, bool isEmptyV
  */
 bool TSSettings::GetValuesFromQuery(QString query, QStringList &result) //proper result list
 {
-    QSqlQuery q_query(query);
+    QSqlQuery q_query(query, m_SettingsDb);
     if(!q_query.exec())
     {
         QSqlError sql_error = q_query.lastError();
