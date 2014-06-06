@@ -17,7 +17,7 @@ void SettingsDuck::Init(Ducker_Global* ducker_G, Ducker_Channel* ducker_C)
 {
     if(m_ContextMenuUi == -1)
     {
-        m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,tr("Ducking"),"duck_16.png");
+        m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Ducking","duck_16.png");
         connect(TSContextMenu::instance(),SIGNAL(MenusInitialized()),SLOT(onMenusInitialized()),Qt::AutoConnection);
         connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
     }
