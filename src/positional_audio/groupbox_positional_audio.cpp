@@ -7,7 +7,7 @@ GroupBoxPositionalAudio::GroupBoxPositionalAudio(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    ui->groupBoxVolume->setEnabled(false);
+    //ui->groupBoxVolume->setEnabled(false);
     //ui->groupBoxMisc->setEnabled(false);
     //ui->groupBoxVolume->setVisible(false);
     //ui->groupBoxMisc->setVisible(false);
