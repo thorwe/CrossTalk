@@ -41,18 +41,21 @@
             $$("head")[0].insert(new Element("link", {"rel": "stylesheet", "type": "text/css", "href": style}));
         });
 
+		if (typeof overwolf === "undefined")
+			$("ct_host_containter").setStyle({display:"block"});
+		
         $("btn_settings").on("click", function(event) {
             Event.stop(event);
-            var elStyle = document.getElementById("settings_connect").style;
+            var elStyle = document.getElementById("settings").style;	//_connect
             if (elStyle.display == "none")
             {
-                Effect.Appear("settings_connect");
-                Effect.Appear("settings_misc");
+                Effect.Appear("settings");	/*_connect
+                Effect.Appear("settings_misc");*/
             }
             else
             {
-                Effect.Fade("settings_connect");
-                Effect.Fade("settings_misc");
+                Effect.Fade("settings");	/*_connect
+                Effect.Fade("settings_misc");*/
             }
         });
         $("ct_host").on("change", function(event) {
