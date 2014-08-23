@@ -90,7 +90,7 @@ var GW2Maps = {
 		//mapobject.layers[options.i18n.event] = L.layerGroup();
 		//mapobject.layers[options.i18n.group_event] = L.layerGroup();
 		mapobject.layers[options.i18n.landmark] = L.layerGroup();
-		mapobject.layers[options.i18n.polyline] = L.layerGroup();
+		//mapobject.layers[options.i18n.polyline] = L.layerGroup();
 		mapobject.layers[options.i18n.players] = L.layerGroup();
 		mapobject.layers[options.i18n.players].addTo(mapobject.map);
 		mapobject.layers[options.i18n.skill] = L.layerGroup();
@@ -174,15 +174,15 @@ var GW2Maps = {
 		}
 
 		// we have polylines to display?
-		if(options.polyline && options.polyline.length > 7){
+		/*if(options.polyline && options.polyline.length > 7){
 			GW2Maps.parse_polylines(mapobject, options);
-		}
+		}*/
 
 		// magically display/remove icons
 		mapobject.map.on("zoomend", function(){
 			var z = mapobject.map.getZoom();
 			z > 5 ? mapobject.layers[options.i18n.sector].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.sector]);
-			z > 4 ? mapobject.layers[options.i18n.polyline].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.polyline]);
+			//z > 4 ? mapobject.layers[options.i18n.polyline].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.polyline]);
 			//z > 3 ? mapobject.layers[options.i18n.event].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.event]);
 			/*z > 3 ? mapobject.layers[options.i18n.landmark].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.landmark]);
 			z > 3 ? mapobject.layers[options.i18n.skill].addTo(mapobject.map) : mapobject.map.removeLayer(mapobject.layers[options.i18n.skill]);
@@ -703,7 +703,7 @@ var GW2Maps = {
 	 * @param mapobject
 	 * @param options
 	 */
-	parse_polylines: function(mapobject, options){
+	/*parse_polylines: function(mapobject, options){
 		var lines = options.polyline.split(";");
 		lines.each(function(l){
 			var coords = l.split(" "), line = [], opts = {};
@@ -736,7 +736,7 @@ var GW2Maps = {
 				mapobject.layers[options.i18n.polyline].addLayer(L.polylineDecorator(line, {patterns: patterns}));
 			}
 		});
-	},
+	},*/
 
 	/**
 	 *
