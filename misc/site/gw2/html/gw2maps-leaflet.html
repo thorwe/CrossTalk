@@ -1,78 +1,78 @@
 <!DOCTYPE html>
 <html dir="ltr" lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<link rel="shortcut icon" href="../../favicon.ico">
-	<title>Guild Wars 2 Maps API</title>
-	<style type="text/css">
-		#players > div{
-			padding: 0.1em;
-			text-align: left;
-			font-size: 20px;
-			cursor: pointer;
-		}
-		#players img{
-			margin: 0 0.25em;
-		}
-	</style>
-</head>
-<body>
-<!-- map within the worldmap with poi given - especially for wiki purposes - try this in a small container
-<div class="gw2map" data-language="1" data-region_id="4" data-map_id="50" data-poi_id="1057" data-poi_type="1" data-width="250" data-height="250" data-disable_controls="1"></div> -->
-<!-- single floor outside the worldmap
-<div class="gw2map" data-floor_id="-2" data-region_id="2" data-map_id="33"></div> -->
-<!-- map within the worldmap -->
-<!--<div class="gw2map" data-language="2" data-region_id="4" data-map_id="15" data-height="800" data-width="100" data-w_percent="1" data-linkbox="400" data-poi_id="225" data-poi_type="4"></div> -->
-<!-- specific floor within a region
-<div class="gw2map" data-language="3" data-continent_id="2" data-floor_id="3" data-width="100" data-w_percent="1"></div> -->
-<!-- full world map -->
-<div class="gw2map" data-width="100" data-w_percent="1" data-height="100" data-h_percent="1" data-enable_control_continent="1" id="gw2map"></div><!--data-height="800" data-linkbox="350" -->
-<div style="position: absolute; top: 30px; right: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center;">
-	<div><a id="toggle_players" href="#">toggle playerlist</a></div>
-	<div id="players" style="overflow-y: scroll;display:block;"></div>
-</div>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+		<link rel="shortcut icon" href="../../favicon.ico">
+		<title>Guild Wars 2 Map</title>
+		<style type="text/css">
+			#players > div{
+				padding: 0.1em;
+				text-align: left;
+				font-size: 20px;
+				cursor: pointer;
+			}
+			#players img{
+				margin: 0 0.25em;
+			}
+		</style>
+	</head>
+	<body>
+		<!-- map within the worldmap with poi given - especially for wiki purposes - try this in a small container
+		<div class="gw2map" data-language="1" data-region_id="4" data-map_id="50" data-poi_id="1057" data-poi_type="1" data-width="250" data-height="250" data-disable_controls="1"></div> -->
+		<!-- single floor outside the worldmap
+		<div class="gw2map" data-floor_id="-2" data-region_id="2" data-map_id="33"></div> -->
+		<!-- map within the worldmap -->
+		<!--<div class="gw2map" data-language="2" data-region_id="4" data-map_id="15" data-height="800" data-width="100" data-w_percent="1" data-linkbox="400" data-poi_id="225" data-poi_type="4"></div> -->
+		<!-- specific floor within a region
+		<div class="gw2map" data-language="3" data-continent_id="2" data-floor_id="3" data-width="100" data-w_percent="1"></div> -->
+		<!-- full world map -->
+		<div class="gw2map" data-width="100" data-w_percent="1" data-height="100" data-h_percent="1" data-enable_control_continent="1" id="gw2map"></div><!--data-height="800" data-linkbox="350" -->
+		<div style="position: absolute; top: 30px; right: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center;">
+			<div><a id="toggle_players" href="#">toggle playerlist</a></div>
+			<div id="players" style="overflow-y: scroll;display:block;"></div>
+		</div>
 
-<div id="settings" style="position: absolute; bottom: 30px; right: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center; display:none;">	<!-- _connect -->
-	<form>
-		<fieldset>
-			<legend>Misc</legend>
-			<p>
-				<label id="lang_l">Language</label>
-				<select id = "language_list"></select>
-			</p>
-			<p>
-				<label id="home_world_l">Home World</label>
-				<select id = "world_list"></select>
-			</p>
-		</fieldset>
-	</form>
-<!--</div>
-<div id="settings_misc" style="position: absolute; bottom: 30px; left: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center; display:none;">-->
-	<form>
-		<fieldset>
-			<legend>CrossTalk Connection</legend>
-			<!--<input id="key" type="text" placeholder="your channel key" value="" style="width: 15em;" />-->
-			<!--<input id="sm_url" type="url" placeholder="http://www.smiley.edu" value="" style="width: 15em;" />-->
-			<p id="ct_host_containter" style="display:none">Host: <input id="ct_host" type="url" placeholder="localhost" value="" style="width: 10em;" /></p>
-			<p>Port: <input id="ct_port" type="number"  placeholder="64734" value="" style="width: 5em;" min="81" max="65535" /></p>
-		</fieldset>
-	</form>
-</div>
-<a href="#" title="Settings" class="a-btn" id="btn_settings" style="position: absolute; bottom: 10px; right: 10px;"/>
+		<div id="settings" style="position: absolute; bottom: 30px; right: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center; display:none;">	<!-- _connect -->
+			<form>
+				<fieldset>
+					<legend>Misc</legend>
+					<p>
+						<label id="lang_l">Language</label>
+						<select id = "language_list"></select>
+					</p>
+					<p>
+						<label id="home_world_l">Home World</label>
+						<select id = "world_list"></select>
+					</p>
+				</fieldset>
+			</form>
+		<!--</div>
+		<div id="settings_misc" style="position: absolute; bottom: 30px; left: 5px; padding: 0.5em; width: 18em; background-color: rgba(255,255,255,0.5); text-align: center; display:none;">-->
+			<form>
+				<fieldset>
+					<legend>CrossTalk Connection</legend>
+					<!--<input id="key" type="text" placeholder="your channel key" value="" style="width: 15em;" />-->
+					<!--<input id="sm_url" type="url" placeholder="http://www.smiley.edu" value="" style="width: 15em;" />-->
+					<p id="ct_host_containter" style="display:none">Host: <input id="ct_host" type="url" placeholder="localhost" value="" style="width: 10em;" /></p>
+					<p>Port: <input id="ct_port" type="number"  placeholder="64734" value="" style="width: 5em;" min="81" max="65535" /></p>
+				</fieldset>
+			</form>
+		</div>
+		<a href="#" title="Settings" class="a-btn" id="btn_settings" style="position: absolute; bottom: 10px; right: 10px;"/>
 
-<script src="../js/IndexedDBShim.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.2.0/prototype.js"></script>
-<script src="../js/prototype-cors.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js"></script>
-<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
-<script src="../js/leaflet.label.js"></script>
-<script src="../js/Semicircle.js"></script>
-<script src="../js/leaflet.groupedlayercontrol.js"></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/idbwrapper/1.4.1/idbstore.min.js'></script>
-<script src="../js/gw2info.js"></script>
-<script src="../js/gw2maps-prototype.js"></script>
-<script src="../js/gw2app.js"></script>
+		<script src="../js/IndexedDBShim.min.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/prototype/1.7.2.0/prototype.js"></script>
+		<script src="../js/prototype-cors.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/scriptaculous/1.9.0/scriptaculous.js"></script>
+		<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
+		<script src="../js/leaflet.label.js"></script>
+		<script src="../js/Semicircle.js"></script>
+		<script src="../js/leaflet.groupedlayercontrol.js"></script>
+		<script src='https://cdnjs.cloudflare.com/ajax/libs/idbwrapper/1.4.1/idbstore.min.js'></script>
+		<script src="../js/gw2info.js"></script>
+		<script src="../js/gw2maps-prototype.js"></script>
+		<script src="../js/gw2app.js"></script>
 
-</body>
+	</body>
 </html>
