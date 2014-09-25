@@ -37,24 +37,24 @@ void SettingsPositionalAudio::Init(PositionalAudio *positionalAudio)
         connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
     }
 
-    this->connect(this,SIGNAL(EnabledSet(bool)),positionalAudio, SLOT(setEnabled(bool)));
-    this->connect(this,SIGNAL(UseCameraSet(bool)),positionalAudio,SLOT(setUseCamera(bool)));
-    this->connect(this,SIGNAL(UseAttenuationSet(bool)),positionalAudio,SLOT(setUseAttenuation(bool)));
-    this->connect(this,SIGNAL(DistanceMinChanged(int)),positionalAudio,SLOT(setDistanceMin(int)));
-    this->connect(this,SIGNAL(DistanceMaxChanged(int)),positionalAudio,SLOT(setDistanceMax(int)));
-    this->connect(this,SIGNAL(RollOffChanged(float)),positionalAudio,SLOT(setRollOff(float)));
-    this->connect(this,SIGNAL(RollOffMaxChanged(float)),positionalAudio,SLOT(setRollOffMax(float)));
+    this->connect(this, &SettingsPositionalAudio::EnabledSet, positionalAudio, &PositionalAudio::setEnabled);
+    this->connect(this, &SettingsPositionalAudio::UseCameraSet, positionalAudio, &PositionalAudio::setUseCamera);
+    this->connect(this, &SettingsPositionalAudio::UseAttenuationSet, positionalAudio, &PositionalAudio::setUseAttenuation);
+    this->connect(this, &SettingsPositionalAudio::DistanceMinChanged, positionalAudio, &PositionalAudio::setDistanceMin);
+    this->connect(this, &SettingsPositionalAudio::DistanceMaxChanged, positionalAudio,&PositionalAudio::setDistanceMax);
+    this->connect(this, &SettingsPositionalAudio::RollOffChanged, positionalAudio, &PositionalAudio::setRollOff);
+    this->connect(this, &SettingsPositionalAudio::RollOffMaxChanged, positionalAudio, &PositionalAudio::setRollOffMax);
 
-    this->connect(this,SIGNAL(ServerSettingsAdd(QString,QString)),positionalAudio,SLOT(AddServerSetting(QString,QString)));
-    this->connect(this,SIGNAL(ServerSettingsRemove(QString,QString)),positionalAudio,SLOT(RemoveServerSetting(QString,QString)));
-    this->connect(this,SIGNAL(ServerEnabledSet(QString,bool)),positionalAudio,SLOT(setServerSettingEnabled(QString,bool)));
-    this->connect(this,SIGNAL(ServerBlockSet(QString,bool)),positionalAudio,SLOT(setServerSettingBlocked(QString,bool)));
-    this->connect(this,SIGNAL(ServerSendIntervalChange(QString,float)),positionalAudio,SLOT(setServerSettingSendInterval(QString,float)));
-    this->connect(this,SIGNAL(ServerSendIntervalSilentIncChange(QString,float)),positionalAudio,SLOT(setServerSettingSendIntervalSilentInc(QString,float)));
+    this->connect(this, &SettingsPositionalAudio::ServerSettingsAdd, positionalAudio, &PositionalAudio::AddServerSetting);
+    this->connect(this, &SettingsPositionalAudio::ServerSettingsRemove, positionalAudio, &PositionalAudio::RemoveServerSetting);
+    this->connect(this, &SettingsPositionalAudio::ServerEnabledSet, positionalAudio, &PositionalAudio::setServerSettingEnabled);
+    this->connect(this, &SettingsPositionalAudio::ServerBlockSet, positionalAudio, &PositionalAudio::setServerSettingBlocked);
+    this->connect(this, &SettingsPositionalAudio::ServerSendIntervalChange, positionalAudio, &PositionalAudio::setServerSettingSendInterval);
+    this->connect(this, &SettingsPositionalAudio::ServerSendIntervalSilentIncChange, positionalAudio, &PositionalAudio::setServerSettingSendIntervalSilentInc);
 
     //pure display
-    this->connect(positionalAudio,SIGNAL(myIdentityChanged(QString)),this, SIGNAL(UpdateUIStatusSelfName(QString)),Qt::QueuedConnection);
-    this->connect(positionalAudio,SIGNAL(myVrChanged(QString)),this,SIGNAL(UpdateUIStatusSelfGame(QString)),Qt::QueuedConnection);
+    this->connect(positionalAudio, &PositionalAudio::myIdentityChanged, this, &SettingsPositionalAudio::UpdateUIStatusSelfName, Qt::QueuedConnection);
+    this->connect(positionalAudio, &PositionalAudio::myVrChanged, this, &SettingsPositionalAudio::UpdateUIStatusSelfGame, Qt::QueuedConnection);
 
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
@@ -130,31 +130,31 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
                 QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
                 cfg.beginGroup(mP_positionalAudio.data()->objectName());
                 //p_config->UpdateUIEnabledSet(cfg.value("enabled",true).toBool());
-                this->connect(this,SIGNAL(UpdateUIEnabledSet(bool)),p_config, SIGNAL(UpdateUIEnabledSet(bool)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIEnabledSet, p_config, &ConfigPositionalAudio::UpdateUIEnabledSet);
                 emit UpdateUIEnabledSet(cfg.value("enabled",true).toBool());
-                this->connect(this,SIGNAL(UpdateUIUseCameraSet(bool)),p_config, SIGNAL(UpdateUIUseCameraSet(bool)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIUseCameraSet, p_config, &ConfigPositionalAudio::UpdateUIUseCameraSet);
                 emit UpdateUIUseCameraSet(cfg.value("isUseCamera",true).toBool());
 
                 cfg.beginGroup("attenuation");
-                this->connect(this,SIGNAL(UpdateUIUseAttenuationSet(bool)),p_config, SIGNAL(UpdateUIUseAttenuationSet(bool)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIUseAttenuationSet, p_config, &ConfigPositionalAudio::UpdateUIUseAttenuationSet);
                 emit UpdateUIUseAttenuationSet(cfg.value("enabled",false).toBool());
-                this->connect(this,SIGNAL(UpdateUIDistanceMin(int)),p_config,SIGNAL(UpdateUIDistanceMin(int)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIDistanceMin, p_config, &ConfigPositionalAudio::UpdateUIDistanceMin);
                 emit UpdateUIDistanceMin(cfg.value("distance_min",0).toInt());
-                this->connect(this,SIGNAL(UpdateUIDistanceMax(int)),p_config,SIGNAL(UpdateUIDistanceMax(int)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIDistanceMax, p_config, &ConfigPositionalAudio::UpdateUIDistanceMax);
                 emit UpdateUIDistanceMax(cfg.value("distance_max",0).toInt());
-                this->connect(this,SIGNAL(UpdateUIRollOff(float)),p_config,SIGNAL(UpdateUIRollOff(float)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIRollOff, p_config, &ConfigPositionalAudio::UpdateUIRollOff);
                 emit UpdateUIRollOff(cfg.value("rolloff",-6.0f).toFloat());
-                this->connect(this,SIGNAL(UpdateUIRollOffMax(float)),p_config,SIGNAL(UpdateUIRollOffMax(float)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIRollOffMax, p_config, &ConfigPositionalAudio::UpdateUIRollOffMax);
                 emit UpdateUIRollOffMax(cfg.value("rolloff_max",-200.0f).toFloat());
                 cfg.endGroup();
 
-                this->connect(this,SIGNAL(UpdateUIServerSettingsAdd(QString,QString)), p_config, SIGNAL(UpdateUIServerAdd(QString,QString)));
-                this->connect(this,SIGNAL(UpdateUIServerSettingsRemove(QString,QString)), p_config, SIGNAL(UpdateUIServerRemove(QString,QString)));
-                this->connect(this,SIGNAL(UpdateUIServerEnabled(QString,bool)), p_config, SIGNAL(UpdateUIServerEnabled(QString,bool)));
-                this->connect(this,SIGNAL(UpdateUIServerBlock(QString,bool)), p_config, SIGNAL(UpdateUIServerBlocked(QString,bool)));
-                this->connect(this,SIGNAL(UpdateUIServerSendInterval(QString,float)), p_config, SIGNAL(UpdateUIServerSendInterval(QString,float)));
-                this->connect(this,SIGNAL(UpdateUIServerSendIntervalSilentInc(QString,float)), p_config, SIGNAL(UpdateUIServerSendIntervalSilentInc(QString,float)));
-                this->connect(this,SIGNAL(UpdateUIServerSelect(QString)),p_config, SIGNAL(UpdateUIServerSelect(QString)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIServerSettingsAdd, p_config, &ConfigPositionalAudio::UpdateUIServerAdd);
+                this->connect(this, &SettingsPositionalAudio::UpdateUIServerSettingsRemove, p_config, &ConfigPositionalAudio::UpdateUIServerRemove);
+                this->connect(this, &SettingsPositionalAudio::UpdateUIServerEnabled, p_config, &ConfigPositionalAudio::UpdateUIServerEnabled);
+                this->connect(this, &SettingsPositionalAudio::UpdateUIServerBlock, p_config, &ConfigPositionalAudio::UpdateUIServerBlocked);
+                this->connect(this, &SettingsPositionalAudio::UpdateUIServerSendInterval, p_config, &ConfigPositionalAudio::UpdateUIServerSendInterval);
+                this->connect(this, &SettingsPositionalAudio::UpdateUIServerSendIntervalSilentInc, p_config, &ConfigPositionalAudio::UpdateUIServerSendIntervalSilentInc);
+                this->connect(this, &SettingsPositionalAudio::UpdateUIServerSelect, p_config, &ConfigPositionalAudio::UpdateUIServerSelect);
 
                 cfg.beginGroup("server_s");
                 QStringList groups = cfg.childGroups();
@@ -195,28 +195,28 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
 
                 cfg.endGroup();
 
-                this->connect(p_config,SIGNAL(EnabledSet(bool)),SIGNAL(EnabledSet(bool)));
-                this->connect(p_config,SIGNAL(CameraSet(bool)),SIGNAL(UseCameraSet(bool)));
-                this->connect(p_config,SIGNAL(AttenuationSet(bool)),SIGNAL(UseAttenuationSet(bool)));
-                this->connect(p_config,SIGNAL(DistanceMinChanged(int)),SIGNAL(DistanceMinChanged(int)));
-                this->connect(p_config,SIGNAL(DistanceMaxChanged(int)),SIGNAL(DistanceMaxChanged(int)));
-                this->connect(p_config,SIGNAL(RollOffChanged(float)),SIGNAL(RollOffChanged(float)));
-                this->connect(p_config,SIGNAL(RollOffMaxChanged(float)),SIGNAL(RollOffMaxChanged(float)));
+                this->connect(p_config, &ConfigPositionalAudio::EnabledSet, this, &SettingsPositionalAudio::EnabledSet);
+                this->connect(p_config, &ConfigPositionalAudio::CameraSet, this, &SettingsPositionalAudio::UseCameraSet);
+                this->connect(p_config, &ConfigPositionalAudio::AttenuationSet, this, &SettingsPositionalAudio::UseAttenuationSet);
+                this->connect(p_config, &ConfigPositionalAudio::DistanceMinChanged, this, &SettingsPositionalAudio::DistanceMinChanged);
+                this->connect(p_config, &ConfigPositionalAudio::DistanceMaxChanged, this, &SettingsPositionalAudio::DistanceMaxChanged);
+                this->connect(p_config, &ConfigPositionalAudio::RollOffChanged, this, &SettingsPositionalAudio::RollOffChanged);
+                this->connect(p_config, &ConfigPositionalAudio::RollOffMaxChanged, this, &SettingsPositionalAudio::RollOffMaxChanged);
 
-                this->connect(p_config,SIGNAL(ServerEnabledSet(QString,bool)),SIGNAL(ServerEnabledSet(QString,bool)));
-                this->connect(p_config,SIGNAL(ServerSendIntervalChange(QString,float)),SIGNAL(ServerSendIntervalChange(QString,float)));
-                this->connect(p_config,SIGNAL(ServerSendIntervalSilentIncChange(QString,float)), SIGNAL(ServerSendIntervalSilentIncChange(QString,float)));
-                this->connect(p_config,SIGNAL(ServerBlockSet(QString,bool)),SIGNAL(ServerBlockSet(QString,bool)));
+                this->connect(p_config, &ConfigPositionalAudio::ServerEnabledSet, this, &SettingsPositionalAudio::ServerEnabledSet);
+                this->connect(p_config, &ConfigPositionalAudio::ServerSendIntervalChange, this, &SettingsPositionalAudio::ServerSendIntervalChange);
+                this->connect(p_config, &ConfigPositionalAudio::ServerSendIntervalSilentIncChange, this, &SettingsPositionalAudio::ServerSendIntervalSilentIncChange);
+                this->connect(p_config, &ConfigPositionalAudio::ServerBlockSet, this, &SettingsPositionalAudio::ServerBlockSet);
 
-                this->connect(p_config,SIGNAL(ServerAddButtonClicked()),SLOT(AddCustomServerSettingForCurrentTab()));
-                this->connect(p_config,SIGNAL(ServerRemoveButtonClicked(QString)),SLOT(RemoveCustomServerSettingByServerUniqueId(QString)));
+                this->connect(p_config, &ConfigPositionalAudio::ServerAddButtonClicked, this, &SettingsPositionalAudio::AddCustomServerSettingForCurrentTab);
+                this->connect(p_config, &ConfigPositionalAudio::ServerRemoveButtonClicked, this, &SettingsPositionalAudio::RemoveCustomServerSettingByServerUniqueId);
 
-                connect(p_config,SIGNAL(finished(int)),this,SLOT(saveSettings(int)));
+                connect(p_config, &ConfigPositionalAudio::finished, this, &SettingsPositionalAudio::saveSettings);
 
                 //pure display
-                this->connect(this,SIGNAL(UpdateUIStatusSelfName(QString)),p_config, SIGNAL(UpdateUIStatusSelfName(QString)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIStatusSelfName, p_config, &ConfigPositionalAudio::UpdateUIStatusSelfName);
                 emit UpdateUIStatusSelfName(mP_positionalAudio.data()->getMyIdentity());
-                this->connect(this,SIGNAL(UpdateUIStatusSelfGame(QString)),p_config,SIGNAL(UpdateUIStatusSelfGame(QString)));
+                this->connect(this, &SettingsPositionalAudio::UpdateUIStatusSelfGame, p_config, &ConfigPositionalAudio::UpdateUIStatusSelfGame);
                 emit UpdateUIStatusSelfGame(mP_positionalAudio.data()->getMyVr());
 
                 p_config->show();
