@@ -7,7 +7,7 @@
 #include "ts_logging_qt.h"
 
 const QUrl GW2_BUILD("https://api.guildwars2.com/v1/build.json");
-const QUrl GW2_WORLD_NAMES("https://api.guildwars2.com/v1/world_names.json");
+const QUrl GW2_WORLD_NAMES("https://api.guildwars2.com/v2/worlds?ids=all");
 const QUrl GW2_CONTINENTS("https://api.guildwars2.com/v1/continents.json");
 const QUrl GW2_MAPS("https://api.guildwars2.com/v1/maps.json");
 
@@ -208,6 +208,7 @@ void GuildWarsTwo::onNetwManagerFinished(QNetworkReply *reply)
 
 void GuildWarsTwo::onSslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
 {
+    Q_UNUSED(reply);
     foreach (const QSslError &error, errors) {
         TSLogging::Error(QString("%1 SSL Error: %2").arg(this->objectName()).arg(error.errorString()),true);
     }
