@@ -16,8 +16,8 @@ GroupBoxPositionalAudio::GroupBoxPositionalAudio(QWidget *parent) :
     connect(ui->groupBoxVolume,SIGNAL(toggled(bool)),this,SIGNAL(attenuationSet(bool)));
     connect(ui->spinBox_MinDistance,SIGNAL(valueChanged(int)),this,SIGNAL(distanceMinChanged(int)));
     connect(ui->spinBox_MaxDistance,SIGNAL(valueChanged(int)),this,SIGNAL(distanceMaxChanged(int)));
-    connect(ui->doubleSpinBox_RollOff,SIGNAL(valueChanged(double)),this,SIGNAL(rollOffChanged(float))); //let's see if that works
-    connect(ui->doubleSpinBox_RollOffMax,SIGNAL(valueChanged(double)),this,SIGNAL(rollOffMaxChanged(float)));
+    connect(ui->doubleSpinBox_RollOff,SIGNAL(valueChanged(double)),this,SLOT(on_DoubleSpinBoxRollOff_valueChanged(double)));
+    connect(ui->doubleSpinBox_RollOffMax,SIGNAL(valueChanged(double)),this,SLOT(on_DoubleSpinBoxRollOffMax_valueChanged(double)));
 
     connect(ui->groupBoxServerSettings,SIGNAL(enabledSet(QString,bool)),this,SIGNAL(ServerEnabledSet(QString,bool)));
     connect(ui->groupBoxServerSettings,SIGNAL(sendIntervalChange(QString,float)),this,SIGNAL(ServerSendIntervalChange(QString,float)));
@@ -83,4 +83,14 @@ void GroupBoxPositionalAudio::UpdateUIRollOffMax(float val)
     this->blockSignals(true);
     ui->doubleSpinBox_RollOffMax->setValue(val);
     this->blockSignals(false);
+}
+
+void GroupBoxPositionalAudio::on_DoubleSpinBoxRollOff_valueChanged(double val)
+{
+    emit rollOffChanged(static_cast<float>(val));
+}
+
+void GroupBoxPositionalAudio::on_DoubleSpinBoxRollOffMax_valueChanged(double val)
+{
+    emit rollOffMaxChanged(static_cast<float>(val));
 }

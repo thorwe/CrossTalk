@@ -18,7 +18,6 @@
 
 #include "../talkers.h"
 #include "../ts_helpers_qt.h"
-#include "../ts_logging_qt.h"
 
 #include "ts_serversinfo.h"
 
@@ -166,7 +165,6 @@ void PositionalAudio::setRollOff(float val)
         return;
     m_rollOff = val;
     //m_rollOff_Lin = db2lin_alt2(m_rollOff);
-
     emit rollOffChanged(m_rollOff);
 }
 
@@ -176,7 +174,6 @@ void PositionalAudio::setRollOffMax(float val)
         return;
     m_rollOffMax = val;
     m_rollOffMax_Lin = db2lin_alt2(m_rollOffMax);
-
     emit rollOffMaxChanged(m_rollOffMax);
 }
 
