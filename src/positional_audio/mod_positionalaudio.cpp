@@ -18,6 +18,7 @@
 
 #include "../talkers.h"
 #include "../ts_helpers_qt.h"
+#include "../ts_logging_qt.h"
 
 #include "ts_serversinfo.h"
 
@@ -26,6 +27,8 @@
 #ifndef M_PI
 #define M_PI    3.14159265358979323846f
 #endif
+
+double log2(double d) {return log(d)/log(2) ;}
 
 #ifndef INCHTOM
 #define INCHTOM(b) (b*39.3701)
@@ -70,7 +73,7 @@ PositionalAudio::PositionalAudio(QObject *parent) :
     m_distanceMax(0),
     m_rollOff(0.0f),
     m_rollOffMax(0.0f),
-    m_rollOff_Lin(1.0f),
+    //m_rollOff_Lin(1.0f),
     m_rollOffMax_Lin(1.0f),
     m_IsSendAllOverride(true)
 {
@@ -162,7 +165,8 @@ void PositionalAudio::setRollOff(float val)
     if (m_rollOff == val)
         return;
     m_rollOff = val;
-    m_rollOff_Lin = db2lin_alt2(m_rollOff);
+    //m_rollOff_Lin = db2lin_alt2(m_rollOff);
+
     emit rollOffChanged(m_rollOff);
 }
 
@@ -172,6 +176,7 @@ void PositionalAudio::setRollOffMax(float val)
         return;
     m_rollOffMax = val;
     m_rollOffMax_Lin = db2lin_alt2(m_rollOffMax);
+
     emit rollOffMaxChanged(m_rollOffMax);
 }
 
@@ -367,11 +372,13 @@ void PositionalAudio::onCustom3dRolloffCalculationClientEvent(uint64 serverConne
             else
             {
                 distance = distance - m_distanceMin;
-                float rollOff = distance * m_rollOff_Lin;
-                if (rollOff < m_rollOffMax_Lin)
-                    rollOff = m_rollOffMax_Lin;
+                if(distance <= 1)
+                    *volume = 1.0f;
+                else
+                    *volume = db2lin_alt2(log2(distance) * m_rollOff);
 
-                *volume = rollOff;
+                if (*volume < m_rollOffMax_Lin)
+                    *volume = m_rollOffMax_Lin;
             }
         }
     }
@@ -443,6 +450,7 @@ void PositionalAudio::onRunningStateChanged(bool value)
         connect(universe,SIGNAL(removed(QString)),this,SLOT(onUniverseRemoved(QString)),Qt::UniqueConnection);
         connect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)),Qt::UniqueConnection);
         connect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)),Qt::UniqueConnection);
+        connect(this,&PositionalAudio::BroadcastJSON, (PluginQt::instance()->m_PipeServer), &PipeServer::Send, Qt::UniqueConnection);
 #ifdef USE_WEBSOCKET
         connect(this, SIGNAL(BroadcastJSON(QString)),PluginQt::instance()->m_WebSocketServer,SIGNAL(broadcastMessage(QString)), Qt::UniqueConnection);
 #endif

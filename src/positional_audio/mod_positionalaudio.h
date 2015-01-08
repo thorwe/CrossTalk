@@ -137,7 +137,7 @@ private:
     int m_distanceMax;
     float m_rollOff;
     float m_rollOffMax;
-    float m_rollOff_Lin;
+    //float m_rollOff_Lin;
     float m_rollOffMax_Lin;
 
     QString GetSendString(bool isAll);

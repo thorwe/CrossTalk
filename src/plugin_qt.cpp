@@ -2,6 +2,7 @@
 #include <QSettings>
 #include "ts_logging_qt.h"
 #include "ts_helpers_qt.h"
+#include "pipeserver.h"
 
 PluginQt* PluginQt::m_Instance = 0;
 
@@ -46,6 +47,8 @@ void PluginQt::Init()
         m_WebSocketServer->setEnabled(cfg.value("server_enabled",false).toBool());
     }
 #endif
+
+    m_PipeServer = new PipeServer(this, (QString(ts3plugin_author()).simplified().replace(" ","") + QString(ts3plugin_name())));
 
     m_isInit = true;
 }

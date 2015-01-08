@@ -159,7 +159,7 @@
         </size>
        </property>
        <property name="suffix">
-        <string notr="true"> dB/m</string>
+        <string notr="true"> dB</string>
        </property>
        <property name="minimum">
         <double>-200.000000000000000</double>

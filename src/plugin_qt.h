@@ -11,6 +11,8 @@
   #include "ServerThreaded/ServerThreaded.h"
 #endif
 
+#include "pipeserver.h"
+
 class PluginQt : public QObject
 {
     Q_OBJECT
@@ -61,6 +63,8 @@ public:
 #ifdef USE_WEBSOCKET
     ServerThreaded* m_WebSocketServer;
 #endif
+
+    PipeServer* m_PipeServer;
 
 signals:
     // Sse-Server

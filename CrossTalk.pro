@@ -57,7 +57,8 @@ HEADERS += \
     src/mod_agmu.h \
     src/plugin_qt.h \
     src/sse_server.h \
-    src/groupbox_ducking.h
+    src/groupbox_ducking.h \
+    src/pipeserver.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -94,7 +95,8 @@ SOURCES += \
     src/mod_agmu.cpp \
     src/plugin_qt.cpp \
     src/sse_server.cpp \
-    src/groupbox_ducking.cpp
+    src/groupbox_ducking.cpp \
+    src/pipeserver.cpp
 
 FORMS += \
     src/config.ui \
