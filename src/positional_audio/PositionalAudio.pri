@@ -14,7 +14,8 @@ HEADERS += \
     $$PWD/guildwarstwo.h \
     $$PWD/tsvr_definitions.h \
     $$PWD/tsvr_obj_self.h \
-    $$PWD/tsvr_obj_other.h
+    $$PWD/tsvr_obj_other.h ##\
+    ##$$PWD/minecraft.h
 
 SOURCES += \
     $$PWD/tsvr_obj.cpp \
@@ -27,7 +28,8 @@ SOURCES += \
     $$PWD/groupbox_positionalaudio_status.cpp \
     $$PWD/guildwarstwo.cpp \
     $$PWD/tsvr_obj_self.cpp \
-    $$PWD/tsvr_obj_other.cpp
+    $$PWD/tsvr_obj_other.cpp ##\
+    ##$$PWD/minecraft.cpp
 
 FORMS += \
     $$PWD/groupbox_positional_audio.ui \

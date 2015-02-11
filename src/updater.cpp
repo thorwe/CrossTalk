@@ -11,7 +11,7 @@
 
 const QUrl STABLE("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html");
 const QUrl BETA_CHECK("http://dl.dropbox.com/u/18413693/CrossTalk-builds/package.ini");
-const QUrl BETA_DOWNLOAD("http://jianji.de/crosstalk/");
+const QUrl BETA_DOWNLOAD("https://github.com/thorwe/CrossTalk/releases");
 
 // Note that TS doesn't ship with any ssl support, so no GitHub API etc
 
