@@ -8,12 +8,13 @@
 
 #include "ts_helpers_qt.h"
 #include "ts_logging_qt.h"
+#include "version_qt.h"
 
 const QUrl STABLE("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html");
-const QUrl BETA_CHECK("http://dl.dropbox.com/u/18413693/CrossTalk-builds/package.ini");
+const QUrl BETA_CHECK("https://dl.dropbox.com/u/18413693/CrossTalk-builds/package.ini");
 const QUrl BETA_DOWNLOAD("https://github.com/thorwe/CrossTalk/releases");
-
-// Note that TS doesn't ship with any ssl support, so no GitHub API etc
+const QString GITHUBAPI_URL = "https://api.github.com/repos/";
+const QString GITHUBAPI_LATEST = "/releases/latest";   //GET /repos/:owner/:repo/releases/latest
 
 //! Constructor
 /*!
@@ -36,15 +37,12 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
     if (!m_URLs.remove(reply->url()))
         return;
 
-    bool isReplyStable = reply->url().toString().contains("addons.teamspeak.com");
     if (reply->error() != QNetworkReply::NoError)
     {
         TSLogging::Log(reply->errorString(),LogLevel_WARNING);
     }
     else
     {
-        QByteArray arr = reply->readAll();
-
         QVariant possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
 
         /* We'll deduct if the redirection is valid in the redirectUrl function */
@@ -57,39 +55,13 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
             return;
         }
 
-        int start = arr.indexOf((isReplyStable)?QString(ts3plugin_name()).append("_"):"Version",0);
-        if (start == -1)
-        {
-            TSLogging::Log((this->objectName() + ": Did not find Version."),LogLevel_WARNING);
-            return;
-        }
-
-        QString endStr = (isReplyStable)?".ts3_plugin":"Platforms";
-        int end = arr.indexOf(endStr,start);
-        if (end == -1)
-        {
-            TSLogging::Log((this->objectName() + ": Did not find %1.").arg(endStr),LogLevel_WARNING);
-            return;
-        }
-
-        QString parse(arr.mid(start,end-start));
-        QRegExp rx;
-        if (isReplyStable)
-            rx.setPattern("\\d+(?:\\_\\d+)+");
+        //https://api.github.com/repos/thorwe/crosstalk/releases/latest
+        QString replyUrl = reply->url().toString();
+        if (replyUrl.startsWith("https://api.github.com/repos/") && replyUrl.endsWith("/releases/latest"))
+            parseGithubResponse(reply);
         else
-            rx.setPattern("\\d+(?:\\.\\d+)+");
+            parseResponse(reply);
 
-        int pos = rx.indexIn(parse);
-        if (pos > -1)
-            parse = rx.cap(0);
-
-        if (isReplyStable)
-        {
-            parse.replace("_",".");
-            m_VersionStable = parse;
-        }
-        else
-            m_VersionBeta = parse;
     }
 
     reply->deleteLater();
@@ -107,11 +79,12 @@ void Updater::CheckUpdate(bool isBetaChannelEnabled)
     if (m_netwManager==NULL)
         m_netwManager = new QNetworkAccessManager(this);
 
-//    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-//    m_isBetaChannel = cfg.value("beta",false).toBool();
     m_isBetaChannel = isBetaChannelEnabled;
     if (m_isBetaChannel)
-        CheckUpdate(BETA_CHECK);
+    {
+        //CheckUpdate(BETA_CHECK);
+        CheckUpdate(QString(GITHUBAPI_URL + "thorwe" + "/" + "crosstalk" + GITHUBAPI_LATEST));
+    }
 
     CheckUpdate(STABLE);
 }
@@ -124,8 +97,10 @@ void Updater::CheckUpdate(QUrl url)
     m_netwManager->get(request);
 }
 
-void Updater::ShowUpdateDialog(QString remoteVersion)
+void Updater::ShowUpdateDialog(QString remoteVersion, QUrl downloadUrl)
 {
+    m_resultDownloadUrl = downloadUrl;
+
     QWidget* mainWindow = TSHelpers::GetMainWindow();
     // Create Dialog
     QMessageBox updateMsgBox(mainWindow);
@@ -146,7 +121,8 @@ void Updater::ShowUpdateDialog(QString remoteVersion)
     // I must be missing something for the non-blocking variant to work -.-
     if (ret == QMessageBox::Ok || ret == QMessageBox::Yes)
     {
-        QDesktopServices::openUrl((remoteVersion==m_VersionStable)?STABLE:BETA_DOWNLOAD);
+        //QDesktopServices::openUrl((remoteVersion==m_VersionStable)?STABLE:BETA_DOWNLOAD);
+        QDesktopServices::openUrl(m_resultDownloadUrl);
         qApp->quit();
     }
     else if (ret == QMessageBox::Cancel || ret == QMessageBox::No)
@@ -170,9 +146,136 @@ QUrl Updater::redirectUrl(const QUrl& possibleRedirectUrl, const QUrl& oldRedire
     return redirectUrl;
 }
 
+void Updater::parseResponse(QNetworkReply *reply)
+{
+    bool isReplyStable = reply->url().toString().contains("addons.teamspeak.com");
+
+    QByteArray arr = reply->readAll();
+    int start = arr.indexOf((isReplyStable)?QString(ts3plugin_name()).append("_"):"Version",0);
+    if (start == -1)
+    {
+        TSLogging::Log((this->objectName() + ": Did not find Version."),LogLevel_WARNING);
+        return;
+    }
+
+    QString endStr = (isReplyStable)?".ts3_plugin":"Platforms";
+    int end = arr.indexOf(endStr,start);
+    if (end == -1)
+    {
+        TSLogging::Log((this->objectName() + ": Did not find %1.").arg(endStr),LogLevel_WARNING);
+        return;
+    }
+
+    QString parse(arr.mid(start,end-start));
+    QRegExp rx;
+    if (isReplyStable)
+        rx.setPattern("\\d+(?:\\_\\d+)+");
+    else
+        rx.setPattern("\\d+(?:\\.\\d+)+");
+
+    int pos = rx.indexIn(parse);
+    if (pos > -1)
+        parse = rx.cap(0);
+
+    if (isReplyStable)
+    {
+        parse.replace("_",".");
+        m_VersionStable = parse;
+    }
+    else
+        m_VersionBeta = parse;
+}
+
+void Updater::parseGithubResponse(QNetworkReply *reply)
+{
+    QJsonParseError jsonError;
+    QJsonDocument jdoc = QJsonDocument::fromJson(reply->readAll(),&jsonError);
+    if (jsonError.error != QJsonParseError::ParseError::NoError)
+    {
+        TSLogging::Error(QString("%1: Json error: %2").arg(this->objectName()).arg(jsonError.errorString()),true);
+        return;
+    }
+    if (!jdoc.isObject())
+    {
+        TSLogging::Error(QString("%1: is not an object.").arg(this->objectName()),true);
+        return;
+    }
+
+    QJsonObject jobj = jdoc.object();
+    m_GithubBetaDownloadUrl = QUrl(jobj.value("html_url").toString());
+
+    m_VersionGithubBeta = jobj.value("tag_name").toString();
+
+    if (m_VersionGithubBeta.endsWith("-beta"))
+        m_VersionGithubBeta.chop(5);
+
+    if (m_VersionGithubBeta.startsWith("v"))
+        m_VersionGithubBeta.remove(0,1);
+}
+
 void Updater::CheckTriggerUpdateDialog()
 {
+    TSLogging::Log(QString("Versions found: Stable: %1 Github Beta: %2").arg(m_VersionStable, m_VersionGithubBeta));
+
+    VersionQt current(this,ts3plugin_version());
+    if (!current.valid())
+    {
+        TSLogging::Error(QString("Could not parse current version: %1").arg(ts3plugin_version()));
+        return;
+    }
+
+    VersionQt stable(this,m_VersionStable);
+    if (!stable.valid()) {
+        TSLogging::Log(QString("Could not parse stable version: %1").arg(ts3plugin_version()),LogLevel_WARNING);
+        //stable = VersionQt(this);
+    }
+
+    TSLogging::Log(QString("Current Version: %1").arg(current.toString()));
     if (!m_isBetaChannel)
+    {
+        if (current < stable)
+            ShowUpdateDialog(m_VersionStable, STABLE);
+    }
+    else
+    {
+        bool isUseStable = true;
+        bool isUseBetaGithub = true;
+
+        VersionQt betaGithub(this,m_VersionGithubBeta);
+        if (!betaGithub.valid())
+        {
+            TSLogging::Log(QString("Could not parse github beta version: %1").arg(m_VersionGithubBeta));
+            //betaGithub = VersionQt(this);
+        }
+
+        if (stable == betaGithub)
+            isUseBetaGithub = false;
+        else if (stable < betaGithub)
+            isUseStable = false;
+        else
+            isUseBetaGithub = false;
+
+        if (isUseStable == isUseBetaGithub)
+        {
+            TSLogging::Error("Logic error in version comparison. Please report.");
+            return;
+        }
+
+        if (isUseStable)
+        {
+            if (current < stable)
+                ShowUpdateDialog(m_VersionStable, STABLE);
+        }
+        else if (isUseBetaGithub)
+        {
+            if (current < betaGithub)
+                ShowUpdateDialog(m_VersionGithubBeta, m_GithubBetaDownloadUrl);
+        }
+        else
+            TSLogging::Error("Logic error #2 in version comparison. Please report.");
+    }
+
+    /*if (!m_isBetaChannel)
     {
         if (m_VersionStable != ts3plugin_version())
             ShowUpdateDialog(m_VersionStable);
@@ -235,5 +338,5 @@ void Updater::CheckTriggerUpdateDialog()
             ShowUpdateDialog(m_VersionBeta);
         else
             TSLogging::Log(QString("%1 version %2 is up to date.").arg(ts3plugin_name()).arg(ts3plugin_version()));
-    }
+    }*/
 }

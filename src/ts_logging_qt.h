@@ -23,13 +23,11 @@ namespace TSLogging
     inline void Error(QString message, bool isSoundSilent)                                      {Error(message, 0, NULL, isSoundSilent);}
     inline void Error(QString message)                                                          {Error(message, 0, NULL, false);}
 
-    void Print(QString message, uint64 serverConnectionHandlerID, LogLevel logLevel);
+    void Print(QString message, uint64 serverConnectionHandlerID = 0, LogLevel logLevel = LogLevel_INFO);
     inline void Print(QString message, LogLevel logLevel)                                       {Print(message, 0, logLevel);}
-    inline void Print(QString message)                                                          {Print(message, 0, LogLevel_INFO);}
 
-    void Log(QString message, uint64 serverConnectionHandlerID, LogLevel logLevel);
+    void Log(QString message, uint64 serverConnectionHandlerID = 0, LogLevel logLevel = LogLevel_INFO);
     inline void Log(QString message, LogLevel logLevel)                                         {Log(message, 0, logLevel);}
-    inline void Log(QString message)                                                            {Log(message, 0, LogLevel_INFO);}
 }
 
 #endif // TS_LOGGING_QT_H

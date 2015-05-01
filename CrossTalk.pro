@@ -58,7 +58,9 @@ HEADERS += \
     src/plugin_qt.h \
     src/sse_server.h \
     src/groupbox_ducking.h \
-    src/pipeserver.h
+    src/pipeserver.h \
+    src/version.h \
+    src/version_qt.h
 
 SOURCES += \
     src/ts_settings_qt.cpp \
@@ -96,7 +98,8 @@ SOURCES += \
     src/plugin_qt.cpp \
     src/sse_server.cpp \
     src/groupbox_ducking.cpp \
-    src/pipeserver.cpp
+    src/pipeserver.cpp \
+    src/version_qt.cpp
 
 FORMS += \
     src/config.ui \

@@ -131,7 +131,7 @@ TSServersInfo* centralStation = TSServersInfo::instance();
 const char* ts3plugin_name() { return "CrossTalk"; }
 
 /* Plugin version */
-const char* ts3plugin_version() { return "1.6.3"; }
+const char* ts3plugin_version() { return "1.6.3.050101"; }
 
 /* Plugin API version. Must be the same as the clients API major version, else the plugin fails to load. */
 int ts3plugin_apiVersion() { return PLUGIN_API_VERSION; }
@@ -279,7 +279,7 @@ int ts3plugin_init() {
     }
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    updater.CheckUpdate(cfg.value("beta",false).toBool());
+    updater.CheckUpdate(cfg.value("beta",true).toBool());
 
     TSLogging::Log("init done");
     return 0;  /* 0 = success, 1 = failure */

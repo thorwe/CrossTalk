@@ -25,32 +25,11 @@ class Ducker_Global : public Module, public InfoDataInterface, public ContextMen
 
 public:
     explicit Ducker_Global(QObject *parent = 0);
-//    static Ducker_Global* instance() {
-//        static QMutex mutex;
-//        if(!m_Instance) {
-//            mutex.lock();
 
-//            if(!m_Instance)
-//                m_Instance = new Ducker_Global;
-
-//            mutex.unlock();
-//        }
-//        return m_Instance;
-//    }
-
-//    static void drop() {
-//        static QMutex mutex;
-//        mutex.lock();
-//        delete m_Instance;
-//        m_Instance = 0;
-//        mutex.unlock();
-//    }
     float getValue() const;
 
     void AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID);
-//    void AddMusicBot(QString uid);
     void RemoveMusicBot(uint64 serverConnectionHandlerID, anyID clientID);
-//    void RemoveMusicBot(QString uid);
     void ToggleMusicBot(uint64 serverConnectionHandlerID, anyID clientID);
 
     // events forwarded from plugin.cpp
@@ -81,12 +60,6 @@ protected:
     void onRunningStateChanged(bool value);
 
 private:
-//    explicit Ducker_Global();
-//    ~Ducker_Global();
-//    static Ducker_Global* m_Instance;
-//    Ducker_Global(const Ducker_Global &);
-//    Ducker_Global& operator=(const Ducker_Global &);
-
     bool m_isActive;
 
     float value() {return m_value;}

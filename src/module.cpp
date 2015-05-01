@@ -37,6 +37,7 @@ void Module::setEnabled(bool value)
         onEnabledStateChanged(value);
         if (running_old != isRunning())
             onRunningStateChanged(isRunning());
+
         emit enabledSet(m_enabled);
     }
 }
@@ -50,6 +51,7 @@ void Module::setBlocked(bool value)
         onBlockedStateChanged(value);
         if (running_old != isRunning())
             onRunningStateChanged(isRunning());
+
         emit blockedSet(value);
     }
 }

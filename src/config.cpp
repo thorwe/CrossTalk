@@ -68,7 +68,7 @@ Config::Config(QWidget *parent) :
     // Fill with settings
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
 
-    checkBoxBeta->setChecked(cfg.value("beta",false).toBool());
+    checkBoxBeta->setChecked(cfg.value("beta",true).toBool());
     connect(checkBoxBeta,SIGNAL(toggled(bool)),SLOT(onBetaChannelToggled(bool)));
 
     // WebSocket Server

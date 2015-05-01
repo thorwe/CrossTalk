@@ -9,8 +9,6 @@
 #include <QSettings>
 #include "ts_helpers_qt.h"
 
-//Ducker_Global* Ducker_Global::m_Instance = 0;
-
 Ducker_Global::Ducker_Global(QObject *parent) :
     m_isActive(false),
     m_value(0.0f),
@@ -28,10 +26,6 @@ float Ducker_Global::getValue() const
 {
     return m_value;
 }
-
-//Ducker_Global::~Ducker_Global()
-//{
-//}
 
 void Ducker_Global::setActive(bool value)
 {
@@ -63,15 +57,6 @@ bool Ducker_Global::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 i
     }
     return isDirty;
 }
-
-//void Ducker_Global::saveSettings()
-//{
-//    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-//    cfg.beginGroup("ducker_global");
-//    cfg.setValue("enabled",isEnabled());
-//    cfg.setValue("value",getValue());
-//    cfg.endGroup();
-//}
 
 void Ducker_Global::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
 {

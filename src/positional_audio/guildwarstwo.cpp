@@ -1,6 +1,5 @@
 #include "guildwarstwo.h"
 
-#include <QStringList>
 #include "ts_helpers_qt.h"
 #include "tsvr_obj.h"
 

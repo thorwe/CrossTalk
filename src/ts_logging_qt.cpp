@@ -164,7 +164,5 @@ void TSLogging::Print(QString message, uint64 serverConnectionHandlerID, LogLeve
 
 void TSLogging::Log(QString message, uint64 serverConnectionHandlerID, LogLevel logLevel)
 {
-    if (serverConnectionHandlerID == NULL)
-        serverConnectionHandlerID = 0;
     ts3Functions.logMessage(message.toLocal8Bit().constData(), logLevel, ts3plugin_name(), serverConnectionHandlerID);
 }
