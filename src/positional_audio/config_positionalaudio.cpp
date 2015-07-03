@@ -9,7 +9,7 @@ ConfigPositionalAudio::ConfigPositionalAudio(QWidget *parent) :
     this->setAttribute( Qt::WA_DeleteOnClose );
     this->setFixedWidth(this->width());
 
-    connect(ui->groupBoxPositionalAudio,SIGNAL(enabledSet(bool)),this,SIGNAL(EnabledSet(bool)));
+    connect(ui->groupBoxPositionalAudio,SIGNAL(toggled(bool)),this,SIGNAL(EnabledSet(bool)));
     connect(ui->groupBoxPositionalAudio,SIGNAL(cameraSet(bool)),this,SIGNAL(CameraSet(bool)));
 
     connect(ui->groupBoxPositionalAudio,SIGNAL(attenuationSet(bool)),this,SIGNAL(AttenuationSet(bool)));

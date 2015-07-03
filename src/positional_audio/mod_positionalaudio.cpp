@@ -489,8 +489,9 @@ void PositionalAudio::onRunningStateChanged(bool value)
         disconnect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)));
         disconnect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)));
         unlock();
-        m_sharedMemory->detach();
+        this->killTimer(m_tryTimerId);
         lm = NULL;
+        m_sharedMemory->detach();
     }
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }

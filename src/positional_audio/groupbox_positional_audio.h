@@ -29,7 +29,6 @@ public slots:
     void on_DoubleSpinBoxRollOffMax_valueChanged(double val);
 
 signals:
-    void enabledSet(bool);
     void cameraSet(bool);
     void attenuationSet(bool);
     void distanceMinChanged(int);
