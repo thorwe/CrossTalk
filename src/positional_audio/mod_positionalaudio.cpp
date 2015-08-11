@@ -27,7 +27,7 @@
 #define M_PI    3.14159265358979323846f
 #endif
 
-double log2(double d) {return log(d)/log(2) ;}
+//double log2(double d) {return log(d)/log(2) ;} // uncomment this on <C++11
 
 #ifndef INCHTOM
 #define INCHTOM(b) (b*39.3701)
