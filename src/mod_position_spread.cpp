@@ -73,7 +73,7 @@ void PositionSpread::onRunningStateChanged(bool value)
 //    else
 //        disconnect(talkers,SIGNAL(TalkStatusChanged(uint64,int,bool,anyID)),this,SLOT(onTalkStatusChanged(uint64,int,bool,anyID)));
 //    talkers->RegisterEventTalkStatusChange(this,value);
-    talkers->DumpTalkStatusChanges(this,((value)?STATUS_TALKING:STATUS_NOT_TALKING));//FlushTalkStatusChanges((value)?STATUS_TALKING:STATUS_NOT_TALKING);
+    talkers->DumpTalkStatusChanges(this,((value)?STATUS_TALKING:STATUS_NOT_TALKING));
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }
 
@@ -83,7 +83,7 @@ void PositionSpread::setSpreadWidth(float value)
         return;
     m_spreadWidth = value;
     if (isRunning())
-        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+        talkers->DumpTalkStatusChanges(this,true);
 
     Log(QString("setSpreadWidth: %1").arg(m_spreadWidth));
     emit spreadWidthSet(value);
@@ -95,7 +95,7 @@ void PositionSpread::setExpertModeEnabled(bool value)
         return;
     m_ExpertModeEnabled = value;
     if (isRunning())
-        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+        talkers->DumpTalkStatusChanges(this,true);
 
     Log(QString("setExpertModeEnabled: %1").arg((m_ExpertModeEnabled)?"true":"false"));
     emit expertModeEnabledSet(value);
@@ -107,7 +107,7 @@ void PositionSpread::setRegionHomeTab(int talkersRegion)
         return;
     m_RegionHomeTab = (TALKERS_REGION)talkersRegion;
     if ((isRunning()) && (m_ExpertModeEnabled))
-        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+        talkers->DumpTalkStatusChanges(this,true);
 
     Log(QString("setRegionHomeTab: %1").arg(talkersRegion));
     emit regionHomeTabSet(m_RegionHomeTab);
@@ -119,7 +119,7 @@ void PositionSpread::setRegionWhisper(int talkersRegion)
         return;
     m_RegionWhisper = (TALKERS_REGION)talkersRegion;
     if ((isRunning()) && (m_ExpertModeEnabled))
-        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+        talkers->DumpTalkStatusChanges(this,true);
 
     Log(QString("setRegionWhisper: %1").arg(talkersRegion));
     emit regionWhisperSet(m_RegionWhisper);
@@ -131,7 +131,7 @@ void PositionSpread::setRegionOther(int talkersRegion)
         return;
     m_RegionOther = (TALKERS_REGION)talkersRegion;
     if ((isRunning()) && (m_ExpertModeEnabled))
-        talkers->DumpTalkStatusChanges(this,true);//FlushTalkStatusChanges(true);
+        talkers->DumpTalkStatusChanges(this,true);
 
     Log(QString("setRegionOther: %1").arg(talkersRegion));
     emit regionOtherSet(m_RegionOther);
