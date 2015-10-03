@@ -10,6 +10,7 @@ const unsigned int ERROR_client_is_online                       = 0x020b;
 
 //channel
 const unsigned int ERROR_channel_is_private_channel             = 0x030e;
+//note 0x030f is defined in public_errors;
 
 //database
 const unsigned int ERROR_database                               = 0x0500;
@@ -18,32 +19,6 @@ const unsigned int ERROR_database_duplicate_entry               = 0x0502;
 const unsigned int ERROR_database_no_modifications              = 0x0503;
 const unsigned int ERROR_database_constraint                    = 0x0504;
 const unsigned int ERROR_database_reinvoke                      = 0x0505;
-
-//file transfer
-const unsigned int ERROR_file_invalid_name                      = 0x0800;
-const unsigned int ERROR_file_invalid_permissions               = 0x0801;
-const unsigned int ERROR_file_already_exists                    = 0x0802;
-const unsigned int ERROR_file_not_found                         = 0x0803;
-const unsigned int ERROR_file_io_error                          = 0x0804;
-const unsigned int ERROR_file_invalid_transfer_id               = 0x0805;
-const unsigned int ERROR_file_invalid_path                      = 0x0806;
-const unsigned int ERROR_file_no_files_available                = 0x0807;
-const unsigned int ERROR_file_overwrite_excludes_resume         = 0x0808;
-const unsigned int ERROR_file_invalid_size                      = 0x0809;
-const unsigned int ERROR_file_already_in_use                    = 0x080a;
-const unsigned int ERROR_file_could_not_open_connection         = 0x080b;
-const unsigned int ERROR_file_no_space_left_on_device           = 0x080c;
-const unsigned int ERROR_file_exceeds_file_system_maximum_size  = 0x080d;
-const unsigned int ERROR_file_transfer_connection_timeout       = 0x080e;
-const unsigned int ERROR_file_connection_lost                   = 0x080f;
-const unsigned int ERROR_file_exceeds_supplied_size             = 0x0810;
-const unsigned int ERROR_file_transfer_complete                 = 0x0811;
-const unsigned int ERROR_file_transfer_canceled                 = 0x0812;
-const unsigned int ERROR_file_transfer_interrupted              = 0x0813;
-const unsigned int ERROR_file_transfer_server_quota_exceeded    = 0x0814;
-const unsigned int ERROR_file_transfer_client_quota_exceeded    = 0x0815;
-const unsigned int ERROR_file_transfer_reset                    = 0x0816;
-const unsigned int ERROR_file_transfer_limit_reached            = 0x0817;
 
 //permissions
 const unsigned int ERROR_permission_invalid_group_id            = 0x0a00;
@@ -54,10 +29,10 @@ const unsigned int ERROR_permission_default_group_forbidden     = 0x0a04;
 const unsigned int ERROR_permission_invalid_size                = 0x0a05;
 const unsigned int ERROR_permission_invalid_value               = 0x0a06;
 const unsigned int ERROR_permissions_group_not_empty            = 0x0a07;
-const unsigned int ERROR_permissions_client_insufficient        = 0x0a08;
 const unsigned int ERROR_permissions_insufficient_group_power   = 0x0a09;
 const unsigned int ERROR_permissions_insufficient_permission_power = 0x0a0a;
 const unsigned int ERROR_permission_template_group_is_used      = 0x0a0b;
+//0x0a0c is in public_errors.h
 
 //server
 const unsigned int ERROR_server_deployment_active               = 0x0405;
