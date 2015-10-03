@@ -127,6 +127,11 @@ float PositionalAudio::getRollOffMax() const
     return m_rollOffMax;
 }
 
+bool PositionalAudio::isPositioned(anyID clientID) const
+{
+    return m_PlayersInMyContext.contains(clientID);
+}
+
 void PositionalAudio::setUseCamera(bool val)
 {
     if (m_isUseCamera == val)

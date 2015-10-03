@@ -57,6 +57,8 @@ public:
     float getRollOff() const;
     float getRollOffMax() const;
 
+    bool isPositioned(anyID clientID) const;
+
     QMap<QString,PositionalAudio_ServerSettings> getServerSettings() const;
 
     //bool RegisterCustomEnvironmentSupport(QObject *p);
