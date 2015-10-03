@@ -932,10 +932,7 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
 void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels)
 {
     if (clientID > 32767)
-    {
         clientID = 65535 - clientID + 1;
-//        TSLogging::Print(QString("corrected clientID: %1").arg(clientID));
-    }
 
     if (channel_Muter.onEditPlaybackVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels))
         return; //Client is muted;
@@ -952,19 +949,15 @@ void ts3plugin_onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, an
 
 void ts3plugin_onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask)
 {
-//    TSLogging::Print(QString("clientID: %1").arg(clientID));
     if (clientID > 32767)
-    {
         clientID = 65535 - clientID + 1;
-//        TSLogging::Print(QString("corrected clientID: %1").arg(clientID));
-    }
 
+#ifdef USE_POSITIONAL_AUDIO
+    if (positionalAudio.isPositioned(clientID))
+        return;
+#endif
     positionSpread.onEditPostProcessVoiceDataEvent(serverConnectionHandlerID,clientID,samples,sampleCount,channels,channelSpeakerArray,channelFillMask);
 }
-
-/*void ts3plugin_onEditMixedPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask)
-{
-}*/
 
 void ts3plugin_onCustom3dRolloffCalculationClientEvent(uint64 serverConnectionHandlerID, anyID clientID, float distance, float* volume)
 {
