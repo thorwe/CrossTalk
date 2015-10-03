@@ -46,7 +46,7 @@ public slots:
 
 private:
     //void process(int sampleCount, short *pleft, short *pright);
-    void process(int nSamples, QList<float> *pleft, QList<float> *pright, float balance);
+    static void process(int nSamples, QList<float> *pleft, QList<float> *pright, float balance);
     unsigned short sampleRate;
 
     bool panAdjustment;

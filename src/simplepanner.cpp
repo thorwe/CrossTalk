@@ -200,71 +200,12 @@ void SimplePanner::process(int nSamples,
     gl=::cos(p);
     gr=::sin(p);
 
-//    if (balance < 0)
-//    {
-//        gl = 1;
-//        gr = 1 + balance;
-//    }
-//    else
-//    {
-//        gl = 1 - balance;
-//        gr = 1;
-//    }
-//    while( nSamples-- )
-//    {
-//       *pleft =*pleft++ *gl;
-//       *pright=*pright++*gr;
-//    }
     for (int i = 0; i<nSamples;++i)
     {
         pleft->replace(i, (pleft->at(i) * gl));
         pright->replace(i, (pright->at(i) * gr));
     }
 }
-
-/*void SimplePanner::process(int sampleCount,
-                          short *pleft,
-                          short *pright)
-{
-
-
-    QList<float> float_data_left;
-    for (int i=0;i<sampleCount;i++)
-        float_data_left.insert(i,pleft[i]);
-
-
-    QList<float> float_data_right;
-    for (int i=0;i<sampleCount;i++)
-    {
-//        if (i==0)
-//            printf("%i\n",pright[i]);
-
-        float_data_right.insert(i,pright[i]);
-    }
-
-    //don't need to adjust the range to -1 - +1 do we?
-
-    process(sampleCount,&float_data_left,&float_data_right,currentPan);
-
-    for (int i=0;i<sampleCount;++i)
-    {
-        float left = float_data_left.at(i);
-        if (left>32767.f)
-            pleft[i] = 32767;
-        else if (left< -32768.f)
-            pleft[i] = -32768;
-        else
-            pleft[i] = (short)floor(.5+left);
-
-        float right = float_data_right.at(i);
-        if (right>32767.f)
-            pright[i] = 32767;
-        else if (right< -32768.f)
-            pright[i] = -32768;
-        else
-            pright[i] = (short)floor(.5+right);
-    }
-}*/
 
 void SimplePanner::process(short *samples, int sampleCount, int channels,int leftChannelNr, int rightChannelNr)
 {
@@ -323,7 +264,8 @@ void SimplePanner::process(short *samples, int sampleCount, int channels,int lef
     // Extract from interleaved and convert to QList<float>
     QList<float> float_data_left;
     QList<float> float_data_right;
-    for(int i=0; i<sampleCount; ++i){
+    for(int i=0; i < sampleCount; ++i)
+    {
         float_data_left.insert(i,samples[leftChannelNr + (i*channels) ]);
         float_data_right.insert(i,samples[rightChannelNr + (i*channels) ]);
     }
@@ -333,20 +275,20 @@ void SimplePanner::process(short *samples, int sampleCount, int channels,int lef
     process(sampleCount,&float_data_left,&float_data_right,currentPan);
 
     // put it back into interleaved and Clip
-    for (int i=0;i<sampleCount;++i)
+    for (int i = 0; i < sampleCount; ++i)
     {
         float left = float_data_left.at(i);
-        if (left>32767.f)
+        if (left > 32767.f)
             samples[leftChannelNr + (i*channels) ] = 32767;
-        else if (left< -32768.f)
+        else if (left < -32768.f)
             samples[leftChannelNr + (i*channels) ] = -32768;
         else
             samples[leftChannelNr + (i*channels) ] = (short)floor(.5+left);
 
         float right = float_data_right.at(i);
-        if (right>32767.f)
+        if (right > 32767.f)
             samples[rightChannelNr + (i*channels) ] = 32767;
-        else if (right< -32768.f)
+        else if (right < -32768.f)
             samples[rightChannelNr + (i*channels) ] = -32768;
         else
             samples[rightChannelNr + (i*channels) ] = (short)floor(.5+right);
