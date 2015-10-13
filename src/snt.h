@@ -33,6 +33,9 @@ private:
     bool m_shallClearWhisper;
     QString m_returnCode;
     uint64 m_returnCodeScHandler;
+
+    // short term fix for double trigger
+    QString m_last_cmd;
 };
 
 #endif // SNT_H

@@ -28,7 +28,8 @@ SnT::SnT(QObject *parent) :
     m_returnToSCHandler(0),
     m_shallClearWhisper(false),
     m_returnCode(QString::null),
-    m_returnCodeScHandler(0)
+    m_returnCodeScHandler(0),
+    m_last_cmd(QString::null)
 {
 }
 
@@ -105,6 +106,11 @@ void SnT::onServerError(uint64 serverConnectionHandlerID, const char *errorMessa
 
 void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args)
 {
+    if (m_last_cmd == cmd)
+        return;
+
+    m_last_cmd = cmd;
+
     if (m_returnCode.isEmpty())
     {
         char returnCode[RETURNCODE_BUFSIZE];
