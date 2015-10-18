@@ -589,4 +589,66 @@ namespace TSHelpers
         return isPathOk;
     }
 
+    QString GetChannelVariableAsQString(uint64 serverConnectionHandlerID, uint64 channelID, ChannelProperties property)
+    {
+        char* str_c;
+        unsigned int error;
+        if ((error = ts3Functions.getChannelVariableAsString(serverConnectionHandlerID, channelID, property, &str_c)) != ERROR_ok)
+        {
+            TSLogging::Error("Error on getChannelVariableAsString", serverConnectionHandlerID, error);
+            return QString::null;
+        }
+        QString str_q = QString::fromUtf8(str_c);
+        ts3Functions.freeMemory(str_c);
+        return str_q;
+    }
+
+    //Note that we have the convention of the delimiter "__CH_DELIM__" here and with GetChannelIDFromPath
+    QString GetChannelPath(uint64 serverConnectionHandlerID, uint64 channel_id)
+    {
+        QString path = QString::null;
+        unsigned int error;
+        while (true)
+        {
+            QString name = GetChannelVariableAsQString(serverConnectionHandlerID, channel_id, ChannelProperties::CHANNEL_NAME);
+            path.prepend(name);
+
+            uint64 parent;
+            if((error = ts3Functions.getParentChannelOfChannel(serverConnectionHandlerID, channel_id, &parent)) != ERROR_ok)
+            {
+                TSLogging::Error("(GetChannelPath) Error getting channel id from channel names.", serverConnectionHandlerID, error);
+                return QString::null;
+            }
+            if (parent == 0)
+                return path;
+
+            channel_id = parent;
+            path.prepend("__CH_DELIM__");
+        }
+    }
+
+    //Note that we have the convention of the delimiter "__CH_DELIM__" here and with GetChannelPath
+    uint64 GetChannelIDFromPath(uint64 serverConnectionHandlerID, QString path_q)
+    {
+        uint64 channel_id;
+        std::vector<char*> hierarchy;
+        QStringList path_list = path_q.split("__CH_DELIM__");
+
+        for (auto constIterator = path_list.constBegin(); constIterator != path_list.constEnd(); ++constIterator)
+        {
+            char* the_char_array = new char[(*constIterator).toLocal8Bit().size()+1];
+            strcpy(the_char_array,(*constIterator).toLocal8Bit().constData());
+            the_char_array[strlen(the_char_array)] = '\0';
+            hierarchy.push_back(the_char_array);
+        }
+        hierarchy.push_back(QString("").toLocal8Bit().data()); // Add the terminator
+
+        unsigned int error;
+        if((error = ts3Functions.getChannelIDFromChannelNames(serverConnectionHandlerID, &hierarchy[0], &channel_id)) != ERROR_ok)
+        {
+            TSLogging::Error("(GetChannelIDFromPath) Error getting channel id from channel names.", serverConnectionHandlerID, error);
+            return 0;
+        }
+        return channel_id;
+    }
 }

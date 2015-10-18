@@ -37,7 +37,6 @@ namespace TSHelpers
     inline int SetNextActiveServer(uint64 serverConnectionHandlerID) { return SetActiveServerRelative(serverConnectionHandlerID, true); }
     inline int SetPrevActiveServer(uint64 serverConnectionHandlerID) { return SetActiveServerRelative(serverConnectionHandlerID, false); }
     unsigned int SetWhisperList(uint64 serverConnectionHandlerID, GroupWhisperType groupWhisperType, GroupWhisperTargetMode groupWhisperTargetMode, QString returnCode = QString::null, uint64 arg = (uint64)NULL);
-    /**/
 
     unsigned int GetDefaultProfile(PluginGuiProfile profile, QString &result);
 
@@ -48,6 +47,10 @@ namespace TSHelpers
     unsigned int GetClientChannelGroup(uint64 serverConnectionHandlerID, uint64* result, anyID clientId = (anyID)NULL);
 
     bool GetCreatePluginConfigFolder(QDir &result);
+
+    QString GetChannelVariableAsQString(uint64 serverConnectionHandlerID, uint64 channelID, ChannelProperties property);
+    QString GetChannelPath(uint64 serverConnectionHandlerID, uint64 channel_id);
+    uint64 GetChannelIDFromPath(uint64 serverConnectionHandlerID, QString path_q);
 }
 
 #endif // TS_HELPERS_QT_H
