@@ -35,6 +35,7 @@ public:
     }
     
     TSServerInfo* GetServerInfo(uint64 serverConnectionHandlerID);
+    uint64 FindServerByUniqueId(QString server_id);
 
     // forwarded from plugin.cpp
     void onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);

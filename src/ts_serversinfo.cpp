@@ -1,6 +1,7 @@
 #include "ts_serversinfo.h"
 
 #include "ts_logging_qt.h"
+#include "public_errors.h"
 
 TSServersInfo* TSServersInfo::m_Instance = 0;
 TSServersInfo::TSServersInfo()
@@ -12,6 +13,22 @@ TSServerInfo* TSServersInfo::GetServerInfo(uint64 serverConnectionHandlerID)
 {
 //    return (m_serverInfoMap.contains(serverConnectionHandlerID))?m_serverInfoMap.value(serverConnectionHandlerID):(const QPointer<TSServerInfo>)NULL;
     return m_serverInfoMap.value(serverConnectionHandlerID,NULL);
+}
+
+uint64 TSServersInfo::FindServerByUniqueId(QString server_id)
+{
+    uint64* servers;
+    if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
+    {
+        uint64* server;
+        for(server = servers; *server != (uint64)NULL; ++server)
+        {
+            TSServerInfo* tsServerInfo = _GetServerInfo(*server,true);
+            if (tsServerInfo && (server_id == tsServerInfo->getUniqueId()))
+                return tsServerInfo->getServerConnectionHandlerID();
+        }
+    }
+    return 0;
 }
 
 void TSServersInfo::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber)
