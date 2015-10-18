@@ -36,9 +36,11 @@ public:
 
     bool isClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID);
 
+    // events forwarded from plugin.cpp
     void onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels);
 
     QMap<QString,RadioFX_Settings> GetSettingsMap() const;
+    QMap<QString,RadioFX_Settings>& GetSettingsMapRef();
 
 signals:
     void ChannelStripEnabledSet(QString, bool);

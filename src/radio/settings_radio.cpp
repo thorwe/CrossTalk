@@ -4,6 +4,8 @@
 #include "ts_logging_qt.h"
 
 #include "plugin.h" //pluginID
+#include "ts_serversinfo.h"
+#include <public_errors.h>
 
 SettingsRadio* SettingsRadio::m_Instance = 0;
 SettingsRadio::SettingsRadio() :
@@ -18,6 +20,7 @@ void SettingsRadio::Init(Radio *radio)
     if(m_ContextMenuUi == -1)
     {
         m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Radio FX","walkie_talkie_16.png");
+        m_ContextMenuChannelUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CHANNEL,"Radio FX (Channel)","walkie_talkie_16.png");
         m_ContextMenuToggleClientBlacklisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT, "Radio FX: Toggle Client Blacklisted [temp]", "walkie_talkie_16.png");
         connect(TSContextMenu::instance(),SIGNAL(MenusInitialized()),SLOT(onMenusInitialized()),Qt::AutoConnection);
         connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
@@ -39,8 +42,8 @@ void SettingsRadio::Init(Radio *radio)
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.beginGroup(radio->objectName());
 
-    QStringList stringList;
-    stringList << "HomeTab" << "Whisper" << "Other";
+    QStringList stringList = cfg.childGroups();
+    //stringList << "HomeTab" << "Whisper" << "Other";
     for (int i = 0; i<stringList.size(); ++i)
     {
         QString name = stringList.at(i);
@@ -136,6 +139,75 @@ void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginM
             }
         }
     }
+    else if (type == PLUGIN_MENU_TYPE_CHANNEL)
+    {
+        if (menuItemID == m_ContextMenuChannelUi)
+        {
+            QPair<uint64, uint64> server_channel = qMakePair<uint64, uint64> (serverConnectionHandlerID, selectedItemID);
+            if (m_channel_configs.contains(server_channel) && m_channel_configs.value(server_channel))
+            {
+                m_channel_configs.value(server_channel).data()->activateWindow();
+                return;
+            }
+
+            if (!mP_radio)
+                return;
+
+            unsigned int error;
+
+            char* channel_name_c;
+            if ((error = ts3Functions.getChannelVariableAsString(serverConnectionHandlerID, selectedItemID, CHANNEL_NAME, &channel_name_c)) != ERROR_ok)
+            {
+                TSLogging::Error(QString("%1: Could not get channel name").arg(this->objectName()));
+                return;
+            }
+            QString channel_name = QString::fromUtf8(channel_name_c);
+            ts3Functions.freeMemory(channel_name_c);
+
+            ConfigRadio* p_config = new ConfigRadio(TSHelpers::GetMainWindow(), TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getName() + ":" + channel_name);  //has delete on close attribute
+            QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+            cfg.beginGroup(mP_radio.data()->objectName());
+
+            QString custom_channel_id = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getUniqueId() + TSHelpers::GetChannelPath(serverConnectionHandlerID, selectedItemID);
+            cfg.beginGroup(custom_channel_id);
+
+            // also push temp default setting to radio
+            mP_radio->setChannelStripEnabled(custom_channel_id,cfg.value("enabled",false).toBool());
+            mP_radio->setInLoFreq(custom_channel_id,cfg.value("low_freq",300.0).toDouble());
+            mP_radio->setInHiFreq(custom_channel_id,cfg.value("high_freq",3000.0).toDouble());
+            mP_radio->setFudge(custom_channel_id,cfg.value("fudge",2.0).toDouble());
+            p_config->UpdateEnabled(custom_channel_id,cfg.value("enabled",false).toBool());
+            p_config->UpdateBandpassInLowFrequency(custom_channel_id,cfg.value("low_freq",300.0).toDouble());
+            p_config->UpdateBandpassInHighFrequency(custom_channel_id,cfg.value("high_freq",3000.0).toDouble());
+            p_config->UpdateDestruction(custom_channel_id,cfg.value("fudge",2.0).toDouble());
+            cfg.beginGroup("RingMod");
+            mP_radio->setRingModFrequency(custom_channel_id,cfg.value("rm_mod_freq",0.0f).toDouble());
+            mP_radio->setRingModMix(custom_channel_id,cfg.value("rm_mix",0.0f).toDouble());
+            p_config->UpdateRingModFrequency(custom_channel_id,cfg.value("rm_mod_freq",0.0f).toDouble());
+            p_config->UpdateRingModMix(custom_channel_id,cfg.value("rm_mix",0.0f).toDouble());
+            cfg.endGroup();
+            mP_radio->setOutLoFreq(custom_channel_id,cfg.value("o_freq_lo",300.0).toDouble());
+            mP_radio->setOutHiFreq(custom_channel_id,cfg.value("o_freq_hi",3000.0).toDouble());
+            p_config->UpdateBandpassOutLowFrequency(custom_channel_id,cfg.value("o_freq_lo",300.0).toDouble());
+            p_config->UpdateBandpassOutHighFrequency(custom_channel_id,cfg.value("o_freq_hi",3000.0).toDouble());
+
+            cfg.endGroup(); // Channel
+            cfg.endGroup(); // radio module
+
+            this->connect(p_config,SIGNAL(EnabledSet(QString,bool)),SIGNAL(EnabledSet(QString,bool)));
+            this->connect(p_config,SIGNAL(InLoFreqSet(QString,double)),SIGNAL(InLoFreqSet(QString,double)));
+            this->connect(p_config,SIGNAL(InHiFreqSet(QString,double)),SIGNAL(InHiFreqSet(QString,double)));
+            this->connect(p_config,SIGNAL(DestructionSet(QString,double)),SIGNAL(DestructionSet(QString,double)));
+            this->connect(p_config,SIGNAL(RingModFrequencySet(QString,double)),SIGNAL(RingModFrequencySet(QString,double)));
+            this->connect(p_config,SIGNAL(RingModMixSet(QString,double)),SIGNAL(RingModMixSet(QString,double)));
+            this->connect(p_config,SIGNAL(OutLoFreqSet(QString,double)),SIGNAL(OutLoFreqSet(QString,double)));
+            this->connect(p_config,SIGNAL(OutHiFreqSet(QString,double)),SIGNAL(OutHiFreqSet(QString,double)));
+
+            connect(p_config, &ConfigRadio::channel_closed, this, &SettingsRadio::on_channel_settings_finished);
+            p_config->show();
+            m_channel_configs.insert(server_channel,p_config);
+        }
+    }
     else if (type == PLUGIN_MENU_TYPE_CLIENT)
     {
         if (menuItemID == m_ContextMenuToggleClientBlacklisted)
@@ -147,6 +219,9 @@ void SettingsRadio::onMenusInitialized()
 {
     if(m_ContextMenuUi == -1)
         TSLogging::Error(QString("%1: Menu wasn't registered.").arg(this->objectName()));
+
+    if (m_ContextMenuChannelUi == -1)
+        TSLogging::Error(QString("%1: Channel Menu wasn't registered.").arg(this->objectName()));
 
     if(m_ContextMenuToggleClientBlacklisted == -1)
         TSLogging::Error(QString("%1: Toggle Client Blacklisted menu item wasn't registered.").arg(this->objectName()));
@@ -190,4 +265,71 @@ void SettingsRadio::saveSettings(int r)
 
         emit settingsSave();
     }
+}
+
+void SettingsRadio::on_channel_settings_finished(int r, QString setting_id)
+{
+    // clean up and close widget
+    uint64 serverConnectionHandlerID = TSServersInfo::instance()->FindServerByUniqueId(setting_id.left(28));    // 28 length always? or always ends with = ?
+    if (serverConnectionHandlerID != NULL)
+    {
+        uint64 channel_id = TSHelpers::GetChannelIDFromPath(serverConnectionHandlerID, setting_id.right(setting_id.length() - 28));
+        if (channel_id != NULL)
+        {
+            //TSLogging::Log(QString("serverid: %1 channelid: %2").arg(serverConnectionHandlerID).arg(channel_id));
+
+            QPair<uint64, uint64> server_channel = qMakePair<uint64, uint64>(serverConnectionHandlerID,channel_id);
+            if (!m_channel_configs.contains(server_channel))
+            {
+                TSLogging::Error("Could not remove setting dialog from map");
+            }
+            else
+                m_channel_configs.remove(server_channel);
+        }
+    }
+
+    // Settings
+    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    cfg.beginGroup(mP_radio.data()->objectName());
+
+    if (r == QDialog::DialogCode::Accepted) // delete button
+    {
+        TSLogging::Log(QString("Removing setting %1").arg(setting_id));
+
+        // remove from setting
+        cfg.remove(setting_id);
+        cfg.endGroup();
+
+        // This makes me wish for a redesign
+        QMap<QString, RadioFX_Settings> &settings_map = mP_radio->GetSettingsMapRef();
+        if (settings_map.contains(setting_id))
+            settings_map.remove(setting_id);
+
+        // TODO Update all current talkers
+    }
+    else    // save / create
+    {
+        TSLogging::Log(QString("Save channel settings: %1").arg(setting_id));
+
+        // First: Check if setting exists
+        bool already_exists = cfg.childGroups().contains(setting_id);
+        if (already_exists)
+        {
+            this->saveSettings(NULL);
+            return;
+        }
+
+        // else if not enabled remove setting (aka don't create setting) to not pollute for every dialog open
+        // This makes me wish for a redesign
+        QMap<QString, RadioFX_Settings> &settings_map = mP_radio->GetSettingsMapRef();
+
+        if ((settings_map.contains(setting_id)) && (!settings_map.value(setting_id).enabled))
+            settings_map.remove(setting_id);
+        else
+        {
+            this->saveSettings(NULL);
+            return;
+        }
+    }
+    cfg.endGroup();
 }

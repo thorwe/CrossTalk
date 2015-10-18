@@ -1,6 +1,10 @@
 #include "mod_radio.h"
 
 #include "ts_helpers_qt.h"
+#include "ts_serversinfo.h"
+#include "ts3_functions.h"
+#include "plugin.h"
+#include "public_errors.h"
 
 Radio::Radio(QObject *parent)
 {
@@ -211,36 +215,6 @@ bool Radio::isClientBlacklisted(uint64 serverConnectionHandlerID, anyID clientID
     return m_ClientBlacklist.contains(serverConnectionHandlerID,clientID);
 }
 
-/*void Radio::saveSettings(int r)
-{
-    Q_UNUSED(r);
-    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    cfg.beginGroup(this->objectName());
-
-    cfg.beginGroup("HomeTab");
-    cfg.setValue("enabled",m_enabled_HomeTab);
-    cfg.setValue("low_freq",m_lowFrequency_HomeTab);
-    cfg.setValue("high_freq",m_highFrequency_HomeTab);
-    cfg.setValue("fudge",m_fudge_HomeTab);
-    cfg.endGroup();
-
-    cfg.beginGroup("Whisper");
-    cfg.setValue("enabled",m_enabled_Whisper);
-    cfg.setValue("low_freq",m_lowFrequency_Whisper);
-    cfg.setValue("high_freq",m_highFrequency_Whisper);
-    cfg.setValue("fudge",m_fudge_Whisper);
-    cfg.endGroup();
-
-    cfg.beginGroup("Other");
-    cfg.setValue("enabled",m_enabled_Other);
-    cfg.setValue("low_freq",m_lowFrequency_Other);
-    cfg.setValue("high_freq",m_highFrequency_Other);
-    cfg.setValue("fudge",m_fudge_Other);
-    cfg.endGroup();
-
-    cfg.endGroup();
-}*/
-
 void Radio::onRunningStateChanged(bool value)
 {
     talkers->DumpTalkStatusChanges(this,((value)?STATUS_TALKING:STATUS_NOT_TALKING));//FlushTalkStatusChanges((value)?STATUS_TALKING:STATUS_NOT_TALKING);
@@ -255,6 +229,26 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
 
     if (status == STATUS_TALKING)
     {   // Robust against multiple STATUS_TALKING in a row to be able to use it when the user changes settings
+
+        unsigned int error = ERROR_ok;
+        uint64 channel_id;
+        if(!isReceivedWhisper)
+        {   // Filter talk events outside of our channel
+            anyID my_id;
+            if ((error = ts3Functions.getClientID(serverConnectionHandlerID, &my_id)) != ERROR_ok)
+                this->Error("Error getting my id", serverConnectionHandlerID, error);
+
+            uint64 my_channel_id;
+            if ((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID, my_id, &my_channel_id)) != ERROR_ok)
+                this->Error("Error getting my channel id", serverConnectionHandlerID, error);
+
+            if ((error = ts3Functions.getChannelOfClient(serverConnectionHandlerID, clientID, &channel_id)) != ERROR_ok)
+                this->Error("Error getting my channel id", serverConnectionHandlerID, error);
+
+            if (channel_id != my_channel_id)
+                return false;
+        }
+
         DspRadio* dspObj;
         bool isNewDspObj = true;
         if (!(TalkersDspRadios->contains(serverConnectionHandlerID)))
@@ -285,10 +279,24 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
         RadioFX_Settings settings;
         if (isReceivedWhisper)
             settings = m_SettingsMap.value("Whisper");
-        else if (serverConnectionHandlerID == m_homeId)
-            settings = m_SettingsMap.value("Home");
         else
-            settings = m_SettingsMap.value("Other");
+        {
+            // get channel
+            QString server_id = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getUniqueId();
+            QString channel_path = TSHelpers::GetChannelPath(serverConnectionHandlerID, channel_id);
+
+            QString settings_map_key(server_id + channel_path);
+            this->Log(settings_map_key);
+            if (error == ERROR_ok && (!channel_path.isEmpty()) && m_SettingsMap.contains(settings_map_key))
+            {
+                this->Log("Applying custom setting");
+                settings = m_SettingsMap.value(settings_map_key);
+            }
+            else if (serverConnectionHandlerID == m_homeId)
+                settings = m_SettingsMap.value("Home");
+            else
+                settings = m_SettingsMap.value("Other");
+        }
 
         dspObj->setChannelType(settings.name);
         dspObj->setEnabled(settings.name, settings.enabled);
@@ -356,6 +364,11 @@ void Radio::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID
 }
 
 QMap<QString, RadioFX_Settings> Radio::GetSettingsMap() const
+{
+    return m_SettingsMap;
+}
+
+QMap<QString, RadioFX_Settings> &Radio::GetSettingsMapRef()
 {
     return m_SettingsMap;
 }

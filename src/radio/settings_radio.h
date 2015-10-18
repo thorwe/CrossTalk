@@ -2,6 +2,7 @@
 #define SETTINGS_RADIO_H
 
 #include <QObject>
+#include <QMap>
 
 #include "ts_context_menu_qt.h"
 #include "config_radio.h"
@@ -61,6 +62,7 @@ public slots:
 
 private slots:
     void saveSettings(int);
+    void on_channel_settings_finished(int r, QString setting_id);
 
 private:
     explicit SettingsRadio();
@@ -70,11 +72,13 @@ private:
     SettingsRadio& operator=(const SettingsRadio &);
 
     int m_ContextMenuUi;
+    int m_ContextMenuChannelUi;
     int m_ContextMenuToggleClientBlacklisted;
     QPointer<ConfigRadio> config;
 
     QPointer<Radio> mP_radio;
 
+    QMap<QPair<uint64,uint64>,QPointer<ConfigRadio> > m_channel_configs;
 };
 
 #endif // SETTINGS_RADIO_H

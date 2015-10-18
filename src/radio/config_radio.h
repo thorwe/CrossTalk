@@ -15,7 +15,7 @@ class ConfigRadio : public QDialog
     Q_OBJECT
     
 public:
-    explicit ConfigRadio(QWidget *parent = 0);
+    explicit ConfigRadio(QWidget *parent = 0, QString title = QString::null);
     ~ConfigRadio();
 
     // For Settings initialization and updating from other sources of interaction
@@ -40,10 +40,16 @@ signals:
     void OutLoFreqSet(QString,double);
     void OutHiFreqSet(QString,double);
 
+    // Accepted: isDeleteButton Rejected: is x button
+    void channel_closed(int, QString);   // custom channel setting
+
 private:
-    Ui::ConfigRadio *ui;
+    Ui::ConfigRadio *ui = nullptr;
+
     QMap<QString,ConfigRadioGroupBox*> m_ChannelStripMap;
     ConfigRadioGroupBox* GetChannelStrip(QString name);
+    QString m_title;    // for channel ident
+    QString m_name; // for custom channel -> onDeleteButtonClicked
 };
 
 #endif // CONFIG_RADIO_H
