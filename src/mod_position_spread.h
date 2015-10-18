@@ -90,6 +90,7 @@ private:
 
     inline void CheckClearSeq(QList<QPair<uint64, anyID> > *seq);
     void RemoveSeqPair(QPair<uint64, anyID> seqPair, QList<QPair<uint64, anyID> > *seq);
+
 protected:
     void onRunningStateChanged(bool value);
 };

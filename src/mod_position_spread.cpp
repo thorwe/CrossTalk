@@ -3,7 +3,6 @@
 #include "ts3_functions.h"
 #include "plugin.h"
 
-const QList<unsigned int> FlagList = QList<unsigned int>() << 1 << 2 << 4 << 8 << 16 << 32 << 64 << 128;
 const QList<float> SPREAD = QList<float>() << 0 << -0.5f << 0.5f << -1.0f << 1.0f; //<< -0.25f << 0.25f << -0.75f << 0.75f;
 
 const QList<float> SPREAD_CENTER = QList<float>() << 0 << -0.2f << 0.2f << -0.4f << 0.4f << -0.1f << 0.1f << -0.3f << 0.3f;
@@ -142,6 +141,10 @@ void PositionSpread::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHand
     if (!(isRunning()))
         return;
 
+    // no data in any channel -> nothing to see here move along
+    if (*channelFillMask == 0)
+        return;
+
     // channels seems to be basically determined by soundcard setting
     if (channels == 1)
         return;
@@ -156,19 +159,23 @@ void PositionSpread::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHand
     SimplePanner* panner = sPanners->value(clientID);
 
     QMap<unsigned int,int> speaker2Channel;
-    for(int i=0; i<channels; ++i)
+    for(int i=0; i < channels; ++i)
     {
-        if (*channelFillMask & FlagList.at(i))
+        if (*channelFillMask & (1 << i))
             speaker2Channel.insert(channelSpeakerArray[i],i);
     }
-    if (speaker2Channel.size() > 2)    // Todo: For now.
-        return;
 
-    if (speaker2Channel.contains(SPEAKER_HEADPHONES_LEFT))
+    /*if (speaker2Channel.size() > 2)
+    {   // Todo: For now.
+        //Log("speaker2Channel.size() > 2: return");
+        //return;
+    }*/
+
+    if (speaker2Channel.contains(SPEAKER_HEADPHONES_LEFT) && speaker2Channel.contains(SPEAKER_HEADPHONES_RIGHT))
         panner->process(samples,sampleCount,channels,speaker2Channel.value(SPEAKER_HEADPHONES_LEFT),speaker2Channel.value(SPEAKER_HEADPHONES_RIGHT));
     else if (speaker2Channel.contains(SPEAKER_FRONT_LEFT))
         panner->process(samples,sampleCount,channels,speaker2Channel.value(SPEAKER_FRONT_LEFT),speaker2Channel.value(SPEAKER_FRONT_RIGHT));
-    else if (speaker2Channel.contains(SPEAKER_FRONT_CENTER))
+    else if (speaker2Channel.contains(SPEAKER_FRONT_CENTER))    // TODO: This is effectively never called in practice
     {
         if (!((panner->getPanDesired() == panner->getPanCurrent()) == 0.0f)) // if middle is where it is and is to be, leave it at center, otherwise...
         {
@@ -206,13 +213,6 @@ void PositionSpread::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHand
             panner->process(samples,sampleCount,channels,leftChannelNr, rightChannelNr);
         }
     }
-
-//    if (!(isReported))
-//    {
-//        printf("Channels: %i, channelFillMask: %u \n", channels,*channelFillMask);
-//        printf("Active Channels: %i\n",speaker2Channel.size());
-//        isReported = true;
-//    }
 }
 
 bool PositionSpread::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe)
