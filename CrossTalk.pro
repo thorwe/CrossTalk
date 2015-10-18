@@ -59,7 +59,6 @@ HEADERS += \
     src/sse_server.h \
     src/groupbox_ducking.h \
     src/pipeserver.h \
-    src/version.h \
     src/version_qt.h
 
 SOURCES += \
