@@ -1,7 +1,5 @@
 #include "updater.h"
 
-//#include <QDialog>
-
 #include <QApplication>
 #include <QDesktopServices>
 #include <QMessageBox>
@@ -11,7 +9,6 @@
 #include "version_qt.h"
 
 const QUrl STABLE("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html");
-const QUrl BETA_CHECK("https://dl.dropbox.com/u/18413693/CrossTalk-builds/package.ini");
 const QUrl BETA_DOWNLOAD("https://github.com/thorwe/CrossTalk/releases");
 const QString GITHUBAPI_URL = "https://api.github.com/repos/";
 const QString GITHUBAPI_LATEST = "/releases/latest";   //GET /repos/:owner/:repo/releases/latest
@@ -81,10 +78,7 @@ void Updater::CheckUpdate(bool isBetaChannelEnabled)
 
     m_isBetaChannel = isBetaChannelEnabled;
     if (m_isBetaChannel)
-    {
-        //CheckUpdate(BETA_CHECK);
         CheckUpdate(QString(GITHUBAPI_URL + "thorwe" + "/" + "crosstalk" + GITHUBAPI_LATEST));
-    }
 
     CheckUpdate(STABLE);
 }
@@ -116,7 +110,6 @@ void Updater::ShowUpdateDialog(QString remoteVersion, QUrl downloadUrl)
     updateMsgBox.setWindowTitle(ts3plugin_name());
     int ret = updateMsgBox.exec();    // blocking variant; might work to workaround api check disaster
 //    updateMsgBox->open(this,SLOT(onButtonClicked(QAbstractButton*)));
-//    updateMsgBox->deleteLater();
 
     // I must be missing something for the non-blocking variant to work -.-
     if (ret == QMessageBox::Ok || ret == QMessageBox::Yes)
@@ -274,69 +267,4 @@ void Updater::CheckTriggerUpdateDialog()
         else
             TSLogging::Error("Logic error #2 in version comparison. Please report.");
     }
-
-    /*if (!m_isBetaChannel)
-    {
-        if (m_VersionStable != ts3plugin_version())
-            ShowUpdateDialog(m_VersionStable);
-        else
-            TSLogging::Log(QString("%1 version %2 is up to date.").arg(ts3plugin_name()).arg(ts3plugin_version()));
-    }
-    else
-    {
-        // Is Stable newer than beta?
-        bool isStableNewer = false;
-        if (m_VersionStable.isEmpty() && m_VersionBeta.isEmpty())
-        {
-            TSLogging::Log(QString("(Updater) Could not check for updates."));
-        }
-        else if (m_VersionStable.isEmpty()) // TS site is down
-        {
-            TSLogging::Log("(Updater) Could not get stable version info. Aborting.");
-        }
-        else if (m_VersionBeta.isEmpty()) // Beta site is down
-        {
-            TSLogging::Log("(Updater) Could not get beta version info.");
-            isStableNewer = true;
-        }
-        else if (m_VersionBeta == m_VersionStable)
-            isStableNewer = true;
-        else
-        {
-            QStringList stable = m_VersionStable.split(".",QString::SkipEmptyParts);
-            QStringList beta = m_VersionBeta.split(".",QString::SkipEmptyParts);
-            bool isOk;
-            for (int i = 0; i< stable.length(); ++i)
-            {
-                int stableInt = stable[i].toInt(&isOk,10);
-                if (!isOk)
-                    break;
-
-                int betaInt = beta[i].toInt(&isOk,10);
-                if (!isOk)
-                    break;
-
-                if (stableInt > betaInt)
-                {
-                    isStableNewer = true;
-                    break;
-                }
-            }
-            if (!isOk)
-            {
-                TSLogging::Log("(Updater) Problem with version comparison.");
-                isStableNewer = true;
-            }
-#ifdef CT_VERBOSE
-            TSLogging::Log(QString("(Updater) Remote Stable is %1 than beta.").arg((isStableNewer)?"newer":"older"),LogLevel_DEVEL);
-#endif
-        }
-
-        if (isStableNewer && (m_VersionStable != ts3plugin_version()))
-            ShowUpdateDialog(m_VersionStable);
-        else if (!isStableNewer && (m_VersionBeta != ts3plugin_version()))
-            ShowUpdateDialog(m_VersionBeta);
-        else
-            TSLogging::Log(QString("%1 version %2 is up to date.").arg(ts3plugin_name()).arg(ts3plugin_version()));
-    }*/
 }
