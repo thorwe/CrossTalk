@@ -5,7 +5,7 @@
 #include <QtCore>
 //#include <QMutex>
 
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 #include "plugin_definitions.h"
 
 class InfoDataInterface

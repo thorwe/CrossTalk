@@ -1,7 +1,7 @@
 #ifndef TS_SERVERINFO_QT_H
 #define TS_SERVERINFO_QT_H
 
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 
 #include "ts_servergroups.h"
 

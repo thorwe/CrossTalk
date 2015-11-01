@@ -2,7 +2,7 @@
 #define MOD_POSITION_SPREAD_H
 
 #include <QObject>
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 #include "module.h"
 #include "talkers.h"
 #include "simplepanner.h"

@@ -5,7 +5,7 @@
 
 #include "plugin.h" //pluginID
 #include "ts_serversinfo.h"
-#include <public_errors.h>
+#include <teamspeak/public_errors.h>
 
 SettingsRadio* SettingsRadio::m_Instance = 0;
 SettingsRadio::SettingsRadio() :

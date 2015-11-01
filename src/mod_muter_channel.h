@@ -2,7 +2,7 @@
 #define MOD_MUTER_CHANNEL_H
 
 #include <QObject>
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 #include "module.h"
 #include "volumes.h"
 //#include "simple_volume.h"

@@ -12,13 +12,14 @@ INCLUDEPATH += includes
 TRANSLATIONS = crosstalk_de_DE.ts
 
 HEADERS += \
-    includes/clientlib_publicdefinitions.h \
-    includes/ts3_functions.h \
-    includes/public_rare_definitions.h \
-    includes/public_errors_rare.h \
-    includes/public_errors.h \
-    includes/public_definitions.h \
+    includes/teamlog/logtypes.h \
+    includes/teamspeak/clientlib_publicdefinitions.h \
+    includes/teamspeak/public_rare_definitions.h \
+    includes/teamspeak/public_errors_rare.h \
+    includes/teamspeak/public_errors.h \
+    includes/teamspeak/public_definitions.h \
     includes/plugin_definitions.h \
+    includes/ts3_functions.h \
     includes/db.h \
     includes/MMtoDB.h \
     includes/ts_missing_definitions.h \

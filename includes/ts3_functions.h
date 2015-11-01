@@ -5,8 +5,8 @@
 extern "C" {
 #endif
 
-#include "clientlib_publicdefinitions.h"
-#include "public_definitions.h"
+#include "teamspeak/clientlib_publicdefinitions.h"
+#include "teamspeak/public_definitions.h"
 #include "plugin_definitions.h"
 
 /* Functions exported to plugin from main binary */

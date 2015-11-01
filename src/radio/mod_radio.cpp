@@ -4,7 +4,7 @@
 #include "ts_serversinfo.h"
 #include "ts3_functions.h"
 #include "plugin.h"
-#include "public_errors.h"
+#include "teamspeak/public_errors.h"
 
 Radio::Radio(QObject *parent)
 {

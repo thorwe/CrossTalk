@@ -1,5 +1,5 @@
 #include "mod_agmu.h"
-#include "public_errors.h"
+#include "teamspeak/public_errors.h"
 #include "ts_helpers_qt.h"
 #include "ts3_functions.h"  //currently only used in a debug output
 #include "plugin.h"  //currently only used in a debug output

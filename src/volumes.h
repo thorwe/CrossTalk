@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QMap>
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 //#include "simple_volume.h"
 #include "dsp_volume.h"
 

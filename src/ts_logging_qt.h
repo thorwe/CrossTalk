@@ -6,7 +6,7 @@
 #endif
 
 #include <QtCore>
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 #include "ts3_functions.h"
 #include "plugin.h"
 

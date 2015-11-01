@@ -2,7 +2,7 @@
 #define SNT_H
 
 #include <QObject>
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 
 class SnT : public QObject
 {

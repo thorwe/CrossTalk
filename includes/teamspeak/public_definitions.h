@@ -1,6 +1,8 @@
 #ifndef PUBLIC_DEFINITIONS_H
 #define PUBLIC_DEFINITIONS_H
 
+#include "teamlog/logtypes.h"
+
 //limited length, measured in characters
 #define TS3_MAX_SIZE_CHANNEL_NAME 40
 #define TS3_MAX_SIZE_VIRTUALSERVER_NAME 64
@@ -220,24 +222,6 @@ enum ConnectionProperties {
 	CONNECTION_BANDWIDTH_RECEIVED_LAST_MINUTE_CONTROL,
 	CONNECTION_BANDWIDTH_RECEIVED_LAST_MINUTE_TOTAL,
 	CONNECTION_ENDMARKER,
-};
-
-enum LogTypes {
-	LogType_NONE          = 0x0000,
-	LogType_FILE          = 0x0001,
-	LogType_CONSOLE       = 0x0002,
-	LogType_USERLOGGING   = 0x0004,
-	LogType_NO_NETLOGGING = 0x0008,
-	LogType_DATABASE      = 0x0010,
-};
-
-enum LogLevel {
-	LogLevel_CRITICAL = 0, //these messages stop the program
-	LogLevel_ERROR,        //everything that is really bad, but not so bad we need to shut down
-	LogLevel_WARNING,      //everything that *might* be bad
-	LogLevel_DEBUG,        //output that might help find a problem
-	LogLevel_INFO,         //informational output, like "starting database version x.y.z"
-	LogLevel_DEVEL         //developer only output (will not be displayed in release mode)
 };
 
 typedef struct {

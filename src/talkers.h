@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QtCore>
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 
 #include "module.h"
 

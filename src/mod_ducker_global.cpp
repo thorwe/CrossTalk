@@ -1,7 +1,7 @@
 #include "mod_ducker_global.h"
 
-#include "public_errors.h"
-#include "public_errors_rare.h"
+#include "teamspeak/public_errors.h"
+#include "teamspeak/public_errors_rare.h"
 #include "ts3_functions.h"
 
 #include "plugin.h"

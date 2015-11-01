@@ -1,7 +1,7 @@
 #include "ts_serverinfo_qt.h"
 
-#include "public_errors.h"
-#include "public_rare_definitions.h"
+#include "teamspeak/public_errors.h"
+#include "teamspeak/public_rare_definitions.h"
 
 #include "ts_missing_definitions.h"
 

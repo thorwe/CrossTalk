@@ -1,7 +1,7 @@
 #ifndef TS_SERVERGROUPS_H
 #define TS_SERVERGROUPS_H
 
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 
 #include <QObject>
 #include <QtCore>

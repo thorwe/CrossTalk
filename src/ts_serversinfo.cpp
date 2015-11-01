@@ -1,7 +1,7 @@
 #include "ts_serversinfo.h"
 
 #include "ts_logging_qt.h"
-#include "public_errors.h"
+#include "teamspeak/public_errors.h"
 
 TSServersInfo* TSServersInfo::m_Instance = 0;
 TSServersInfo::TSServersInfo()

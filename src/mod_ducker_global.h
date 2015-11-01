@@ -2,7 +2,7 @@
 #define MOD_DUCKER_GLOBAL_H
 
 #include <QObject>
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 #include "module.h"
 #include "volumes.h"
 #include "talkers.h"

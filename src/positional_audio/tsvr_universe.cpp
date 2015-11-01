@@ -1,5 +1,5 @@
 #include "tsvr_universe.h"
-#include "clientlib_publicdefinitions.h"
+#include "teamspeak/clientlib_publicdefinitions.h"
 
 TsVrUniverse::TsVrUniverse(QObject *parent) :
     QObject(parent)

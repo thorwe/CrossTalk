@@ -1,7 +1,7 @@
 #include "ts_ptt_qt.h"
 
-#include "public_errors.h"
-#include "public_errors_rare.h"
+#include "teamspeak/public_errors.h"
+#include "teamspeak/public_errors_rare.h"
 
 #include "plugin.h"
 

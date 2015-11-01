@@ -1,6 +1,6 @@
 #include "tsvr_obj_other.h"
 
-#include "public_errors.h"
+#include "teamspeak/public_errors.h"
 #include "ts_helpers_qt.h"
 #include "ts_logging_qt.h"
 

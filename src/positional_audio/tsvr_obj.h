@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include <QTextStream>
-#include "public_definitions.h"
+#include "teamspeak/public_definitions.h"
 
 #include "tsvr_definitions.h"
 
