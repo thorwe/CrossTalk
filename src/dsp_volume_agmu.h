@@ -28,10 +28,10 @@ public slots:
 private slots:
 
 private:
-    float m_rateLouder;
-    float m_rateQuieter;
+    float m_rateLouder = 90.0f;
+    float m_rateQuieter = 120.0f;
 
-    short m_peak;
+    short m_peak = 0;
 };
 
 #endif // DSP_VOLUME_AGMU_H

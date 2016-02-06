@@ -61,14 +61,14 @@ private:
 
     QTimer* timer;
 
-    bool pttActive;
-    bool vadActive;
-    bool inputActive;
+    bool pttActive = false;
+    bool vadActive = false;
+    bool inputActive = false;
 
     void UpdatePttDelayInfo();
 
-    bool pttDelayEnabled;
-    int pttDelayMsec;
+    bool pttDelayEnabled = false;
+    int pttDelayMsec = 0;
 };
 
 #endif // TS_PTT_QT_H

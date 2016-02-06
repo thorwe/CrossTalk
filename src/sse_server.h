@@ -29,7 +29,7 @@ private slots:
 
 private:
 //    void incomingConnection(int socket);
-    bool m_isEnabled;
+    bool m_isEnabled = true;
 
     QSet<QTcpSocket*>* m_Sockets;
     QMap<QTcpSocket*,QTextStream*> m_SocketStreams;

@@ -53,7 +53,7 @@ public slots:
 private:
     //singleton
     explicit TSContextMenu();
-    ~TSContextMenu();
+    ~TSContextMenu() = default;
     static TSContextMenu* m_Instance;
     TSContextMenu(const TSContextMenu &);
     TSContextMenu& operator=(const TSContextMenu &);
@@ -61,7 +61,7 @@ private:
     QList<PluginMenuItem*> m_Items;
     QVector<QPointer<QObject> > m_Callbacks;
     QString m_MainIcon;
-    bool m_isInit;
+    bool m_isInit = false;
 };
 
 #endif // TS_CONTEXT_MENU_QT_H

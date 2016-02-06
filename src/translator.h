@@ -40,7 +40,7 @@ public slots:
 
 private:
     explicit Translator();
-    ~Translator();
+    ~Translator() = default;
     static Translator* m_Instance;
     Translator(const Translator &);
     Translator& operator=(const Translator &);

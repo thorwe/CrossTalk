@@ -58,12 +58,12 @@ private slots:
 
 private:
     explicit SettingsPositionSpread();
-    ~SettingsPositionSpread();
+    ~SettingsPositionSpread() = default;
     static SettingsPositionSpread* m_Instance;
     SettingsPositionSpread(const SettingsPositionSpread &);
     SettingsPositionSpread& operator=(const SettingsPositionSpread &);
 
-    int m_ContextMenuUi;
+    int m_ContextMenuUi = -1;
     QPointer<QDialog> config;
 
     QPointer<PositionSpread> mP_positionSpread;

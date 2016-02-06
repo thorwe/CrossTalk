@@ -5,12 +5,7 @@
 const float GAIN_FADE_RATE = (400.0f);	// Rate to fade at (dB per second)
 
 DspVolume::DspVolume(QObject *parent) :
-    QObject(parent),
-    m_sampleRate(48000),
-    m_gainCurrent(VOLUME_0DB),
-    m_gainDesired(VOLUME_0DB),
-    m_isProcessing(false),
-    m_muted(false)
+    QObject(parent)
 {
 }
 

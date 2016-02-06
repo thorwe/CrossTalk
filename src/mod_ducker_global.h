@@ -60,10 +60,10 @@ protected:
     void onRunningStateChanged(bool value);
 
 private:
-    bool m_isActive;
+    bool m_isActive = false;
 
     float value() {return m_value;}
-    float m_value;
+    float m_value = 0.0f;
 
     Talkers* talkers;
     Volumes* vols;
@@ -73,7 +73,7 @@ private:
     void SaveDuckTargets();
     void UpdateActive();
 
-    int m_ContextMenuToggleMusicBot;
+    int m_ContextMenuToggleMusicBot = -1;
 };
 
 #endif // MOD_DUCKER_GLOBAL_H

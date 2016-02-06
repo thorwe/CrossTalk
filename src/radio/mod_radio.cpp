@@ -307,14 +307,14 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
         dspObj->setRmMix(settings.name, settings.rm_mix);
         dspObj->setBandpassEqOutCenterFrequency(settings.name, getCenterFrequencyOut(settings));
         dspObj->setBandpassEqOutBandWidth(settings.name, getBandWidthOut(settings));
-        connect(this,SIGNAL(ChannelStripEnabledSet(QString,bool)), dspObj, SLOT(setEnabled(QString,bool)),Qt::UniqueConnection);
-        connect(this,SIGNAL(FudgeChanged(QString,double)), dspObj, SLOT(setFudge(QString,double)),Qt::UniqueConnection);
-        connect(this,SIGNAL(InBpCenterFreqSet(QString,double)), dspObj, SLOT(setBandpassEqInCenterFrequency(QString,double)),Qt::UniqueConnection);
-        connect(this,SIGNAL(InBpBandwidthSet(QString,double)), dspObj, SLOT(setBandpassEqInBandWidth(QString,double)),Qt::UniqueConnection);
-        connect(this,SIGNAL(RingModFrequencyChanged(QString,double)), dspObj, SLOT(setRmModFreq(QString,double)),Qt::UniqueConnection);
-        connect(this,SIGNAL(RingModMixChanged(QString,double)), dspObj, SLOT(setRmMix(QString,double)));
-        connect(this,SIGNAL(OutBpCenterFreqSet(QString,double)), dspObj, SLOT(setBandpassEqOutCenterFrequency(QString,double)),Qt::UniqueConnection);
-        connect(this,SIGNAL(OutBpBandwidthSet(QString,double)), dspObj, SLOT(setBandpassEqOutBandWidth(QString,double)),Qt::UniqueConnection);
+        connect(this, &Radio::ChannelStripEnabledSet, dspObj, &DspRadio::setEnabled, Qt::UniqueConnection);
+        connect(this, &Radio::FudgeChanged, dspObj, &DspRadio::setFudge, Qt::UniqueConnection);
+        connect(this, &Radio::InBpCenterFreqSet, dspObj, &DspRadio::setBandpassEqInCenterFrequency, Qt::UniqueConnection);
+        connect(this, &Radio::InBpBandwidthSet, dspObj, &DspRadio::setBandpassEqInBandWidth, Qt::UniqueConnection);
+        connect(this, &Radio::RingModFrequencyChanged, dspObj, &DspRadio::setRmModFreq, Qt::UniqueConnection);
+        connect(this, &Radio::RingModMixChanged, dspObj, &DspRadio::setRmMix, Qt::UniqueConnection);
+        connect(this, &Radio::OutBpCenterFreqSet, dspObj, &DspRadio::setBandpassEqOutCenterFrequency, Qt::UniqueConnection);
+        connect(this, &Radio::OutBpBandwidthSet, dspObj, &DspRadio::setBandpassEqOutBandWidth, Qt::UniqueConnection);
 
         return settings.enabled;
     }

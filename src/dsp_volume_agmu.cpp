@@ -7,10 +7,7 @@
 #include "db.h"
 #include "ts_logging_qt.h"
 
-DspVolumeAGMU::DspVolumeAGMU(QObject *parent) :
-    m_rateQuieter(120.0f),
-    m_rateLouder(90.0f),
-    m_peak(0)
+DspVolumeAGMU::DspVolumeAGMU(QObject *parent)
 {
     this->setParent(parent);
 }

@@ -62,7 +62,7 @@ public:
 private:
     //singleton
     explicit TSSettings();
-    ~TSSettings();
+    ~TSSettings() = default;
     static TSSettings* m_Instance;
     TSSettings(const TSSettings &);
     TSSettings& operator=(const TSSettings &);

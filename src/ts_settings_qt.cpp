@@ -4,7 +4,6 @@
 TSSettings* TSSettings::m_Instance = 0;
 
 TSSettings::TSSettings(){}
-TSSettings::~TSSettings(){}
 
 void TSSettings::Init(QString tsConfigPath)
 {

@@ -6,14 +6,7 @@
 
 PluginQt* PluginQt::m_Instance = 0;
 
-PluginQt::PluginQt():
-    m_isInit(false),
-    m_isServerEnabled(false),
-    m_serverPort(0),
-    m_SseServer(NULL)
-{}
-
-PluginQt::~PluginQt(){}
+PluginQt::PluginQt(){}
 
 void PluginQt::Init()
 {

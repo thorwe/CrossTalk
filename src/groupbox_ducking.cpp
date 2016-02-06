@@ -6,7 +6,7 @@ GroupBoxDucking::GroupBoxDucking(QWidget *parent) :
     ui(new Ui::GroupBoxDucking)
 {
     ui->setupUi(this);
-    this->connect(ui->wFader_Duck,SIGNAL(valueChanged(float)),SIGNAL(duckerValueChanged(float)));
+    connect(ui->wFader_Duck, &FaderVertical::valueChanged, this, &GroupBoxDucking::duckerValueChanged);
 }
 
 GroupBoxDucking::~GroupBoxDucking()

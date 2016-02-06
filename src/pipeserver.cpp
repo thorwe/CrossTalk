@@ -14,7 +14,7 @@ PipeServer::PipeServer(QObject *parent, QString name) :
         TSLogging::Error(QString("Unable to start the server: %1.").arg(m_PipeServer->errorString()));
         return;
     }
-    connect(m_PipeServer, SIGNAL(newConnection()), this, SLOT(onNewConnection()));
+    connect(m_PipeServer, &QLocalServer::newConnection, this, &PipeServer::onNewConnection);
     connect(m_SignalMapper, SIGNAL(mapped(QString)), this, SLOT(onClientDisconnected(QString)));
 }
 

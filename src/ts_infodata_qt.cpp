@@ -12,13 +12,7 @@
 
 TSInfoData* TSInfoData::m_Instance = 0;
 
-TSInfoData::TSInfoData() :
-    m_homeId(0),
-    m_InfoType(PLUGIN_SERVER),
-    m_InfoId(0)
-{}
-TSInfoData::~TSInfoData(){}
-
+TSInfoData::TSInfoData(){}
 
 PluginItemType TSInfoData::getInfoType() const
 {

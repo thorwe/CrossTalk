@@ -6,11 +6,6 @@
 
 VersionQt::VersionQt(QObject *parent, QString versionStr) :
     QObject(parent),
-    m_major(0),
-    m_minor(0),
-    m_revision(0),
-    m_build(0),
-    m_isValid(true),
     m_versionString(versionStr)
 {
     if (m_versionString.isEmpty())

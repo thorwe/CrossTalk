@@ -22,22 +22,22 @@ void SettingsRadio::Init(Radio *radio)
         m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Radio FX","walkie_talkie_16.png");
         m_ContextMenuChannelUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CHANNEL,"Radio FX (Channel)","walkie_talkie_16.png");
         m_ContextMenuToggleClientBlacklisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT, "Radio FX: Toggle Client Blacklisted [temp]", "walkie_talkie_16.png");
-        connect(TSContextMenu::instance(),SIGNAL(MenusInitialized()),SLOT(onMenusInitialized()),Qt::AutoConnection);
-        connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::MenusInitialized, this, &SettingsRadio::onMenusInitialized, Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &SettingsRadio::onContextMenuEvent, Qt::AutoConnection);
 
         TSInfoData::instance()->Register(this,true,1);
     }
 
-    this->connect(this, SIGNAL(EnabledSet(QString,bool)), radio, SLOT(setChannelStripEnabled(QString,bool)));
-    this->connect(this, SIGNAL(InLoFreqSet(QString,double)), radio, SLOT(setInLoFreq(QString,double)));
-    this->connect(this, SIGNAL(InHiFreqSet(QString,double)), radio, SLOT(setInHiFreq(QString,double)));
-    this->connect(this, SIGNAL(DestructionSet(QString,double)), radio, SLOT(setFudge(QString,double)));
-    this->connect(this, SIGNAL(RingModFrequencySet(QString,double)), radio, SLOT(setRingModFrequency(QString,double)));
-    this->connect(this, SIGNAL(RingModMixSet(QString,double)), radio, SLOT(setRingModMix(QString,double)));
-    this->connect(this, SIGNAL(OutLoFreqSet(QString,double)), radio, SLOT(setOutLoFreq(QString,double)));
-    this->connect(this, SIGNAL(OutHiFreqSet(QString,double)), radio, SLOT(setOutHiFreq(QString,double)));
+    connect(this, &SettingsRadio::EnabledSet, radio, &Radio::setChannelStripEnabled);
+    connect(this, &SettingsRadio::InLoFreqSet, radio, &Radio::setInLoFreq);
+    connect(this, &SettingsRadio::InHiFreqSet, radio, &Radio::setInHiFreq);
+    connect(this, &SettingsRadio::DestructionSet, radio, &Radio::setFudge);
+    connect(this, &SettingsRadio::RingModFrequencySet, radio, &Radio::setRingModFrequency);
+    connect(this, &SettingsRadio::RingModMixSet, radio, &Radio::setRingModMix);
+    connect(this, &SettingsRadio::OutLoFreqSet, radio, &Radio::setOutLoFreq);
+    connect(this, &SettingsRadio::OutHiFreqSet, radio, &Radio::setOutHiFreq);
 
-    this->connect(this, SIGNAL(ToggleClientBlacklisted(uint64,anyID)), radio, SLOT(ToggleClientBlacklisted(uint64,anyID)));
+    connect(this, &SettingsRadio::ToggleClientBlacklisted, radio, &Radio::ToggleClientBlacklisted);
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.beginGroup(radio->objectName());
@@ -124,16 +124,16 @@ void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginM
                     cfg.endGroup();
                 }
 
-                this->connect(p_config,SIGNAL(EnabledSet(QString,bool)),SIGNAL(EnabledSet(QString,bool)));
-                this->connect(p_config,SIGNAL(InLoFreqSet(QString,double)),SIGNAL(InLoFreqSet(QString,double)));
-                this->connect(p_config,SIGNAL(InHiFreqSet(QString,double)),SIGNAL(InHiFreqSet(QString,double)));
-                this->connect(p_config,SIGNAL(DestructionSet(QString,double)),SIGNAL(DestructionSet(QString,double)));
-                this->connect(p_config,SIGNAL(RingModFrequencySet(QString,double)),SIGNAL(RingModFrequencySet(QString,double)));
-                this->connect(p_config,SIGNAL(RingModMixSet(QString,double)),SIGNAL(RingModMixSet(QString,double)));
-                this->connect(p_config,SIGNAL(OutLoFreqSet(QString,double)),SIGNAL(OutLoFreqSet(QString,double)));
-                this->connect(p_config,SIGNAL(OutHiFreqSet(QString,double)),SIGNAL(OutHiFreqSet(QString,double)));
+                connect(p_config, &ConfigRadio::EnabledSet, this, &SettingsRadio::EnabledSet);
+                connect(p_config, &ConfigRadio::InLoFreqSet, this, &SettingsRadio::InLoFreqSet);
+                connect(p_config, &ConfigRadio::InHiFreqSet, this,  &SettingsRadio::InHiFreqSet);
+                connect(p_config, &ConfigRadio::DestructionSet, this, &SettingsRadio::DestructionSet);
+                connect(p_config, &ConfigRadio::RingModFrequencySet, this, &SettingsRadio::RingModFrequencySet);
+                connect(p_config, &ConfigRadio::RingModMixSet, this, &SettingsRadio::RingModMixSet);
+                connect(p_config, &ConfigRadio::OutLoFreqSet, this, &SettingsRadio::OutLoFreqSet);
+                connect(p_config, &ConfigRadio::OutHiFreqSet, this, &SettingsRadio::OutHiFreqSet);
 
-                connect(p_config,SIGNAL(finished(int)),this,SLOT(saveSettings(int)));
+                connect(p_config, &ConfigRadio::finished, this, &SettingsRadio::saveSettings);
                 p_config->show();
                 config = p_config;
             }
@@ -194,14 +194,14 @@ void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginM
             cfg.endGroup(); // Channel
             cfg.endGroup(); // radio module
 
-            this->connect(p_config,SIGNAL(EnabledSet(QString,bool)),SIGNAL(EnabledSet(QString,bool)));
-            this->connect(p_config,SIGNAL(InLoFreqSet(QString,double)),SIGNAL(InLoFreqSet(QString,double)));
-            this->connect(p_config,SIGNAL(InHiFreqSet(QString,double)),SIGNAL(InHiFreqSet(QString,double)));
-            this->connect(p_config,SIGNAL(DestructionSet(QString,double)),SIGNAL(DestructionSet(QString,double)));
-            this->connect(p_config,SIGNAL(RingModFrequencySet(QString,double)),SIGNAL(RingModFrequencySet(QString,double)));
-            this->connect(p_config,SIGNAL(RingModMixSet(QString,double)),SIGNAL(RingModMixSet(QString,double)));
-            this->connect(p_config,SIGNAL(OutLoFreqSet(QString,double)),SIGNAL(OutLoFreqSet(QString,double)));
-            this->connect(p_config,SIGNAL(OutHiFreqSet(QString,double)),SIGNAL(OutHiFreqSet(QString,double)));
+            connect(p_config, &ConfigRadio::EnabledSet, this, &SettingsRadio::EnabledSet);
+            connect(p_config, &ConfigRadio::InLoFreqSet, this, &SettingsRadio::InLoFreqSet);
+            connect(p_config, &ConfigRadio::InHiFreqSet, this, &SettingsRadio::InHiFreqSet);
+            connect(p_config, &ConfigRadio::DestructionSet, this, &SettingsRadio::DestructionSet);
+            connect(p_config, &ConfigRadio::RingModFrequencySet, this, &SettingsRadio::RingModFrequencySet);
+            connect(p_config, &ConfigRadio::RingModMixSet, this, &SettingsRadio::RingModMixSet);
+            connect(p_config, &ConfigRadio::OutLoFreqSet, this, &SettingsRadio::OutLoFreqSet);
+            connect(p_config, &ConfigRadio::OutHiFreqSet, this, &SettingsRadio::OutHiFreqSet);
 
             connect(p_config, &ConfigRadio::channel_closed, this, &SettingsRadio::on_channel_settings_finished);
             p_config->show();

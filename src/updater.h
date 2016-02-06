@@ -17,7 +17,7 @@ public slots:
     void CheckUpdate(bool isBetaChannelEnabled);
 
 private:
-    QNetworkAccessManager *m_netwManager;
+    QNetworkAccessManager *m_netwManager = NULL;
 
     void ShowUpdateDialog(QString remoteVersion, QUrl downloadUrl);
     void CheckUpdate(QUrl url);

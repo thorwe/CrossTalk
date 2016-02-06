@@ -17,10 +17,10 @@ BannerFrame::BannerFrame(QWidget *parent) :
     m_netwManager = new QNetworkAccessManager(this);
 
     // load image
-    connect(ui->banner_pledgie,SIGNAL(onClick()),this,SLOT(onPledgieClicked()));
-    connect(ui->banner_logo,SIGNAL(onClick()),this,SLOT(onCrossTalkClicked()));
+    connect(ui->banner_pledgie, &Banner::onClick, this, &BannerFrame::onPledgieClicked);
+    connect(ui->banner_logo, &Banner::onClick, this, &BannerFrame::onCrossTalkClicked);
 
-    connect(m_netwManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetwManagerFinished(QNetworkReply*)));
+    connect(m_netwManager, &QNetworkAccessManager::finished, this, &BannerFrame::onNetwManagerFinished);
     QNetworkRequest request(PLEDGIE_IMAGE);
     m_netwManager->get(request);
 }

@@ -18,8 +18,7 @@ const QString GITHUBAPI_LATEST = "/releases/latest";   //GET /repos/:owner/:repo
  * \brief Config::Config create an instance of this class
  */
 Updater::Updater(QObject *parent) :
-    QObject(parent),
-    m_netwManager(NULL)
+    QObject(parent)
 {
     this->setObjectName("Updater");
 }
@@ -86,7 +85,7 @@ void Updater::CheckUpdate(bool isBetaChannelEnabled)
 void Updater::CheckUpdate(QUrl url)
 {
     m_URLs.insert(url);
-    connect(m_netwManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetwManagerFinished(QNetworkReply*)),Qt::UniqueConnection);
+    connect(m_netwManager, &QNetworkAccessManager::finished, this, &Updater::onNetwManagerFinished, Qt::UniqueConnection);
     QNetworkRequest request(url);
     m_netwManager->get(request);
 }

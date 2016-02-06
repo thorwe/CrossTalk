@@ -95,14 +95,16 @@ ConfigRadioGroupBox* ConfigRadio::GetChannelStrip(QString name)
     ConfigRadioGroupBox* channelStrip = new ConfigRadioGroupBox(this);
     channelStrip->setObjectName(name);
     channelStrip->setTitle((m_title.isEmpty()) ? name : m_title);
-    connect(channelStrip,SIGNAL(EnabledSet(QString,bool)),this,SIGNAL(EnabledSet(QString,bool)));
-    connect(channelStrip,SIGNAL(InLoFreqSet(QString,double)),this,SIGNAL(InLoFreqSet(QString,double)));
-    connect(channelStrip,SIGNAL(InHiFreqSet(QString,double)),this,SIGNAL(InHiFreqSet(QString,double)));
-    connect(channelStrip,SIGNAL(DestructionSet(QString,double)),this,SIGNAL(DestructionSet(QString,double)));
-    connect(channelStrip,SIGNAL(RingModFrequencySet(QString,double)),this,SIGNAL(RingModFrequencySet(QString,double)));
-    connect(channelStrip,SIGNAL(RingModMixSet(QString,double)),this,SIGNAL(RingModMixSet(QString,double)));
-    connect(channelStrip,SIGNAL(OutLoFreqSet(QString,double)),this,SIGNAL(OutLoFreqSet(QString,double)));
-    connect(channelStrip,SIGNAL(OutHiFreqSet(QString,double)),this,SIGNAL(OutHiFreqSet(QString,double)));
+
+    connect(channelStrip, &ConfigRadioGroupBox::EnabledSet, this, &ConfigRadio::EnabledSet);
+    connect(channelStrip, &ConfigRadioGroupBox::InLoFreqSet, this, &ConfigRadio::InLoFreqSet);
+    connect(channelStrip, &ConfigRadioGroupBox::InHiFreqSet, this, &ConfigRadio::InHiFreqSet);
+    connect(channelStrip, &ConfigRadioGroupBox::DestructionSet, this, &ConfigRadio::DestructionSet);
+    connect(channelStrip, &ConfigRadioGroupBox::RingModFrequencySet, this, &ConfigRadio::RingModFrequencySet);
+    connect(channelStrip, &ConfigRadioGroupBox::RingModMixSet, this, &ConfigRadio::RingModMixSet);
+    connect(channelStrip, &ConfigRadioGroupBox::OutLoFreqSet, this, &ConfigRadio::OutLoFreqSet);
+    connect(channelStrip, &ConfigRadioGroupBox::OutHiFreqSet, this, &ConfigRadio::OutHiFreqSet);
+
     if (ui != nullptr)
         ui->horizontalLayout->addWidget(channelStrip);
     else

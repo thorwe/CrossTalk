@@ -23,13 +23,7 @@
  * \param parent optional Qt Object
  */
 SnT::SnT(QObject *parent) :
-    QObject(parent),
-    m_shallActivatePtt(false),
-    m_returnToSCHandler(0),
-    m_shallClearWhisper(false),
-    m_returnCode(QString::null),
-    m_returnCodeScHandler(0),
-    m_last_cmd(QString::null)
+    QObject(parent)
 {
 }
 
@@ -120,7 +114,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
     }
 
     TSPtt* ptt = TSPtt::instance();
-    connect(ptt,SIGNAL(PttDelayFinished()),this,SLOT(PttDelayFinished()),Qt::UniqueConnection); // UniqueConnection saving init
+    connect(ptt, &TSPtt::PttDelayFinished, this, &SnT::PttDelayFinished, Qt::UniqueConnection); // UniqueConnection saving init
 
     unsigned int error = ERROR_ok;
 

@@ -47,18 +47,18 @@ public slots:
 private:
     //void process(int sampleCount, short *pleft, short *pright);
     static void process(int nSamples, QList<float> *pleft, QList<float> *pright, float balance);
-    unsigned short sampleRate;
+    unsigned short sampleRate = 48000;
 
-    bool panAdjustment;
+    bool panAdjustment = false;
 
     // Property Privates
-    float panCurrent;               // decibels
-    float panDesired;               // decibels
-    float panDesiredByManual;       // decibels
-    float panDesiredByPanAdjuster;  // decibels
+    float panCurrent = 0.0f;                // decibels
+    float panDesired = 0.0f;                // decibels
+    float panDesiredByManual = 0.0f;        // decibels
+    float panDesiredByPanAdjuster = 0.0f;   // decibels
 
-    float apaAttackRate;
-    float apaDecayRate;
+    float apaAttackRate = 20.0f;
+    float apaDecayRate = 1.0f;
 };
 
 #endif // SIMPLEPANNER_H

@@ -16,7 +16,7 @@ GroupBoxPositionalAudioStatus::GroupBoxPositionalAudioStatus(QWidget *parent) :
     QIcon threedeerefresh(":/icons/check_update.png");    //"gfx/default/16x16_check_update.png"
     ui->pushButton_Refresh->setText(QString::null);
     ui->pushButton_Refresh->setIcon(threedeerefresh);
-    connect(ui->pushButton_Refresh,SIGNAL(clicked()),this,SLOT(onRefreshStatus()));
+    connect(ui->pushButton_Refresh, &QPushButton::clicked, this, &GroupBoxPositionalAudioStatus::onRefreshStatus);
 
     ui->label_3DSettingStatus->setWordWrap(true);
     ui->label_SelfStatus->clear();

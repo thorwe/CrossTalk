@@ -37,14 +37,14 @@ signals:
 public slots:
     
 protected:
-    unsigned short m_sampleRate;
+    unsigned short m_sampleRate = 48000;
     void doProcess(short *samples, int sampleCount);
-    bool m_isProcessing;
+    bool m_isProcessing = false;
 
 private:
-    float m_gainCurrent;    // decibels
-    float m_gainDesired;    // decibels
-    bool m_muted;
+    float m_gainCurrent = VOLUME_0DB;   // decibels
+    float m_gainDesired = VOLUME_0DB;   // decibels
+    bool m_muted = false;
 };
 
 #endif // DSP_VOLUME_H

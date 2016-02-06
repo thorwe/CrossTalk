@@ -60,12 +60,12 @@ private slots:
 
 private:
     explicit SettingsDuck();
-    ~SettingsDuck();
+    ~SettingsDuck() = default;
     static SettingsDuck* m_Instance;
     SettingsDuck(const SettingsDuck &);
     SettingsDuck& operator=(const SettingsDuck &);
 
-    int m_ContextMenuUi;
+    int m_ContextMenuUi = -1;
     QPointer<ConfigDucking> config;
 
     QPointer<Ducker_Global> mP_ducker_G;

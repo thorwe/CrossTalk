@@ -68,15 +68,15 @@ public slots:
 private:
     //singleton
     explicit TSInfoData();
-    ~TSInfoData();
+    ~TSInfoData() = default;
     static TSInfoData* m_Instance;
     TSInfoData(const TSInfoData &);
     TSInfoData& operator=(const TSInfoData &);
 
-    PluginItemType m_InfoType;
-    uint64 m_InfoId;
+    PluginItemType m_InfoType = PLUGIN_SERVER;
+    uint64 m_InfoId = 0;
 
-    uint64 m_homeId;
+    uint64 m_homeId = 0;
 
     QList<QPointer<QObject> > m_Callbacks;
 };

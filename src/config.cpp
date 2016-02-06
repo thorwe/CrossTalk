@@ -26,7 +26,7 @@ Config::Config(QWidget *parent) :
     this->setFixedSize(this->width(),this->height());
 
     // load image
-    connect(ui->banner_jianji,SIGNAL(onClick()),SLOT(onJianjiClicked()));
+    connect(ui->banner_jianji, &Banner::onClick, this, &Config::onJianjiClicked);
 
     QString lang = TSHelpers::GetLanguage();
     if (lang != "de_DE") // outside of german locale, hide jianji banner
@@ -69,7 +69,7 @@ Config::Config(QWidget *parent) :
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
 
     checkBoxBeta->setChecked(cfg.value("beta",true).toBool());
-    connect(checkBoxBeta,SIGNAL(toggled(bool)),SLOT(onBetaChannelToggled(bool)));
+    connect(checkBoxBeta, &QCheckBox::toggled, this, &Config::onBetaChannelToggled);
 
     // WebSocket Server
     bool ok;
@@ -84,9 +84,9 @@ Config::Config(QWidget *parent) :
     else
     {
         wssSpinBox->setValue(port);
-        connect(wssSpinBox,SIGNAL(valueChanged(int)),this,SLOT(onServerPortChanged(int)));
+        connect(wssSpinBox, SIGNAL(valueChanged(int)),this,SLOT(onServerPortChanged(int)));
         groupBoxWSS->setChecked(cfg.value("server_enabled",true).toBool());
-        connect(groupBoxWSS,SIGNAL(toggled(bool)),this,SLOT(onServerEnabledToggled(bool)));
+        connect(groupBoxWSS, &QGroupBox::toggled, this, &Config::onServerEnabledToggled);
     }
     // SSE-Server
     port = cfg.value("sse_server_port",64736).toUInt(&ok);
@@ -102,7 +102,7 @@ Config::Config(QWidget *parent) :
         sseSpinBox->setValue(port);
         connect(sseSpinBox,SIGNAL(valueChanged(int)),this,SLOT(onSseServerPortChanged(int)));
         groupBoxSSE->setChecked(cfg.value("sse_server_enabled",false).toBool());
-        connect(groupBoxSSE,SIGNAL(toggled(bool)),this,SLOT(onSseServerEnabledToggled(bool)));
+        connect(groupBoxSSE, &QGroupBox::toggled, this, &Config::onSseServerEnabledToggled);
     }
 }
 

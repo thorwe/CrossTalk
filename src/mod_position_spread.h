@@ -72,18 +72,15 @@ public slots:
     void setRegionOther(int talkersRegion);
 
 private:
-    float m_spreadWidth;
+    float m_spreadWidth = 0.0f;
 
     Talkers* talkers;
 
     QMap<TALKERS_REGION,QList< QPair<uint64,anyID> >* >* TalkerSequences;
-
-//    bool isReported;
-
     QMap<uint64,QMap<anyID,SimplePanner*>* >* TalkersPanners;
 
-    bool m_ExpertModeEnabled;
-    uint64 m_homeId;
+    bool m_ExpertModeEnabled = false;
+    uint64 m_homeId = 0;
     TALKERS_REGION m_RegionHomeTab;
     TALKERS_REGION m_RegionWhisper;
     TALKERS_REGION m_RegionOther;

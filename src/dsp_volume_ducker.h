@@ -35,11 +35,11 @@ public slots:
     void setGainAdjustment(bool val);
 
 private:
-    float m_attackRate;
-    float m_decayRate;
+    float m_attackRate = 120.0f;
+    float m_decayRate = 90.0f;
 
-    bool m_gainAdjustment;
-    bool m_isDuckBlocked;
+    bool m_gainAdjustment = false;
+    bool m_isDuckBlocked = false;
 };
 
 #endif // DSP_VOLUME_DUCKER_H

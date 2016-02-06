@@ -19,8 +19,8 @@ GuildWarsTwo::GuildWarsTwo(QObject *parent) :
 //    pa->RegisterCustomEnvironmentSupport(this);
 
     m_netwManager = new QNetworkAccessManager(this);
-    connect(m_netwManager, SIGNAL(finished(QNetworkReply*)), this, SLOT(onNetwManagerFinished(QNetworkReply*)));
-    connect(m_netwManager, SIGNAL(sslErrors(QNetworkReply*,QList<QSslError>)),this,SLOT(onSslErrors(QNetworkReply*,QList<QSslError>)));
+    connect(m_netwManager, &QNetworkAccessManager::finished, this, &GuildWarsTwo::onNetwManagerFinished);
+    connect(m_netwManager, &QNetworkAccessManager::sslErrors, this, &GuildWarsTwo::onSslErrors);
     QNetworkRequest request(GW2_BUILD);
     m_netwManager->get(request);
 }

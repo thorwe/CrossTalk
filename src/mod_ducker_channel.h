@@ -48,11 +48,11 @@ public:
 
 private:
     bool m_isTargetOtherTabs;
-    bool m_isActive;
+    bool m_isActive = false;
     float value() {return m_value;}
-    float m_value;
-    uint64 m_homeId;
-    bool m_isDuckPrioritySpeakers;
+    float m_value = 0.0f;
+    uint64 m_homeId = 0;
+    bool m_isDuckPrioritySpeakers = false;
 
     Talkers* talkers;
     Volumes* vols;

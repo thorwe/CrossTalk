@@ -12,9 +12,7 @@
 
 #include "talkers.h"
 
-ChannelMuter::ChannelMuter(QObject *parent) :
-    m_ContextMenuIdToggleChannelMute(-1),
-    m_ContextMenuToggleClientWhitelisted(-1)
+ChannelMuter::ChannelMuter(QObject *parent)
 {
     m_isPrintEnabled = false;
     this->setParent(parent);
@@ -34,14 +32,14 @@ void ChannelMuter::onRunningStateChanged(bool value)
     if (m_ContextMenuIdToggleChannelMute == -1)
     {
         m_ContextMenuIdToggleChannelMute = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CHANNEL,"Toggle Channel Mute [temp]","");
-        connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &ChannelMuter::onContextMenuEvent, Qt::AutoConnection);
     }
 
     if (m_ContextMenuToggleClientWhitelisted == -1)
         m_ContextMenuToggleClientWhitelisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle ChannelMuter Whitelisting [temp]","");
 
     TSInfoData::instance()->Register(this,value,1);
-    connect(Talkers::instance(),SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
+    connect(Talkers::instance(), &Talkers::ConnectStatusChanged, vols, &Volumes::onConnectStatusChanged, Qt::UniqueConnection);
 
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }

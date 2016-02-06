@@ -32,8 +32,11 @@ public:
     bool operator== (const VersionQt& other) const;
 
 private:
-    int m_major, m_minor, m_revision, m_build;
-    bool m_isValid;
+    int m_major = 0;
+    int m_minor = 0;
+    int m_revision = 0;
+    int m_build = 0;
+    bool m_isValid = true;
     QString m_versionString;
 };
 

@@ -4,8 +4,7 @@
 #include "ts3_functions.h"  //currently only used in a debug output
 #include "plugin.h"  //currently only used in a debug output
 
-Agmu::Agmu(QObject *parent) :
-    m_isForceProcessing(false)
+Agmu::Agmu(QObject *parent)
 {
     this->setParent(parent);
     this->setObjectName("Agmu");

@@ -45,8 +45,8 @@ private:
     QSet<QPair<uint64,uint64> > MutedChannels;
     QSet<QPair<uint64,anyID> > ClientWhiteList;
 
-    int m_ContextMenuIdToggleChannelMute;
-    int m_ContextMenuToggleClientWhitelisted;
+    int m_ContextMenuIdToggleChannelMute = -1;
+    int m_ContextMenuToggleClientWhitelisted = -1;
 };
 
 #endif // MOD_MUTER_CHANNEL_H

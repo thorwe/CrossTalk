@@ -3,8 +3,7 @@
 #include "ts_logging_qt.h"
 
 SseServer::SseServer(QObject *parent, quint16 port) :
-    QTcpServer(parent),
-    m_isEnabled(true)
+    QTcpServer(parent)
 {
     this->setObjectName("SseServer");
 //    setMaxPendingConnections(2);
@@ -17,16 +16,6 @@ SseServer::SseServer(QObject *parent, quint16 port) :
     connect(m_keepAlive, SIGNAL(timeout()), this, SLOT(onKeepAlive()));
     TSLogging::Log(this->objectName() + " started.");
 }
-
-//void SseServer::pause()
-//{
-//    m_isEnabled = false;
-//}
-
-//void SseServer::resume()
-//{
-//    m_isEnabled = true;
-//}
 
 void SseServer::Send(QTcpSocket *socket, QString val)
 {
@@ -42,7 +31,6 @@ void SseServer::Send(QTcpSocket *socket, QString val)
      os <<     "data: "
        << val << "\n\n";
     os.flush();
-//    TSLogging::Log(QString("%1: Short stream sent.").arg(socket->socketDescriptor()));
 }
 
 void SseServer::Send(QString val)

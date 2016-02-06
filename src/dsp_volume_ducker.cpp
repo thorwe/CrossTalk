@@ -1,10 +1,6 @@
 #include "dsp_volume_ducker.h"
 
-DspVolumeDucker::DspVolumeDucker(QObject *parent) :
-    m_gainAdjustment(false),
-    m_isDuckBlocked(false),
-    m_attackRate(120.0f),
-    m_decayRate(90.0f)
+DspVolumeDucker::DspVolumeDucker(QObject *parent)
 {
     this->setParent(parent);
 }

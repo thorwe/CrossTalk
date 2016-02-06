@@ -80,17 +80,17 @@ public slots:
 private:
     //singleton
     explicit PluginQt();
-    ~PluginQt();
+    ~PluginQt() = default;
     static PluginQt* m_Instance;
     PluginQt(const PluginQt &);
     PluginQt& operator=(const PluginQt &);
 
-    bool m_isInit;
+    bool m_isInit = false;
 
     // Sse-Server
-    SseServer* m_SseServer;
-    bool m_isServerEnabled;
-    quint16 m_serverPort;
+    SseServer* m_SseServer = NULL;
+    bool m_isServerEnabled = false;
+    quint16 m_serverPort = 0;
     inline void serverStart();
     inline void serverStop();
 

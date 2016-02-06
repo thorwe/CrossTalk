@@ -16,7 +16,7 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     // Channel Ducking
     c = new QGroupBox("Channel",this);
     c->setCheckable(true);
-    this->connect(c,SIGNAL(toggled(bool)),SIGNAL(channelDuckerEnabledSet(bool)));
+    this->connect(c, &QGroupBox::toggled, this, &ConfigDucking::channelDuckerEnabledSet);
 
     QVBoxLayout* cLayout = new QVBoxLayout();
 
@@ -27,14 +27,14 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     cTargetLayout->addWidget(cTargetLabel,0,0,Qt::AlignCenter);
 
     cRadioTargetCurrent = new QRadioButton(qApp->translate("HotkeyDialog","Current Server"));
-    this->connect(cRadioTargetCurrent,SIGNAL(toggled(bool)),this,SLOT(onCRadioTargetCurrentToggled(bool)));
+    connect(cRadioTargetCurrent, &QRadioButton::toggled, this, &ConfigDucking::onCRadioTargetCurrentToggled);
     cTargetLayout->addWidget(cRadioTargetCurrent,0,1,Qt::AlignLeft);
 
     QString otherServers = qApp->translate("NotificationsSetup","Other");
     otherServers.append(" ");
     otherServers.append(qApp->translate("ImprovedTabBar", "Server Tabs"));
     cRadioTargetOther = new QRadioButton(otherServers);
-    this->connect(cRadioTargetOther,SIGNAL(toggled(bool)),this,SLOT(onCRadioTargetOtherToggled(bool)));
+    connect(cRadioTargetOther, &QRadioButton::toggled, this, &ConfigDucking::onCRadioTargetOtherToggled);
     cTargetLayout->addWidget(cRadioTargetOther,1,1,Qt::AlignLeft);
 
     //cTargetLayout->setColumnStretch(0,1);
@@ -43,11 +43,11 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     cLayout->addLayout(cTargetLayout);
 
     cFader = new FaderVertical();
-    this->connect(cFader,SIGNAL(valueChanged(float)),SIGNAL(channelDuckerValueChanged(float)));
+    connect(cFader, &FaderVertical::valueChanged, this, &ConfigDucking::channelDuckerValueChanged);
     cLayout->addWidget(cFader,0,Qt::AlignCenter);
 
     cPS = new QCheckBox("Duck Priority Speakers");
-    this->connect(cPS,SIGNAL(toggled(bool)),SIGNAL(channelDuckerDuckPSEnabledSet(bool)));
+    connect(cPS, &QCheckBox::toggled, this, &ConfigDucking::channelDuckerDuckPSEnabledSet);
     cLayout->addWidget(cPS,0,Qt::AlignCenter);
 
     c->setLayout(cLayout);
@@ -55,11 +55,11 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     // Global Ducking
     g = new QGroupBox("Global (music bots)",this);
     g->setCheckable(true);
-    this->connect(g,SIGNAL(toggled(bool)),SIGNAL(globalDuckerEnabledSet(bool)));
+    connect(g, &QGroupBox::toggled, this, &ConfigDucking::globalDuckerEnabledSet);
 
     QVBoxLayout* gLayout = new QVBoxLayout();
     gFader = new FaderVertical();
-    this->connect(gFader,SIGNAL(valueChanged(float)),SIGNAL(globalDuckerValueChanged(float)));
+    connect(gFader, &FaderVertical::valueChanged, this, &ConfigDucking::globalDuckerValueChanged);
     gLayout->addWidget(gFader,0,Qt::AlignCenter);
 
     gLayout->addStretch(1);

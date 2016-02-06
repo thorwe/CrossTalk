@@ -45,9 +45,9 @@ private:
     uint64 m_ServerConnectionHandlerID;
 
     QMap<uint64,QString> m_ServerGroups;
-    bool m_isServerGroupsUpdating;
+    bool m_isServerGroupsUpdating = false;
     QMap<uint64,QString> m_ChannelGroups;
-    bool m_isChannelGroupsUpdating;
+    bool m_isChannelGroupsUpdating = false;
 };
 
 #endif // TS_SERVERINFO_QT_H

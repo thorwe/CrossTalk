@@ -10,11 +10,8 @@
 
 TSServerInfo::TSServerInfo(QObject *parent, uint64 serverConnectionHandlerID) :
     QObject(parent),
-    m_isServerGroupsUpdating(false),
-    m_isChannelGroupsUpdating(false)
-{
-    m_ServerConnectionHandlerID = serverConnectionHandlerID;
-}
+    m_ServerConnectionHandlerID(serverConnectionHandlerID)
+{}
 
 uint64 TSServerInfo::getServerConnectionHandlerID() const
 {

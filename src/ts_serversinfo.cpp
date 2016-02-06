@@ -4,10 +4,7 @@
 #include "teamspeak/public_errors.h"
 
 TSServersInfo* TSServersInfo::m_Instance = 0;
-TSServersInfo::TSServersInfo()
-{
-}
-TSServersInfo::~TSServersInfo(){}
+TSServersInfo::TSServersInfo(){}
 
 TSServerInfo* TSServersInfo::GetServerInfo(uint64 serverConnectionHandlerID)
 {
@@ -95,7 +92,7 @@ TSServerInfo* TSServersInfo::_GetServerInfo(uint64 serverConnectionHandlerID, bo
         {
             TSServerInfo* tsServerInfo = new TSServerInfo(this,serverConnectionHandlerID);
             m_serverInfoMap.insert(serverConnectionHandlerID, tsServerInfo);
-            this->connect(tsServerInfo,SIGNAL(serverGroupListUpdated(uint64,QMap<uint64,QString>)),SIGNAL(serverGroupListUpdated(uint64,QMap<uint64,QString>)),Qt::UniqueConnection);
+            connect(tsServerInfo, &TSServerInfo::serverGroupListUpdated, this, &TSServersInfo::serverGroupListUpdated, Qt::UniqueConnection);
             return tsServerInfo;
         }
         else

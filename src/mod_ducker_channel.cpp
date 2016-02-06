@@ -9,11 +9,7 @@
 #include "plugin.h"
 #include "ts_helpers_qt.h"
 
-Ducker_Channel::Ducker_Channel(QObject *parent) :
-    m_isActive(false),
-    m_value(0.0f),
-    m_homeId(0),
-    m_isDuckPrioritySpeakers(false)
+Ducker_Channel::Ducker_Channel(QObject *parent)
 {
     m_isPrintEnabled = false;
     this->setParent(parent);
@@ -43,7 +39,7 @@ void Ducker_Channel::onRunningStateChanged(bool value)
 {
     if (value)
     {
-        connect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
+        connect(talkers, &Talkers::ConnectStatusChanged, vols, &Volumes::onConnectStatusChanged, Qt::UniqueConnection);
 
         uint64* servers;
         if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
@@ -84,7 +80,7 @@ void Ducker_Channel::onRunningStateChanged(bool value)
     }
     else
     {
-        disconnect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)));
+        disconnect(talkers, &Talkers::ConnectStatusChanged, vols, &Volumes::onConnectStatusChanged);
         setActive(false);
         vols->RemoveVolumes();
     }
@@ -324,9 +320,9 @@ DspVolumeDucker* Ducker_Channel::AddDuckerVolume(uint64 serverConnectionHandlerI
     if (vol != 0)
     {
         vol->setGainDesired(m_value);
-        connect(this,SIGNAL(valueSet(float)),vol,SLOT(setGainDesiredByGainAdjuster(float)),Qt::DirectConnection);
+        connect(this, &Ducker_Channel::valueSet, vol, &DspVolumeDucker::setGainDesired, Qt::DirectConnection);
         vol->setGainAdjustment(m_isActive);
-        connect(this,SIGNAL(activeSet(bool)),vol,SLOT(setGainAdjustment(bool)),Qt::DirectConnection);
+        connect(this, &Ducker_Channel::activeSet, vol, &DspVolumeDucker::setGainAdjustment, Qt::DirectConnection);
     }
 //    Log(QString("Ducker: Added %1 to ServerChannelVolumes.").arg(clientID),serverConnectionHandlerID,LogLevel_DEBUG);
     return vol;

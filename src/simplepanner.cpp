@@ -16,15 +16,7 @@
 const float PAN_FADE_RATE = (400.0f);	// Rate to fade at (dB per second)
 
 SimplePanner::SimplePanner(QObject *parent) :
-    QObject(parent),
-    sampleRate(48000),
-    panCurrent(0.0f),
-    panDesired(0.0f),
-    panDesiredByManual(0.0f),
-    panDesiredByPanAdjuster(0.0f),
-    panAdjustment(false),
-    apaAttackRate(20.0f),
-    apaDecayRate(1.0f)
+    QObject(parent)
 {
 }
 

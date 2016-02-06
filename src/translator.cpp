@@ -6,7 +6,6 @@
 Translator* Translator::m_Instance = 0;
 
 Translator::Translator(){}
-Translator::~Translator(){}
 
 bool Translator::InitLocalization()
 {

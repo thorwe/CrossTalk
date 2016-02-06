@@ -328,10 +328,10 @@ void ts3plugin_configure(void* handle, void* qParentWidget) {
 
     Config* config = new Config((QWidget*)qParentWidget);
     config->connect(config,SIGNAL(betaChannelToggled(bool)),&updater,SLOT(CheckUpdate(bool)),Qt::UniqueConnection);
-    config->connect(config,SIGNAL(sseServerEnabledToggled(bool)),pluginQt,SLOT(setSseServerEnabled(bool)),Qt::UniqueConnection);
-    config->connect(config,SIGNAL(sseServerPortChanged(quint16)),pluginQt,SLOT(setSseServerPort(quint16)),Qt::UniqueConnection);
-    config->connect(config,SIGNAL(serverEnabledToggled(bool)),pluginQt->m_WebSocketServer,SLOT(setEnabled(bool)),Qt::UniqueConnection);
-    config->connect(config,SIGNAL(serverPortChanged(quint16)),pluginQt->m_WebSocketServer,SLOT(setPort(quint16)),Qt::UniqueConnection);
+    config->connect(config, &Config::sseServerEnabledToggled, pluginQt, &PluginQt::setSseServerEnabled, Qt::UniqueConnection);
+    config->connect(config, &Config::sseServerPortChanged, pluginQt, &PluginQt::setSseServerPort, Qt::UniqueConnection);
+    config->connect(config, &Config::serverEnabledToggled, pluginQt->m_WebSocketServer, &ServerThreaded::setEnabled, Qt::UniqueConnection);
+    config->connect(config, &Config::serverPortChanged, pluginQt->m_WebSocketServer, &ServerThreaded::setPort, Qt::UniqueConnection);
     config->exec();
 }
 

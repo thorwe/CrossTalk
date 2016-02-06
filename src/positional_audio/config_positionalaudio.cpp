@@ -9,44 +9,43 @@ ConfigPositionalAudio::ConfigPositionalAudio(QWidget *parent) :
     this->setAttribute( Qt::WA_DeleteOnClose );
     this->setFixedWidth(this->width());
 
-    connect(ui->groupBoxPositionalAudio,SIGNAL(toggled(bool)),this,SIGNAL(EnabledSet(bool)));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(cameraSet(bool)),this,SIGNAL(CameraSet(bool)));
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::toggled, this, &ConfigPositionalAudio::EnabledSet);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::cameraSet, this, &ConfigPositionalAudio::CameraSet);
 
-    connect(ui->groupBoxPositionalAudio,SIGNAL(attenuationSet(bool)),this,SIGNAL(AttenuationSet(bool)));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(distanceMinChanged(int)),this,SIGNAL(DistanceMinChanged(int)));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(distanceMaxChanged(int)),this,SIGNAL(DistanceMaxChanged(int)));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(rollOffChanged(float)),this,SIGNAL(RollOffChanged(float)));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(rollOffMaxChanged(float)),this,SIGNAL(RollOffMaxChanged(float)));
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::attenuationSet, this, &ConfigPositionalAudio::AttenuationSet);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::distanceMinChanged, this, &ConfigPositionalAudio::DistanceMinChanged);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::distanceMaxChanged, this, &ConfigPositionalAudio::DistanceMaxChanged);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::rollOffChanged, this, &ConfigPositionalAudio::RollOffChanged);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::rollOffMaxChanged, this, &ConfigPositionalAudio::RollOffMaxChanged);
 
-    connect(ui->groupBoxPositionalAudio,SIGNAL(ServerEnabledSet(QString,bool)),this,SIGNAL(ServerEnabledSet(QString,bool)));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(ServerSendIntervalChange(QString,float)),this,SIGNAL(ServerSendIntervalChange(QString,float)));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(ServerSendIntervalSilentIncChange(QString,float)),this,SIGNAL(ServerSendIntervalSilentIncChange(QString,float)));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(ServerBlockSet(QString,bool)),this,SIGNAL(ServerBlockSet(QString,bool)));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(ServerAddButtonClicked()),this,SIGNAL(ServerAddButtonClicked()));
-    connect(ui->groupBoxPositionalAudio,SIGNAL(ServerRemoveButtonClicked(QString)),this,SIGNAL(ServerRemoveButtonClicked(QString)));
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::ServerEnabledSet, this, &ConfigPositionalAudio::ServerEnabledSet);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::ServerSendIntervalChange, this, &ConfigPositionalAudio::ServerSendIntervalChange);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::ServerSendIntervalSilentIncChange, this, &ConfigPositionalAudio::ServerSendIntervalSilentIncChange);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::ServerBlockSet, this, &ConfigPositionalAudio::ServerBlockSet);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::ServerAddButtonClicked, this, &ConfigPositionalAudio::ServerAddButtonClicked);
+    connect(ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::ServerRemoveButtonClicked, this, &ConfigPositionalAudio::ServerRemoveButtonClicked);
 
     // to UI
-    this->connect(this,SIGNAL(UpdateUIEnabledSet(bool)),ui->groupBoxPositionalAudio,SLOT(setChecked(bool)));
-    this->connect(this,SIGNAL(UpdateUIUseCameraSet(bool)),ui->groupBoxPositionalAudio,SLOT(UpdateUIUseCameraSet(bool)));
+    connect(this, &ConfigPositionalAudio::UpdateUIEnabledSet, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::setChecked);
+    connect(this, &ConfigPositionalAudio::UpdateUIUseCameraSet, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIUseCameraSet);
 
-    this->connect(this,SIGNAL(UpdateUIUseAttenuationSet(bool)),ui->groupBoxPositionalAudio,SLOT(UpdateUIUseAttenuationSet(bool)));
-    this->connect(this,SIGNAL(UpdateUIDistanceMin(int)),ui->groupBoxPositionalAudio,SLOT(UpdateUIDistanceMin(int)));
-    this->connect(this,SIGNAL(UpdateUIDistanceMax(int)),ui->groupBoxPositionalAudio,SLOT(UpdateUIDistanceMax(int)));
-    this->connect(this,SIGNAL(UpdateUIRollOff(float)),ui->groupBoxPositionalAudio,SLOT(UpdateUIRollOff(float)));
-    this->connect(this,SIGNAL(UpdateUIRollOffMax(float)),ui->groupBoxPositionalAudio,SLOT(UpdateUIRollOffMax(float)));
+    connect(this, &ConfigPositionalAudio::UpdateUIUseAttenuationSet, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIUseAttenuationSet);
+    connect(this, &ConfigPositionalAudio::UpdateUIDistanceMin, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIDistanceMin);
+    connect(this, &ConfigPositionalAudio::UpdateUIDistanceMax, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIDistanceMax);
+    connect(this, &ConfigPositionalAudio::UpdateUIRollOff, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIRollOff);
+    connect(this, &ConfigPositionalAudio::UpdateUIRollOffMax, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIRollOffMax);
 
+    connect(this, &ConfigPositionalAudio::UpdateUIServerAdd, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIServerAdd);
+    connect(this, &ConfigPositionalAudio::UpdateUIServerRemove, ui->groupBoxPositionalAudio,&GroupBoxPositionalAudio::UpdateUIServerRemove);
+    connect(this, &ConfigPositionalAudio::UpdateUIServerEnabled, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIServerEnabled);
+    connect(this, &ConfigPositionalAudio::UpdateUIServerBlocked, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIServerBlocked);
+    connect(this, &ConfigPositionalAudio::UpdateUIServerSendInterval, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIServerSendInterval);
+    connect(this, &ConfigPositionalAudio::UpdateUIServerSendIntervalSilentInc, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIServerSendIntervalSilentInc);
 
-    this->connect(this,SIGNAL(UpdateUIServerAdd(QString,QString)),ui->groupBoxPositionalAudio,SIGNAL(UpdateUIServerAdd(QString,QString)));
-    this->connect(this,SIGNAL(UpdateUIServerRemove(QString,QString)),ui->groupBoxPositionalAudio,SIGNAL(UpdateUIServerRemove(QString,QString)));
-    this->connect(this,SIGNAL(UpdateUIServerEnabled(QString,bool)),ui->groupBoxPositionalAudio,SIGNAL(UpdateUIServerEnabled(QString,bool)));
-    this->connect(this,SIGNAL(UpdateUIServerBlocked(QString,bool)),ui->groupBoxPositionalAudio,SIGNAL(UpdateUIServerBlocked(QString,bool)));
-    this->connect(this,SIGNAL(UpdateUIServerSendInterval(QString,float)),ui->groupBoxPositionalAudio,SIGNAL(UpdateUIServerSendInterval(QString,float)));
-    this->connect(this,SIGNAL(UpdateUIServerSendIntervalSilentInc(QString,float)),ui->groupBoxPositionalAudio,SIGNAL(UpdateUIServerSendIntervalSilentInc(QString,float)));
+    connect(this, &ConfigPositionalAudio::UpdateUIServerSelect, ui->groupBoxPositionalAudio, &GroupBoxPositionalAudio::UpdateUIServerSelect);
 
-    this->connect(this,SIGNAL(UpdateUIServerSelect(QString)),ui->groupBoxPositionalAudio,SIGNAL(UpdateUIServerSelect(QString)));
-
-    this->connect(this,SIGNAL(UpdateUIStatusSelfName(QString)),ui->groupBoxPositionalAudioStatus,SLOT(UpdateUIStatusSelfName(QString)));
-    this->connect(this,SIGNAL(UpdateUIStatusSelfGame(QString)),ui->groupBoxPositionalAudioStatus,SLOT(UpdateUIStatusSelfGame(QString)));
+    connect(this, &ConfigPositionalAudio::UpdateUIStatusSelfName, ui->groupBoxPositionalAudioStatus, &GroupBoxPositionalAudioStatus::UpdateUIStatusSelfName);
+    connect(this, &ConfigPositionalAudio::UpdateUIStatusSelfGame, ui->groupBoxPositionalAudioStatus, &GroupBoxPositionalAudioStatus::UpdateUIStatusSelfGame);
 }
 
 ConfigPositionalAudio::~ConfigPositionalAudio()

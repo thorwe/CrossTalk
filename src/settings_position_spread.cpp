@@ -8,28 +8,26 @@
 
 SettingsPositionSpread* SettingsPositionSpread::m_Instance = 0;
 
-SettingsPositionSpread::SettingsPositionSpread():
-    m_ContextMenuUi(-1)
+SettingsPositionSpread::SettingsPositionSpread()
 {
     this->setObjectName("SettingsPositionSpread");
 }
-SettingsPositionSpread::~SettingsPositionSpread(){}
 
 void SettingsPositionSpread::Init(PositionSpread *positionSpread)
 {
     if(m_ContextMenuUi == -1)
     {
         m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Position Spread","radar_16.png");
-        connect(TSContextMenu::instance(),SIGNAL(MenusInitialized()),SLOT(onMenusInitialized()),Qt::AutoConnection);
-        connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::MenusInitialized, this, &SettingsPositionSpread::onMenusInitialized, Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &SettingsPositionSpread::onContextMenuEvent, Qt::AutoConnection);
     }
 
-    this->connect(this,SIGNAL(EnabledSet(bool)),positionSpread, SLOT(setEnabled(bool)));
-    this->connect(this,SIGNAL(ValueChanged(float)),positionSpread, SLOT(setSpreadWidth(float)));
-    this->connect(this,SIGNAL(ExpertModeEnabledSet(bool)),positionSpread, SLOT(setExpertModeEnabled(bool)));
-    this->connect(this,SIGNAL(RegionHomeTabSet(int)),positionSpread,SLOT(setRegionHomeTab(int)));
-    this->connect(this,SIGNAL(RegionWhisperSet(int)),positionSpread,SLOT(setRegionWhisper(int)));
-    this->connect(this,SIGNAL(RegionOtherSet(int)),positionSpread,SLOT(setRegionOther(int)));
+    connect(this, &SettingsPositionSpread::EnabledSet, positionSpread, &PositionSpread::setEnabled);
+    connect(this, &SettingsPositionSpread::ValueChanged, positionSpread, &PositionSpread::setSpreadWidth);
+    connect(this, &SettingsPositionSpread::ExpertModeEnabledSet, positionSpread, &PositionSpread::setExpertModeEnabled);
+    connect(this, &SettingsPositionSpread::RegionHomeTabSet, positionSpread, &PositionSpread::setRegionHomeTab);
+    connect(this, &SettingsPositionSpread::RegionWhisperSet, positionSpread, &PositionSpread::setRegionWhisper);
+    connect(this, &SettingsPositionSpread::RegionOtherSet, positionSpread, &PositionSpread::setRegionOther);
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
 
@@ -75,15 +73,15 @@ void SettingsPositionSpread::onContextMenuEvent(uint64 serverConnectionHandlerID
                 groupBox->UpdateExpertWhisperValueChanged(cfg.value("stereo_position_spread_region_whisper",2).toInt());
                 groupBox->UpdateExpertOtherValueChanged(cfg.value("stereo_position_spread_region_other",0).toInt());
 
-                this->connect(groupBox,SIGNAL(EnabledSet(bool)),SIGNAL(EnabledSet(bool)));
-                this->connect(groupBox,SIGNAL(ValueChanged(float)),SIGNAL(ValueChanged(float)));
+                connect(groupBox, &GroupBoxPositionSpread::EnabledSet, this, &SettingsPositionSpread::EnabledSet);
+                connect(groupBox, &GroupBoxPositionSpread::ValueChanged, this, &SettingsPositionSpread::ValueChanged);
 
-                this->connect(groupBox,SIGNAL(ExpertEnabledSet(bool)),SIGNAL(ExpertModeEnabledSet(bool)));
-                this->connect(groupBox,SIGNAL(ExpertHomeValueChanged(int)),SIGNAL(RegionHomeTabSet(int)));
-                this->connect(groupBox,SIGNAL(ExpertWhisperValueChanged(int)),SIGNAL(RegionWhisperSet(int)));
-                this->connect(groupBox,SIGNAL(ExpertOtherValueChanged(int)),SIGNAL(RegionOtherSet(int)));
+                connect(groupBox, &GroupBoxPositionSpread::ExpertEnabledSet, this, &SettingsPositionSpread::ExpertModeEnabledSet);
+                connect(groupBox, &GroupBoxPositionSpread::ExpertHomeValueChanged, this, &SettingsPositionSpread::RegionHomeTabSet);
+                connect(groupBox, &GroupBoxPositionSpread::ExpertWhisperValueChanged, this, &SettingsPositionSpread::RegionWhisperSet);
+                connect(groupBox, &GroupBoxPositionSpread::ExpertOtherValueChanged, this, &SettingsPositionSpread::RegionOtherSet);
 
-                connect(p_config,SIGNAL(finished(int)),this,SLOT(saveSettings(int)));
+                connect(p_config, &QDialog::finished, this, &SettingsPositionSpread::saveSettings);
                 p_config->show();
                 config = p_config;
             }

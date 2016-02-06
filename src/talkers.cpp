@@ -11,15 +11,7 @@
 
 Talkers* Talkers::m_Instance = 0;
 
-Talkers::Talkers():
-    m_meTalkingScHandler(0)
-{
-
-}
-
-Talkers::~Talkers()
-{
-}
+Talkers::Talkers() {}
 
 unsigned int Talkers::RefreshTalkers(uint64 serverConnectionHandlerID)
 {

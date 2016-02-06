@@ -27,15 +27,15 @@ private:
     static inline GroupWhisperTargetMode GetGroupWhisperTargetMode(QString val);
     static inline GroupWhisperType GetGroupWhisperType(QString val);
 
-    bool m_shallActivatePtt;
+    bool m_shallActivatePtt = false;
 
-    uint64 m_returnToSCHandler;
-    bool m_shallClearWhisper;
-    QString m_returnCode;
-    uint64 m_returnCodeScHandler;
+    uint64 m_returnToSCHandler = 0;
+    bool m_shallClearWhisper = false;
+    QString m_returnCode = QString::null;
+    uint64 m_returnCodeScHandler = 0;
 
     // short term fix for double trigger
-    QString m_last_cmd;
+    QString m_last_cmd = QString::null;
 };
 
 #endif // SNT_H

@@ -5,30 +5,27 @@
 
 SettingsDuck* SettingsDuck::m_Instance = 0;
 
-SettingsDuck::SettingsDuck():
-    m_ContextMenuUi(-1)
+SettingsDuck::SettingsDuck()
 {
     this->setObjectName("SettingsDuck");
 }
-SettingsDuck::~SettingsDuck(){}
-
 
 void SettingsDuck::Init(Ducker_Global* ducker_G, Ducker_Channel* ducker_C)
 {
     if(m_ContextMenuUi == -1)
     {
         m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Ducking","duck_16.png");
-        connect(TSContextMenu::instance(),SIGNAL(MenusInitialized()),SLOT(onMenusInitialized()),Qt::AutoConnection);
-        connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::MenusInitialized, this, &SettingsDuck::onMenusInitialized, Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &SettingsDuck::onContextMenuEvent, Qt::AutoConnection);
     }
 
-    this->connect(this,SIGNAL(globalDuckerEnabledSet(bool)),ducker_G, SLOT(setEnabled(bool)));
-    this->connect(this,SIGNAL(globalDuckerValueChanged(float)),ducker_G, SLOT(setValue(float)));
+    this->connect(this, &SettingsDuck::globalDuckerEnabledSet, ducker_G, &Ducker_Global::setEnabled);
+    this->connect(this, &SettingsDuck::globalDuckerValueChanged, ducker_G, &Ducker_Global::setValue);
 
-    this->connect(this,SIGNAL(channelDuckerEnabledSet(bool)),ducker_C, SLOT(setEnabled(bool)));
-    this->connect(this,SIGNAL(channelDuckerValueChanged(float)),ducker_C,SLOT(setValue(float)));
-    this->connect(this,SIGNAL(channelDuckerReverseSet(bool)), ducker_C, SLOT(setDuckingReverse(bool)));
-    this->connect(this,SIGNAL(channelDuckerDuckPSEnabledSet(bool)), ducker_C, SLOT(setDuckPrioritySpeakers(bool)));
+    this->connect(this, &SettingsDuck::channelDuckerEnabledSet, ducker_C, &Ducker_Channel::setEnabled);
+    this->connect(this, &SettingsDuck::channelDuckerValueChanged, ducker_C, &Ducker_Channel::setValue);
+    this->connect(this, &SettingsDuck::channelDuckerReverseSet, ducker_C, &Ducker_Channel::setDuckingReverse);
+    this->connect(this, &SettingsDuck::channelDuckerDuckPSEnabledSet, ducker_C, &Ducker_Channel::setDuckPrioritySpeakers);
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
 
@@ -79,15 +76,15 @@ void SettingsDuck::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMe
                 p_config->UpdateChannelDuckerReverse((cfg.value("ducking_reverse",false).toBool())?1:0);
                 p_config->UpdateChannelDuckerDuckPSEnabled(cfg.value("ducking_PS",false).toBool());
 
-                this->connect(p_config,SIGNAL(globalDuckerEnabledSet(bool)),SIGNAL(globalDuckerEnabledSet(bool)));
-                this->connect(p_config,SIGNAL(globalDuckerValueChanged(float)),SIGNAL(globalDuckerValueChanged(float)));
+                this->connect(p_config, &ConfigDucking::globalDuckerEnabledSet, this, &SettingsDuck::globalDuckerEnabledSet);
+                this->connect(p_config, &ConfigDucking::globalDuckerValueChanged, this, &SettingsDuck::globalDuckerValueChanged);
 
-                this->connect(p_config,SIGNAL(channelDuckerEnabledSet(bool)),SIGNAL(channelDuckerEnabledSet(bool)));
-                this->connect(p_config,SIGNAL(channelDuckerValueChanged(float)),SIGNAL(channelDuckerValueChanged(float)));
-                this->connect(p_config,SIGNAL(channelDuckerReverseSet(bool)),SIGNAL(channelDuckerReverseSet(bool)));
-                this->connect(p_config,SIGNAL(channelDuckerDuckPSEnabledSet(bool)),SIGNAL(channelDuckerDuckPSEnabledSet(bool)));
+                this->connect(p_config, &ConfigDucking::channelDuckerEnabledSet, this, &SettingsDuck::channelDuckerEnabledSet);
+                this->connect(p_config, &ConfigDucking::channelDuckerValueChanged, this, &SettingsDuck::channelDuckerValueChanged);
+                this->connect(p_config, &ConfigDucking::channelDuckerReverseSet, this, &SettingsDuck::channelDuckerReverseSet);
+                this->connect(p_config, &ConfigDucking::channelDuckerDuckPSEnabledSet, this, &SettingsDuck::channelDuckerDuckPSEnabledSet);
 
-                connect(p_config,SIGNAL(finished(int)),this,SLOT(saveSettings(int)));
+                connect(p_config, &ConfigDucking::finished, this, &SettingsDuck::saveSettings);
                 p_config->show();
                 config = p_config;
             }

@@ -69,7 +69,7 @@ public slots:
     
 private:
     explicit Talkers();
-    ~Talkers();
+    ~Talkers() = default;
     static Talkers* m_Instance;
     Talkers(const Talkers &);
     Talkers& operator=(const Talkers &);
@@ -78,7 +78,7 @@ private:
 //    void ProcessClientMove(uint64 serverConnectionHandlerID, anyID clientID, uint64 newChannelID);
 
 //    QMap<uint64,QMap<anyID,bool>* >* TalkersMap;
-    uint64 m_meTalkingScHandler;
+    uint64 m_meTalkingScHandler = 0;
     bool m_meTalkingIsWhisper;
 
     QMultiMap<uint64,anyID> TalkerMap;

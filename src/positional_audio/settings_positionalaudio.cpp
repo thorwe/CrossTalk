@@ -33,28 +33,28 @@ void SettingsPositionalAudio::Init(PositionalAudio *positionalAudio)
 #ifdef Q_OS_WIN
         m_ContextMenuGW2Map = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Gw2 Map","");
 #endif
-        connect(TSContextMenu::instance(),SIGNAL(MenusInitialized()),SLOT(onMenusInitialized()),Qt::AutoConnection);
-        connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::MenusInitialized, this, &SettingsPositionalAudio::onMenusInitialized, Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &SettingsPositionalAudio::onContextMenuEvent, Qt::AutoConnection);
     }
 
-    this->connect(this, &SettingsPositionalAudio::EnabledSet, positionalAudio, &PositionalAudio::setEnabled);
-    this->connect(this, &SettingsPositionalAudio::UseCameraSet, positionalAudio, &PositionalAudio::setUseCamera);
-    this->connect(this, &SettingsPositionalAudio::UseAttenuationSet, positionalAudio, &PositionalAudio::setUseAttenuation);
-    this->connect(this, &SettingsPositionalAudio::DistanceMinChanged, positionalAudio, &PositionalAudio::setDistanceMin);
-    this->connect(this, &SettingsPositionalAudio::DistanceMaxChanged, positionalAudio,&PositionalAudio::setDistanceMax);
-    this->connect(this, &SettingsPositionalAudio::RollOffChanged, positionalAudio, &PositionalAudio::setRollOff);
-    this->connect(this, &SettingsPositionalAudio::RollOffMaxChanged, positionalAudio, &PositionalAudio::setRollOffMax);
+    connect(this, &SettingsPositionalAudio::EnabledSet, positionalAudio, &PositionalAudio::setEnabled);
+    connect(this, &SettingsPositionalAudio::UseCameraSet, positionalAudio, &PositionalAudio::setUseCamera);
+    connect(this, &SettingsPositionalAudio::UseAttenuationSet, positionalAudio, &PositionalAudio::setUseAttenuation);
+    connect(this, &SettingsPositionalAudio::DistanceMinChanged, positionalAudio, &PositionalAudio::setDistanceMin);
+    connect(this, &SettingsPositionalAudio::DistanceMaxChanged, positionalAudio,&PositionalAudio::setDistanceMax);
+    connect(this, &SettingsPositionalAudio::RollOffChanged, positionalAudio, &PositionalAudio::setRollOff);
+    connect(this, &SettingsPositionalAudio::RollOffMaxChanged, positionalAudio, &PositionalAudio::setRollOffMax);
 
-    this->connect(this, &SettingsPositionalAudio::ServerSettingsAdd, positionalAudio, &PositionalAudio::AddServerSetting);
-    this->connect(this, &SettingsPositionalAudio::ServerSettingsRemove, positionalAudio, &PositionalAudio::RemoveServerSetting);
-    this->connect(this, &SettingsPositionalAudio::ServerEnabledSet, positionalAudio, &PositionalAudio::setServerSettingEnabled);
-    this->connect(this, &SettingsPositionalAudio::ServerBlockSet, positionalAudio, &PositionalAudio::setServerSettingBlocked);
-    this->connect(this, &SettingsPositionalAudio::ServerSendIntervalChange, positionalAudio, &PositionalAudio::setServerSettingSendInterval);
-    this->connect(this, &SettingsPositionalAudio::ServerSendIntervalSilentIncChange, positionalAudio, &PositionalAudio::setServerSettingSendIntervalSilentInc);
+    connect(this, &SettingsPositionalAudio::ServerSettingsAdd, positionalAudio, &PositionalAudio::AddServerSetting);
+    connect(this, &SettingsPositionalAudio::ServerSettingsRemove, positionalAudio, &PositionalAudio::RemoveServerSetting);
+    connect(this, &SettingsPositionalAudio::ServerEnabledSet, positionalAudio, &PositionalAudio::setServerSettingEnabled);
+    connect(this, &SettingsPositionalAudio::ServerBlockSet, positionalAudio, &PositionalAudio::setServerSettingBlocked);
+    connect(this, &SettingsPositionalAudio::ServerSendIntervalChange, positionalAudio, &PositionalAudio::setServerSettingSendInterval);
+    connect(this, &SettingsPositionalAudio::ServerSendIntervalSilentIncChange, positionalAudio, &PositionalAudio::setServerSettingSendIntervalSilentInc);
 
     //pure display
-    this->connect(positionalAudio, &PositionalAudio::myIdentityChanged, this, &SettingsPositionalAudio::UpdateUIStatusSelfName, Qt::QueuedConnection);
-    this->connect(positionalAudio, &PositionalAudio::myVrChanged, this, &SettingsPositionalAudio::UpdateUIStatusSelfGame, Qt::QueuedConnection);
+    connect(positionalAudio, &PositionalAudio::myIdentityChanged, this, &SettingsPositionalAudio::UpdateUIStatusSelfName, Qt::QueuedConnection);
+    connect(positionalAudio, &PositionalAudio::myVrChanged, this, &SettingsPositionalAudio::UpdateUIStatusSelfGame, Qt::QueuedConnection);
 
 
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);

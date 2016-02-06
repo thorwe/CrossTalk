@@ -13,15 +13,7 @@
 
 TSPtt* TSPtt::m_Instance = 0;
 
-TSPtt::TSPtt() :
-    pttActive(false),
-    vadActive(false),
-    inputActive(false),
-    pttDelayEnabled(false),
-    pttDelayMsec(0)
-{
-//    command_mutex = new QMutex();
-}
+TSPtt::TSPtt(){}
 
 TSPtt::~TSPtt()
 {
@@ -34,7 +26,7 @@ TSPtt::~TSPtt()
 void TSPtt::Init(QMutex *mutex_cmd)
 {
     timer = new QTimer(this);
-    connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()));
+    connect(timer, &QTimer::timeout, this, &TSPtt::onPttDelayFinished);
     timer->setSingleShot(true);
     command_mutex = mutex_cmd;
     this->setObjectName("TSPtt");
@@ -42,11 +34,8 @@ void TSPtt::Init(QMutex *mutex_cmd)
 
 int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS action)
 {
-//    connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()),Qt::UniqueConnection);
     if (action == PTT_ACTIVATE)
     {
-//        TSLogging::Log("PTT_ACTIVATE",serverConnectionHandlerID,LogLevel_DEBUG);
-//        TSLogging::Log(QString("Timer is running: %1").arg(timer->isActive()?"true":"false"),serverConnectionHandlerID,LogLevel_DEBUG);
         if (timer->isActive())
             timer->stop();
 
@@ -54,7 +43,6 @@ int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS act
     }
     else if (action == PTT_DEACTIVATE)
     {
-//        TSLogging::Log("PTT_DEACTIVATE",serverConnectionHandlerID,LogLevel_DEBUG);
         UpdatePttDelayInfo();
         if (pttDelayEnabled)
             timer->start(pttDelayMsec);
@@ -78,9 +66,6 @@ int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS act
 
 int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, bool shouldTalk)
 {
-//    TSLogging::Log(QString("SetPushToTalk: %1").arg(shouldTalk?"true":"false"),serverConnectionHandlerID,LogLevel_DEBUG);
-//    connect(timer, SIGNAL(timeout()), this, SLOT(onPttDelayFinished()),Qt::UniqueConnection);
-
     unsigned int error;
 
     // If PTT is inactive, store the current settings

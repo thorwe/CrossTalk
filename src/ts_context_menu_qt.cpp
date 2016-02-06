@@ -25,10 +25,7 @@ static struct PluginMenuItem* createMenuItem(enum PluginMenuType type, int id, c
 
 TSContextMenu* TSContextMenu::m_Instance = 0;
 
-TSContextMenu::TSContextMenu():
-    m_isInit(false)
-{}
-TSContextMenu::~TSContextMenu(){}
+TSContextMenu::TSContextMenu(){}
 
 bool TSContextMenu::setMainIcon(QString icon)
 {

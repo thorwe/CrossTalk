@@ -12,15 +12,15 @@ GroupBoxPositionSpread::GroupBoxPositionSpread(QWidget *parent) :
     ui->label_SPS_Other->setText(qApp->translate("NotificationsSetup","Other"));
     ui->groupBox_SPS_expert->setTitle(qApp->translate("captureSoundSetupDialog","&Advanced Options"));
 
-    connect(this,SIGNAL(toggled(bool)),this,SIGNAL(EnabledSet(bool))); // remove this redundancy later?
-    connect(ui->groupBox_SPS_expert,SIGNAL(toggled(bool)),this,SIGNAL(ExpertEnabledSet(bool)));
+    connect(this, &GroupBoxPositionSpread::toggled, this, &GroupBoxPositionSpread::EnabledSet); // remove this redundancy later?
+    connect(ui->groupBox_SPS_expert, &QGroupBox::toggled, this, &GroupBoxPositionSpread::ExpertEnabledSet);
 
-    connect(ui->dial_SPS,SIGNAL(valueChanged(int)),this,SLOT(onDialValueChanged(int)));
+    connect(ui->dial_SPS, &QDial::valueChanged, this, &GroupBoxPositionSpread::onDialValueChanged);
     connect(ui->doubleSpinBox_SPS,SIGNAL(valueChanged(double)),this,SLOT(onSpinBoxValueChanged(double)));
 
-    connect(ui->slider_SPS_Home,SIGNAL(valueChanged(int)),this,SIGNAL(ExpertHomeValueChanged(int)));
-    connect(ui->slider_SPS_Whisper,SIGNAL(valueChanged(int)),this,SIGNAL(ExpertWhisperValueChanged(int)));
-    connect(ui->slider_SPS_Other,SIGNAL(valueChanged(int)),this,SIGNAL(ExpertOtherValueChanged(int)));
+    connect(ui->slider_SPS_Home, &QSlider::valueChanged, this, &GroupBoxPositionSpread::ExpertHomeValueChanged);
+    connect(ui->slider_SPS_Whisper, &QSlider::valueChanged, this, &GroupBoxPositionSpread::ExpertWhisperValueChanged);
+    connect(ui->slider_SPS_Other, &QSlider::valueChanged, this, &GroupBoxPositionSpread::ExpertOtherValueChanged);
 }
 
 GroupBoxPositionSpread::~GroupBoxPositionSpread()

@@ -7,23 +7,24 @@ ConfigRadioGroupBox::ConfigRadioGroupBox(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->dial_in_lo,SIGNAL(valueChanged(int)),this,SLOT(onInLoDialValueChanged(int)));
-    connect(ui->dial_in_hi,SIGNAL(valueChanged(int)),this,SLOT(onInHiDialValueChanged(int)));
-    connect(ui->dial_out_lo,SIGNAL(valueChanged(int)),this,SLOT(onOutLoDialValueChanged(int)));
-    connect(ui->dial_out_hi,SIGNAL(valueChanged(int)),this,SLOT(onOutHiDialValueChanged(int)));
-    connect(ui->dial_destr,SIGNAL(valueChanged(int)),this,SLOT(onDestrDialValueChanged(int)));
-    connect(ui->dial_rm,SIGNAL(valueChanged(int)),this,SLOT(onRingModFrequencyDialValueChanged(int)));
-    connect(ui->dial_rm_mix,SIGNAL(valueChanged(int)),this,SLOT(onRingModMixDialValueChanged(int)));
+    connect(ui->dial_in_lo, &QDial::valueChanged, this, &ConfigRadioGroupBox::onInLoDialValueChanged);
+    connect(ui->dial_in_hi, &QDial::valueChanged, this, &ConfigRadioGroupBox::onInHiDialValueChanged);
+    connect(ui->dial_out_lo, &QDial::valueChanged, this, &ConfigRadioGroupBox::onOutLoDialValueChanged);
+    connect(ui->dial_out_hi, &QDial::valueChanged, this, &ConfigRadioGroupBox::onOutHiDialValueChanged);
+    connect(ui->dial_destr, &QDial::valueChanged, this, &ConfigRadioGroupBox::onDestrDialValueChanged);
+    connect(ui->dial_rm, &QDial::valueChanged, this, &ConfigRadioGroupBox::onRingModFrequencyDialValueChanged);
+    connect(ui->dial_rm_mix, &QDial::valueChanged, this, &ConfigRadioGroupBox::onRingModMixDialValueChanged);
 
-    connect(ui->doubleSpinBox_in_lo,SIGNAL(valueChanged(double)),this,SLOT(onInLoValueChanged(double)));
-    connect(ui->doubleSpinBox_in_hi,SIGNAL(valueChanged(double)),this,SLOT(onInHiValueChanged(double)));
-    connect(ui->doubleSpinBox_out_lo,SIGNAL(valueChanged(double)),this,SLOT(onOutLoValueChanged(double)));
-    connect(ui->doubleSpinBox_out_hi,SIGNAL(valueChanged(double)),this,SLOT(onOutHiValueChanged(double)));
-    connect(ui->doubleSpinBox_destr,SIGNAL(valueChanged(double)),this,SLOT(onDestrValueChanged(double)));
-    connect(ui->doubleSpinBox_rm,SIGNAL(valueChanged(double)),this,SLOT(onRingModFrequencyValueChanged(double)));
-    connect(ui->doubleSpinBox_rm_mix,SIGNAL(valueChanged(double)),this,SLOT(onRingModMixValueChanged(double)));
+    // QT5 on overloaded functions ain't pretty
+    connect(ui->doubleSpinBox_in_lo, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onInLoValueChanged);
+    connect(ui->doubleSpinBox_in_hi, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onInHiValueChanged);
+    connect(ui->doubleSpinBox_out_lo, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onOutLoValueChanged);
+    connect(ui->doubleSpinBox_out_hi,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onOutHiValueChanged);
+    connect(ui->doubleSpinBox_destr, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onDestrValueChanged);
+    connect(ui->doubleSpinBox_rm, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onRingModFrequencyValueChanged);
+    connect(ui->doubleSpinBox_rm_mix, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onRingModMixValueChanged);
 
-    connect(this,SIGNAL(toggled(bool)),this,SLOT(onToggled(bool)));
+    connect(this, &ConfigRadioGroupBox::toggled, this, &ConfigRadioGroupBox::onToggled);
 }
 
 ConfigRadioGroupBox::~ConfigRadioGroupBox()

@@ -8,8 +8,8 @@ FaderVertical::FaderVertical(QWidget *parent) :
     ui(new Ui::FaderVertical)
 {
     ui->setupUi(this);
-    this->connect(ui->horizontalSlider,SIGNAL(valueChanged(int)),SLOT(onSliderValueChanged(int)));
-    this->connect(ui->doubleSpinBox,SIGNAL(valueChanged(double)),SLOT(onDoubleSpinBoxValueChanged(double)));
+    connect(ui->horizontalSlider, &QSlider::valueChanged, this, &FaderVertical::onSliderValueChanged);
+    connect(ui->doubleSpinBox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &FaderVertical::onDoubleSpinBoxValueChanged);
     ui->label_loud->setText(qApp->translate("PlaybackSoundSetupDialog","Loud"));
     ui->label_quiet->setText(qApp->translate("PlaybackSoundSetupDialog","Quiet"));
 }

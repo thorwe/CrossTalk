@@ -9,10 +9,7 @@
 #include <QSettings>
 #include "ts_helpers_qt.h"
 
-Ducker_Global::Ducker_Global(QObject *parent) :
-    m_isActive(false),
-    m_value(0.0f),
-    m_ContextMenuToggleMusicBot(-1)
+Ducker_Global::Ducker_Global(QObject *parent)
 {
     m_isPrintEnabled = false;
     this->setParent(parent);
@@ -240,12 +237,12 @@ void Ducker_Global::onRunningStateChanged(bool value)
     if(m_ContextMenuToggleMusicBot == -1)
     {
         m_ContextMenuToggleMusicBot = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle Global Ducking Target","duck_16.png");
-        connect(TSContextMenu::instance(),SIGNAL(FireContextMenuEvent(uint64,PluginMenuType,int,uint64)),SLOT(onContextMenuEvent(uint64,PluginMenuType,int,uint64)),Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &Ducker_Global::onContextMenuEvent, Qt::AutoConnection);
     }
 
     if (value)
     {
-        connect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
+        connect(talkers, &Talkers::ConnectStatusChanged, vols, &Volumes::onConnectStatusChanged, Qt::UniqueConnection);
 
         uint64* servers;
         if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
@@ -285,7 +282,7 @@ void Ducker_Global::onRunningStateChanged(bool value)
     }
     else
     {
-        disconnect(talkers,SIGNAL(ConnectStatusChanged(uint64,int,uint)),vols,SLOT(onConnectStatusChanged(uint64,int,uint)));
+        disconnect(talkers, &Talkers::ConnectStatusChanged, vols, &Volumes::onConnectStatusChanged);
         setActive(false);
         vols->RemoveVolumes();
     }
@@ -336,9 +333,9 @@ DspVolumeDucker* Ducker_Global::AddMusicBotVolume(uint64 serverConnectionHandler
     if (vol != 0)
     {
         vol->setGainDesired(m_value);
-        connect(this,SIGNAL(valueSet(float)),vol,SLOT(setGainDesiredByGainAdjuster(float)),Qt::DirectConnection);
+        connect(this, &Ducker_Global::valueSet, vol, &DspVolumeDucker::setGainDesired, Qt::DirectConnection);
         vol->setGainAdjustment(m_isActive);
-        connect(this,SIGNAL(activeSet(bool)),vol,SLOT(setGainAdjustment(bool)),Qt::DirectConnection);
+        connect(this, &Ducker_Global::activeSet, vol, &DspVolumeDucker::setGainAdjustment, Qt::DirectConnection);
     }
     return vol;
 }

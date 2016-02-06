@@ -28,7 +28,7 @@ private:
 
     QMap<uint64,QMap<anyID,DspVolumeAGMU*>* >* m_TalkersDSPs;   //QMap is reportedly faster on small (<10)
     QHash<QString,short>* m_PeakCache;
-    bool m_isForceProcessing;
+    bool m_isForceProcessing = false;
 };
 
 #endif // MOD_AGMU_H

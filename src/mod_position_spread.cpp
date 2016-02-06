@@ -11,8 +11,7 @@ const QList<float> SPREAD_LEFT = QList<float>() << -0.75f << -1.0f << -0.5f << -
 
 const QPair<uint64,anyID> SEAT_HOLDER = qMakePair((uint64)0,(anyID)0);
 
-PositionSpread::PositionSpread(QObject *parent) :
-    m_homeId(0)
+PositionSpread::PositionSpread(QObject *parent)
 {
     this->setParent(parent);
     this->setObjectName("Position Spread");
