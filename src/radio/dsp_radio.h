@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include "DspFilters/Dsp.h"
+#include <memory>
 
 class DspRadio : public QObject
 {
@@ -61,11 +62,11 @@ private:
     bool m_Enabled;
     double m_Fudge = 0.0f;
 
-    Dsp::Filter* f_m;
-    Dsp::Filter* f_s;
+    std::unique_ptr<Dsp::Filter> f_m = std::make_unique< Dsp::SmoothedFilterDesign<Dsp::Butterworth::Design::BandPass <4>, 1, Dsp::DirectFormII> >(1024);
+    std::unique_ptr<Dsp::Filter> f_s = std::make_unique< Dsp::SmoothedFilterDesign<Dsp::Butterworth::Design::BandPass <4>, 2, Dsp::DirectFormII> >(1024);
 
-    Dsp::Filter* f_m_o;
-    Dsp::Filter* f_s_o;
+    std::unique_ptr<Dsp::Filter> f_m_o = std::make_unique< Dsp::SmoothedFilterDesign<Dsp::Butterworth::Design::BandPass <4>, 1, Dsp::DirectFormII> >(1024);
+    std::unique_ptr<Dsp::Filter> f_s_o = std::make_unique< Dsp::SmoothedFilterDesign<Dsp::Butterworth::Design::BandPass <4>, 2, Dsp::DirectFormII> >(1024);
 
     //RingMod
     double m_RM_modFreq = 0.0f;

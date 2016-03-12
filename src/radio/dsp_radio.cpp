@@ -10,28 +10,15 @@ const double TWO_PI_OVER_SAMPLE_RATE = 2*M_PI/48000;
 DspRadio::DspRadio(QObject *parent) :
     QObject(parent)
 {
-    f_m = new Dsp::SmoothedFilterDesign
-            <Dsp::Butterworth::Design::BandPass <4>, 1, Dsp::DirectFormII> (1024);
-    f_s = new Dsp::SmoothedFilterDesign
-          <Dsp::Butterworth::Design::BandPass <4>, 2, Dsp::DirectFormII> (1024);
-//    f_m = new Dsp::SmoothedFilterDesign
-//            <Dsp::RBJ::Design::BandPass2, 1, Dsp::DirectFormII> (1024);
-//    f_s = new Dsp::SmoothedFilterDesign
-//          <Dsp::RBJ::Design::BandPass2, 2> (1024);
-    f_m_o = new Dsp::SmoothedFilterDesign
-            <Dsp::Butterworth::Design::BandPass <4>, 1, Dsp::DirectFormII> (1024);
-    f_s_o = new Dsp::SmoothedFilterDesign
-          <Dsp::Butterworth::Design::BandPass <4>, 2, Dsp::DirectFormII> (1024);
-
     Dsp::Params params;
     params[0] = 48000; // sample rate
     params[1] = 4; // order
     params[2] = 1600; // center frequency
     params[3] = 1300; // band width
-    f_m->setParams (params);
-    f_s->setParams (params);
-    f_m_o->setParams (params);
-    f_s_o->setParams (params);
+    f_m->setParams(params);
+    f_s->setParams(params);
+    f_m_o->setParams(params);
+    f_s_o->setParams(params);
 }
 
 void DspRadio::setEnabled(QString name, bool val)
@@ -60,9 +47,9 @@ void DspRadio::setBandpassEqInCenterFrequency(QString name, double val)
 {
     if (name.isEmpty() || (name == m_ChannelType))
     {
-        if (f_m != NULL)
+        if (f_m)
             f_m->setParam(2,val);
-        if (f_s != NULL)
+        if (f_s)
             f_s->setParam(2,val);
 
         emit bandpassEqInCenterFrequencyChanged(val);
@@ -73,9 +60,9 @@ void DspRadio::setBandpassEqInBandWidth(QString name, double val)
 {
     if (name.isEmpty() || (name == m_ChannelType))
     {
-        if (f_m != NULL)
+        if (f_m)
             f_m->setParam(3,val);
-        if (f_s != NULL)
+        if (f_s)
             f_s->setParam(3,val);
 
         emit bandpassEqInBandWidthChanged(val);
@@ -112,9 +99,9 @@ void DspRadio::setBandpassEqOutCenterFrequency(QString name, double val)
 {
     if (name.isEmpty() || (name == m_ChannelType))
     {
-        if (f_m_o != NULL)
+        if (f_m_o)
             f_m_o->setParam(2,val);
-        if (f_s_o != NULL)
+        if (f_s_o)
             f_s_o->setParam(2,val);
 
         emit bandpassEqOutCenterFrequencyChanged(val);
@@ -125,9 +112,9 @@ void DspRadio::setBandpassEqOutBandWidth(QString name, double val)
 {
     if (name.isEmpty() || (name == m_ChannelType))
     {
-        if (f_m_o != NULL)
+        if (f_m_o)
             f_m_o->setParam(3,val);
-        if (f_s_o != NULL)
+        if (f_s_o)
             f_s_o->setParam(3,val);
 
         emit bandpassEqOutBandWidthChanged(val);
@@ -273,9 +260,9 @@ float DspRadio::getFudge() const
 
 double DspRadio::getBandpassEqInCenterFrequency() const
 {
-    if (f_m != NULL)
+    if (f_m)
         return f_m->getParam(2);
-    else if (f_s != NULL)
+    else if (f_s)
         return f_s->getParam(2);
     else
         return -1;
@@ -283,9 +270,9 @@ double DspRadio::getBandpassEqInCenterFrequency() const
 
 double DspRadio::getBandpassEqInBandWidth() const
 {
-    if (f_m != NULL)
+    if (f_m)
         return f_m->getParam(3);
-    else if (f_s != NULL)
+    else if (f_s)
         return f_s->getParam(3);
     else
         return -1;
@@ -298,9 +285,9 @@ double DspRadio::getRmModFreq() const
 
 double DspRadio::getBandpassEqOutCenterFrequency() const
 {
-    if (f_m_o != NULL)
+    if (f_m_o)
         return f_m_o->getParam(2);
-    else if (f_s_o != NULL)
+    else if (f_s_o)
         return f_s_o->getParam(2);
     else
         return -1;
@@ -308,9 +295,9 @@ double DspRadio::getBandpassEqOutCenterFrequency() const
 
 double DspRadio::getBandpassEqOutBandWidth() const
 {
-    if (f_m_o != NULL)
+    if (f_m_o)
         return f_m_o->getParam(3);
-    else if (f_s_o != NULL)
+    else if (f_s_o)
         return f_s_o->getParam(3);
     else
         return -1;
