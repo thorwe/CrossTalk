@@ -19,7 +19,7 @@ PositionSpread::PositionSpread(QObject *parent)
     talkers = Talkers::instance();
     TalkersPanners = new QMap<uint64,QMap<anyID,SimplePanner*>* >;
     TalkerSequences = new QMap<TALKERS_REGION,QList< QPair<uint64,anyID> >* >;
-    for (int i = 0; i<TALKERS_REGION_END;++i)
+    for (int i = 0; i < TALKERS_REGION_END; ++i)
     {
         QList< QPair<uint64,anyID> >* list = new QList< QPair<uint64,anyID> >;
         TalkerSequences->insert((TALKERS_REGION)i,list);
@@ -176,7 +176,7 @@ void PositionSpread::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHand
         panner->process(samples,sampleCount,channels,speaker2Channel.value(SPEAKER_FRONT_LEFT),speaker2Channel.value(SPEAKER_FRONT_RIGHT));
     else if (speaker2Channel.contains(SPEAKER_FRONT_CENTER))    // TODO: This is effectively never called in practice
     {
-        if (!((panner->getPanDesired() == panner->getPanCurrent()) == 0.0f)) // if middle is where it is and is to be, leave it at center, otherwise...
+        if (!((panner->getPanDesired() == panner->getPanCurrent()) && (panner->getPanDesired() == 0.0f))) // if middle is where it is and is to be, leave it at center, otherwise...
         {
             // Search for the non-used front left & right
             // Populate Front Left and Right & Fill Center with 0s
@@ -376,7 +376,7 @@ void PositionSpread::RemoveSeqPair(QPair<uint64,anyID> seqPair,QList< QPair<uint
             position = seq->indexOf(seqPair);
     else
     {
-        for (int i = 0; i<TALKERS_REGION_END; ++i)
+        for (int i = 0; i < TALKERS_REGION_END; ++i)
         {
             seq = TalkerSequences->value((TALKERS_REGION)i);
             if (seq->contains(seqPair))
