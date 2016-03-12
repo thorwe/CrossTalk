@@ -4,9 +4,7 @@
 #include <QObject>
 #include <QMutex>
 #include "sse_server.h"
-//#ifdef USE_QT_WEB_APP
-//  #include "QtWebApp/src/ts_httpserver_qt.h"
-//#endif
+
 #ifdef USE_WEBSOCKET
   #include "ServerThreaded/ServerThreaded.h"
 #endif

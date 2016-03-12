@@ -4,7 +4,6 @@
 #include "teamspeak/public_errors.h"
 
 TSServersInfo* TSServersInfo::m_Instance = 0;
-TSServersInfo::TSServersInfo(){}
 
 TSServerInfo* TSServersInfo::GetServerInfo(uint64 serverConnectionHandlerID)
 {

@@ -152,8 +152,6 @@ namespace TSHelpers
     {
         unsigned int error;
         uint64* servers;
-        uint64* server;
-        uint64 handle = NULL;
 
         if((error = ts3Functions.getServerConnectionHandlerList(&servers)) != ERROR_ok)
         {
@@ -162,20 +160,21 @@ namespace TSHelpers
         }
 
         // Find the first server that matches the criteria
-        for(server = servers; *server != (uint64)NULL && handle == NULL; server++)
+        uint64 active = 0;
+        for(auto server = servers; *server != (uint64)NULL && active == 0; server++)
         {
             int result;
             if((error = ts3Functions.getClientSelfVariableAsInt(*server, CLIENT_INPUT_HARDWARE, &result)) != ERROR_ok)
                 TSLogging::Error("(TSHelpers::GetActiveServerConnectionHandlerID) Error retrieving client variable",*server,error);
             else if(result)
             {
-                handle = *server;
+                active = *server;
                 break;
             }
         }
 
         ts3Functions.freeMemory(servers);
-        return handle;
+        return active;
     }
 
     unsigned int GetActiveServerRelative(uint64 serverConnectionHandlerID, bool next, uint64* result)

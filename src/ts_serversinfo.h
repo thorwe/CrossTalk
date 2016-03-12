@@ -55,7 +55,7 @@ public slots:
 private slots:
 
 private:
-    explicit TSServersInfo();
+    TSServersInfo() = default;
     ~TSServersInfo() = default;
     static TSServersInfo* m_Instance;
     TSServersInfo(const TSServersInfo &);
