@@ -36,7 +36,7 @@ private:
     QUrl m_GithubBetaDownloadUrl;
 
     QUrl m_resultDownloadUrl;
-    bool m_isBetaChannel;
+    bool m_isBetaChannel = false;
 };
 
 #endif // UPDATER_H

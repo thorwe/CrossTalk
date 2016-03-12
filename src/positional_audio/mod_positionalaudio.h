@@ -107,25 +107,25 @@ private:
     bool trylock();
     bool fetch();
 
-    int m_tryTimerId;
+    int m_tryTimerId = 0;
 
-    int m_fetchTimerId;
+    int m_fetchTimerId = 0;
     static const int FETCH_TIMER_INTERVAL = 20; //Mumble fetches these values 50 times a second aka 20msec
     static const int SEND_THROTTLE_GLOBAL = 5;  // Send(): 50times/sec; count to 5 -> 10times/sec; save some computation
     static const int SEND_INTERVAL_MODIFIER = 50 / SEND_THROTTLE_GLOBAL;    // I...think.
-    int m_fetchTimerElapsed;
-    int m_fetchTimerTimeoutMsec;
+    int m_fetchTimerElapsed = 0;
+    int m_fetchTimerTimeoutMsec = 5000;
 
     // myself
     //QString m_Identity;
     QString m_IdentityUncleaned;
-    bool m_isDirty_IdentityUncleaned;
+    bool m_isDirty_IdentityUncleaned = false;
     QByteArray m_Context;
     //QString m_ContextHex;
-    bool m_Context_Dirty;
-    bool m_Avatar_Dirty;
+    bool m_Context_Dirty = false;
+    bool m_Avatar_Dirty = false;
 
-    ulong m_lastCount;
+    ulong m_lastCount = 0;
 
     QMultiMap<uint64,anyID> m_PlayersInMyContext;
 
@@ -133,14 +133,14 @@ private:
 
     void Update3DListenerAttributes();
 
-    bool m_isUseCamera;
-    bool m_isUseAttenuation;
-    int m_distanceMin;
-    int m_distanceMax;
-    float m_rollOff;
-    float m_rollOffMax;
+    bool m_isUseCamera = true;
+    bool m_isUseAttenuation = false;
+    int m_distanceMin = 0;
+    int m_distanceMax = 0;
+    float m_rollOff = 0.0f;
+    float m_rollOffMax = 0.0f;
     //float m_rollOff_Lin;
-    float m_rollOffMax_Lin;
+    float m_rollOffMax_Lin = 1.0f;
 
     QString GetSendString(bool isAll);
     QString GetSendStringJson(bool isAll, bool isMe, TsVrObj *obj);
@@ -148,13 +148,13 @@ private:
     void Send();
     void Send(QString args, int targetMode);
 
-    bool m_IsSendAllOverride;
-    int m_sendCounter;
-    int m_silentSendCounter;
+    bool m_IsSendAllOverride = true;
+    int m_sendCounter = 0;
+    int m_silentSendCounter = 2;
 
     TS3_VECTOR NULL_VECTOR;
 
-    QSharedMemory* m_sharedMemory;
+    QSharedMemory* m_sharedMemory = nullptr;
 
     QMap<QString,PositionalAudio_ServerSettings> m_ServerSettings;
     QHash<uint64,int> m_SendCounters;

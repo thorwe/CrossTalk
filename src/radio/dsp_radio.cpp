@@ -8,13 +8,7 @@
 const double TWO_PI_OVER_SAMPLE_RATE = 2*M_PI/48000;
 
 DspRadio::DspRadio(QObject *parent) :
-    QObject(parent),
-    m_volFollow(0.0f),
-    m_volFollow_r(0.0f),
-    m_Fudge(0.0f),
-    m_RM_modFreq(0.0f),
-    m_RM_modAngle(0.0f),
-    m_RM_modAngle_r(0.0f)
+    QObject(parent)
 {
     f_m = new Dsp::SmoothedFilterDesign
             <Dsp::Butterworth::Design::BandPass <4>, 1, Dsp::DirectFormII> (1024);

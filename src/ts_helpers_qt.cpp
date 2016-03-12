@@ -610,7 +610,7 @@ namespace TSHelpers
         unsigned int error;
         while (true)
         {
-            QString name = GetChannelVariableAsQString(serverConnectionHandlerID, channel_id, ChannelProperties::CHANNEL_NAME);
+            QString name = GetChannelVariableAsQString(serverConnectionHandlerID, channel_id, CHANNEL_NAME);
             path.prepend(name);
 
             uint64 parent;

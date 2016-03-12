@@ -56,25 +56,7 @@ struct LinkedMem {
 
 static LinkedMem *lm = NULL;
 
-PositionalAudio::PositionalAudio(QObject *parent) :
-    m_tryTimerId(0),
-    m_fetchTimerId(0),
-    m_fetchTimerTimeoutMsec(5000),
-    m_sendCounter(0),
-    m_silentSendCounter(2),
-    m_Context_Dirty(false),
-    m_isDirty_IdentityUncleaned(false),
-    m_Avatar_Dirty(false),
-    m_lastCount(0),
-    m_isUseCamera(true),
-    m_isUseAttenuation(false),
-    m_distanceMin(0),
-    m_distanceMax(0),
-    m_rollOff(0.0f),
-    m_rollOffMax(0.0f),
-    //m_rollOff_Lin(1.0f),
-    m_rollOffMax_Lin(1.0f),
-    m_IsSendAllOverride(true)
+PositionalAudio::PositionalAudio(QObject *parent)
 {
     this->setParent(parent);
     this->setObjectName("PositionalAudio");

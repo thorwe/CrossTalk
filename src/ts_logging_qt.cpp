@@ -50,9 +50,9 @@ bool TSLogging::GetInfoIcon(QString &in)
 
 void TSLogging::PlayErrorSound(uint64 serverConnectionHandlerID)
 {
-    if ((serverConnectionHandlerID == NULL) || (serverConnectionHandlerID == 0))
+    if (serverConnectionHandlerID == NULL)
         serverConnectionHandlerID = ts3Functions.getCurrentServerConnectionHandlerID();
-    if ((serverConnectionHandlerID == NULL) || (serverConnectionHandlerID == 0))
+    if (serverConnectionHandlerID == NULL)
         return;
 
     QString errorSound;
@@ -97,9 +97,9 @@ void TSLogging::Error(QString message, uint64 serverConnectionHandlerID, unsigne
         PlayErrorSound(serverConnectionHandlerID);
 
     // Format and print the error message
-    if ((serverConnectionHandlerID == NULL) || (serverConnectionHandlerID == 0))
+    if (serverConnectionHandlerID == NULL)
         serverConnectionHandlerID = ts3Functions.getCurrentServerConnectionHandlerID();
-    if ((serverConnectionHandlerID == NULL) || (serverConnectionHandlerID == 0))
+    if (serverConnectionHandlerID == NULL)
         return;
 
     // Use a transparent underscore because a double space will be collapsed
@@ -151,7 +151,7 @@ void TSLogging::Print(QString message, uint64 serverConnectionHandlerID, LogLeve
         break;
     }
 
-    if ((serverConnectionHandlerID != NULL) && (serverConnectionHandlerID != 0))
+    if (serverConnectionHandlerID != NULL)
         message.prepend(QString("%1 : ").arg(serverConnectionHandlerID));
 
     QTime time = QTime::currentTime ();

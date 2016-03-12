@@ -55,11 +55,11 @@ private:
 
     QString m_ChannelType;
 
-    float m_volFollow;
-    float m_volFollow_r;
+    float m_volFollow = 0.0f;
+    float m_volFollow_r = 0.0f;
 
     bool m_Enabled;
-    double m_Fudge;
+    double m_Fudge = 0.0f;
 
     Dsp::Filter* f_m;
     Dsp::Filter* f_s;
@@ -68,10 +68,10 @@ private:
     Dsp::Filter* f_s_o;
 
     //RingMod
-    double m_RM_modFreq;
-    double m_RM_modAngle;
-    double m_RM_modAngle_r;
-    double m_RM_mix;
+    double m_RM_modFreq = 0.0f;
+    double m_RM_modAngle = 0.0f;
+    double m_RM_modAngle_r = 0.0f;
+    double m_RM_mix = 0.0f;
 
 };
 

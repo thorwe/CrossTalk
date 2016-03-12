@@ -2,17 +2,20 @@
 #define MOD_POSITION_SPREAD_H
 
 #include <QObject>
+#include <stdint.h>
 #include "teamspeak/public_definitions.h"
 #include "module.h"
 #include "talkers.h"
 #include "simplepanner.h"
 
-enum TALKERS_REGION {
+enum TALKERS_REGION
+{
     TALKERS_REGION_LEFT = 0,
     TALKERS_REGION_CENTER,
     TALKERS_REGION_RIGHT,
     TALKERS_REGION_END
 };
+Q_DECLARE_METATYPE(TALKERS_REGION)
 
 class PositionSpread : public Module, public TalkInterface
 {
@@ -81,9 +84,9 @@ private:
 
     bool m_ExpertModeEnabled = false;
     uint64 m_homeId = 0;
-    TALKERS_REGION m_RegionHomeTab;
-    TALKERS_REGION m_RegionWhisper;
-    TALKERS_REGION m_RegionOther;
+    TALKERS_REGION m_RegionHomeTab = TALKERS_REGION_CENTER;
+    TALKERS_REGION m_RegionWhisper = TALKERS_REGION_CENTER;
+    TALKERS_REGION m_RegionOther = TALKERS_REGION_CENTER;
 
     inline void CheckClearSeq(QList<QPair<uint64, anyID> > *seq);
     void RemoveSeqPair(QPair<uint64, anyID> seqPair, QList<QPair<uint64, anyID> > *seq);
