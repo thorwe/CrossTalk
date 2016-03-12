@@ -4,16 +4,15 @@
 #include <QObject>
 
 struct RadioFX_Settings {
-    RadioFX_Settings() : name(""), enabled(false), freq_low(0.0f), freq_hi(0.0f), fudge(0.0f), rm_mod_freq(0.0f), rm_mix(0.0f) {}
-    QString name;
-    bool enabled;
-    double freq_low;
-    double freq_hi;
-    double fudge;
-    double rm_mod_freq;
-    double rm_mix;
-    double o_freq_lo;
-    double o_freq_hi;
+    QString name = "";
+    bool enabled = false;
+    double freq_low = 0;
+    double freq_hi = 0;
+    double fudge = 0;
+    double rm_mod_freq = 0;
+    double rm_mix = 0;
+    double o_freq_lo = 0;
+    double o_freq_hi = 0;
 };
 
 #include "module.h"
@@ -72,7 +71,7 @@ public slots:
     //void saveSettings(int r);
 
 private:
-    uint64 m_homeId;
+    uint64 m_homeId = 0;
     Talkers* talkers;
 
     QMap<uint64,QMap<anyID,DspRadio*>* >* TalkersDspRadios;

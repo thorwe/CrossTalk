@@ -915,8 +915,7 @@ void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int sta
         return; //Client is muted;
 
 #ifdef USE_RADIO
-    bool isRadioProcessing = false;
-    isRadioProcessing = radio.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
+    const auto isRadioProcessing = radio.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
     agmu.setNextTalkStatusChangeForceProcessing(isRadioProcessing && (status == STATUS_TALKING));
 #endif
     agmu.onTalkStatusChanged(serverConnectionHandlerID,status,isReceivedWhisper,clientID,isMe);
