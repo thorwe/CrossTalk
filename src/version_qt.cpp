@@ -15,7 +15,7 @@ VersionQt::VersionQt(QObject *parent, QString versionStr) :
     }
 
     QList<int> versionIntList;
-    QStringList versionStringList = versionStr.split(".",QString::SkipEmptyParts);
+    auto versionStringList = versionStr.split(".",QString::SkipEmptyParts);
 
     for (int i = 0; i < versionStringList.length(); ++i)
     {

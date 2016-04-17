@@ -29,9 +29,9 @@ void PipeServer::Send(QString message)
 
 void PipeServer::onNewConnection()
 {
-    QLocalSocket *clientConnection = m_PipeServer->nextPendingConnection();
-    qintptr desc = clientConnection->socketDescriptor();
-    QString descStr = QString("%1").arg(desc);
+    auto clientConnection = m_PipeServer->nextPendingConnection();
+    auto desc = clientConnection->socketDescriptor();
+    auto descStr = QString("%1").arg(desc);
     m_Clients.insert(descStr, clientConnection);
     connect(clientConnection, SIGNAL(disconnected()), m_SignalMapper, SLOT(map()));
     m_SignalMapper->setMapping(clientConnection, descStr);
@@ -39,6 +39,6 @@ void PipeServer::onNewConnection()
 
 void PipeServer::onClientDisconnected(QString descStr)
 {
-    QLocalSocket *clientConnection = m_Clients.take(descStr);
+    auto clientConnection = m_Clients.take(descStr);
     clientConnection->deleteLater();
 }

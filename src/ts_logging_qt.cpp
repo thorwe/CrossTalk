@@ -17,7 +17,7 @@ bool TSLogging::GetErrorSound(QString &in)
         path_qstr.append("sound/" + pack);
 
         QSettings cfg(path_qstr + "/settings.ini", QSettings::IniFormat);
-        QString snd_qstr = cfg.value("soundfiles/SERVER_ERROR").toString();
+        auto snd_qstr = cfg.value("soundfiles/SERVER_ERROR").toString();
         if (snd_qstr.isEmpty() != true)
         {
             // towatch: QSettings insists on eliminating the double quotas '\"' on read
@@ -116,7 +116,7 @@ void TSLogging::Error(QString message, uint64 serverConnectionHandlerID, unsigne
         QTextStream(&styledQstr) << "[img]" << infoIcon << "[/img]";*/
 
     QTime time = QTime::currentTime ();
-    QString time_qstr = time.toString(Qt::TextDate);
+    auto time_qstr = time.toString(Qt::TextDate);
 
     QTextStream(&styledQstr) << "[color=red]" << time_qstr << "[/color][color=transparent]_[/color]" << ": "  << ts3plugin_name() << ": " << message;
     ts3Functions.printMessage(serverConnectionHandlerID, styledQstr.toLocal8Bit().constData(), PLUGIN_MESSAGE_TARGET_SERVER);
@@ -154,8 +154,8 @@ void TSLogging::Print(QString message, uint64 serverConnectionHandlerID, LogLeve
     if (serverConnectionHandlerID != NULL)
         message.prepend(QString("%1 : ").arg(serverConnectionHandlerID));
 
-    QTime time = QTime::currentTime ();
-    QString time_qstr = time.toString(Qt::TextDate);
+    auto time = QTime::currentTime();
+    auto time_qstr = time.toString(Qt::TextDate);
     QString styledQstr;
     QTextStream(&styledQstr) << time_qstr << ": " << ts3plugin_name() << ": " << message << "\n";
     printf(styledQstr.toLocal8Bit().constData());

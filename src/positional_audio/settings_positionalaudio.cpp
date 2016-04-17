@@ -61,7 +61,7 @@ void SettingsPositionalAudio::Init(PositionalAudio *positionalAudio)
     cfg.beginGroup(positionalAudio->objectName());
 
     cfg.beginGroup("server_s");
-    QStringList groups = cfg.childGroups();
+    auto groups = cfg.childGroups();
     if (groups.isEmpty())
     {
         emit ServerSettingsAdd("default","Default");
@@ -74,7 +74,7 @@ void SettingsPositionalAudio::Init(PositionalAudio *positionalAudio)
     {
         for (int i = 0; i < groups.size(); ++i)
         {
-            QString sUId = groups.at(i);
+            auto sUId = groups.at(i);
             cfg.beginGroup(sUId);
             emit ServerSettingsAdd(sUId, cfg.value("sname").toString());
             emit ServerEnabledSet(sUId,cfg.value("enabled",true).toBool());
@@ -125,7 +125,7 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
                 config.data()->activateWindow();
             else
             {
-                ConfigPositionalAudio* p_config = new ConfigPositionalAudio(TSHelpers::GetMainWindow());  //has delete on close attribute
+                auto p_config = new ConfigPositionalAudio(TSHelpers::GetMainWindow());  //has delete on close attribute
 
                 QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
                 cfg.beginGroup(mP_positionalAudio.data()->objectName());
@@ -157,8 +157,8 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
                 this->connect(this, &SettingsPositionalAudio::UpdateUIServerSelect, p_config, &ConfigPositionalAudio::UpdateUIServerSelect);
 
                 cfg.beginGroup("server_s");
-                QStringList groups = cfg.childGroups();
-                QMap<QString,PositionalAudio_ServerSettings> map;
+                auto groups = cfg.childGroups();
+                //QMap<QString,PositionalAudio_ServerSettings> map;
                 if (groups.isEmpty())
                 {
                     emit UpdateUIServerSettingsAdd("default","Default");

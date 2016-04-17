@@ -71,7 +71,7 @@ void TSContextMenu::onInitMenus(PluginMenuItem*** menuItems, char **menuIcon)
      * e.g. for "test_plugin.dll", icon "1.png" is loaded from <TeamSpeak 3 Client install dir>\plugins\test_plugin\1.png
      */
 //    TSLogging::Log(QString("(TSContextMenu::onInitMenu): %1").arg(m_Items.size()),LogLevel_DEBUG);
-    int amount = m_Items.size();
+    auto amount = m_Items.size();
     BEGIN_CREATE_MENUS(amount);  /* IMPORTANT: Number of menu items must be correct! */
     for (int i = 0; i < amount; ++i)
         CREATE_MENU_ITEM(m_Items.takeFirst());

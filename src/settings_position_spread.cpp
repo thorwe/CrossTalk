@@ -54,12 +54,12 @@ void SettingsPositionSpread::onContextMenuEvent(uint64 serverConnectionHandlerID
                 config.data()->activateWindow();
             else
             {
-                QDialog* p_config = new QDialog(TSHelpers::GetMainWindow());
+                auto p_config = new QDialog(TSHelpers::GetMainWindow());
                 p_config->setAttribute( Qt::WA_DeleteOnClose );
                 p_config->setWindowTitle(mP_positionSpread.data()->objectName());
-                GroupBoxPositionSpread* groupBox = new GroupBoxPositionSpread(p_config);
+                auto groupBox = new GroupBoxPositionSpread(p_config);
 
-                QVBoxLayout *layout = new QVBoxLayout;
+                auto layout = new QVBoxLayout;
                 layout->addWidget(groupBox);
                 p_config->setLayout(layout);
 
@@ -107,5 +107,3 @@ void SettingsPositionSpread::saveSettings(int r)
     cfg.setValue("stereo_position_spread_region_whisper",(int)(mP_positionSpread.data()->getRegionWhisper()));
     cfg.setValue("stereo_position_spread_region_other",(int)(mP_positionSpread.data()->getRegionOther()));
 }
-
-

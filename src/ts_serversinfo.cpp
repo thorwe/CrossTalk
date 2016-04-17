@@ -16,13 +16,13 @@ uint64 TSServersInfo::FindServerByUniqueId(QString server_id)
     uint64* servers;
     if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
     {
-        uint64* server;
-        for(server = servers; *server != (uint64)NULL; ++server)
+        for(auto server = servers; *server != (uint64)NULL; ++server)
         {
-            TSServerInfo* tsServerInfo = _GetServerInfo(*server,true);
+            auto tsServerInfo = _GetServerInfo(*server,true);
             if (tsServerInfo && (server_id == tsServerInfo->getUniqueId()))
                 return tsServerInfo->getServerConnectionHandlerID();
         }
+        ts3Functions.freeMemory(servers);
     }
     return 0;
 }
@@ -46,28 +46,28 @@ void TSServersInfo::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID,
 
 void TSServersInfo::onServerGroupListEvent(uint64 serverConnectionHandlerID, uint64 serverGroupID, const char *name, int type, int iconID, int saveDB)
 {
-    TSServerInfo* tsServerInfo = _GetServerInfo(serverConnectionHandlerID,true);
+    auto tsServerInfo = _GetServerInfo(serverConnectionHandlerID,true);
     if (tsServerInfo)
         tsServerInfo->onServerGroupListEvent(serverGroupID,name,type,iconID,saveDB);
 }
 
 void TSServersInfo::onServerGroupListFinishedEvent(uint64 serverConnectionHandlerID)
 {
-    TSServerInfo* tsServerInfo = _GetServerInfo(serverConnectionHandlerID,false);
+    auto tsServerInfo = _GetServerInfo(serverConnectionHandlerID,false);
     if (tsServerInfo)
         tsServerInfo->onServerGroupListFinishedEvent();
 }
 
 void TSServersInfo::onChannelGroupListEvent(uint64 serverConnectionHandlerID, uint64 channelGroupID, const char *name, int type, int iconID, int saveDB)
 {
-    TSServerInfo* tsServerInfo = _GetServerInfo(serverConnectionHandlerID,true);
+    auto tsServerInfo = _GetServerInfo(serverConnectionHandlerID,true);
     if (tsServerInfo)
         tsServerInfo->onChannelGroupListEvent(channelGroupID,name,type,iconID,saveDB);
 }
 
 void TSServersInfo::onChannelGroupListFinishedEvent(uint64 serverConnectionHandlerID)
 {
-    TSServerInfo* tsServerInfo = _GetServerInfo(serverConnectionHandlerID,false);
+    auto tsServerInfo = _GetServerInfo(serverConnectionHandlerID,false);
     if (tsServerInfo)
         tsServerInfo->onChannelGroupListFinishedEvent();
 }
@@ -89,7 +89,7 @@ TSServerInfo* TSServersInfo::_GetServerInfo(uint64 serverConnectionHandlerID, bo
     {
         if (createOnNotExist)
         {
-            TSServerInfo* tsServerInfo = new TSServerInfo(this,serverConnectionHandlerID);
+            auto tsServerInfo = new TSServerInfo(this,serverConnectionHandlerID);
             m_serverInfoMap.insert(serverConnectionHandlerID, tsServerInfo);
             connect(tsServerInfo, &TSServerInfo::serverGroupListUpdated, this, &TSServersInfo::serverGroupListUpdated, Qt::UniqueConnection);
             return tsServerInfo;
@@ -97,7 +97,7 @@ TSServerInfo* TSServersInfo::_GetServerInfo(uint64 serverConnectionHandlerID, bo
         else
         {
             TSLogging::Error("(TSServersInfo::_GetServerInfo): serverConnectionHandlerID not found.");
-            return (TSServerInfo*)NULL;
+            return nullptr;
         }
     }
 }

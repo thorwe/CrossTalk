@@ -27,7 +27,7 @@ namespace TSHelpers
 
     QString GetFullConfigPath()
     {
-        QString fullPath=GetConfigPath();
+        auto fullPath=GetConfigPath();
         fullPath.append(ts3plugin_name());
         fullPath.append(".ini");
         return fullPath;
@@ -118,9 +118,8 @@ namespace TSHelpers
         else
         {
             // Find server in the list
-            uint64* server;
             char* s_name;
-            for(server = servers; *server != (uint64)NULL; ++server)
+            for(auto server = servers; *server != (uint64)NULL; ++server)
             {
                 if ((error = ts3Functions.getServerVariableAsString(*server, VIRTUALSERVER_NAME, &s_name)) != ERROR_ok)
                 {
@@ -502,7 +501,7 @@ namespace TSHelpers
         char* cP_result;
         if ((error = ts3Functions.getClientVariableAsString(serverConnectionHandlerID, clientID, CLIENT_SERVERGROUPS, &cP_result)) == ERROR_ok)
         {
-            QStringList qsl_result = QString(cP_result).split(",",QString::SkipEmptyParts);
+            auto qsl_result = QString(cP_result).split(",",QString::SkipEmptyParts);
             ts3Functions.freeMemory(cP_result);
 
             bool ok;
@@ -557,8 +556,8 @@ namespace TSHelpers
 
     bool GetCreatePluginConfigFolder(QDir &result)
     {
-        bool isPathOk = true;
-        QString path = TSHelpers::GetConfigPath();
+        auto isPathOk = true;
+        auto path = TSHelpers::GetConfigPath();
         QDir dir(path);
         if (!dir.exists())
         {
@@ -609,7 +608,7 @@ namespace TSHelpers
         unsigned int error;
         while (true)
         {
-            QString name = GetChannelVariableAsQString(serverConnectionHandlerID, channel_id, CHANNEL_NAME);
+            auto name = GetChannelVariableAsQString(serverConnectionHandlerID, channel_id, CHANNEL_NAME);
             path.prepend(name);
 
             uint64 parent;
@@ -631,7 +630,7 @@ namespace TSHelpers
     {
         uint64 channel_id;
         std::vector<char*> hierarchy;
-        QStringList path_list = path_q.split("__CH_DELIM__");
+        auto path_list = path_q.split("__CH_DELIM__");
 
         for (auto constIterator = path_list.constBegin(); constIterator != path_list.constEnd(); ++constIterator)
         {

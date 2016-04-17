@@ -27,7 +27,7 @@ QString TSServerInfo::getName() const
         TSLogging::Error("(TSServerInfo::getName())",NULL,error,true);
         return QString::null;
     }
-    QString name = QString::fromUtf8(s_name);
+    auto name = QString::fromUtf8(s_name);
     ts3Functions.freeMemory(s_name);
     return name;
 }
@@ -41,7 +41,7 @@ QString TSServerInfo::getUniqueId() const
         TSLogging::Error("(TSServerInfo::getUniqueId())",NULL,error,true);
         return QString::null;
     }
-    QString val = QString::fromUtf8(s_val);
+    auto val = QString::fromUtf8(s_val);
     ts3Functions.freeMemory(s_val);
     return val;
 }
@@ -73,8 +73,8 @@ QString TSServerInfo::GetServerGroupName(uint64 id) const
 
 uint64 TSServerInfo::GetChannelGroupId(QString name) const
 {
-    QList<uint64> list = m_ChannelGroups.keys(name);
-    int elementCount = list.size();
+    auto list = m_ChannelGroups.keys(name);
+    auto elementCount = list.size();
     if (elementCount == 0)
         return (uint64)NULL;
     else if (elementCount == 1)

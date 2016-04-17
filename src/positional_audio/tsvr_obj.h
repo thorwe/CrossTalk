@@ -68,7 +68,7 @@ private:
     QString m_context;
     QString m_identityRaw;
 
-    QObject* m_CustomEnvironmentSupport;
+    QObject* m_CustomEnvironmentSupport = nullptr;
 };
 
 bool operator==(const TS3_VECTOR &veca, const TS3_VECTOR &vecb);

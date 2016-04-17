@@ -81,7 +81,7 @@ unsigned int Talkers::RefreshAllTalkers()  // I assume getClientVariableAsInt on
 
 void Talkers::DumpTalkStatusChanges(QObject *p, int status)
 {
-    TalkInterface *iTalk = qobject_cast<TalkInterface *>(p);
+    auto iTalk = qobject_cast<TalkInterface *>(p);
     if (!iTalk)
     {
         TSLogging::Error("(Talkers) (DumpTalkStatusChange) Pointer doesn't implement TalkInterface");
@@ -228,14 +228,14 @@ void Talkers::onConnectStatusChangeEvent(uint64 serverConnectionHandlerID, int n
         if (WhisperMap.contains(serverConnectionHandlerID))
         {
 //            WhisperMap.remove(serverConnectionHandlerID);
-            QList<anyID> values = WhisperMap.values(serverConnectionHandlerID);
+            auto values = WhisperMap.values(serverConnectionHandlerID);
             for (int i = 0; i < values.size(); ++i)
                 ts3plugin_onTalkStatusChangeEvent(serverConnectionHandlerID, STATUS_NOT_TALKING, 0, values.at(i));
         }
         if (TalkerMap.contains(serverConnectionHandlerID))
         {
 //            TalkerMap.remove(serverConnectionHandlerID);
-            QList<anyID> values = TalkerMap.values(serverConnectionHandlerID);
+            auto values = TalkerMap.values(serverConnectionHandlerID);
             for (int i = 0; i < values.size(); ++i)
                 ts3plugin_onTalkStatusChangeEvent(serverConnectionHandlerID, STATUS_NOT_TALKING, 0, values.at(i));
         }

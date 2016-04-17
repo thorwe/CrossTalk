@@ -113,13 +113,13 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         //TSLogging::Log(QString("Created SnT Return Code: %1").arg(m_returnCode), LogLevel_DEBUG);
     }
 
-    TSPtt* ptt = TSPtt::instance();
+    auto ptt = TSPtt::instance();
     connect(ptt, &TSPtt::PttDelayFinished, this, &SnT::PttDelayFinished, Qt::UniqueConnection); // UniqueConnection saving init
 
     unsigned int error = ERROR_ok;
 
     // Get the active server
-    uint64 scHandlerID = TSHelpers::GetActiveServerConnectionHandlerID();
+    auto scHandlerID = TSHelpers::GetActiveServerConnectionHandlerID();
     if(scHandlerID == NULL)
     {
         TSLogging::Log("Failed to get an active server, falling back to current server", LogLevel_DEBUG);
@@ -241,9 +241,9 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             return;
         }
 
-        QString name = args.at(0);
-        QString groupWhisperTypeArg = args.at(1);
-        QString groupWhisperTargetModeArg = args.at(2);
+        auto name = args.at(0);
+        auto groupWhisperTypeArg = args.at(1);
+        auto groupWhisperTargetModeArg = args.at(2);
         uint64 arg = (uint64)NULL;
 
         uint64 targetServer = 0;
@@ -263,12 +263,12 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         }
         else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
         {
-            TSServersInfo* serversInfo = TSServersInfo::instance();
+            auto serversInfo = TSServersInfo::instance();
             if (serversInfo != NULL)
             {
                 if (args.count() == 4)
                 {
-                    TSServerInfo* serverInfo = serversInfo->GetServerInfo(targetServer);
+                    auto serverInfo = serversInfo->GetServerInfo(targetServer);
                     if ((arg = serverInfo->GetChannelGroupId(args.at(3))) == (uint64)NULL)
                     {
                         TSLogging::Error("Could not find channel group.");
@@ -281,7 +281,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
                         return;
 
                     // Blacklist default channel group only with no arg
-                    TSServerInfo* serverInfo = serversInfo->GetServerInfo(targetServer);
+                    auto serverInfo = serversInfo->GetServerInfo(targetServer);
                     if (serverInfo->getDefaultChannelGroup() == arg)
                         return;
                 }
@@ -295,10 +295,10 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
                 return;
             }
 
-            TSServersInfo* serversInfo = TSServersInfo::instance();
+            auto serversInfo = TSServersInfo::instance();
             if (serversInfo != NULL)
             {
-                TSServerInfo* serverInfo = serversInfo->GetServerInfo(targetServer);
+                auto serverInfo = serversInfo->GetServerInfo(targetServer);
                 if ((arg = serverInfo->GetServerGroupId(args.at(3))) == (uint64)NULL)
                 {
                     TSLogging::Error("Could not find server group.");
@@ -307,7 +307,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             }
         }
 
-        GroupWhisperTargetMode groupWhisperTargetMode  = GetGroupWhisperTargetMode(groupWhisperTargetModeArg);
+        auto groupWhisperTargetMode  = GetGroupWhisperTargetMode(groupWhisperTargetModeArg);
         if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ENDMARKER)
         {
             TSLogging::Error("Could not recognize group whisper target mode.",scHandlerID,NULL);
@@ -356,7 +356,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
 
         QString arg_qs;
         arg_qs = args.at(0);
-        GroupWhisperType groupWhisperType = GetGroupWhisperType(arg_qs);
+        auto groupWhisperType = GetGroupWhisperType(arg_qs);
         if (groupWhisperType == GROUPWHISPERTYPE_ENDMARKER)
         {
             TSLogging::Error("Could not determine group whisper type.",scHandlerID,NULL);
@@ -379,7 +379,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         }
 
         arg_qs = args.at(1);
-        GroupWhisperTargetMode groupWhisperTargetMode  = GetGroupWhisperTargetMode(arg_qs);
+        auto groupWhisperTargetMode  = GetGroupWhisperTargetMode(arg_qs);
         if (groupWhisperTargetMode == GROUPWHISPERTARGETMODE_ENDMARKER)
         {
             TSLogging::Error("Could not recognize group whisper target mode.",scHandlerID,NULL);

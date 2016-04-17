@@ -35,7 +35,7 @@ void Radio::setChannelStripEnabled(QString name, bool val)
     }
     else
     {
-        RadioFX_Settings setting = RadioFX_Settings();
+        auto setting = RadioFX_Settings();
         setting.name = name;
         setting.enabled = val;
 //        setting.freq_low = 0.0f;
@@ -57,7 +57,7 @@ void Radio::setFudge(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting = RadioFX_Settings();
+        auto setting = RadioFX_Settings();
         setting.name = name;
 //        setting.enabled = false;
 //        setting.freq_low = 0.0f;
@@ -79,7 +79,7 @@ void Radio::setInLoFreq(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting = RadioFX_Settings();
+        auto setting = RadioFX_Settings();
         setting.name = name;
         setting.freq_low = val;
         m_SettingsMap.insert(name,setting);
@@ -100,7 +100,7 @@ void Radio::setInHiFreq(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting = RadioFX_Settings();
+        auto setting = RadioFX_Settings();
         setting.name = name;
         setting.freq_hi = val;
         m_SettingsMap.insert(name,setting);
@@ -121,7 +121,7 @@ void Radio::setRingModFrequency(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting = RadioFX_Settings();
+        auto setting = RadioFX_Settings();
         setting.name = name;
         setting.rm_mod_freq = val;
         m_SettingsMap.insert(name,setting);
@@ -139,7 +139,7 @@ void Radio::setRingModMix(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting = RadioFX_Settings();
+        auto setting = RadioFX_Settings();
         setting.name = name;
         setting.rm_mix = val;
         m_SettingsMap.insert(name,setting);
@@ -157,7 +157,7 @@ void Radio::setOutLoFreq(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting = RadioFX_Settings();
+        auto setting = RadioFX_Settings();
         setting.name = name;
         setting.o_freq_lo = val;
         m_SettingsMap.insert(name,setting);
@@ -177,7 +177,7 @@ void Radio::setOutHiFreq(QString name, double val)
     }
     else
     {
-        RadioFX_Settings setting = RadioFX_Settings();
+        auto setting = RadioFX_Settings();
         setting.name = name;
         setting.o_freq_hi = val;
         m_SettingsMap.insert(name,setting);
@@ -205,7 +205,7 @@ void Radio::ToggleClientBlacklisted(uint64 serverConnectionHandlerID, anyID clie
     QMap<anyID,DspRadio*>* sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
     if (sDspRadios->contains(clientID))
     {
-        DspRadio* dspObj = sDspRadios->value(clientID);
+        auto dspObj = sDspRadios->value(clientID);
         dspObj->setEnabled(QString::null,!isClientBlacklisted(serverConnectionHandlerID,clientID));
     }
 }
@@ -250,17 +250,17 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
         }
 
         DspRadio* dspObj;
-        bool isNewDspObj = true;
+        auto isNewDspObj = true;
         if (!(TalkersDspRadios->contains(serverConnectionHandlerID)))
         {
             dspObj = new DspRadio(this);
-            QMap<anyID,DspRadio*>* sDspRadios = new QMap<anyID,DspRadio*>;
+            auto sDspRadios = new QMap<anyID,DspRadio*>;
             sDspRadios->insert(clientID,dspObj);
             TalkersDspRadios->insert(serverConnectionHandlerID,sDspRadios);
         }
         else
         {
-            QMap<anyID,DspRadio*>* sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
+            auto sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
             if (sDspRadios->contains(clientID))
             {
                 dspObj = sDspRadios->value(clientID);
@@ -282,8 +282,8 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
         else
         {
             // get channel
-            QString server_id = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getUniqueId();
-            QString channel_path = TSHelpers::GetChannelPath(serverConnectionHandlerID, channel_id);
+            auto server_id = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getUniqueId();
+            auto channel_path = TSHelpers::GetChannelPath(serverConnectionHandlerID, channel_id);
 
             QString settings_map_key(server_id + channel_path);
             //this->Log(settings_map_key);
@@ -324,13 +324,13 @@ bool Radio::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bo
         if (!TalkersDspRadios->contains(serverConnectionHandlerID))
             return false;   // return silent bec. of ChannelMuter implementation
 
-        QMap<anyID,DspRadio*>* sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
+        auto sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
         if (!(sDspRadios->contains(clientID)))
             return false;
 
-        DspRadio* dspObj = sDspRadios->value(clientID);
+        auto dspObj = sDspRadios->value(clientID);
         dspObj->blockSignals(true);
-        bool isEnabled = dspObj->getEnabled();
+        auto isEnabled = dspObj->getEnabled();
         dspObj->deleteLater();
         sDspRadios->remove(clientID);
         return isEnabled;
@@ -355,11 +355,11 @@ void Radio::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID
     if (!(TalkersDspRadios->contains(serverConnectionHandlerID)))
         return;
 
-    QMap<anyID,DspRadio*>* sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
+    auto sDspRadios = TalkersDspRadios->value(serverConnectionHandlerID);
     if (!(sDspRadios->contains(clientID)))
         return;
 
-    DspRadio* dspObj = sDspRadios->value(clientID);
+    auto dspObj = sDspRadios->value(clientID);
     dspObj->Process(samples,sampleCount,channels);
 }
 

@@ -58,7 +58,7 @@ void GroupBoxPositionalAudioServers::UpdateUIServerRemove(QString serverUniqueId
 {
     m_ServerSettingsMap.remove(serverUniqueId);
     m_Name2sUId.remove(serverName);
-    QList<QListWidgetItem *> list = ui->listWidget_servers->findItems(serverName,Qt::MatchExactly);
+    auto list = ui->listWidget_servers->findItems(serverName,Qt::MatchExactly);
     if (list.size() == 1)
     {
         int row = ui->listWidget_servers->row(list.at(0));
@@ -102,11 +102,11 @@ void GroupBoxPositionalAudioServers::UpdateUIServerBlocked(QString serverUniqueI
         return;
     m_ServerSettingsMap[serverUniqueId].isBlocked = val;
 
-    QList<QListWidgetItem*> selectedItems = ui->listWidget_servers->selectedItems();
+    auto selectedItems = ui->listWidget_servers->selectedItems();
     if (selectedItems.isEmpty())
         return;
 
-    QString rowName = selectedItems.at(0)->text();
+    auto rowName = selectedItems.at(0)->text();
     if (m_ServerSettingsMap.value(serverUniqueId).serverName == rowName)
         ui->pushButton_unblock->setVisible(val);
 }
@@ -119,11 +119,11 @@ void GroupBoxPositionalAudioServers::UpdateUIServerSendInterval(QString serverUn
         return;
     m_ServerSettingsMap[serverUniqueId].sendInterval = val;
 
-    QList<QListWidgetItem*> selectedItems = ui->listWidget_servers->selectedItems();
+    auto selectedItems = ui->listWidget_servers->selectedItems();
     if (selectedItems.isEmpty())
         return;
 
-    QString rowName = selectedItems.at(0)->text();
+    auto rowName = selectedItems.at(0)->text();
     if (m_ServerSettingsMap.value(serverUniqueId).serverName == rowName)
     {
 //        ui->doubleSpinBox_SendInterval->blockSignals(true);
@@ -140,11 +140,11 @@ void GroupBoxPositionalAudioServers::UpdateUIServerSendIntervalSilentInc(QString
         return;
     m_ServerSettingsMap[serverUniqueId].sendIntervalSilentInc = val;
 
-    QList<QListWidgetItem*> selectedItems = ui->listWidget_servers->selectedItems();
+    auto selectedItems = ui->listWidget_servers->selectedItems();
     if (selectedItems.isEmpty())
         return;
 
-    QString rowName = selectedItems.at(0)->text();
+    auto rowName = selectedItems.at(0)->text();
     if (m_ServerSettingsMap.value(serverUniqueId).serverName == rowName)
     {
 //        ui->doubleSpinBox_SendInterval->blockSignals(true);
@@ -158,9 +158,9 @@ void GroupBoxPositionalAudioServers::UpdateUIServerSelect(QString serverUniqueId
     if (!m_ServerSettingsMap.contains(serverUniqueId))
         serverUniqueId = "default";
 
-    QString serverName = m_ServerSettingsMap.value(serverUniqueId).serverName;
+    auto serverName = m_ServerSettingsMap.value(serverUniqueId).serverName;
 
-    QList<QListWidgetItem *> list = ui->listWidget_servers->findItems(serverName,Qt::MatchExactly);
+    auto list = ui->listWidget_servers->findItems(serverName,Qt::MatchExactly);
     if (list.size() == 1)
     {
         int row = ui->listWidget_servers->row(list.at(0));
@@ -177,7 +177,7 @@ void GroupBoxPositionalAudioServers::UpdateUIServerSelect(QString serverUniqueId
 
 void GroupBoxPositionalAudioServers::changePage(QString val)
 {
-    QString serverUniqueId = m_Name2sUId.value(val);
+    auto serverUniqueId = m_Name2sUId.value(val);
     ui->groupBoxSettings->blockSignals(true);
     ui->groupBoxSettings->setChecked(m_ServerSettingsMap.value(serverUniqueId).enabled);
     ui->groupBoxSettings->blockSignals(false);
@@ -197,59 +197,59 @@ void GroupBoxPositionalAudioServers::changePage(QString val)
 
 void GroupBoxPositionalAudioServers::onRemoveButtonClicked()
 {
-    QList<QListWidgetItem*> selectedItems = ui->listWidget_servers->selectedItems();
+    auto selectedItems = ui->listWidget_servers->selectedItems();
     if (selectedItems.isEmpty())
         return;
 
-    QString rowName = selectedItems.at(0)->text();
-    QString serverUniqueId = m_Name2sUId.value(rowName);
+    auto rowName = selectedItems.at(0)->text();
+    auto serverUniqueId = m_Name2sUId.value(rowName);
     emit removeButtonClicked(serverUniqueId);
 }
 
 void GroupBoxPositionalAudioServers::onSendIntervalSpinBoxValueChanged(double val)
 {
-    QList<QListWidgetItem*> selectedItems = ui->listWidget_servers->selectedItems();
+    auto selectedItems = ui->listWidget_servers->selectedItems();
     if (selectedItems.isEmpty())
         return;
 
-    QString rowName = selectedItems.at(0)->text();
-    QString serverUniqueId = m_Name2sUId.value(rowName);
+    auto rowName = selectedItems.at(0)->text();
+    auto serverUniqueId = m_Name2sUId.value(rowName);
     m_ServerSettingsMap[serverUniqueId].sendInterval = (float)val;
     emit sendIntervalChange(serverUniqueId,(float)val);
 }
 
 void GroupBoxPositionalAudioServers::onSendIntervalSilentIncSpinBoxValueChanged(double val)
 {
-    QList<QListWidgetItem*> selectedItems = ui->listWidget_servers->selectedItems();
+    auto selectedItems = ui->listWidget_servers->selectedItems();
     if (selectedItems.isEmpty())
         return;
 
-    QString rowName = selectedItems.at(0)->text();
-    QString serverUniqueId = m_Name2sUId.value(rowName);
+    auto rowName = selectedItems.at(0)->text();
+    auto serverUniqueId = m_Name2sUId.value(rowName);
     m_ServerSettingsMap[serverUniqueId].sendIntervalSilentInc = (float)val;
     emit sendIntervalSilentIncChange(serverUniqueId,(float)val);
 }
 
 void GroupBoxPositionalAudioServers::onEnabledCheckToggled(bool val)
 {
-    QList<QListWidgetItem*> selectedItems = ui->listWidget_servers->selectedItems();
+    auto selectedItems = ui->listWidget_servers->selectedItems();
     if (selectedItems.isEmpty())
         return;
 
-    QString rowName = selectedItems.at(0)->text();
-    QString serverUniqueId = m_Name2sUId.value(rowName);
+    auto rowName = selectedItems.at(0)->text();
+    auto serverUniqueId = m_Name2sUId.value(rowName);
     m_ServerSettingsMap[serverUniqueId].enabled = val;
     emit enabledSet(serverUniqueId,val);
 }
 
 void GroupBoxPositionalAudioServers::onUnblockButtonClicked()
 {
-    QList<QListWidgetItem*> selectedItems = ui->listWidget_servers->selectedItems();
+    auto selectedItems = ui->listWidget_servers->selectedItems();
     if (selectedItems.isEmpty())
         return;
 
-    QString rowName = selectedItems.at(0)->text();
-    QString serverUniqueId = m_Name2sUId.value(rowName);
+    auto rowName = selectedItems.at(0)->text();
+    auto serverUniqueId = m_Name2sUId.value(rowName);
     m_ServerSettingsMap[serverUniqueId].isBlocked = false;
     ui->pushButton_unblock->setVisible(false);
     emit blockedSet(serverUniqueId,false);

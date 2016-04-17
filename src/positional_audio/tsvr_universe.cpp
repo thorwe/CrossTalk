@@ -17,13 +17,13 @@ TsVrObjOther* TsVrUniverse::Add(uint64 serverConnectionHandlerID,anyID clientID)
     TsVrObjOther* obj = new TsVrObjOther(this,serverConnectionHandlerID,clientID);
     if (!(m_Map.contains(serverConnectionHandlerID))) //safety measurement
     {
-        QMap<anyID,TsVrObjOther*>* ConnectionHandlerUniverse = new QMap<anyID,TsVrObjOther*>;
+        auto ConnectionHandlerUniverse = new QMap<anyID,TsVrObjOther*>;
         ConnectionHandlerUniverse->insert(clientID,obj);
         m_Map.insert(serverConnectionHandlerID,ConnectionHandlerUniverse);
     }
     else
     {
-        QMap<anyID,TsVrObjOther*>* ConnectionHandlerUniverse = m_Map.value(serverConnectionHandlerID);
+        auto ConnectionHandlerUniverse = m_Map.value(serverConnectionHandlerID);
         ConnectionHandlerUniverse->insert(clientID,obj);
     }
     return obj;
@@ -40,12 +40,12 @@ void TsVrUniverse::Remove(uint64 serverConnectionHandlerID, anyID clientID)
     if (!(m_Map.contains(serverConnectionHandlerID)))
         return;
 
-    QMap<anyID,TsVrObjOther*>* ConnectionHandlerUniverse = m_Map.value(serverConnectionHandlerID);
+    auto ConnectionHandlerUniverse = m_Map.value(serverConnectionHandlerID);
     if (!(ConnectionHandlerUniverse->contains(clientID)))
         return;
 
-    TsVrObjOther* removedObj = ConnectionHandlerUniverse->take(clientID);
-    QString clientUID = removedObj->getClientUID();
+    auto removedObj = ConnectionHandlerUniverse->take(clientID);
+    auto clientUID = removedObj->getClientUID();
     delete removedObj;
     emit removed(clientUID);
 }
@@ -60,7 +60,7 @@ void TsVrUniverse::Remove(uint64 serverConnectionHandlerID)
     if (!(m_Map.contains(serverConnectionHandlerID)))
         return;
 
-    QMap<anyID,TsVrObjOther*>* ConnectionHandlerUniverse = m_Map.take(serverConnectionHandlerID);
+    auto ConnectionHandlerUniverse = m_Map.take(serverConnectionHandlerID);
     QMutableMapIterator<anyID,TsVrObjOther*> i(*ConnectionHandlerUniverse);
     while (i.hasNext())
     {

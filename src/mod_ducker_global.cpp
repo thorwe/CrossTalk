@@ -39,7 +39,7 @@ bool Ducker_Global::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 i
     if (!isRunning())
         return false;
 
-    bool isDirty = false;
+    auto isDirty = false;
     if (type == PLUGIN_CLIENT)
     {
         ts3Functions.setPluginMenuEnabled(pluginID,m_ContextMenuToggleMusicBot,(id != mine)?1:0);
@@ -91,7 +91,7 @@ void Ducker_Global::AddMusicBot(uint64 serverConnectionHandlerID, anyID clientID
                 if (channelID!=my_channelID)
                     return;
 
-                DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(AddMusicBotVolume(serverConnectionHandlerID,clientID));
+                auto vol = qobject_cast<DspVolumeDucker*>(AddMusicBotVolume(serverConnectionHandlerID,clientID));
                 if (vol != 0)
                 {
                     if ((talking==STATUS_TALKING) && (!isActive()))
@@ -224,7 +224,7 @@ bool Ducker_Global::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerI
     if (!(isRunning()))
         return false;
 
-    DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
+    auto vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
     if (vol == 0)
         return false;
 
@@ -247,8 +247,7 @@ void Ducker_Global::onRunningStateChanged(bool value)
         uint64* servers;
         if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
         {
-            uint64* server;
-            for(server = servers; *server != (uint64)NULL; ++server)
+            for(auto server = servers; *server != (uint64)NULL; ++server)
             {
                 int status;
                 if (ts3Functions.getConnectionStatus(*server, &status) != ERROR_ok)
@@ -321,7 +320,7 @@ void Ducker_Global::onTalkStatusChanged(uint64 serverConnectionHandlerID, int st
 
     if ((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING))
     {
-        DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
+        auto vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
         if (vol != 0)
             vol->setProcessing(status==STATUS_TALKING);
     }
@@ -329,7 +328,7 @@ void Ducker_Global::onTalkStatusChanged(uint64 serverConnectionHandlerID, int st
 
 DspVolumeDucker* Ducker_Global::AddMusicBotVolume(uint64 serverConnectionHandlerID, anyID clientID)
 {
-    DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->AddVolume(serverConnectionHandlerID,clientID));
+    auto vol = qobject_cast<DspVolumeDucker*>(vols->AddVolume(serverConnectionHandlerID,clientID));
     if (vol != 0)
     {
         vol->setGainDesired(m_value);

@@ -17,7 +17,7 @@ DspVolumeAGMU::DspVolumeAGMU(QObject *parent)
 void DspVolumeAGMU::process(short *samples, int sampleCount, int channels)
 {
     sampleCount = sampleCount * channels;
-    short peak = getPeak(samples,sampleCount);
+    auto peak = getPeak(samples,sampleCount);
     peak = qMax(m_peak,peak);
     if (peak != m_peak)
     {
@@ -33,8 +33,8 @@ void DspVolumeAGMU::process(short *samples, int sampleCount, int channels)
 // Compute gain change
 float DspVolumeAGMU::GetFadeStep(int sampleCount)
 {
-    float current_gain = getGainCurrent();
-    float desired_gain = getGainDesired();
+    auto current_gain = getGainCurrent();
+    auto desired_gain = getGainDesired();
     if (current_gain != desired_gain)
     {
         float fade_step_down = (m_rateQuieter / m_sampleRate) * sampleCount;

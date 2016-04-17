@@ -22,11 +22,11 @@ bool Agmu::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID 
     if (!(m_TalkersDSPs->contains(serverConnectionHandlerID)))
         return false;
 
-    QMap<anyID,DspVolumeAGMU*>* sDspVolumeAGMUs = m_TalkersDSPs->value(serverConnectionHandlerID);
+    auto sDspVolumeAGMUs = m_TalkersDSPs->value(serverConnectionHandlerID);
     if (!(sDspVolumeAGMUs->contains(clientID)))
         return false;
 
-    DspVolumeAGMU* dspObj = sDspVolumeAGMUs->value(clientID);
+    auto dspObj = sDspVolumeAGMUs->value(clientID);
     dspObj->process(samples,sampleCount,channels);
     return true;
 }
@@ -43,17 +43,17 @@ bool Agmu::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, boo
     if (status == STATUS_TALKING)
     {   // Robust against multiple STATUS_TALKING in a row to be able to use it when the user changes settings
         DspVolumeAGMU* dspObj;
-        bool isNewDspObj = true;
+        auto isNewDspObj = true;
         if (!(m_TalkersDSPs->contains(serverConnectionHandlerID)))
         {
             dspObj = new DspVolumeAGMU(this);
-            QMap<anyID,DspVolumeAGMU*>* sDspVolumeAGMUs = new QMap<anyID,DspVolumeAGMU*>;
+            auto sDspVolumeAGMUs = new QMap<anyID,DspVolumeAGMU*>;
             sDspVolumeAGMUs->insert(clientID,dspObj);
             m_TalkersDSPs->insert(serverConnectionHandlerID,sDspVolumeAGMUs);
         }
         else
         {
-            QMap<anyID,DspVolumeAGMU*>* sDspVolumeAGMUs = m_TalkersDSPs->value(serverConnectionHandlerID);
+            auto sDspVolumeAGMUs = m_TalkersDSPs->value(serverConnectionHandlerID);
             if (sDspVolumeAGMUs->contains(clientID))
             {
                 dspObj = sDspVolumeAGMUs->value(clientID);
@@ -101,11 +101,11 @@ bool Agmu::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, boo
         if (!m_TalkersDSPs->contains(serverConnectionHandlerID))
             return false;   // return silent bec. of ChannelMuter implementation
 
-        QMap<anyID,DspVolumeAGMU*>* sDspVolumeAGMUs = m_TalkersDSPs->value(serverConnectionHandlerID);
+        auto sDspVolumeAGMUs = m_TalkersDSPs->value(serverConnectionHandlerID);
         if (!(sDspVolumeAGMUs->contains(clientID)))
             return false;
 
-        DspVolumeAGMU* dspObj = sDspVolumeAGMUs->value(clientID);
+        auto dspObj = sDspVolumeAGMUs->value(clientID);
         QString clientUID;
         unsigned int error;
         if ((error = TSHelpers::GetClientUID(serverConnectionHandlerID,clientID, clientUID)) != ERROR_ok)

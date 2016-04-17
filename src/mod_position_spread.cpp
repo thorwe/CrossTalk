@@ -151,11 +151,11 @@ void PositionSpread::onEditPostProcessVoiceDataEvent(uint64 serverConnectionHand
     if (!(TalkersPanners->contains(serverConnectionHandlerID)))
         return;
 
-    QMap<anyID,SimplePanner*>* sPanners = TalkersPanners->value(serverConnectionHandlerID);
+    auto sPanners = TalkersPanners->value(serverConnectionHandlerID);
     if (!(sPanners->contains(clientID)))
         return;
 
-    SimplePanner* panner = sPanners->value(clientID);
+    auto panner = sPanners->value(clientID);
 
     QMap<unsigned int,int> speaker2Channel;
     for(int i=0; i < channels; ++i)
@@ -221,7 +221,7 @@ bool PositionSpread::onTalkStatusChanged(uint64 serverConnectionHandlerID, int s
 
 //    QList< QPair<uint64,anyID>* >* seq;
     QList< QPair<uint64,anyID> >* seq;
-    QPair<uint64,anyID> seqPair = qMakePair(serverConnectionHandlerID,clientID);
+    auto seqPair = qMakePair(serverConnectionHandlerID,clientID);
 //    Print(QString("scHandler: %1, seqPair: %2,%3").arg(serverConnectionHandlerID).arg(seqPair.first).arg(seqPair.second));
     if (status == STATUS_TALKING)
     {   // Robust against multiple STATUS_TALKING in a row to be able to use it when the user changes settings
@@ -230,13 +230,13 @@ bool PositionSpread::onTalkStatusChanged(uint64 serverConnectionHandlerID, int s
         if (!(TalkersPanners->contains(serverConnectionHandlerID)))
         {
             panner = new SimplePanner(this);
-            QMap<anyID,SimplePanner*>* ConnectionHandlerPanners = new QMap<anyID,SimplePanner*>;
+            auto ConnectionHandlerPanners = new QMap<anyID,SimplePanner*>;
             ConnectionHandlerPanners->insert(clientID,panner);
             TalkersPanners->insert(serverConnectionHandlerID,ConnectionHandlerPanners);
         }
         else
         {
-            QMap<anyID,SimplePanner*>* ConnectionHandlerPanners = TalkersPanners->value(serverConnectionHandlerID);
+            auto ConnectionHandlerPanners = TalkersPanners->value(serverConnectionHandlerID);
             if (ConnectionHandlerPanners->contains(clientID))
             {
                 panner = ConnectionHandlerPanners->value(clientID);
@@ -321,13 +321,13 @@ bool PositionSpread::onTalkStatusChanged(uint64 serverConnectionHandlerID, int s
             return false;
         }
 
-        QMap<anyID,SimplePanner*>* sPanners = TalkersPanners->value(serverConnectionHandlerID);
+        auto sPanners = TalkersPanners->value(serverConnectionHandlerID);
         if (!(sPanners->contains(clientID)))
         {
             //Error("(onTalkStatusChanged) Trying to remove talker with an invalid client id.",serverConnectionHandlerID,NULL);
             return false;
         }
-        SimplePanner* panner = sPanners->value(clientID);
+        auto panner = sPanners->value(clientID);
         panner->setPanAdjustment(false);
         panner->blockSignals(true);
         panner->deleteLater();
@@ -351,7 +351,7 @@ void PositionSpread::CheckClearSeq(QList< QPair<uint64,anyID> >* seq)
     if (seq->isEmpty())
         return;
 
-    bool shallClear = true;
+    auto shallClear = true;
     for (int i=0;i<seq->size();++i)
     {
         if (seq->value(i) != SEAT_HOLDER)

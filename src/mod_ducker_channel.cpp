@@ -44,8 +44,7 @@ void Ducker_Channel::onRunningStateChanged(bool value)
         uint64* servers;
         if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
         {
-            uint64* server;
-            for(server = servers; *server != (uint64)NULL; ++server)
+            for(auto server = servers; *server != (uint64)NULL; ++server)
             {
                 int status;
                 if (ts3Functions.getConnectionStatus(*server, &status) != ERROR_ok)
@@ -151,25 +150,25 @@ void Ducker_Channel::setHomeId(uint64 serverConnectionHandlerID)
     // Dump talk changes for new and old home id
 //    talkers->DumpTalkStatusChanges(this,STATUS_TALKING); //ToDo: ServerConnectionHandler specific dump
     // don't need no whisper or self talk here
-    QMultiMap<uint64,anyID> map = talkers->GetTalkerMap();
+    auto map = talkers->GetTalkerMap();
     if (map.contains(oldHomeId))
     {
-        QList<anyID> list = map.values(oldHomeId);
+        auto list = map.values(oldHomeId);
         for (int i = 0; i<list.size(); ++i)
         {
-            DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(oldHomeId,list[i]));
-            if (vol!=NULL)
+            auto vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(oldHomeId,list[i]));
+            if (vol)
                 vol->setDuckBlocked(!m_isTargetOtherTabs);
         }
     }
 
     if (map.contains(m_homeId))
     {
-        QList<anyID> list = map.values(m_homeId);
+        auto list = map.values(m_homeId);
         for (int i = 0; i<list.size(); ++i)
         {
-            DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(m_homeId,list[i]));
-            if (vol!=NULL)
+            auto vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(m_homeId,list[i]));
+            if (vol)
                 vol->setDuckBlocked(m_isTargetOtherTabs);
         }
     }
@@ -261,8 +260,8 @@ bool Ducker_Channel::onTalkStatusChanged(uint64 serverConnectionHandlerID, int s
 
     if (((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING)))
     {
-        DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
-        if (vol == NULL)
+        auto vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
+        if (!vol)
         {
 //            Error("(onTalkStatusChanged) Could not get volume.",serverConnectionHandlerID,NULL);
             return false;
@@ -299,7 +298,7 @@ void Ducker_Channel::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandler
     if (((!m_isTargetOtherTabs) && (serverConnectionHandlerID != m_homeId)) || ((m_isTargetOtherTabs) && (serverConnectionHandlerID == m_homeId)))
         return;
 
-    DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
+    auto vol = qobject_cast<DspVolumeDucker*>(vols->GetVolume(serverConnectionHandlerID,clientID));
     if (vol == 0)
         return;
 
@@ -316,7 +315,7 @@ void Ducker_Channel::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandler
  */
 DspVolumeDucker* Ducker_Channel::AddDuckerVolume(uint64 serverConnectionHandlerID,anyID clientID)
 {
-    DspVolumeDucker* vol = qobject_cast<DspVolumeDucker*>(vols->AddVolume(serverConnectionHandlerID,clientID));
+    auto vol = qobject_cast<DspVolumeDucker*>(vols->AddVolume(serverConnectionHandlerID,clientID));
     if (vol != 0)
     {
         vol->setGainDesired(m_value);

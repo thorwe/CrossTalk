@@ -28,34 +28,34 @@ Config::Config(QWidget *parent) :
     // load image
     connect(ui->banner_jianji, &Banner::onClick, this, &Config::onJianjiClicked);
 
-    QString lang = TSHelpers::GetLanguage();
+    auto lang = TSHelpers::GetLanguage();
     if (lang != "de_DE") // outside of german locale, hide jianji banner
         ui->banner_jianji->setVisible(false);
 
     // Create Settings UI
-    QGroupBox* groupBoxBeta = new QGroupBox(tr("Plugin Updates"),this);
-    QHBoxLayout* groupBoxBetaLayout = new QHBoxLayout;
-    QCheckBox* checkBoxBeta = new QCheckBox(tr("Beta Channel"),this);
+    auto groupBoxBeta = new QGroupBox(tr("Plugin Updates"),this);
+    auto groupBoxBetaLayout = new QHBoxLayout;
+    auto checkBoxBeta = new QCheckBox(tr("Beta Channel"),this);
     groupBoxBetaLayout->addWidget(checkBoxBeta);
     groupBoxBeta->setLayout(groupBoxBetaLayout);
 
-    QGroupBox* groupBoxWSS = new QGroupBox(tr("WebSockets Server"),this);
+    auto groupBoxWSS = new QGroupBox(tr("WebSockets Server"),this);
     groupBoxWSS->setCheckable(true);
-    QHBoxLayout* groupBoxWSSLayout = new QHBoxLayout;
-    QLabel* wssLabel = new QLabel(tr("Port"),this);
+    auto groupBoxWSSLayout = new QHBoxLayout;
+    auto wssLabel = new QLabel(tr("Port"),this);
     groupBoxWSSLayout->addWidget(wssLabel,0,Qt::AlignRight);
-    QSpinBox* wssSpinBox = new QSpinBox(this);
+    auto wssSpinBox = new QSpinBox(this);
     wssSpinBox->setMaximum(65535);
     wssSpinBox->setMinimumWidth(80);
     groupBoxWSSLayout->addWidget(wssSpinBox,0,Qt::AlignLeft);
     groupBoxWSS->setLayout(groupBoxWSSLayout);
 
-    QGroupBox* groupBoxSSE = new QGroupBox(tr("Local SSE-Server"),this);
+    auto groupBoxSSE = new QGroupBox(tr("Local SSE-Server"),this);
     groupBoxSSE->setCheckable(true);
-    QHBoxLayout* groupBoxSSELayout = new QHBoxLayout;
-    QLabel* sseLabel = new QLabel(tr("Port"),this);
+    auto groupBoxSSELayout = new QHBoxLayout;
+    auto sseLabel = new QLabel(tr("Port"),this);
     groupBoxSSELayout->addWidget(sseLabel,0,Qt::AlignRight);
-    QSpinBox* sseSpinBox = new QSpinBox(this);
+    auto sseSpinBox = new QSpinBox(this);
     sseSpinBox->setMaximum(65535);
     sseSpinBox->setMinimumWidth(80);
     groupBoxSSELayout->addWidget(sseSpinBox,0,Qt::AlignLeft);

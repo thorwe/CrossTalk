@@ -202,10 +202,10 @@ void SimplePanner::process(int nSamples,
 void SimplePanner::process(short *samples, int sampleCount, int channels,int leftChannelNr, int rightChannelNr)
 {
     // Determine Pan for current buffer
-    float currentPan = getPanCurrent();
-    float desiredPan = getPanDesired();
-    float desiredPanByManual = getPanDesiredByManual();
-    float desiredPanByPanAdjuster = getPanDesiredByPanAdjuster();
+    auto currentPan = getPanCurrent();
+    auto desiredPan = getPanDesired();
+    auto desiredPanByManual = getPanDesiredByManual();
+    auto desiredPanByPanAdjuster = getPanDesiredByPanAdjuster();
 
     if (desiredPan != desiredPanByManual) {
         if (getPanAdjustment() == true) {
@@ -269,7 +269,7 @@ void SimplePanner::process(short *samples, int sampleCount, int channels,int lef
     // put it back into interleaved and Clip
     for (int i = 0; i < sampleCount; ++i)
     {
-        float left = float_data_left.at(i);
+        auto left = float_data_left.at(i);
         if (left > 32767.f)
             samples[leftChannelNr + (i*channels) ] = 32767;
         else if (left < -32768.f)

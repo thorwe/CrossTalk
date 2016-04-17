@@ -76,7 +76,7 @@ float DspVolumeDucker::GetFadeStep(int sampleCount)
         current_gain = VOLUME_0DB;
     else
     {
-        float desired_gain = getGainDesired();
+        auto desired_gain = getGainDesired();
         if ((m_gainAdjustment == true) && (current_gain != desired_gain))   // is attacking / adjusting
         {
             float fade_step_down = (m_attackRate / m_sampleRate) * sampleCount;

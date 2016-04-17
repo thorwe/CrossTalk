@@ -137,7 +137,7 @@ void TSPtt::UpdatePttDelayInfo()
         return;
     }
 
-    QStringList lines = preProcessorData.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+    auto lines = preProcessorData.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
     QStringListIterator iterator(lines);
     while (iterator.hasNext())
     {

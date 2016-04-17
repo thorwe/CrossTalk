@@ -25,7 +25,7 @@ ConfigRadio::~ConfigRadio()
 
 void ConfigRadio::UpdateEnabled(QString name, bool val)
 {
-    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    auto channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
     channelStrip->setChecked(val);
     channelStrip->blockSignals(false);
@@ -33,7 +33,7 @@ void ConfigRadio::UpdateEnabled(QString name, bool val)
 
 void ConfigRadio::UpdateBandpassInLowFrequency(QString name, double val)
 {
-    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    auto channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
     channelStrip->onInLoValueChanged(val);
     channelStrip->blockSignals(false);
@@ -41,7 +41,7 @@ void ConfigRadio::UpdateBandpassInLowFrequency(QString name, double val)
 
 void ConfigRadio::UpdateBandpassInHighFrequency(QString name, double val)
 {
-    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    auto channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
     channelStrip->onInHiValueChanged(val);
     channelStrip->blockSignals(false);
@@ -49,7 +49,7 @@ void ConfigRadio::UpdateBandpassInHighFrequency(QString name, double val)
 
 void ConfigRadio::UpdateDestruction(QString name, double val)
 {
-    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    auto channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
     channelStrip->onDestrValueChanged(val);
     channelStrip->blockSignals(false);
@@ -57,7 +57,7 @@ void ConfigRadio::UpdateDestruction(QString name, double val)
 
 void ConfigRadio::UpdateRingModFrequency(QString name, double val)
 {
-    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    auto channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
     channelStrip->onRingModFrequencyValueChanged(val);
     channelStrip->blockSignals(false);
@@ -65,7 +65,7 @@ void ConfigRadio::UpdateRingModFrequency(QString name, double val)
 
 void ConfigRadio::UpdateRingModMix(QString name, double val)
 {
-    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    auto channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
     channelStrip->onRingModMixValueChanged(val);
     channelStrip->blockSignals(false);
@@ -73,7 +73,7 @@ void ConfigRadio::UpdateRingModMix(QString name, double val)
 
 void ConfigRadio::UpdateBandpassOutLowFrequency(QString name, double val)
 {
-    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    auto channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
     channelStrip->onOutLoValueChanged(val);
     channelStrip->blockSignals(false);
@@ -81,7 +81,7 @@ void ConfigRadio::UpdateBandpassOutLowFrequency(QString name, double val)
 
 void ConfigRadio::UpdateBandpassOutHighFrequency(QString name, double val)
 {
-    ConfigRadioGroupBox* channelStrip = GetChannelStrip(name);
+    auto channelStrip = GetChannelStrip(name);
     channelStrip->blockSignals(true);
     channelStrip->onOutHiValueChanged(val);
     channelStrip->blockSignals(false);
@@ -92,7 +92,7 @@ ConfigRadioGroupBox* ConfigRadio::GetChannelStrip(QString name)
     if (m_ChannelStripMap.contains(name))
         return m_ChannelStripMap.value(name);
 
-    ConfigRadioGroupBox* channelStrip = new ConfigRadioGroupBox(this);
+    auto channelStrip = new ConfigRadioGroupBox(this);
     channelStrip->setObjectName(name);
     channelStrip->setTitle((m_title.isEmpty()) ? name : m_title);
 

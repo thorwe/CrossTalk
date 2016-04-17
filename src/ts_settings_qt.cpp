@@ -116,7 +116,7 @@ bool TSSettings::GetBookmarkByServerUID(QString sUID, QMap<QString, QString> &re
     sUID.prepend("ServerUID=");
     for (int i = 0;i<bookmarks.count();++i)
     {
-        QString bookmark = bookmarks.at(i);
+        auto bookmark = bookmarks.at(i);
         if (bookmark.contains(sUID))
         {
             result = GetMapFromValue(bookmark);
@@ -193,7 +193,7 @@ bool TSSettings::Set3DSoundEnabled(bool val)
     QSqlQuery q_query(QString("UPDATE Application SET value='%1' WHERE key='3DSoundEnabled'").arg((val)?"1":"0"), m_SettingsDb);
     if (!q_query.exec())
     {
-        QSqlError sql_error = q_query.lastError();
+        auto sql_error = q_query.lastError();
         if (sql_error.isValid())
             error_qsql=sql_error;
         else
@@ -225,10 +225,10 @@ QSqlError TSSettings::GetLastError()
 QMap<QString, QString> TSSettings::GetMapFromValue(QString value)
 {
     QMap<QString,QString> result;
-    QStringList qstrl_value = value.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+    auto qstrl_value = value.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
     for (int i = 0;i<qstrl_value.count();++i)
     {
-        QString qs_val = qstrl_value.at(i);
+        auto qs_val = qstrl_value.at(i);
         result.insert(qs_val.section("=",0,0),qs_val.section("=",1));
     }
     return result;
@@ -263,7 +263,7 @@ bool TSSettings::GetValueFromQuery(QString query, QString &result, bool isEmptyV
     {
         if (!(q_query.isSelect()))
         {
-            QSqlError sql_error = q_query.lastError();
+            auto sql_error = q_query.lastError();
             if (sql_error.isValid())
             {
                 error_qsql=sql_error;
@@ -277,7 +277,7 @@ bool TSSettings::GetValueFromQuery(QString query, QString &result, bool isEmptyV
         }
         if (!(q_query.isActive()))
         {
-            QSqlError sql_error = q_query.lastError();
+            auto sql_error = q_query.lastError();
             if (sql_error.isValid())
             {
                 error_qsql=sql_error;
@@ -290,12 +290,12 @@ bool TSSettings::GetValueFromQuery(QString query, QString &result, bool isEmptyV
             return false;
         }
 
-        bool found = false;
+        auto found = false;
         while (q_query.next())
         {
             if (!(q_query.isValid()))
             {
-                QSqlError sql_error = q_query.lastError();
+                auto sql_error = q_query.lastError();
                 if (sql_error.isValid())
                 {
                     error_qsql=sql_error;
@@ -342,15 +342,12 @@ bool TSSettings::GetValuesFromQuery(QString query, QStringList &result) //proper
     QSqlQuery q_query(query, m_SettingsDb);
     if(!q_query.exec())
     {
-        QSqlError sql_error = q_query.lastError();
+        auto sql_error = q_query.lastError();
         if (sql_error.isValid())
-        {
             error_qsql=sql_error;
-        }
         else
-        {
             SetError("Unknown error on query.exec.");
-        }
+
         return false;
     }
     else
@@ -359,26 +356,20 @@ bool TSSettings::GetValuesFromQuery(QString query, QStringList &result) //proper
         {
             QSqlError sql_error = q_query.lastError();
             if (sql_error.isValid())
-            {
                 error_qsql=sql_error;
-            }
             else
-            {
                 SetError("Unknown error on query.isSelect().");
-            }
+
             return false;
         }
         if (!(q_query.isActive()))
         {
             QSqlError sql_error = q_query.lastError();
             if (sql_error.isValid())
-            {
                 error_qsql=sql_error;
-            }
             else
-            {
                 SetError("Unknown error on query.isActive().");
-            }
+
             return false;
         }
 
@@ -388,13 +379,10 @@ bool TSSettings::GetValuesFromQuery(QString query, QStringList &result) //proper
             {
                 QSqlError sql_error = q_query.lastError();
                 if (sql_error.isValid())
-                {
                     error_qsql=sql_error;
-                }
                 else
-                {
                     SetError("Unknown error on query.isValid().");
-                }
+
                 return false;
             }
             QString qstr(q_query.value(0).toString());

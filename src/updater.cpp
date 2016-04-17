@@ -39,7 +39,7 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
     }
     else
     {
-        QVariant possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
+        auto possibleRedirectUrl = reply->attribute(QNetworkRequest::RedirectionTargetAttribute);
 
         /* We'll deduct if the redirection is valid in the redirectUrl function */
         _urlRedirectedTo = this->redirectUrl(possibleRedirectUrl.toUrl(), _urlRedirectedTo);
@@ -52,7 +52,7 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
         }
 
         //https://api.github.com/repos/thorwe/crosstalk/releases/latest
-        QString replyUrl = reply->url().toString();
+        auto replyUrl = reply->url().toString();
         if (replyUrl.startsWith("https://api.github.com/repos/") && replyUrl.endsWith("/releases/latest"))
             parseGithubResponse(reply);
         else
@@ -94,7 +94,7 @@ void Updater::ShowUpdateDialog(QString remoteVersion, QUrl downloadUrl)
 {
     m_resultDownloadUrl = downloadUrl;
 
-    QWidget* mainWindow = TSHelpers::GetMainWindow();
+    auto mainWindow = TSHelpers::GetMainWindow();
     // Create Dialog
     QMessageBox updateMsgBox(mainWindow);
 //    updateMsgBox = new QMessageBox();
@@ -140,10 +140,10 @@ QUrl Updater::redirectUrl(const QUrl& possibleRedirectUrl, const QUrl& oldRedire
 
 void Updater::parseResponse(QNetworkReply *reply)
 {
-    bool isReplyStable = reply->url().toString().contains("addons.teamspeak.com");
+    auto isReplyStable = reply->url().toString().contains("addons.teamspeak.com");
 
-    QByteArray arr = reply->readAll();
-    int start = arr.indexOf((isReplyStable)?QString(ts3plugin_name()).append("_"):"Version",0);
+    auto arr = reply->readAll();
+    auto start = arr.indexOf((isReplyStable)?QString(ts3plugin_name()).append("_"):"Version",0);
     if (start == -1)
     {
         TSLogging::Log((this->objectName() + ": Did not find Version."),LogLevel_WARNING);
@@ -151,7 +151,7 @@ void Updater::parseResponse(QNetworkReply *reply)
     }
 
     QString endStr = (isReplyStable)?".ts3_plugin":"Platforms";
-    int end = arr.indexOf(endStr,start);
+    auto end = arr.indexOf(endStr,start);
     if (end == -1)
     {
         TSLogging::Log((this->objectName() + ": Did not find %1.").arg(endStr),LogLevel_WARNING);
@@ -165,7 +165,7 @@ void Updater::parseResponse(QNetworkReply *reply)
     else
         rx.setPattern("\\d+(?:\\.\\d+)+");
 
-    int pos = rx.indexIn(parse);
+    auto pos = rx.indexIn(parse);
     if (pos > -1)
         parse = rx.cap(0);
 
@@ -181,7 +181,7 @@ void Updater::parseResponse(QNetworkReply *reply)
 void Updater::parseGithubResponse(QNetworkReply *reply)
 {
     QJsonParseError jsonError;
-    QJsonDocument jdoc = QJsonDocument::fromJson(reply->readAll(),&jsonError);
+    auto jdoc = QJsonDocument::fromJson(reply->readAll(),&jsonError);
     if (jsonError.error != QJsonParseError::ParseError::NoError)
     {
         TSLogging::Error(QString("%1: Json error: %2").arg(this->objectName()).arg(jsonError.errorString()),true);
@@ -193,7 +193,7 @@ void Updater::parseGithubResponse(QNetworkReply *reply)
         return;
     }
 
-    QJsonObject jobj = jdoc.object();
+    auto jobj = jdoc.object();
     m_GithubBetaDownloadUrl = QUrl(jobj.value("html_url").toString());
 
     m_VersionGithubBeta = jobj.value("tag_name").toString();

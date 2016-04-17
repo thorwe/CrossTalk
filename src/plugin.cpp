@@ -214,8 +214,7 @@ int ts3plugin_init() {
     uint64* servers;
     if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
     {
-        uint64* server;
-        for(server = servers; *server != (uint64)NULL; ++server)
+        for(auto server = servers; *server != (uint64)NULL; ++server)
         {
             int status;
             if (ts3Functions.getConnectionStatus(*server, &status) != ERROR_ok)
@@ -273,7 +272,7 @@ int ts3plugin_init() {
         ts3Functions.freeMemory(servers);
 
         // Get the active server tab
-        uint64 scHandlerID = ts3Functions.getCurrentServerConnectionHandlerID();
+        auto scHandlerID = ts3Functions.getCurrentServerConnectionHandlerID();
         if (scHandlerID != 0)
             ts3plugin_currentServerConnectionChanged(scHandlerID);
     }
@@ -326,7 +325,7 @@ int ts3plugin_offersConfigure() {
 void ts3plugin_configure(void* handle, void* qParentWidget) {
     Q_UNUSED(handle);
 
-    Config* config = new Config((QWidget*)qParentWidget);
+    auto config = new Config((QWidget*)qParentWidget);
     config->connect(config,SIGNAL(betaChannelToggled(bool)),&updater,SLOT(CheckUpdate(bool)),Qt::UniqueConnection);
     config->connect(config, &Config::sseServerEnabledToggled, pluginQt, &PluginQt::setSseServerEnabled, Qt::UniqueConnection);
     config->connect(config, &Config::sseServerPortChanged, pluginQt, &PluginQt::setSseServerPort, Qt::UniqueConnection);
@@ -365,10 +364,10 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
     QString cmd_qs;
     cmd_qs = command;
 
-    bool inside = (cmd_qs.startsWith("\"")); //true if the first character is "
-    QStringList tmpList = cmd_qs.split(QRegExp("\""), QString::SkipEmptyParts); // Split by " and make sure you don't have an empty string at the beginning
+    auto inside = (cmd_qs.startsWith("\"")); //true if the first character is "
+    auto tmpList = cmd_qs.split(QRegExp("\""), QString::SkipEmptyParts); // Split by " and make sure you don't have an empty string at the beginning
     QStringList args_qs;
-    foreach (QString s, tmpList)
+    foreach (auto s, tmpList)
     {
         if (inside) // If 's' is inside quotes ...
             args_qs.append(s); // ... get the whole string
@@ -385,12 +384,12 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
     cmd_qs = args_qs.takeFirst();
     if (cmd_qs == "HIDE_TASKBAR")
     {
-        QWidget* mainWindow = TSHelpers::GetMainWindow();
-        Qt::WindowType type = mainWindow->windowType();
+        auto mainWindow = TSHelpers::GetMainWindow();
+        auto type = mainWindow->windowType();
         TSLogging::Log(QString("type: %1").arg(type));
-        Qt::WindowFlags flags = mainWindow->windowFlags();
+        auto flags = mainWindow->windowFlags();
         TSLogging::Log(QString("flags: %1").arg(flags));
-        if (mainWindow != NULL)
+        if (mainWindow)
         {
             mainWindow->setWindowFlags(Qt::Tool | Qt::CustomizeWindowHint | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);   //mainWindow->windowFlags() |
             mainWindow->setWindowFlags(flags);
@@ -463,7 +462,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
         {
             unsigned int error;
             uint64 targetServer = 0;
-            QString serverName = args_qs.takeFirst();
+            auto serverName = args_qs.takeFirst();
 
             if ((error = TSHelpers::GetServerHandler(serverName,&targetServer)) != ERROR_ok)
                 ret = 0;
@@ -477,9 +476,9 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                 }
                 else
                 {
-                    QString serverGroupName = args_qs.takeFirst();
-                    uint64 serverGroupId = centralStation->GetServerInfo(targetServer)->GetServerGroupId(serverGroupName);
-                    if (serverGroupId == (uint64)NULL)
+                    auto serverGroupName = args_qs.takeFirst();
+                    auto serverGroupId = centralStation->GetServerInfo(targetServer)->GetServerGroupId(serverGroupName);
+                    if (!serverGroupId)
                         ret = 1;
                     else
                     {
@@ -522,7 +521,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
         {
             unsigned int error;
             uint64 targetServer = 0;
-            QString serverName = args_qs.takeFirst();
+            auto serverName = args_qs.takeFirst();
 
             if ((error = TSHelpers::GetServerHandler(serverName,&targetServer)) != ERROR_ok)
                 ret = 0;
@@ -554,7 +553,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                         else
                         {
                             uint64 channelGroupId;
-                            QString channelGroupName = args_qs.takeFirst();
+                            auto channelGroupName = args_qs.takeFirst();
                             if (channelGroupName == "DEFAULT_CHANNEL_GROUP")
                                 channelGroupId = centralStation->GetServerInfo(targetServer)->getDefaultChannelGroup();
                             else

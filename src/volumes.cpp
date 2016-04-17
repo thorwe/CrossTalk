@@ -85,11 +85,11 @@ void Volumes::RemoveVolume(uint64 serverConnectionHandlerID, anyID clientID)
     if (!(VolumesMap->contains(serverConnectionHandlerID)))
         return;
 
-    QMap<anyID,DspVolume*>* ConnectionHandlerVolumes = VolumesMap->value(serverConnectionHandlerID);
+    auto ConnectionHandlerVolumes = VolumesMap->value(serverConnectionHandlerID);
     if (!(ConnectionHandlerVolumes->contains(clientID)))
         return;
 
-    DspVolume* dspObj = ConnectionHandlerVolumes->take(clientID);
+    auto dspObj = ConnectionHandlerVolumes->take(clientID);
     DeleteVolume(dspObj);
 }
 

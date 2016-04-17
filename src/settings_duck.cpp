@@ -63,7 +63,7 @@ void SettingsDuck::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMe
                 config.data()->activateWindow();
             else
             {
-                ConfigDucking* p_config = new ConfigDucking(TSHelpers::GetMainWindow());  //has delete on close attribute
+                auto p_config = new ConfigDucking(TSHelpers::GetMainWindow());  //has delete on close attribute
 
                 QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
                 cfg.beginGroup("ducker_global");

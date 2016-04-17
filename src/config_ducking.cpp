@@ -18,19 +18,19 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     c->setCheckable(true);
     this->connect(c, &QGroupBox::toggled, this, &ConfigDucking::channelDuckerEnabledSet);
 
-    QVBoxLayout* cLayout = new QVBoxLayout();
+    auto cLayout = new QVBoxLayout();
 
-    QGridLayout* cTargetLayout = new QGridLayout();
+    auto cTargetLayout = new QGridLayout();
 
-    QString text = QString("<b>%1</b>").arg(tr("Target:"));
-    QLabel* cTargetLabel = new QLabel(text);
+    auto text = QString("<b>%1</b>").arg(tr("Target:"));
+    auto cTargetLabel = new QLabel(text);
     cTargetLayout->addWidget(cTargetLabel,0,0,Qt::AlignCenter);
 
     cRadioTargetCurrent = new QRadioButton(qApp->translate("HotkeyDialog","Current Server"));
     connect(cRadioTargetCurrent, &QRadioButton::toggled, this, &ConfigDucking::onCRadioTargetCurrentToggled);
     cTargetLayout->addWidget(cRadioTargetCurrent,0,1,Qt::AlignLeft);
 
-    QString otherServers = qApp->translate("NotificationsSetup","Other");
+    auto otherServers = qApp->translate("NotificationsSetup","Other");
     otherServers.append(" ");
     otherServers.append(qApp->translate("ImprovedTabBar", "Server Tabs"));
     cRadioTargetOther = new QRadioButton(otherServers);
@@ -57,7 +57,7 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     g->setCheckable(true);
     connect(g, &QGroupBox::toggled, this, &ConfigDucking::globalDuckerEnabledSet);
 
-    QVBoxLayout* gLayout = new QVBoxLayout();
+    auto gLayout = new QVBoxLayout();
     gFader = new FaderVertical();
     connect(gFader, &FaderVertical::valueChanged, this, &ConfigDucking::globalDuckerValueChanged);
     gLayout->addWidget(gFader,0,Qt::AlignCenter);

@@ -32,10 +32,10 @@ void Module::setEnabled(bool value)
 {
     if (value!=m_enabled)
     {
-        bool running_old = isRunning();
+        const auto kRunningOld = isRunning();
         m_enabled = value;
         onEnabledStateChanged(value);
-        if (running_old != isRunning())
+        if (kRunningOld != isRunning())
             onRunningStateChanged(isRunning());
 
         emit enabledSet(m_enabled);
@@ -46,10 +46,10 @@ void Module::setBlocked(bool value)
 {
     if (value!=m_blocked)
     {
-        bool running_old = isRunning();
+        const auto kRunningOld = isRunning();
         m_blocked = value;
         onBlockedStateChanged(value);
-        if (running_old != isRunning())
+        if (kRunningOld != isRunning())
             onRunningStateChanged(isRunning());
 
         emit blockedSet(value);

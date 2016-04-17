@@ -684,18 +684,18 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
             //name
             //context
             //identity
-            QString args_stri = args.readAll().trimmed();
-            QStringList list = args_stri.split("[Ct_Delimiter]",QString::KeepEmptyParts,Qt::CaseSensitive);    // keep empty parts?
-            QString name = list.at(0);
+            auto args_stri = args.readAll().trimmed();
+            auto list = args_stri.split("[Ct_Delimiter]",QString::KeepEmptyParts,Qt::CaseSensitive);    // keep empty parts?
+            auto name = list.at(0);
             if (list.size() > 1)
             {
-                QString rest = list.at(1);
+                auto rest = list.at(1);
                 QTextStream in(&rest);
 
                 QString context;
                 in >> context;
 
-                QString identity = in.readAll().trimmed();
+                auto identity = in.readAll().trimmed();
 
                 //Log(QString("Received (me): cId: %1 VR: %2 CO: %3 ID: %4").arg(clientID).arg(name).arg((context == meObj->getContext())?"match":"no match -.-").arg(identity), serverConnectionHandlerID, LogLevel_DEBUG);
             }
@@ -710,7 +710,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
         return true;
     }
 
-    TsVrObjOther* obj = universe->Get(serverConnectionHandlerID,clientID);
+    auto obj = universe->Get(serverConnectionHandlerID,clientID);
     if (!obj)
     {
         obj = universe->Add(serverConnectionHandlerID,clientID);
@@ -737,18 +737,18 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
         //name
         //context
         //identity
-        QString args_stri = args.readAll().trimmed();
-        QStringList list = args_stri.split("[Ct_Delimiter]",QString::KeepEmptyParts,Qt::CaseSensitive);    // keep empty parts?
-        QString name = list.at(0);
+        auto args_stri = args.readAll().trimmed();
+        auto list = args_stri.split("[Ct_Delimiter]",QString::KeepEmptyParts,Qt::CaseSensitive);    // keep empty parts?
+        auto name = list.at(0);
 
-        bool isDirtyName = (name != obj->getVr());
+        auto isDirtyName = (name != obj->getVr());
         obj->setVr(name);
-        bool isDirtyContext = false;
-        bool isDirtyId = false;
+        auto isDirtyContext = false;
+        auto isDirtyId = false;
 
         if (list.size() > 1)
         {
-            QString rest = list.at(1);
+            auto rest = list.at(1);
             QTextStream in(&rest);
 
             QString context;
@@ -756,7 +756,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
             isDirtyContext = (context != obj->getContext());
             obj->setContext(context);
 
-            QString identity = in.readAll().trimmed();
+            auto identity = in.readAll().trimmed();
             isDirtyId = (identity != obj->getIdentityRaw());
             obj->setIdentityRaw(identity);
 
@@ -789,11 +789,11 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
 
     if (m_PlayersInMyContext.contains(serverConnectionHandlerID,clientID))
     {
-        TS3_VECTOR vector = obj->getAvatarPosition();
+        auto vector = obj->getAvatarPosition();
         ts3Functions.channelset3DAttributes(serverConnectionHandlerID,clientID,&vector);
     }
 
-    QString sendString = GetSendStringJson(true,false,obj);
+    auto sendString = GetSendStringJson(true,false,obj);
     emit BroadcastJSON(sendString);
     return true;
 }
@@ -815,9 +815,9 @@ QString PositionalAudio::GetSendString(bool isAll)
         if (lm->uiVersion == 2)
         {
 //            out << "[Ct_Delimiter]" << (m_ContextHex.isEmpty()?"[Ct_None]":m_ContextHex);
-            QString myContext = meObj->getContext();
+            auto myContext = meObj->getContext();
             out << "[Ct_Delimiter]" << (myContext.isEmpty()?"[Ct_None]":myContext);
-            QString my_ident = meObj->getIdentityRaw();
+            auto my_ident = meObj->getIdentityRaw();
             if (!my_ident.isEmpty())
                 out << " " << my_ident;
         }
@@ -833,7 +833,7 @@ QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
     QString out_stri;
     QTextStream out(&out_stri);
     out << "{";
-    TS3_VECTOR vec = obj->getAvatarPosition();
+    auto vec = obj->getAvatarPosition();
     out << "\"px\":" << INCHTOM(vec.x) << "," << "\"pz\":" << INCHTOM(vec.z) << ",";// << "\"ap_z\":" << vec.z << ",";
 
     vec = obj->getAvatarFront();
@@ -848,7 +848,7 @@ QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
 
     if (isAll)
     {
-        QString ident = obj->getIdentityRaw();
+        auto ident = obj->getIdentityRaw();
         if (ident.isEmpty())
         {
             Log("ident is empty!",LogLevel_INFO);   //fixed with >1.5.0
@@ -861,13 +861,13 @@ QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
 
         if (!isMe)
         {
-            TsVrObjOther *iObj = qobject_cast<TsVrObjOther *>(obj);
+            auto iObj = qobject_cast<TsVrObjOther *>(obj);
             if (iObj)
             {
                 unsigned int error;
                 char name[512];
-                uint64 serverConnectionHandlerID = iObj->getServerConnectionHandlerID();
-                anyID clientID = iObj->getClientID();
+                auto serverConnectionHandlerID = iObj->getServerConnectionHandlerID();
+                auto clientID = iObj->getClientID();
                 if((error = ts3Functions.getClientDisplayName(serverConnectionHandlerID, clientID, name, 512)) != ERROR_ok)
                     Error("(GetSendStringJson)",serverConnectionHandlerID,error);
                 else
@@ -929,12 +929,12 @@ void PositionalAudio::Send(QString args, int targetMode)
     {
 //        m_silentSendCounter++;
 
-        uint64 myTalkingScHandler = Talkers::instance()->isMeTalking();
+        auto myTalkingScHandler = Talkers::instance()->isMeTalking();
 
         uint64* server;
         for(server = servers; *server != (uint64)NULL; ++server)
         {
-            TSServerInfo* serverInfo = TSServersInfo::instance()->GetServerInfo(*server);
+            auto serverInfo = TSServersInfo::instance()->GetServerInfo(*server);
             if (serverInfo == (TSServerInfo*)NULL)
                 continue;
 
@@ -951,8 +951,8 @@ void PositionalAudio::Send(QString args, int targetMode)
 //                continue;
 //            }
 
-            QString sUId = serverInfo->getUniqueId();
-            const PositionalAudio_ServerSettings s_settings = (m_ServerSettings.contains(sUId)?m_ServerSettings.value(sUId):m_ServerSettings.value("default"));
+            auto sUId = serverInfo->getUniqueId();
+            const auto s_settings = (m_ServerSettings.contains(sUId)?m_ServerSettings.value(sUId):m_ServerSettings.value("default"));
             if (!s_settings.enabled)
                 continue;
 
@@ -1045,10 +1045,9 @@ void PositionalAudio::Update3DListenerAttributes()
     uint64* servers;
     if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
     {
-        QString myVr = meObj->getVr();
-        QString myContext = meObj->getContext();
-        uint64* server;
-        for(server = servers; *server != (uint64)NULL; ++server)
+        auto myVr = meObj->getVr();
+        auto myContext = meObj->getContext();
+        for(auto server = servers; *server != (uint64)NULL; ++server)
         {
             int status;
             if (ts3Functions.getConnectionStatus(*server, &status) != ERROR_ok)

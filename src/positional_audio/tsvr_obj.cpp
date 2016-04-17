@@ -3,8 +3,7 @@
 #include "guildwarstwo.h"
 
 TsVrObj::TsVrObj(QObject *parent) :
-    QObject(parent),
-    m_CustomEnvironmentSupport(NULL)
+    QObject(parent)
 {
 }
 

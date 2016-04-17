@@ -76,7 +76,7 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
         {
             uint64 targetChannelId = (channelID != (uint64)NULL)?channelID:myChannelID;
 
-            QPair<uint64,uint64> newPair = qMakePair(serverConnectionHandlerID,targetChannelId);
+            auto newPair = qMakePair(serverConnectionHandlerID,targetChannelId);
             if (!(MutedChannels.contains(newPair)))
                 MutedChannels.insert(newPair);
             else
@@ -123,7 +123,7 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
  */
 bool ChannelMuter::isChannelMuted(uint64 serverConnectionHandlerID, uint64 channelID)
 {
-    QPair<uint64,uint64> newPair = qMakePair(serverConnectionHandlerID,channelID);
+    auto newPair = qMakePair(serverConnectionHandlerID,channelID);
     return (MutedChannels.contains(newPair));
 }
 
@@ -163,7 +163,7 @@ bool ChannelMuter::toggleClientWhitelisted(uint64 serverConnectionHandlerID, any
  */
 bool ChannelMuter::isClientWhitelisted(uint64 serverConnectionHandlerID, anyID clientID)
 {
-    QPair<uint64,anyID> newPair = qMakePair(serverConnectionHandlerID,clientID);
+    auto newPair = qMakePair(serverConnectionHandlerID,clientID);
     return (ClientWhiteList.contains(newPair));
 }
 
@@ -242,8 +242,8 @@ bool ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int sta
 
     if ((status==STATUS_TALKING) || (status==STATUS_NOT_TALKING))
     {
-        DspVolume* vol = vols->GetVolume(serverConnectionHandlerID,clientID);
-        if (vol == (DspVolume*)NULL)
+        auto vol = vols->GetVolume(serverConnectionHandlerID,clientID);
+        if (!vol)
             return false;
 
         unsigned int error = ERROR_ok;
@@ -255,8 +255,8 @@ bool ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int sta
         }
         else
         {
-            QPair<uint64,uint64> channelPair = qMakePair(serverConnectionHandlerID,channelID);
-            QPair<uint64,anyID> clientPair = qMakePair(serverConnectionHandlerID,clientID);
+            auto channelPair = qMakePair(serverConnectionHandlerID,channelID);
+            auto clientPair = qMakePair(serverConnectionHandlerID,clientID);
             vol->setMuted((MutedChannels.contains(channelPair)) && (!(ClientWhiteList.contains(clientPair))));
             vol->setProcessing(status==STATUS_TALKING);
             return vol->isMuted();
@@ -267,7 +267,7 @@ bool ChannelMuter::onTalkStatusChanged(uint64 serverConnectionHandlerID, int sta
 
 bool ChannelMuter::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, PluginItemType type, uint64 mine, QTextStream &data)
 {
-    bool isDirty = false;
+    auto isDirty = false;
     if (type == PLUGIN_CLIENT)
     {
         if (m_ContextMenuToggleClientWhitelisted != -1)
@@ -316,8 +316,8 @@ bool ChannelMuter::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID
     if (!(isRunning()))
         return false;
 
-    DspVolume* vol = vols->GetVolume(serverConnectionHandlerID,clientID);
-    if (vol == NULL)
+    auto vol = vols->GetVolume(serverConnectionHandlerID,clientID);
+    if (!vol)
         return false;
 
     vol->process(samples, sampleCount, channels);
