@@ -35,10 +35,12 @@ namespace TSHelpers
 
     QString GetLanguage()
     {
-        QString lang = "";
+        QString lang;
         if (!TSSettings::instance()->GetLanguage(lang))
+        {
             TSLogging::Error("(TSHelpers::GetLanguage) " + TSSettings::instance()->GetLastError().text(), true);
-
+            return QString::null;
+        }
         return lang;
     }
 
@@ -150,17 +152,27 @@ namespace TSHelpers
     uint64 GetActiveServerConnectionHandlerID()
     {
         unsigned int error;
-        uint64* servers;
+        // First suspect the active (mic enabled) server being the current server
+        {
+            const auto kCurrentSchandler = ts3Functions.getCurrentServerConnectionHandlerID();
+            int result;
+            if((error = ts3Functions.getClientSelfVariableAsInt(kCurrentSchandler, CLIENT_INPUT_HARDWARE, &result)) != ERROR_ok)
+                TSLogging::Error("(TSHelpers::GetActiveServerConnectionHandlerID) Error retrieving client variable", kCurrentSchandler, error);
+            else if(result)
+                return kCurrentSchandler;
+        }
 
+        // else walk through the server list
+        uint64* servers;
         if((error = ts3Functions.getServerConnectionHandlerList(&servers)) != ERROR_ok)
         {
             TSLogging::Error("(TSHelpers::GetActiveServerConnectionHandlerID) Error retrieving list of servers",error);
-            return NULL;
+            return (uint64)NULL;
         }
 
         // Find the first server that matches the criteria
         uint64 active = 0;
-        for(auto server = servers; *server != (uint64)NULL && active == 0; server++)
+        for(auto server = servers; *server; ++server)
         {
             int result;
             if((error = ts3Functions.getClientSelfVariableAsInt(*server, CLIENT_INPUT_HARDWARE, &result)) != ERROR_ok)
@@ -171,7 +183,6 @@ namespace TSHelpers
                 break;
             }
         }
-
         ts3Functions.freeMemory(servers);
         return active;
     }
