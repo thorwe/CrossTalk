@@ -140,6 +140,14 @@ beta {
     !build_pass:message( "Beta." )
 }
 
+contains(QT_ARCH, i386) {
+    message("32-bit")
+    TARGET=crosstalk_win32
+} else {
+    message("64-bit")
+    TARGET=crosstalk_win64
+}
+
 win32 {
     CONFIG(release, debug|release){ #release build
         QMAKE_CXXFLAGS_RELEASE += -Zi
