@@ -9,6 +9,8 @@ void TSSettings::Init(QString tsConfigPath)
 {
     m_SettingsDb = QSqlDatabase::addDatabase("QSQLITE","CrossTalk_SetDbConn");
     m_SettingsDb.setDatabaseName(tsConfigPath + "settings.db");
+    if (!QFile::exists(m_SettingsDb.database().databaseName()))
+        TSLogging::Log(QString("Couldn't open settings.db: %1 does not exist.").arg(m_SettingsDb.database().databaseName()));
 
     if (!m_SettingsDb.isValid())
         TSLogging::Log("Database is not valid.");
