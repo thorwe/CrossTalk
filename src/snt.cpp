@@ -137,11 +137,11 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
     /***** Communication *****/
     if(cmd == QLatin1String("TS3_PTT_ACTIVATE"))
         ptt->SetPushToTalk(scHandlerID, PTT_ACTIVATE);
-    else if(cmd == QLating1String("TS3_PTT_DEACTIVATE"))
+    else if(cmd == QLatin1String("TS3_PTT_DEACTIVATE"))
         ptt->SetPushToTalk(scHandlerID, PTT_DEACTIVATE);
     else if(cmd == QLatin1String("TS3_PTT_TOGGLE"))
         ptt->SetPushToTalk(scHandlerID, PTT_TOGGLE);
-    else if((cmd == QLating1String("TS3_SWITCH_N_TALK_END")) || (cmd == QLatin1String("TS3_NEXT_TAB_AND_TALK_END")) || (cmd == QLatin1String("TS3_NEXT_TAB_AND_WHISPER_END"))) // universal OnKeyUp Handler
+    else if((cmd == QLatin1String("TS3_SWITCH_N_TALK_END")) || (cmd == QLatin1String("TS3_NEXT_TAB_AND_TALK_END")) || (cmd == QLatin1String("TS3_NEXT_TAB_AND_WHISPER_END"))) // universal OnKeyUp Handler
     {
         ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
         if (m_shallClearWhisper)
