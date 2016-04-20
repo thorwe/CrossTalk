@@ -10,7 +10,7 @@ SettingsPositionSpread* SettingsPositionSpread::m_Instance = 0;
 
 SettingsPositionSpread::SettingsPositionSpread()
 {
-    this->setObjectName("SettingsPositionSpread");
+    this->setObjectName(QStringLiteral("SettingsPositionSpread"));
 }
 
 void SettingsPositionSpread::Init(PositionSpread *positionSpread)

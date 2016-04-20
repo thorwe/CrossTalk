@@ -16,7 +16,7 @@ ChannelMuter::ChannelMuter(QObject *parent)
 {
     m_isPrintEnabled = false;
     this->setParent(parent);
-    this->setObjectName("ChannelMuter");
+    this->setObjectName(QStringLiteral("ChannelMuter"));
     vols = new Volumes(this,VolumeTypeManual);
 //    MutedChannels = new QSet<QPair<uint64,uint64> >;
 //    ClientWhiteList = new QSet<QPair<uint64,anyID> >;
@@ -41,7 +41,7 @@ void ChannelMuter::onRunningStateChanged(bool value)
     TSInfoData::instance()->Register(this,value,1);
     connect(Talkers::instance(), &Talkers::ConnectStatusChanged, vols, &Volumes::onConnectStatusChanged, Qt::UniqueConnection);
 
-    Log(QString("enabled: %1").arg((value)?"true":"false"));
+    Log(QString("enabled: %1").arg((value)?QStringLiteral("true"):QStringLiteral("false")));
 }
 
 //! Toggles a channels mute status on a server tab

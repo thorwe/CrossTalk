@@ -14,7 +14,7 @@ const QPair<uint64,anyID> SEAT_HOLDER = qMakePair((uint64)0,(anyID)0);
 PositionSpread::PositionSpread(QObject *parent)
 {
     this->setParent(parent);
-    this->setObjectName("Position Spread");
+    this->setObjectName(QStringLiteral("Position Spread"));
     m_isPrintEnabled = false;
     talkers = Talkers::instance();
     TalkersPanners = new QMap<uint64,QMap<anyID,SimplePanner*>* >;
@@ -419,9 +419,9 @@ int PositionSpread::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, 
         return 1;
 
     cmd = args.at(0);
-    if (cmd.compare("SET_BLOCKED",Qt::CaseInsensitive) == 0)
+    if (cmd.compare(QLatin1String("SET_BLOCKED"),Qt::CaseInsensitive) == 0)
     {
-        setBlocked((args.at(1).compare("true",Qt::CaseInsensitive) == 0));
+        setBlocked((args.at(1).compare(QLatin1String("true"),Qt::CaseInsensitive) == 0));
         return 0;
     }
     return 1;

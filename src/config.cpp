@@ -11,7 +11,7 @@
 #include "ts_logging_qt.h"
 #include "ts_helpers_qt.h"
 
-const QUrl JIANJI_CAMPAIGN("http://www.jianji.de");
+const QUrl JIANJI_CAMPAIGN(QStringLiteral("http://www.jianji.de"));
 
 //! Constructor
 /*!
@@ -29,7 +29,7 @@ Config::Config(QWidget *parent) :
     connect(ui->banner_jianji, &Banner::onClick, this, &Config::onJianjiClicked);
 
     auto lang = TSHelpers::GetLanguage();
-    if (lang != "de_DE") // outside of german locale, hide jianji banner
+    if (lang != QStringLiteral("de_DE")) // outside of german locale, hide jianji banner
         ui->banner_jianji->setVisible(false);
 
     // Create Settings UI

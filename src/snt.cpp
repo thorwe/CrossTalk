@@ -135,13 +135,13 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         return;
 
     /***** Communication *****/
-    if(cmd == "TS3_PTT_ACTIVATE")
+    if(cmd == QLatin1String("TS3_PTT_ACTIVATE"))
         ptt->SetPushToTalk(scHandlerID, PTT_ACTIVATE);
-    else if(cmd == "TS3_PTT_DEACTIVATE")
+    else if(cmd == QLating1String("TS3_PTT_DEACTIVATE"))
         ptt->SetPushToTalk(scHandlerID, PTT_DEACTIVATE);
-    else if(cmd == "TS3_PTT_TOGGLE")
+    else if(cmd == QLatin1String("TS3_PTT_TOGGLE"))
         ptt->SetPushToTalk(scHandlerID, PTT_TOGGLE);
-    else if((cmd == "TS3_SWITCH_N_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_WHISPER_END")) // universal OnKeyUp Handler
+    else if((cmd == QLating1String("TS3_SWITCH_N_TALK_END")) || (cmd == QLatin1String("TS3_NEXT_TAB_AND_TALK_END")) || (cmd == QLatin1String("TS3_NEXT_TAB_AND_WHISPER_END"))) // universal OnKeyUp Handler
     {
         ptt->SetPushToTalk(scHandlerID, false); //always do immediately regardless of delay settings
         if (m_shallClearWhisper)
@@ -155,7 +155,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         if(m_returnToSCHandler != (uint64)NULL)
         {
             TSHelpers::SetActiveServer(m_returnToSCHandler);
-            if((cmd == "TS3_NEXT_TAB_AND_TALK_END") || (cmd == "TS3_NEXT_TAB_AND_WHISPER_END")) // annoy user to upgrade
+            if((cmd == QLatin1String("TS3_NEXT_TAB_AND_TALK_END")) || (cmd == QLatin1String("TS3_NEXT_TAB_AND_WHISPER_END"))) // annoy user to upgrade
             {
                 TSLogging::Error("Hotkeys Next Tab and Talk Stop & Next Tab and Whisper Stop are being DEPRECATED! Please use SnT Stop instead!",m_returnToSCHandler,NULL);
             }
@@ -186,7 +186,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         m_shallClearWhisper = true;
         TSHelpers::SetActiveServer(nextServer);
     }
-    else if(cmd == "TS3_NEXT_TAB_AND_TALK_START")
+    else if(cmd == QLatin1String("TS3_NEXT_TAB_AND_TALK_START"))
     {
         uint64 nextServer;
         if ((error = TSHelpers::GetActiveServerRelative(scHandlerID,true,&nextServer)) != ERROR_ok)
@@ -201,7 +201,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         m_returnToSCHandler=scHandlerID;
         TSHelpers::SetActiveServer(nextServer);
     }
-    else if(cmd == "TS3_SWITCH_TAB_AND_TALK_START")
+    else if(cmd == QLatin1String("TS3_SWITCH_TAB_AND_TALK_START"))
     {
         if (args.isEmpty())
         {
@@ -233,7 +233,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             ptt->SetPushToTalk(scHandlerID,true);
 
     }
-    else if (cmd == "TS3_SWITCH_TAB_AND_WHISPER_START")
+    else if (cmd == QLatin1String("TS3_SWITCH_TAB_AND_WHISPER_START"))
     {
         if (args.count() < 3)
         {
@@ -339,7 +339,7 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
             TSHelpers::SetActiveServer(targetServer);
         }
     }
-    else if (cmd == "TS3_NEXT_TAB_AND_WHISPER_START")
+    else if (cmd == QLatin1String("TS3_NEXT_TAB_AND_WHISPER_START"))
     {
         uint64 nextServer;
         if ((error = TSHelpers::GetActiveServerRelative(scHandlerID,true,&nextServer)) != ERROR_ok)
@@ -423,19 +423,19 @@ GroupWhisperTargetMode SnT::GetGroupWhisperTargetMode(QString val)
 {
     GroupWhisperTargetMode groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ENDMARKER;
 
-    if (val.contains("ALLPARENT"))
+    if (val.contains(QLatin1String("ALLPARENT")))
         groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALLPARENTCHANNELS;
-    else if (val.contains("PARENT"))
+    else if (val.contains(QLatin1String("PARENT")))
         groupWhisperTargetMode = GROUPWHISPERTARGETMODE_PARENTCHANNEL;
-    else if (val.contains("CURRENT"))
+    else if (val.contains(QLatin1String("CURRENT")))
         groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CURRENTCHANNEL;
-    else if (val.contains("SUB"))
+    else if (val.contains(QLatin1String("SUB")))
         groupWhisperTargetMode = GROUPWHISPERTARGETMODE_SUBCHANNELS;
-    else if (val.contains("ANCESTORCHANNELFAMILY"))
+    else if (val.contains(QLatin1String("ANCESTORCHANNELFAMILY")))
         groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ANCESTORCHANNELFAMILY;
-    else if (val.contains("FAMILY"))
+    else if (val.contains(QLatin1String("FAMILY")))
         groupWhisperTargetMode = GROUPWHISPERTARGETMODE_CHANNELFAMILY;
-    else if (val.contains("ALL"))
+    else if (val.contains(QLatin1String("ALL")))
         groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ALL;
 
     return groupWhisperTargetMode;
@@ -444,13 +444,13 @@ GroupWhisperTargetMode SnT::GetGroupWhisperTargetMode(QString val)
 GroupWhisperType SnT::GetGroupWhisperType(QString val)
 {
     GroupWhisperType groupWhisperType = GROUPWHISPERTYPE_ENDMARKER;
-    if (val.contains("COMMANDER",Qt::CaseInsensitive))
+    if (val.contains(QLatin1String("COMMANDER"),Qt::CaseInsensitive))
         groupWhisperType = GROUPWHISPERTYPE_CHANNELCOMMANDER;
-    else if (val.contains("CHANNEL_GROUP",Qt::CaseInsensitive))
+    else if (val.contains(QLatin1String("CHANNEL_GROUP"),Qt::CaseInsensitive))
         groupWhisperType = GROUPWHISPERTYPE_CHANNELGROUP;
-    else if (val.contains("SERVER_GROUP",Qt::CaseInsensitive))
+    else if (val.contains(QLatin1String("SERVER_GROUP"),Qt::CaseInsensitive))
         groupWhisperType = GROUPWHISPERTYPE_SERVERGROUP;
-    else if (val.contains("ALLC",Qt::CaseInsensitive))
+    else if (val.contains(QLatin1String("ALLC"),Qt::CaseInsensitive))
         groupWhisperType = GROUPWHISPERTYPE_ALLCLIENTS;
 
     return groupWhisperType;

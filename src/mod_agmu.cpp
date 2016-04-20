@@ -7,7 +7,7 @@
 Agmu::Agmu(QObject *parent)
 {
     this->setParent(parent);
-    this->setObjectName("Agmu");
+    this->setObjectName(QStringLiteral("Agmu"));
     m_isPrintEnabled = false;
     talkers = Talkers::instance();
     m_TalkersDSPs = new QMap<uint64,QMap<anyID,DspVolumeAGMU*>* >;

@@ -13,7 +13,7 @@ Ducker_Channel::Ducker_Channel(QObject *parent)
 {
     m_isPrintEnabled = false;
     this->setParent(parent);
-    this->setObjectName("ChannelDucker");
+    this->setObjectName(QStringLiteral("ChannelDucker"));
     talkers = Talkers::instance();
     vols = new Volumes(this,VolumeTypeDucker);
 }

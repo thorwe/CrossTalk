@@ -8,10 +8,10 @@
 #include "ts_logging_qt.h"
 #include "version_qt.h"
 
-const QUrl STABLE("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html");
-const QUrl BETA_DOWNLOAD("https://github.com/thorwe/CrossTalk/releases");
-const QString GITHUBAPI_URL = "https://api.github.com/repos/";
-const QString GITHUBAPI_LATEST = "/releases/latest";   //GET /repos/:owner/:repo/releases/latest
+const QUrl STABLE(QStringLiteral("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html"));
+const QUrl BETA_DOWNLOAD(QStringLiteral("https://github.com/thorwe/CrossTalk/releases"));
+const QString GITHUBAPI_URL = QStringLiteral("https://api.github.com/repos/");
+const QString GITHUBAPI_LATEST = QStringLiteral("/releases/latest");   //GET /repos/:owner/:repo/releases/latest
 
 //! Constructor
 /*!
@@ -20,7 +20,7 @@ const QString GITHUBAPI_LATEST = "/releases/latest";   //GET /repos/:owner/:repo
 Updater::Updater(QObject *parent) :
     QObject(parent)
 {
-    this->setObjectName("Updater");
+    this->setObjectName(QStringLiteral("Updater"));
 }
 
 //! Retrieves update url
@@ -53,7 +53,7 @@ void Updater::onNetwManagerFinished(QNetworkReply *reply)
 
         //https://api.github.com/repos/thorwe/crosstalk/releases/latest
         auto replyUrl = reply->url().toString();
-        if (replyUrl.startsWith("https://api.github.com/repos/") && replyUrl.endsWith("/releases/latest"))
+        if (replyUrl.startsWith(QLatin1String("https://api.github.com/repos/")) && replyUrl.endsWith(QLatin1String("/releases/latest")))
             parseGithubResponse(reply);
         else
             parseResponse(reply);
@@ -150,7 +150,7 @@ void Updater::parseResponse(QNetworkReply *reply)
         return;
     }
 
-    QString endStr = (isReplyStable)?".ts3_plugin":"Platforms";
+    QString endStr = isReplyStable ? QStringLiteral(".ts3_plugin") : QStringLiteral("Platforms");
     auto end = arr.indexOf(endStr,start);
     if (end == -1)
     {

@@ -14,7 +14,7 @@ ConfigDucking::ConfigDucking(QWidget *parent) :
     this->setFixedSize(this->width(),this->height());
 
     // Channel Ducking
-    c = new QGroupBox("Channel",this);
+    c = new QGroupBox(QStringLiteral("Channel"),this);
     c->setCheckable(true);
     this->connect(c, &QGroupBox::toggled, this, &ConfigDucking::channelDuckerEnabledSet);
 

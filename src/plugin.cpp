@@ -364,8 +364,8 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
     QString cmd_qs;
     cmd_qs = command;
 
-    auto inside = (cmd_qs.startsWith("\"")); //true if the first character is "
-    auto tmpList = cmd_qs.split(QRegExp("\""), QString::SkipEmptyParts); // Split by " and make sure you don't have an empty string at the beginning
+    auto inside = (cmd_qs.startsWith(QLatin1String("\""))); //true if the first character is "
+    auto tmpList = cmd_qs.split(QRegExp(QStringLiteral("\"")), QString::SkipEmptyParts); // Split by " and make sure you don't have an empty string at the beginning
     QStringList args_qs;
     foreach (auto s, tmpList)
     {
@@ -382,7 +382,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
         return 1;
 
     cmd_qs = args_qs.takeFirst();
-    if (cmd_qs == "HIDE_TASKBAR")
+    if (cmd_qs == QLatin1String("HIDE_TASKBAR"))
     {
         auto mainWindow = TSHelpers::GetMainWindow();
         auto type = mainWindow->windowType();
@@ -402,7 +402,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
         ts3plugin_onServerErrorEvent(serverConnectionHandlerID,"CrossTalk Flood Test", ERROR_client_is_flooding,"CrossTalk Flood Test Return Code", "CrossTalk Flood Test Extra Message");
 #endif
     }
-    else if (cmd_qs == "PS_TOGGLE")
+    else if (cmd_qs == QLatin1String("PS_TOGGLE"))
     {
         serverConnectionHandlerID = ts3Functions.getCurrentServerConnectionHandlerID();
         unsigned int error;
@@ -554,7 +554,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                         {
                             uint64 channelGroupId;
                             auto channelGroupName = args_qs.takeFirst();
-                            if (channelGroupName == "DEFAULT_CHANNEL_GROUP")
+                            if (channelGroupName == QLatin1String("DEFAULT_CHANNEL_GROUP"))
                                 channelGroupId = centralStation->GetServerInfo(targetServer)->getDefaultChannelGroup();
                             else
                                 channelGroupId = centralStation->GetServerInfo(targetServer)->GetChannelGroupId(channelGroupName);
@@ -564,7 +564,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                             else
                             {
                                 uint64 targetChannelId;
-                                if (cmd_qs == "SET_SELF_CHANNEL_GROUP")
+                                if (cmd_qs == QLatin1String("SET_SELF_CHANNEL_GROUP"))
                                 {
                                     if ((error = ts3Functions.getChannelOfClient(targetServer,myID,&targetChannelId)) != ERROR_ok)
                                     {
@@ -572,7 +572,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                                         ret = 0;
                                     }
                                 }
-                                else if (cmd_qs == "SET_SELF_CHANNEL_GROUP_INHERITED")
+                                else if (cmd_qs == QLatin1String("SET_SELF_CHANNEL_GROUP_INHERITED"))
                                 {
                                     int inheritingChannelId;
                                     if ((error = ts3Functions.getClientVariableAsInt(targetServer, myID, CLIENT_CHANNEL_GROUP_INHERITED_CHANNEL_ID, &inheritingChannelId)) != ERROR_ok)

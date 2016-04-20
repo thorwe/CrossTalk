@@ -9,12 +9,12 @@ Translator::Translator(){}
 
 bool Translator::InitLocalization()
 {
-    auto lang = TSHelpers::GetLanguage();
-    if (lang == "")
+    const auto kLang = TSHelpers::GetLanguage();
+    if (kLang.isEmpty())
         return false;
 
     translator = new QTranslator(this);
-    const auto kIsTranslate = translator->load(":/locales/crosstalk_" + lang);
+    const auto kIsTranslate = translator->load(QStringLiteral(":/locales/crosstalk_") + kLang);
     if (!kIsTranslate)
         TSLogging::Log("No translation available.");
 

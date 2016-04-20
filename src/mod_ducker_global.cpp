@@ -13,7 +13,7 @@ Ducker_Global::Ducker_Global(QObject *parent)
 {
     m_isPrintEnabled = false;
     this->setParent(parent);
-    this->setObjectName("GlobalDucker");
+    this->setObjectName(QStringLiteral("GlobalDucker"));
     talkers = Talkers::instance();
     vols = new Volumes(this,VolumeTypeDucker);
     DuckTargets = new QMap<QString,QString>;
@@ -342,18 +342,18 @@ DspVolumeDucker* Ducker_Global::AddMusicBotVolume(uint64 serverConnectionHandler
 void Ducker_Global::SaveDuckTargets()
 {
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    cfg.beginGroup("ducker_global");
-    int oldSize = cfg.beginReadArray("targets");
+    cfg.beginGroup(QStringLiteral("ducker_global"));
+    int oldSize = cfg.beginReadArray(QStringLiteral("targets"));
     cfg.endArray();
-    cfg.beginWriteArray("targets", DuckTargets->size());
+    cfg.beginWriteArray(QStringLiteral("targets"), DuckTargets->size());
     QMapIterator<QString,QString> i(*(DuckTargets));
     int count = 0;
     while (i.hasNext())
     {
         i.next();
         cfg.setArrayIndex(count);
-        cfg.setValue("uid",i.key());
-        cfg.setValue("name",i.value());
+        cfg.setValue(QStringLiteral("uid"),i.key());
+        cfg.setValue(QStringLiteral("name"),i.value());
         ++count;
     }
     if (oldSize > DuckTargets->size())
@@ -361,8 +361,8 @@ void Ducker_Global::SaveDuckTargets()
         for (int j = DuckTargets->size(); j<oldSize; ++j)
         {
             cfg.setArrayIndex(j);
-            cfg.remove("uid");
-            cfg.remove("name");
+            cfg.remove(QStringLiteral("uid"));
+            cfg.remove(QStringLiteral("name"));
         }
     }
     cfg.endArray();
