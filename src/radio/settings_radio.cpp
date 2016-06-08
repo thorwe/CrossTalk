@@ -7,13 +7,11 @@
 #include "ts_serversinfo.h"
 #include <teamspeak/public_errors.h>
 
-SettingsRadio* SettingsRadio::m_Instance = 0;
-SettingsRadio::SettingsRadio() :
-    m_ContextMenuUi(-1)
+SettingsRadio* SettingsRadio::m_Instance = nullptr;
+SettingsRadio::SettingsRadio()
 {
     this->setObjectName("SettingsRadio");
 }
-SettingsRadio::~SettingsRadio(){}
 
 void SettingsRadio::Init(Radio *radio)
 {
@@ -22,8 +20,18 @@ void SettingsRadio::Init(Radio *radio)
         m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Radio FX","walkie_talkie_16.png");
         m_ContextMenuChannelUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CHANNEL,"Radio FX (Channel)","walkie_talkie_16.png");
         m_ContextMenuToggleClientBlacklisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT, "Radio FX: Toggle Client Blacklisted [temp]", "walkie_talkie_16.png");
-        connect(TSContextMenu::instance(), &TSContextMenu::MenusInitialized, this, &SettingsRadio::onMenusInitialized, Qt::AutoConnection);
-        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &SettingsRadio::onContextMenuEvent, Qt::AutoConnection);
+        connect(TSContextMenu::instance(), &TSContextMenu::MenusInitialized, this, [=]()
+        {
+            if(m_ContextMenuUi == -1)
+                TSLogging::Error(QString("%1: Menu wasn't registered.").arg(this->objectName()));
+
+            if (m_ContextMenuChannelUi == -1)
+                TSLogging::Error(QString("%1: Channel Menu wasn't registered.").arg(this->objectName()));
+
+            if(m_ContextMenuToggleClientBlacklisted == -1)
+                TSLogging::Error(QString("%1: Toggle Client Blacklisted menu item wasn't registered.").arg(this->objectName()));
+        });
+        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &SettingsRadio::onContextMenuEvent);
 
         TSInfoData::instance()->Register(this,true,1);
     }
@@ -42,11 +50,10 @@ void SettingsRadio::Init(Radio *radio)
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
     cfg.beginGroup(radio->objectName());
 
-    auto stringList = cfg.childGroups();
-    //stringList << "HomeTab" << "Whisper" << "Other";
-    for (int i = 0; i<stringList.size(); ++i)
+    const auto kStringList = cfg.childGroups();
+    for (int i = 0; i < kStringList.size(); ++i)
     {
-        auto name = stringList.at(i);
+        auto name = kStringList.at(i);
         cfg.beginGroup(name);
         if (name == "HomeTab")
             name = "Home";
@@ -76,9 +83,9 @@ bool SettingsRadio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 i
         if (m_ContextMenuToggleClientBlacklisted != -1)
             ts3Functions.setPluginMenuEnabled(pluginID,m_ContextMenuToggleClientBlacklisted,(id != mine)?1:0);
 
-        if ((id != mine) && (mP_radio != 0) && (mP_radio.data()->isClientBlacklisted(serverConnectionHandlerID,(anyID)id)))
+        if ((id != mine) && mP_radio && mP_radio->isClientBlacklisted(serverConnectionHandlerID,(anyID)id))
         {
-            data << mP_radio.data()->objectName() << ":";
+            data << mP_radio->objectName() << ":";
             isDirty = true;
             data << "blacklisted [temp]";
         }
@@ -93,18 +100,16 @@ void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginM
         if (menuItemID == m_ContextMenuUi)
         {
             if (config)
-                config.data()->activateWindow();
+                config->activateWindow();
             else if(mP_radio)
             {
                 auto p_config = new ConfigRadio(TSHelpers::GetMainWindow());  //has delete on close attribute
 
                 QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-                auto radio = mP_radio.data();
-                cfg.beginGroup(radio->objectName());
+                cfg.beginGroup(mP_radio->objectName());
 
-                QStringList stringList;
-                stringList << "HomeTab" << "Whisper" << "Other";
-                for (int i = 0; i<stringList.size(); ++i)
+                QStringList stringList {"HomeTab", "Whisper", "Other"};
+                for (int i = 0; i < stringList.size(); ++i)
                 {
                     auto name = stringList.at(i);
                     cfg.beginGroup(name);
@@ -146,7 +151,7 @@ void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginM
             auto server_channel = qMakePair<uint64, uint64> (serverConnectionHandlerID, selectedItemID);
             if (m_channel_configs.contains(server_channel) && m_channel_configs.value(server_channel))
             {
-                m_channel_configs.value(server_channel).data()->activateWindow();
+                m_channel_configs.value(server_channel)->activateWindow();
                 return;
             }
 
@@ -166,7 +171,7 @@ void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginM
 
             auto p_config = new ConfigRadio(TSHelpers::GetMainWindow(), TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getName() + ":" + channel_name);  //has delete on close attribute
             QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-            cfg.beginGroup(mP_radio.data()->objectName());
+            cfg.beginGroup(mP_radio->objectName());
 
             auto custom_channel_id = TSServersInfo::instance()->GetServerInfo(serverConnectionHandlerID)->getUniqueId() + TSHelpers::GetChannelPath(serverConnectionHandlerID, selectedItemID);
             cfg.beginGroup(custom_channel_id);
@@ -215,33 +220,17 @@ void SettingsRadio::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginM
     }
 }
 
-void SettingsRadio::onMenusInitialized()
-{
-    if(m_ContextMenuUi == -1)
-        TSLogging::Error(QString("%1: Menu wasn't registered.").arg(this->objectName()));
-
-    if (m_ContextMenuChannelUi == -1)
-        TSLogging::Error(QString("%1: Channel Menu wasn't registered.").arg(this->objectName()));
-
-    if(m_ContextMenuToggleClientBlacklisted == -1)
-        TSLogging::Error(QString("%1: Toggle Client Blacklisted menu item wasn't registered.").arg(this->objectName()));
-}
-
 void SettingsRadio::saveSettings(int r)
 {
     Q_UNUSED(r);
     if(mP_radio)
     {
         QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-        auto radio = mP_radio.data();
-        cfg.beginGroup(radio->objectName());
-
-        QMapIterator<QString,RadioFX_Settings> i(radio->GetSettingsMap());
+        cfg.beginGroup(mP_radio->objectName());
         {
-            while (i.hasNext())
+            auto settings_map = mP_radio->GetSettingsMap();
+            for (auto i = settings_map.constBegin(); i != settings_map.constEnd(); ++i)
             {
-                i.next();
-
                 QString name = i.key();
                 if (name == "Home")
                     name = "HomeTab";
@@ -271,14 +260,14 @@ void SettingsRadio::on_channel_settings_finished(int r, QString setting_id)
 {
     // clean up and close widget
     auto serverConnectionHandlerID = TSServersInfo::instance()->FindServerByUniqueId(setting_id.left(28));    // 28 length always? or always ends with = ?
-    if (serverConnectionHandlerID != NULL)
+    if (serverConnectionHandlerID)
     {
         auto channel_id = TSHelpers::GetChannelIDFromPath(serverConnectionHandlerID, setting_id.right(setting_id.length() - 28));
-        if (channel_id != NULL)
+        if (channel_id)
         {
             //TSLogging::Log(QString("serverid: %1 channelid: %2").arg(serverConnectionHandlerID).arg(channel_id));
 
-            auto server_channel = qMakePair<uint64, uint64>(serverConnectionHandlerID,channel_id);
+            auto server_channel = qMakePair<uint64, uint64>(serverConnectionHandlerID, channel_id);
             if (!m_channel_configs.contains(server_channel))
             {
                 TSLogging::Error("Could not remove setting dialog from map");
@@ -289,8 +278,9 @@ void SettingsRadio::on_channel_settings_finished(int r, QString setting_id)
     }
 
     // Settings
+    auto do_save = true;
     QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    cfg.beginGroup(mP_radio.data()->objectName());
+    cfg.beginGroup(mP_radio->objectName());
 
     if (r == QDialog::DialogCode::Accepted) // delete button
     {
@@ -298,7 +288,6 @@ void SettingsRadio::on_channel_settings_finished(int r, QString setting_id)
 
         // remove from setting
         cfg.remove(setting_id);
-        cfg.endGroup();
 
         // This makes me wish for a redesign
         auto& settings_map = mP_radio->GetSettingsMapRef();
@@ -311,25 +300,19 @@ void SettingsRadio::on_channel_settings_finished(int r, QString setting_id)
     {
         TSLogging::Log(QString("Save channel settings: %1").arg(setting_id));
 
-        // First: Check if setting exists
-        auto already_exists = cfg.childGroups().contains(setting_id);
-        if (already_exists)
-        {
-            this->saveSettings(NULL);
-            return;
-        }
-
-        // else if not enabled remove setting (aka don't create setting) to not pollute for every dialog open
-        // This makes me wish for a redesign
-        auto& settings_map = mP_radio->GetSettingsMapRef();
-
-        if ((settings_map.contains(setting_id)) && (!settings_map.value(setting_id).enabled))
-            settings_map.remove(setting_id);
-        else
-        {
-            this->saveSettings(NULL);
-            return;
+        if (!(cfg.childGroups().contains(setting_id)))
+        {   // if not enabled remove setting (aka don't create setting) to not pollute for every dialog open
+            // This makes me wish for a redesign
+            auto& settings_map = mP_radio->GetSettingsMapRef();
+            if ((settings_map.contains(setting_id)) && (!settings_map.value(setting_id).enabled))
+            {
+                settings_map.remove(setting_id);
+                do_save = false;
+            }
         }
     }
+
     cfg.endGroup();
+    if (do_save)
+        this->saveSettings(NULL);
 }

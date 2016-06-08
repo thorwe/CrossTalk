@@ -1,8 +1,7 @@
-#ifndef SETTINGS_RADIO_H
-#define SETTINGS_RADIO_H
+#pragma once
 
 #include <QObject>
-#include <QMap>
+#include <QHash>
 
 #include "ts_context_menu_qt.h"
 #include "config_radio.h"
@@ -35,7 +34,7 @@ public:
         static QMutex mutex;
         mutex.lock();
         delete m_Instance;
-        m_Instance = 0;
+        m_Instance = nullptr;
         mutex.unlock();
     }
     
@@ -58,7 +57,6 @@ signals:
 
 public slots:
     void onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID);
-    void onMenusInitialized();
 
 private slots:
     void saveSettings(int);
@@ -66,19 +64,17 @@ private slots:
 
 private:
     explicit SettingsRadio();
-    ~SettingsRadio();
+    ~SettingsRadio() = default;
     static SettingsRadio* m_Instance;
     SettingsRadio(const SettingsRadio &);
     SettingsRadio& operator=(const SettingsRadio &);
 
-    int m_ContextMenuUi;
-    int m_ContextMenuChannelUi;
-    int m_ContextMenuToggleClientBlacklisted;
+    int m_ContextMenuUi = -1;
+    int m_ContextMenuChannelUi = -1;
+    int m_ContextMenuToggleClientBlacklisted = -1;
     QPointer<ConfigRadio> config;
 
     QPointer<Radio> mP_radio;
 
-    QMap<QPair<uint64,uint64>,QPointer<ConfigRadio> > m_channel_configs;
+    QHash<QPair<uint64,uint64>,QPointer<ConfigRadio> > m_channel_configs;
 };
-
-#endif // SETTINGS_RADIO_H
