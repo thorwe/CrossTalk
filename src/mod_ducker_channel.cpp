@@ -15,7 +15,7 @@ Ducker_Channel::Ducker_Channel(QObject *parent)
     this->setParent(parent);
     this->setObjectName(QStringLiteral("ChannelDucker"));
     talkers = Talkers::instance();
-    vols = new Volumes(this,VolumeTypeDucker);
+    vols = new Volumes(this, Volumes::Volume_Type::DUCKER);
 }
 
 float Ducker_Channel::getValue() const

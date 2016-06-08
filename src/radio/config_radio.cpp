@@ -25,95 +25,95 @@ ConfigRadio::~ConfigRadio()
 
 void ConfigRadio::UpdateEnabled(QString name, bool val)
 {
-    auto channelStrip = GetChannelStrip(name);
-    channelStrip->blockSignals(true);
-    channelStrip->setChecked(val);
-    channelStrip->blockSignals(false);
+    auto channel_strip = GetChannelStrip(name);
+    channel_strip->blockSignals(true);
+    channel_strip->setChecked(val);
+    channel_strip->blockSignals(false);
 }
 
 void ConfigRadio::UpdateBandpassInLowFrequency(QString name, double val)
 {
-    auto channelStrip = GetChannelStrip(name);
-    channelStrip->blockSignals(true);
-    channelStrip->onInLoValueChanged(val);
-    channelStrip->blockSignals(false);
+    auto channel_strip = GetChannelStrip(name);
+    channel_strip->blockSignals(true);
+    channel_strip->onInLoValueChanged(val);
+    channel_strip->blockSignals(false);
 }
 
 void ConfigRadio::UpdateBandpassInHighFrequency(QString name, double val)
 {
-    auto channelStrip = GetChannelStrip(name);
-    channelStrip->blockSignals(true);
-    channelStrip->onInHiValueChanged(val);
-    channelStrip->blockSignals(false);
+    auto channel_strip = GetChannelStrip(name);
+    channel_strip->blockSignals(true);
+    channel_strip->onInHiValueChanged(val);
+    channel_strip->blockSignals(false);
 }
 
 void ConfigRadio::UpdateDestruction(QString name, double val)
 {
-    auto channelStrip = GetChannelStrip(name);
-    channelStrip->blockSignals(true);
-    channelStrip->onDestrValueChanged(val);
-    channelStrip->blockSignals(false);
+    auto channel_strip = GetChannelStrip(name);
+    channel_strip->blockSignals(true);
+    channel_strip->onDestrValueChanged(val);
+    channel_strip->blockSignals(false);
 }
 
 void ConfigRadio::UpdateRingModFrequency(QString name, double val)
 {
-    auto channelStrip = GetChannelStrip(name);
-    channelStrip->blockSignals(true);
-    channelStrip->onRingModFrequencyValueChanged(val);
-    channelStrip->blockSignals(false);
+    auto channel_strip = GetChannelStrip(name);
+    channel_strip->blockSignals(true);
+    channel_strip->onRingModFrequencyValueChanged(val);
+    channel_strip->blockSignals(false);
 }
 
 void ConfigRadio::UpdateRingModMix(QString name, double val)
 {
-    auto channelStrip = GetChannelStrip(name);
-    channelStrip->blockSignals(true);
-    channelStrip->onRingModMixValueChanged(val);
-    channelStrip->blockSignals(false);
+    auto channel_strip = GetChannelStrip(name);
+    channel_strip->blockSignals(true);
+    channel_strip->onRingModMixValueChanged(val);
+    channel_strip->blockSignals(false);
 }
 
 void ConfigRadio::UpdateBandpassOutLowFrequency(QString name, double val)
 {
-    auto channelStrip = GetChannelStrip(name);
-    channelStrip->blockSignals(true);
-    channelStrip->onOutLoValueChanged(val);
-    channelStrip->blockSignals(false);
+    auto channel_strip = GetChannelStrip(name);
+    channel_strip->blockSignals(true);
+    channel_strip->onOutLoValueChanged(val);
+    channel_strip->blockSignals(false);
 }
 
 void ConfigRadio::UpdateBandpassOutHighFrequency(QString name, double val)
 {
-    auto channelStrip = GetChannelStrip(name);
-    channelStrip->blockSignals(true);
-    channelStrip->onOutHiValueChanged(val);
-    channelStrip->blockSignals(false);
+    auto channel_strip = GetChannelStrip(name);
+    channel_strip->blockSignals(true);
+    channel_strip->onOutHiValueChanged(val);
+    channel_strip->blockSignals(false);
 }
 
 ConfigRadioGroupBox* ConfigRadio::GetChannelStrip(QString name)
 {
-    if (m_ChannelStripMap.contains(name))
-        return m_ChannelStripMap.value(name);
+    if (m_channelstrips.contains(name))
+        return m_channelstrips.value(name);
 
-    auto channelStrip = new ConfigRadioGroupBox(this);
-    channelStrip->setObjectName(name);
-    channelStrip->setTitle((m_title.isEmpty()) ? name : m_title);
+    auto channel_strip = new ConfigRadioGroupBox(this);
+    channel_strip->setObjectName(name);
+    channel_strip->setTitle((m_title.isEmpty()) ? name : m_title);
 
-    connect(channelStrip, &ConfigRadioGroupBox::EnabledSet, this, &ConfigRadio::EnabledSet);
-    connect(channelStrip, &ConfigRadioGroupBox::InLoFreqSet, this, &ConfigRadio::InLoFreqSet);
-    connect(channelStrip, &ConfigRadioGroupBox::InHiFreqSet, this, &ConfigRadio::InHiFreqSet);
-    connect(channelStrip, &ConfigRadioGroupBox::DestructionSet, this, &ConfigRadio::DestructionSet);
-    connect(channelStrip, &ConfigRadioGroupBox::RingModFrequencySet, this, &ConfigRadio::RingModFrequencySet);
-    connect(channelStrip, &ConfigRadioGroupBox::RingModMixSet, this, &ConfigRadio::RingModMixSet);
-    connect(channelStrip, &ConfigRadioGroupBox::OutLoFreqSet, this, &ConfigRadio::OutLoFreqSet);
-    connect(channelStrip, &ConfigRadioGroupBox::OutHiFreqSet, this, &ConfigRadio::OutHiFreqSet);
+    connect(channel_strip, &ConfigRadioGroupBox::EnabledSet, this, &ConfigRadio::EnabledSet);
+    connect(channel_strip, &ConfigRadioGroupBox::InLoFreqSet, this, &ConfigRadio::InLoFreqSet);
+    connect(channel_strip, &ConfigRadioGroupBox::InHiFreqSet, this, &ConfigRadio::InHiFreqSet);
+    connect(channel_strip, &ConfigRadioGroupBox::DestructionSet, this, &ConfigRadio::DestructionSet);
+    connect(channel_strip, &ConfigRadioGroupBox::RingModFrequencySet, this, &ConfigRadio::RingModFrequencySet);
+    connect(channel_strip, &ConfigRadioGroupBox::RingModMixSet, this, &ConfigRadio::RingModMixSet);
+    connect(channel_strip, &ConfigRadioGroupBox::OutLoFreqSet, this, &ConfigRadio::OutLoFreqSet);
+    connect(channel_strip, &ConfigRadioGroupBox::OutHiFreqSet, this, &ConfigRadio::OutHiFreqSet);
 
-    if (ui != nullptr)
-        ui->horizontalLayout->addWidget(channelStrip);
+    if (ui)
+        ui->horizontalLayout->addWidget(channel_strip);
     else
     {
         m_name = name;
-        QVBoxLayout *layout = new QVBoxLayout;
-        layout->addWidget(channelStrip);
-        QPushButton* remove_button = new QPushButton(this);
-        QIcon remove_icon(":/icons/delete.png");
+        auto layout = new QVBoxLayout;
+        layout->addWidget(channel_strip);
+        auto remove_button = new QPushButton(this);
+        QIcon remove_icon(QStringLiteral(":/icons/delete.png"));
         remove_button->setIcon(remove_icon);
         remove_button->setAccessibleName("Delete");
         remove_button->setText("Delete");
@@ -129,10 +129,10 @@ ConfigRadioGroupBox* ConfigRadio::GetChannelStrip(QString name)
         this->setFixedSize(this->width(),this->height());
         this->connect(this, &ConfigRadio::finished, [=](int r)
         {
-            emit channel_closed(r, m_name); // emit in lambda, nice :)
+            emit channel_closed(r, m_name);
         });
     }
-    m_ChannelStripMap.insert(name,channelStrip);
+    m_channelstrips.insert(name,channel_strip);
 
-    return channelStrip;
+    return channel_strip;
 }

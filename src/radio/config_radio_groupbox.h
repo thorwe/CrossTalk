@@ -1,9 +1,9 @@
-#ifndef CONFIG_RADIO_GROUPBOX_H
-#define CONFIG_RADIO_GROUPBOX_H
+#pragma once
 
 #include <QGroupBox>
 
-namespace Ui {
+namespace Ui
+{
 class ConfigRadioGroupBox;
 }
 
@@ -35,18 +35,6 @@ signals:
     void OutLoFreqSet(QString, double);
     void OutHiFreqSet(QString, double);
 
-private slots:
-    void onToggled(bool val);
-    void onInLoDialValueChanged(int val);
-    void onInHiDialValueChanged(int val);
-    void onOutLoDialValueChanged(int val);
-    void onOutHiDialValueChanged(int val);
-    void onDestrDialValueChanged(int val);
-    void onRingModFrequencyDialValueChanged(int val);
-    void onRingModMixDialValueChanged(int val);
-
 private:
     Ui::ConfigRadioGroupBox *ui;
 };
-
-#endif // CONFIG_RADIO_GROUPBOX_H

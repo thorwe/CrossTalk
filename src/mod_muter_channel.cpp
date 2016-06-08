@@ -17,7 +17,7 @@ ChannelMuter::ChannelMuter(QObject *parent)
     m_isPrintEnabled = false;
     this->setParent(parent);
     this->setObjectName(QStringLiteral("ChannelMuter"));
-    vols = new Volumes(this,VolumeTypeManual);
+    vols = new Volumes(this, Volumes::Volume_Type::MANUAL);
 //    MutedChannels = new QSet<QPair<uint64,uint64> >;
 //    ClientWhiteList = new QSet<QPair<uint64,anyID> >;
 }

@@ -1,12 +1,12 @@
-#ifndef CONFIG_RADIO_H
-#define CONFIG_RADIO_H
+#pragma once
 
 #include <QDialog>
-#include <QMap>
+#include <QHash>
 
 #include "config_radio_groupbox.h"
 
-namespace Ui {
+namespace Ui
+{
 class ConfigRadio;
 }
 
@@ -28,8 +28,6 @@ public:
     void UpdateBandpassOutLowFrequency(QString name, double val);
     void UpdateBandpassOutHighFrequency(QString name, double val);
 
-protected slots:
-
 signals:
     void EnabledSet(QString,bool);
     void InLoFreqSet(QString,double);
@@ -46,10 +44,8 @@ signals:
 private:
     Ui::ConfigRadio *ui = nullptr;
 
-    QMap<QString,ConfigRadioGroupBox*> m_ChannelStripMap;
+    QHash<QString,ConfigRadioGroupBox*> m_channelstrips;
     ConfigRadioGroupBox* GetChannelStrip(QString name);
     QString m_title;    // for channel ident
     QString m_name; // for custom channel -> onDeleteButtonClicked
 };
-
-#endif // CONFIG_RADIO_H

@@ -1,9 +1,13 @@
-#ifndef MOD_RADIO_H
-#define MOD_RADIO_H
+#pragma once
 
 #include <QObject>
 
-struct RadioFX_Settings {
+#include "module.h"
+#include "talkers.h"
+#include "dsp_radio.h"
+
+struct RadioFX_Settings
+{
     QString name = "";
     bool enabled = false;
     double freq_low = 0;
@@ -14,10 +18,6 @@ struct RadioFX_Settings {
     double o_freq_lo = 0;
     double o_freq_hi = 0;
 };
-
-#include "module.h"
-#include "talkers.h"
-#include "dsp_radio.h"
 
 class Radio : public Module, public TalkInterface
 {
@@ -38,8 +38,8 @@ public:
     // events forwarded from plugin.cpp
     void onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels);
 
-    QMap<QString,RadioFX_Settings> GetSettingsMap() const;
-    QMap<QString,RadioFX_Settings>& GetSettingsMapRef();
+    QHash<QString, RadioFX_Settings> GetSettingsMap() const;
+    QHash<QString, RadioFX_Settings>& GetSettingsMapRef();
 
 signals:
     void ChannelStripEnabledSet(QString, bool);
@@ -74,9 +74,9 @@ private:
     uint64 m_homeId = 0;
     Talkers* talkers;
 
-    QMap<uint64,QMap<anyID,DspRadio*>* >* TalkersDspRadios;
+    QHash<uint64,QHash<anyID,DspRadio*>* > m_talkers_dspradios;
 
-    QMap<QString,RadioFX_Settings> m_SettingsMap;
+    QHash<QString,RadioFX_Settings> m_SettingsMap;
 
     // QMultiMap is reported to be faster than QMultiHash until up to 10 entries in 4.x, oh I dunno
     QMultiMap<uint64,uint64> m_ClientBlacklist;
@@ -90,5 +90,3 @@ private:
 protected:
     void onRunningStateChanged(bool value);
 };
-
-#endif // MOD_RADIO_H

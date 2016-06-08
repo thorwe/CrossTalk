@@ -15,7 +15,7 @@ Ducker_Global::Ducker_Global(QObject *parent)
     this->setParent(parent);
     this->setObjectName(QStringLiteral("GlobalDucker"));
     talkers = Talkers::instance();
-    vols = new Volumes(this,VolumeTypeDucker);
+    vols = new Volumes(this, Volumes::Volume_Type::DUCKER);
     DuckTargets = new QMap<QString,QString>;
 }
 

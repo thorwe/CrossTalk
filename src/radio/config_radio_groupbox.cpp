@@ -7,13 +7,13 @@ ConfigRadioGroupBox::ConfigRadioGroupBox(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    connect(ui->dial_in_lo, &QDial::valueChanged, this, &ConfigRadioGroupBox::onInLoDialValueChanged);
-    connect(ui->dial_in_hi, &QDial::valueChanged, this, &ConfigRadioGroupBox::onInHiDialValueChanged);
-    connect(ui->dial_out_lo, &QDial::valueChanged, this, &ConfigRadioGroupBox::onOutLoDialValueChanged);
-    connect(ui->dial_out_hi, &QDial::valueChanged, this, &ConfigRadioGroupBox::onOutHiDialValueChanged);
-    connect(ui->dial_destr, &QDial::valueChanged, this, &ConfigRadioGroupBox::onDestrDialValueChanged);
-    connect(ui->dial_rm, &QDial::valueChanged, this, &ConfigRadioGroupBox::onRingModFrequencyDialValueChanged);
-    connect(ui->dial_rm_mix, &QDial::valueChanged, this, &ConfigRadioGroupBox::onRingModMixDialValueChanged);
+    connect(ui->dial_in_lo,     &QDial::valueChanged,   [=](int val){ ui->doubleSpinBox_in_lo->setValue(static_cast< double > (val)); });
+    connect(ui->dial_in_hi,     &QDial::valueChanged,   [=](int val){ ui->doubleSpinBox_in_hi->setValue(static_cast< double > (val)); });
+    connect(ui->dial_out_lo,    &QDial::valueChanged,   [=](int val){ ui->doubleSpinBox_out_lo->setValue(static_cast< double > (val)); });
+    connect(ui->dial_out_hi,    &QDial::valueChanged,   [=](int val){ ui->doubleSpinBox_out_hi->setValue(static_cast< double > (val)); });
+    connect(ui->dial_destr,     &QDial::valueChanged,   [=](int val){ ui->doubleSpinBox_destr->setValue(static_cast< double > (val)); });
+    connect(ui->dial_rm,        &QDial::valueChanged,   [=](int val){ ui->doubleSpinBox_rm->setValue(static_cast< double > (val)); });
+    connect(ui->dial_rm_mix,    &QDial::valueChanged,   [=](int val){ ui->doubleSpinBox_rm_mix->setValue((static_cast< double > (val)) / 100.0f); });
 
     // QT5 on overloaded functions ain't pretty
     connect(ui->doubleSpinBox_in_lo, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onInLoValueChanged);
@@ -24,17 +24,12 @@ ConfigRadioGroupBox::ConfigRadioGroupBox(QWidget *parent) :
     connect(ui->doubleSpinBox_rm, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onRingModFrequencyValueChanged);
     connect(ui->doubleSpinBox_rm_mix, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &ConfigRadioGroupBox::onRingModMixValueChanged);
 
-    connect(this, &ConfigRadioGroupBox::toggled, this, &ConfigRadioGroupBox::onToggled);
+    connect(this, &ConfigRadioGroupBox::toggled, this, [this](bool val) { emit EnabledSet(this->objectName(),val); });
 }
 
 ConfigRadioGroupBox::~ConfigRadioGroupBox()
 {
     delete ui;
-}
-
-void ConfigRadioGroupBox::onToggled(bool val)
-{
-    emit EnabledSet(this->objectName(),val);
 }
 
 void ConfigRadioGroupBox::onInLoValueChanged(double val)
@@ -91,41 +86,4 @@ void ConfigRadioGroupBox::onOutHiValueChanged(double val)
         ui->dial_out_hi->setValue(static_cast< int >(val));
 
     emit OutHiFreqSet(this->objectName(),val);
-}
-
-// private
-
-void ConfigRadioGroupBox::onInLoDialValueChanged(int val)
-{
-    ui->doubleSpinBox_in_lo->setValue(static_cast< double > (val));
-}
-
-void ConfigRadioGroupBox::onInHiDialValueChanged(int val)
-{
-    ui->doubleSpinBox_in_hi->setValue(static_cast< double > (val));
-}
-
-void ConfigRadioGroupBox::onOutLoDialValueChanged(int val)
-{
-    ui->doubleSpinBox_out_lo->setValue(static_cast< double > (val));
-}
-
-void ConfigRadioGroupBox::onOutHiDialValueChanged(int val)
-{
-    ui->doubleSpinBox_out_hi->setValue(static_cast< double > (val));
-}
-
-void ConfigRadioGroupBox::onDestrDialValueChanged(int val)
-{
-    ui->doubleSpinBox_destr->setValue(static_cast< double > (val));
-}
-
-void ConfigRadioGroupBox::onRingModFrequencyDialValueChanged(int val)
-{
-    ui->doubleSpinBox_rm->setValue(static_cast< double > (val));
-}
-
-void ConfigRadioGroupBox::onRingModMixDialValueChanged(int val)
-{
-    ui->doubleSpinBox_rm_mix->setValue((static_cast< double > (val)) / 100.0f);
 }

@@ -1,23 +1,25 @@
-#ifndef VOLUMES_H
-#define VOLUMES_H
+#pragma once
 
 #include <QObject>
-#include <QMap>
+#include <QHash>
 #include "teamspeak/public_definitions.h"
 //#include "simple_volume.h"
 #include "dsp_volume.h"
 
-enum VolumeType {
-    VolumeTypeManual = 0,
-    VolumeTypeDucker,
-    VolumeTypeAGMU
-};
-
 class Volumes : public QObject
 {
     Q_OBJECT
+
 public:
-    explicit Volumes(QObject *parent = 0, VolumeType volumeType = VolumeTypeManual);
+
+    enum class Volume_Type
+    {
+        MANUAL = 0,
+        DUCKER,
+        AGMU
+    };
+
+    explicit Volumes(QObject *parent = 0, Volume_Type volume_type = Volume_Type::MANUAL);
 
     DspVolume* AddVolume(uint64 serverConnectionHandlerID, anyID clientID);
     void DeleteVolume(DspVolume *dspObj);
@@ -34,8 +36,6 @@ public slots:
 protected:
 
 private:
-    QMap<uint64, QMap<anyID,DspVolume*>* >* VolumesMap;
-    VolumeType m_VolumeType;
+    QHash<QPair<uint64,anyID>, QPointer<DspVolume> > m_volumes;
+    Volume_Type m_volume_type;
 };
-
-#endif // VOLUMES_H

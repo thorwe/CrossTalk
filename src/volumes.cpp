@@ -5,12 +5,11 @@
 #include "dsp_volume_ducker.h"
 #include "dsp_volume_agmu.h"
 
-Volumes::Volumes(QObject *parent, VolumeType volumeType) :
+Volumes::Volumes(QObject *parent, Volume_Type volume_type) :
     QObject(parent)
 {
     this->setObjectName("Volumes");
-    m_VolumeType = volumeType;
-    VolumesMap = new QMap<uint64, QMap<anyID,DspVolume*>* >;
+    m_volume_type = volume_type;
 }
 
 //! Create and add a Volume object to the Volumes map
@@ -21,26 +20,19 @@ Volumes::Volumes(QObject *parent, VolumeType volumeType) :
  */
 DspVolume* Volumes::AddVolume(uint64 serverConnectionHandlerID,anyID clientID)
 {
-    DspVolume* dspObj;
-    if (m_VolumeType == VolumeTypeDucker)
-        dspObj = new DspVolumeDucker(this);
-    else if (m_VolumeType == VolumeTypeAGMU)
-        dspObj = new DspVolumeAGMU(this);
+    DspVolume* dsp_obj;
+    if (m_volume_type == Volume_Type::DUCKER)
+        dsp_obj = new DspVolumeDucker(this);
+    else if (m_volume_type == Volume_Type::AGMU)
+        dsp_obj = new DspVolumeAGMU(this);
     else
-        dspObj = new DspVolume(this);
+        dsp_obj = new DspVolume(this);
 
-    if (!(VolumesMap->contains(serverConnectionHandlerID)))
-    {
-        QMap<anyID,DspVolume*>* ConnectionHandlerVolumes = new QMap<anyID,DspVolume*>;
-        ConnectionHandlerVolumes->insert(clientID,dspObj);
-        VolumesMap->insert(serverConnectionHandlerID,ConnectionHandlerVolumes);
-    }
-    else
-    {
-        QMap<anyID,DspVolume*>* ConnectionHandlerVolumes = VolumesMap->value(serverConnectionHandlerID);
-        ConnectionHandlerVolumes->insert(clientID,dspObj);
-    }
-    return dspObj;
+    const auto kKey = qMakePair(serverConnectionHandlerID, clientID);
+    if (!m_volumes.contains(kKey))
+        m_volumes.insert(kKey, dsp_obj);
+
+    return dsp_obj;
 }
 
 //! When disconnecting from a server tab, clear channel volumes
@@ -67,7 +59,7 @@ void Volumes::DeleteVolume(DspVolume *dspObj)
     dspObj->parent()->disconnect(dspObj);
     this->parent()->disconnect(dspObj);
 
-    if (m_VolumeType == VolumeTypeDucker)   //should be unnecessary
+    if (m_volume_type == Volume_Type::DUCKER)   //should be unnecessary
         ((DspVolumeDucker*)dspObj)->setGainAdjustment(false);
 
     dspObj->blockSignals(true);
@@ -82,68 +74,58 @@ void Volumes::DeleteVolume(DspVolume *dspObj)
  */
 void Volumes::RemoveVolume(uint64 serverConnectionHandlerID, anyID clientID)
 {
-    if (!(VolumesMap->contains(serverConnectionHandlerID)))
+    const auto kKey = qMakePair(serverConnectionHandlerID, clientID);
+    if (!(m_volumes.contains(kKey)))
         return;
 
-    auto ConnectionHandlerVolumes = VolumesMap->value(serverConnectionHandlerID);
-    if (!(ConnectionHandlerVolumes->contains(clientID)))
-        return;
-
-    auto dspObj = ConnectionHandlerVolumes->take(clientID);
-    DeleteVolume(dspObj);
+    auto dsp_obj = m_volumes.take(kKey);
+    DeleteVolume(dsp_obj);
 }
 
-//! Remove all Volume objects from a servers Volumes map
+//! Remove all Volume objects of a server
 /*!
  * \brief Volumes::RemoveVolumes Helper function
  * \param serverConnectionHandlerID the connection id of the server
  */
 void Volumes::RemoveVolumes(uint64 serverConnectionHandlerID)
 {
-    if (!(VolumesMap->contains(serverConnectionHandlerID)))
+    if (m_volumes.isEmpty())
         return;
 
-    QMap<anyID,DspVolume*>* ConnectionHandlerVolumes = VolumesMap->take(serverConnectionHandlerID);
-    QMutableMapIterator<anyID,DspVolume*> i(*ConnectionHandlerVolumes);
-    while (i.hasNext())
+    for (auto i = m_volumes.begin(); i != m_volumes.end(); ++i)
     {
-        i.next();
-        DspVolume* dspObj = ConnectionHandlerVolumes->take(i.key());
-        DeleteVolume(dspObj);
+        if (i.key().first == serverConnectionHandlerID)
+        {
+            auto dsp_obj = m_volumes.take(i.key());
+            DeleteVolume(dsp_obj);
+        }
     }
-    VolumesMap->remove(serverConnectionHandlerID);
     //TSLogging::Log("Volumes: Server Volumes cleared",serverConnectionHandlerID,LogLevel_INFO);
 }
 
-//! Remove all Volume objects from all servers Volumes map
+//! Remove all Volume objects
 /*!
  * \brief Volumes::RemoveVolumes Helper function
  */
 void Volumes::RemoveVolumes()
 {
-    if (VolumesMap->isEmpty())
+    if (m_volumes.isEmpty())
         return;
 
-    QMutableMapIterator<uint64, QMap<anyID,DspVolume*>* > i(*VolumesMap);
-    while (i.hasNext())
-    {
-        i.next();
-        RemoveVolumes(i.key());
-    }
+    for (auto i = m_volumes.begin(); i != m_volumes.end(); ++i)
+        DeleteVolume(i.value());
+
+    m_volumes.clear();
 }
 
 bool Volumes::ContainsVolume(uint64 serverConnectionHandlerID, anyID clientID)
 {
-    if (!VolumesMap->contains(serverConnectionHandlerID))
-        return false;
-    return VolumesMap->value(serverConnectionHandlerID)->contains(clientID);
+    const auto kKey = qMakePair(serverConnectionHandlerID, clientID);
+    return m_volumes.contains(kKey);
 }
 
 DspVolume* Volumes::GetVolume(uint64 serverConnectionHandlerID, anyID clientID)
 {
-    if (!VolumesMap->contains(serverConnectionHandlerID))
-        return NULL;
-    if (!VolumesMap->value(serverConnectionHandlerID)->contains(clientID))
-        return NULL;
-    return VolumesMap->value(serverConnectionHandlerID)->value(clientID);
+    const auto kKey = qMakePair(serverConnectionHandlerID, clientID);
+    return m_volumes.contains(kKey) ? m_volumes[kKey] : nullptr;
 }
