@@ -1,5 +1,4 @@
-#ifndef TS_SERVERINFO_QT_H
-#define TS_SERVERINFO_QT_H
+#pragma once
 
 #include "teamspeak/public_definitions.h"
 
@@ -45,9 +44,7 @@ private:
     uint64 m_ServerConnectionHandlerID;
 
     QMap<uint64,QString> m_ServerGroups;
-    bool m_isServerGroupsUpdating = false;
+    bool m_is_server_groups_updating = false;
     QMap<uint64,QString> m_ChannelGroups;
-    bool m_isChannelGroupsUpdating = false;
+    bool m_is_channel_groups_updating = false;
 };
-
-#endif // TS_SERVERINFO_QT_H

@@ -108,16 +108,16 @@ void TSServerInfo::onServerGroupListEvent(uint64 serverGroupID, const char *name
     Q_UNUSED(iconID);
     Q_UNUSED(saveDB);
 
-    if (!m_isServerGroupsUpdating)
+    if (!m_is_server_groups_updating)
         m_ServerGroups.clear();
 
     m_ServerGroups.insert(serverGroupID,name);
-    m_isServerGroupsUpdating = true;
+    m_is_server_groups_updating = true;
 }
 
 void TSServerInfo::onServerGroupListFinishedEvent()
 {
-    m_isServerGroupsUpdating = false;
+    m_is_server_groups_updating = false;
     emit serverGroupListUpdated(m_ServerConnectionHandlerID, m_ServerGroups);
 }
 
@@ -129,15 +129,15 @@ void TSServerInfo::onChannelGroupListEvent(uint64 channelGroupID, const char *na
     Q_UNUSED(iconID);
     Q_UNUSED(saveDB);
 
-    if (!m_isChannelGroupsUpdating)
+    if (!m_is_channel_groups_updating)
         m_ChannelGroups.clear();
 
     m_ChannelGroups.insert(channelGroupID,name);
-    m_isChannelGroupsUpdating = true;
+    m_is_channel_groups_updating = true;
 }
 
 void TSServerInfo::onChannelGroupListFinishedEvent()
 {
-    m_isChannelGroupsUpdating = false;
+    m_is_channel_groups_updating = false;
     emit channelGroupListUpdated(m_ServerConnectionHandlerID, m_ChannelGroups);
 }

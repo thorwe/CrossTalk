@@ -1,5 +1,4 @@
-#ifndef DSP_RADIO_H
-#define DSP_RADIO_H
+#pragma once
 
 #include <QObject>
 #include "DspFilters/Dsp.h"
@@ -18,11 +17,11 @@ class DspRadio : public QObject
 public:
     explicit DspRadio(QObject *parent = 0);
     
-    void Process(short* samples, int sampleCount, int channels);
+    void process(short* samples, int sampleCount, int channels);
 
     void setChannelType(QString name);
 
-    bool getEnabled() const {return m_Enabled;}
+    bool getEnabled() const {return m_enabled;}
     float getFudge() const;
     double getBandpassEqInCenterFrequency() const;
     double getBandpassEqInBandWidth() const;
@@ -51,16 +50,16 @@ public slots:
     void setBandpassEqOutBandWidth(QString name, double val);
 
 private:
-    void DoProcess(float *samples, int sampleCount, float &volFollow);
-    void DoProcessRingMod(float *samples, int sampleCount, double &modAngle);
+    void do_process(float *samples, int sampleCount, float &volFollow);
+    void do_process_ring_mod(float *samples, int sampleCount, double &modAngle);
 
-    QString m_ChannelType;
+    QString m_channel_type;
 
-    float m_volFollow = 0.0f;
-    float m_volFollow_r = 0.0f;
+    float m_vol_follow = 0.0f;
+    float m_vol_follow_r = 0.0f;
 
-    bool m_Enabled;
-    double m_Fudge = 0.0f;
+    bool m_enabled;
+    double m_fudge = 0.0f;
 
     std::unique_ptr<Dsp::Filter> f_m = std::make_unique< Dsp::SmoothedFilterDesign<Dsp::Butterworth::Design::BandPass <4>, 1, Dsp::DirectFormII> >(1024);
     std::unique_ptr<Dsp::Filter> f_s = std::make_unique< Dsp::SmoothedFilterDesign<Dsp::Butterworth::Design::BandPass <4>, 2, Dsp::DirectFormII> >(1024);
@@ -69,11 +68,9 @@ private:
     std::unique_ptr<Dsp::Filter> f_s_o = std::make_unique< Dsp::SmoothedFilterDesign<Dsp::Butterworth::Design::BandPass <4>, 2, Dsp::DirectFormII> >(1024);
 
     //RingMod
-    double m_RM_modFreq = 0.0f;
-    double m_RM_modAngle = 0.0f;
-    double m_RM_modAngle_r = 0.0f;
-    double m_RM_mix = 0.0f;
+    double m_rm_mod_freq = 0.0f;
+    double m_rm_mod_angle = 0.0f;
+    double m_rm_mod_angle_r = 0.0f;
+    double m_rm_mix = 0.0f;
 
 };
-
-#endif // DSP_RADIO_H
