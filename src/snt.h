@@ -1,5 +1,4 @@
-#ifndef SNT_H
-#define SNT_H
+#pragma once
 
 #include <QObject>
 #include "teamspeak/public_definitions.h"
@@ -37,5 +36,3 @@ private:
     // short term fix for double trigger
     QString m_last_cmd = QString::null;
 };
-
-#endif // SNT_H

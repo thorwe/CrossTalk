@@ -1,5 +1,4 @@
-#ifndef GROUPBOX_POSITION_SPREAD_H
-#define GROUPBOX_POSITION_SPREAD_H
+#pragma once
 
 #include <QGroupBox>
 
@@ -38,5 +37,3 @@ private slots:
 private:
     Ui::GroupBoxPositionSpread *ui;
 };
-
-#endif // GROUPBOX_POSITION_SPREAD_H

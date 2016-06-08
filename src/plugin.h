@@ -4,8 +4,7 @@
  * Author: Thorsten Weinz (philosound@gmail.com)
  */
 
-#ifndef PLUGIN_H
-#define PLUGIN_H
+#pragma once
 
 #ifdef WIN32
 #define PLUGINS_EXPORTDLL __declspec(dllexport)
@@ -149,6 +148,4 @@ PLUGINS_EXPORTDLL void ts3plugin_onHotkeyEvent(const char* keyword);
 
 #ifdef __cplusplus
 }
-#endif
-
 #endif

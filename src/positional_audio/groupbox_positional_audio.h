@@ -1,5 +1,4 @@
-#ifndef GROUPBOX_POSITIONAL_AUDIO_H
-#define GROUPBOX_POSITIONAL_AUDIO_H
+#pragma once
 
 #include <QGroupBox>
 #include <QMap>
@@ -56,5 +55,3 @@ signals:
 private:
     Ui::GroupBoxPositionalAudio *ui;
 };
-
-#endif // GROUPBOX_POSITIONAL_AUDIO_H

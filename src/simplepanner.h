@@ -1,5 +1,4 @@
-#ifndef SIMPLEPANNER_H
-#define SIMPLEPANNER_H
+#pragma once
 
 #include <QObject>
 
@@ -60,5 +59,3 @@ private:
     float apaAttackRate = 20.0f;
     float apaDecayRate = 1.0f;
 };
-
-#endif // SIMPLEPANNER_H

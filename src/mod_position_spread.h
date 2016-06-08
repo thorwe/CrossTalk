@@ -1,5 +1,4 @@
-#ifndef MOD_POSITION_SPREAD_H
-#define MOD_POSITION_SPREAD_H
+#pragma once
 
 #include <QObject>
 #include <stdint.h>
@@ -94,5 +93,3 @@ private:
 protected:
     void onRunningStateChanged(bool value);
 };
-
-#endif // MOD_POSITION_SPREAD_H

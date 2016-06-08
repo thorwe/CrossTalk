@@ -1,5 +1,4 @@
-#ifndef TS_CONTEXT_MENU_QT_H
-#define TS_CONTEXT_MENU_QT_H
+#pragma once
 
 #include <QObject>
 #include <QtCore>
@@ -63,5 +62,3 @@ private:
     QString m_MainIcon;
     bool m_isInit = false;
 };
-
-#endif // TS_CONTEXT_MENU_QT_H

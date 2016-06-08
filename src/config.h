@@ -1,5 +1,4 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#pragma once
 
 #include <QDialog>
 #include <QGroupBox>
@@ -35,5 +34,3 @@ signals:
 private:
     Ui::Config *ui;
 };
-
-#endif // CONFIG_H

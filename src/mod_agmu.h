@@ -1,5 +1,4 @@
-#ifndef MOD_AGMU_H
-#define MOD_AGMU_H
+#pragma once
 
 #include "module.h"
 #include "dsp_volume_agmu.h"
@@ -30,5 +29,3 @@ private:
     QHash<QString,short>* m_PeakCache;
     bool m_isForceProcessing = false;
 };
-
-#endif // MOD_AGMU_H

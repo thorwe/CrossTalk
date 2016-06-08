@@ -1,5 +1,4 @@
-#ifndef TSVR_OBJ_SELF_H
-#define TSVR_OBJ_SELF_H
+#pragma once
 
 #include <QObject>
 #include "tsvr_obj.h"
@@ -34,5 +33,3 @@ private:
     TS3_VECTOR m_Camera_Front;
     TS3_VECTOR m_Camera_Top;
 };
-
-#endif // TSVR_OBJ_SELF_H

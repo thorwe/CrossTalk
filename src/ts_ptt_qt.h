@@ -1,5 +1,4 @@
-#ifndef TS_PTT_QT_H
-#define TS_PTT_QT_H
+#pragma once
 
 #include <QObject>
 #include <QtCore>
@@ -70,5 +69,3 @@ private:
     bool pttDelayEnabled = false;
     int pttDelayMsec = 0;
 };
-
-#endif // TS_PTT_QT_H

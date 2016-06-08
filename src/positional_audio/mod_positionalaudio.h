@@ -1,5 +1,4 @@
-#ifndef MOD_POSITIONALAUDIO_H
-#define MOD_POSITIONALAUDIO_H
+#pragma once
 
 #include <QObject>
 #include <QtCore>
@@ -162,5 +161,3 @@ private:
 QTextStream &operator<<(QTextStream &out, const TS3_VECTOR &ts3Vector);
 QTextStream &operator>>(QTextStream &in, TS3_VECTOR &ts3Vector);
 //bool operator==(const TS3_VECTOR &vec, const float *arr);
-
-#endif // MOD_POSITIONALAUDIO_H

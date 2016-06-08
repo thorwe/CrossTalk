@@ -1,5 +1,4 @@
-#ifndef TS_SERVERSINFO_H
-#define TS_SERVERSINFO_H
+#pragma once
 
 #include "ts_serverinfo_qt.h"
 
@@ -64,5 +63,3 @@ private:
     TSServerInfo* _GetServerInfo(uint64 serverConnectionHandlerID, bool createOnNotExist = false);
     QMap<uint64,QPointer<TSServerInfo> > m_serverInfoMap;
 };
-
-#endif // TS_SERVERSINFO_H

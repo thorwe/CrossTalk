@@ -1,5 +1,4 @@
-#ifndef TS_HELPERS_QT_H
-#define TS_HELPERS_QT_H
+#pragma once
 
 #ifndef PATH_BUFSIZE
 #define PATH_BUFSIZE 512
@@ -52,5 +51,3 @@ namespace TSHelpers
     QString GetChannelPath(uint64 serverConnectionHandlerID, uint64 channel_id);
     uint64 GetChannelIDFromPath(uint64 serverConnectionHandlerID, QString path_q);
 }
-
-#endif // TS_HELPERS_QT_H

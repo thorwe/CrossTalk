@@ -1,5 +1,4 @@
-#ifndef BANNER_H
-#define BANNER_H
+#pragma once
 
 #include <QLabel>
 #include <QObject>
@@ -16,5 +15,3 @@ signals:
 public slots:
     
 };
-
-#endif // BANNER_H

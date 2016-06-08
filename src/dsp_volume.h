@@ -1,5 +1,4 @@
-#ifndef DSP_VOLUME_H
-#define DSP_VOLUME_H
+#pragma once
 
 #include <QObject>
 
@@ -46,5 +45,3 @@ private:
     float m_gainDesired = VOLUME_0DB;   // decibels
     bool m_muted = false;
 };
-
-#endif // DSP_VOLUME_H

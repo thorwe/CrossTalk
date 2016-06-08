@@ -1,5 +1,4 @@
-#ifndef UPDATER_H
-#define UPDATER_H
+#pragma once
 
 #include <QObject>
 #include <QtNetwork/QtNetwork>
@@ -38,5 +37,3 @@ private:
     QUrl m_resultDownloadUrl;
     bool m_isBetaChannel = false;
 };
-
-#endif // UPDATER_H

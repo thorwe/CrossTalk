@@ -1,5 +1,4 @@
-#ifndef TSVR_OBJ_H
-#define TSVR_OBJ_H
+#pragma once
 
 #include <QObject>
 #include <QTextStream>
@@ -73,4 +72,3 @@ private:
 
 bool operator==(const TS3_VECTOR &veca, const TS3_VECTOR &vecb);
 bool operator==(const TS3_VECTOR &vec, const float *arr);
-#endif // TSVR_OBJ_H

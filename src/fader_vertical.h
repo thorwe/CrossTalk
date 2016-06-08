@@ -1,5 +1,4 @@
-#ifndef FADER_VERTICAL_H
-#define FADER_VERTICAL_H
+#pragma once
 
 #include <QWidget>
 
@@ -32,5 +31,3 @@ private slots:
 private:
     Ui::FaderVertical *ui;
 };
-
-#endif // FADER_VERTICAL_H

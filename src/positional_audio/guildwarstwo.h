@@ -1,5 +1,4 @@
-#ifndef GUILDWARSTWO_H
-#define GUILDWARSTWO_H
+#pragma once
 
 #include <QObject>
 #include <QtNetwork>
@@ -66,5 +65,3 @@ private:
     QJsonObject m_WorldNames;
     QJsonObject m_Maps;
 };
-
-#endif // GUILDWARSTWO_H

@@ -1,5 +1,4 @@
-#ifndef CONFIG_DUCKING_H
-#define CONFIG_DUCKING_H
+#pragma once
 
 #include <QDialog>
 #include <QGroupBox>
@@ -52,5 +51,3 @@ private:
     QRadioButton* cRadioTargetOther;
     QCheckBox* cPS;
 };
-
-#endif // CONFIG_DUCKING_H

@@ -1,5 +1,4 @@
-#ifndef DSP_VOLUME_AGMU_H
-#define DSP_VOLUME_AGMU_H
+#pragma once
 
 // "Make up gain / Normalize" variant
 
@@ -33,5 +32,3 @@ private:
 
     short m_peak = 0;
 };
-
-#endif // DSP_VOLUME_AGMU_H

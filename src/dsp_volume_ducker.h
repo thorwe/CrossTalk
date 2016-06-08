@@ -1,5 +1,4 @@
-#ifndef DSP_VOLUME_DUCKER_H
-#define DSP_VOLUME_DUCKER_H
+#pragma once
 
 #include <QObject>
 #include "dsp_volume.h"
@@ -41,5 +40,3 @@ private:
     bool m_gainAdjustment = false;
     bool m_isDuckBlocked = false;
 };
-
-#endif // DSP_VOLUME_DUCKER_H

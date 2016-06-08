@@ -1,5 +1,4 @@
-#ifndef MOD_DUCKER_GLOBAL_H
-#define MOD_DUCKER_GLOBAL_H
+#pragma once
 
 #include <QObject>
 #include "teamspeak/public_definitions.h"
@@ -75,5 +74,3 @@ private:
 
     int m_ContextMenuToggleMusicBot = -1;
 };
-
-#endif // MOD_DUCKER_GLOBAL_H

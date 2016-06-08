@@ -1,5 +1,4 @@
-#ifndef TRANSLATOR_H
-#define TRANSLATOR_H
+#pragma once
 
 #include <QObject>
 #include <QtCore>
@@ -45,5 +44,3 @@ private:
     Translator(const Translator &);
     Translator& operator=(const Translator &);
 };
-
-#endif // TRANSLATOR_H

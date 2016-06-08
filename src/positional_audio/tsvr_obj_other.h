@@ -1,5 +1,4 @@
-#ifndef TSVR_OBJ_OTHER_H
-#define TSVR_OBJ_OTHER_H
+#pragma once
 
 #include <QObject>
 #include "tsvr_obj.h"
@@ -29,5 +28,3 @@ private:
     anyID m_clientID;
     QString m_clientUID;
 };
-
-#endif // TSVR_OBJ_OTHER_H

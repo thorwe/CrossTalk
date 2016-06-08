@@ -1,5 +1,4 @@
-#ifndef BANNER_FRAME_H
-#define BANNER_FRAME_H
+#pragma once
 
 #include <QFrame>
 #include <QtNetwork/QtNetwork>
@@ -25,5 +24,3 @@ private:
     Ui::BannerFrame *ui;
     QNetworkAccessManager *m_netwManager;
 };
-
-#endif // BANNER_FRAME_H

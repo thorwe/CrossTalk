@@ -1,5 +1,4 @@
-#ifndef MOD_MUTER_CHANNEL_H
-#define MOD_MUTER_CHANNEL_H
+#pragma once
 
 #include <QObject>
 #include "teamspeak/public_definitions.h"
@@ -48,5 +47,3 @@ private:
     int m_ContextMenuIdToggleChannelMute = -1;
     int m_ContextMenuToggleClientWhitelisted = -1;
 };
-
-#endif // MOD_MUTER_CHANNEL_H

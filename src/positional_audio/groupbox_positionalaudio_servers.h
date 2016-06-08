@@ -1,5 +1,4 @@
-#ifndef GROUPBOX_POSITIONALAUDIO_SERVERS_H
-#define GROUPBOX_POSITIONALAUDIO_SERVERS_H
+#pragma once
 
 #include <QGroupBox>
 #include <QMap>
@@ -51,5 +50,3 @@ private:
     QMap<QString,PositionalAudio_ServerSettings> m_ServerSettingsMap;
     QMap<QString,QString> m_Name2sUId;
 };
-
-#endif // GROUPBOX_POSITIONALAUDIO_SERVERS_H

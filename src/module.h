@@ -1,5 +1,4 @@
-#ifndef MODULE_H
-#define MODULE_H
+#pragma once
 
 #include <QObject>
 #include "teamspeak/public_definitions.h"
@@ -48,5 +47,3 @@ private:
     bool m_enabled;
     bool m_blocked;
 };
-
-#endif // MODULE_H

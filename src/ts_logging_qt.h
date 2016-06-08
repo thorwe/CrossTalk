@@ -1,5 +1,4 @@
-#ifndef TS_LOGGING_QT_H
-#define TS_LOGGING_QT_H
+#pragma once
 
 #ifndef PATH_BUFSIZE
 #define PATH_BUFSIZE 512
@@ -29,5 +28,3 @@ namespace TSLogging
     void Log(QString message, uint64 serverConnectionHandlerID = 0, LogLevel logLevel = LogLevel_INFO);
     inline void Log(QString message, LogLevel logLevel)                                         {Log(message, 0, logLevel);}
 }
-
-#endif // TS_LOGGING_QT_H

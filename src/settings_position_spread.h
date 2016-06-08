@@ -1,5 +1,4 @@
-#ifndef SETTINGS_POSITION_SPREAD_H
-#define SETTINGS_POSITION_SPREAD_H
+#pragma once
 
 #include <QObject>
 #include <QDialog>
@@ -69,5 +68,3 @@ private:
     QPointer<PositionSpread> mP_positionSpread;
 
 };
-
-#endif // SETTINGS_POSITION_SPREAD_H

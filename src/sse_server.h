@@ -1,5 +1,4 @@
-#ifndef SSE_SERVER_H
-#define SSE_SERVER_H
+#pragma once
 
 #include <QObject>
 #include <QTcpServer>
@@ -35,5 +34,3 @@ private:
     QMap<QTcpSocket*,QTextStream*> m_SocketStreams;
     QTimer* m_keepAlive;
 };
-
-#endif // SSE_SERVER_H

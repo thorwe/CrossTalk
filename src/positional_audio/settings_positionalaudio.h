@@ -1,5 +1,4 @@
-#ifndef SETTINGS_POSITIONALAUDIO_H
-#define SETTINGS_POSITIONALAUDIO_H
+#pragma once
 
 #include <QObject>
 
@@ -112,5 +111,3 @@ private:
 
     QPointer<QMessageBox> mP_serverBlockMsgBox;
 };
-
-#endif // SETTINGS_POSITIONALAUDIO_H

@@ -1,5 +1,5 @@
-#ifndef DEFINITIONS_POSITIONALAUDIO_H
-#define DEFINITIONS_POSITIONALAUDIO_H
+#pragma once
+
 #include <QString>
 struct PositionalAudio_ServerSettings {
     QString serverUniqueId;
@@ -9,5 +9,3 @@ struct PositionalAudio_ServerSettings {
     float sendInterval;
     float sendIntervalSilentInc;
 };
-
-#endif // DEFINITIONS_POSITIONALAUDIO_H

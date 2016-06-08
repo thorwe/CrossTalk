@@ -8,8 +8,7 @@
  * for the original std approach
  */
 
-#ifndef TS_SETTINGS_QT_H
-#define TS_SETTINGS_QT_H
+#pragma once
 
 #include <QtSql>
 #include <QMutex>
@@ -75,5 +74,3 @@ private:
 
     QSqlDatabase m_SettingsDb;
 };
-
-#endif // TS_SETTINGS_QT_H

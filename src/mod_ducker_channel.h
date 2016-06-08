@@ -1,5 +1,4 @@
-#ifndef MOD_DUCKER_CHANNEL_H
-#define MOD_DUCKER_CHANNEL_H
+#pragma once
 
 #include <QObject>
 #include "teamspeak/public_definitions.h"
@@ -74,5 +73,3 @@ public slots:
 protected:
     void onRunningStateChanged(bool value);
 };
-
-#endif // MOD_DUCKER_CHANNEL_H

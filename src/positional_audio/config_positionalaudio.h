@@ -1,5 +1,4 @@
-#ifndef CONFIG_POSITIONALAUDIO_H
-#define CONFIG_POSITIONALAUDIO_H
+#pragma once
 
 #include <QDialog>
 #include "definitions_positionalaudio.h"
@@ -57,5 +56,3 @@ signals:
 private:
     Ui::ConfigPositionalAudio *ui;
 };
-
-#endif // CONFIG_POSITIONALAUDIO_H

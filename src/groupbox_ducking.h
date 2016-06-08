@@ -1,5 +1,4 @@
-#ifndef GROUPBOX_DUCKING_H
-#define GROUPBOX_DUCKING_H
+#pragma once
 
 #include <QGroupBox>
 
@@ -22,5 +21,3 @@ signals:
 private:
 
 };
-
-#endif // GROUPBOX_DUCKING_H

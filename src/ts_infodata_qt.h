@@ -1,5 +1,4 @@
-#ifndef TS_INFODATA_QT_H
-#define TS_INFODATA_QT_H
+#pragma once
 
 #include <QObject>
 #include <QtCore>
@@ -80,5 +79,3 @@ private:
 
     QList<QPointer<QObject> > m_Callbacks;
 };
-
-#endif // TS_INFODATA_QT_H

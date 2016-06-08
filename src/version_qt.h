@@ -1,5 +1,4 @@
-#ifndef VERSIONQT_H
-#define VERSIONQT_H
+#pragma once
 
 #include <QObject>
 #include <QString>
@@ -39,5 +38,3 @@ private:
     bool m_isValid = true;
     QString m_versionString;
 };
-
-#endif // VERSIONQT_H

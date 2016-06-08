@@ -1,5 +1,4 @@
-#ifndef PLUGIN_QT_H
-#define PLUGIN_QT_H
+#pragma once
 
 #include <QObject>
 #include <QMutex>
@@ -93,5 +92,3 @@ private:
     inline void serverStop();
 
 };
-
-#endif // PLUGIN_QT_H

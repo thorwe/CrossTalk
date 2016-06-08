@@ -1,5 +1,4 @@
-#ifndef TALKERS_H
-#define TALKERS_H
+#pragma once
 
 #include <QObject>
 #include <QtCore>
@@ -91,5 +90,3 @@ private:
 };
 
 //Q_DECLARE_OPERATORS_FOR_FLAGS(Talkers::TsTalkers)
-
-#endif // TALKERS_H

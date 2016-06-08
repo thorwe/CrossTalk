@@ -1,5 +1,4 @@
-#ifndef PIPESERVER_H
-#define PIPESERVER_H
+#pragma once
 
 #include <QObject>
 #include <QLocalSocket>
@@ -28,5 +27,3 @@ private:
     QMap<QString, QLocalSocket*> m_Clients;
     QSignalMapper *m_SignalMapper;
 };
-
-#endif // PIPESERVER_H

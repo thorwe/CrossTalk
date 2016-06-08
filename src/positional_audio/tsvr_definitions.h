@@ -1,5 +1,4 @@
-#ifndef TSVR_DEFINITIONS_H
-#define TSVR_DEFINITIONS_H
+#pragma once
 
 #include <QString>
 #include <QTextStream>
@@ -12,5 +11,3 @@ public:
     virtual bool onInfoData(QTextStream &data) = 0;
 };
 Q_DECLARE_INTERFACE(CustomEnvironmentSupportInterface,"net.thorwe.CrossTalk.CustomEnvironmentSupportInterface/1.0")
-
-#endif // TSVR_DEFINITIONS_H

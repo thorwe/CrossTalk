@@ -1,5 +1,4 @@
-#ifndef TSVR_UNIVERSE_H
-#define TSVR_UNIVERSE_H
+#pragma once
 
 #include <QObject>
 #include <QMap>
@@ -31,5 +30,3 @@ public slots:
 private:
     QMap<uint64,QMap<anyID,TsVrObjOther*>* > m_Map;
 };
-
-#endif // TSVR_UNIVERSE_H

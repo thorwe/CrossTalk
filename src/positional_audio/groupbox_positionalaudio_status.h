@@ -1,5 +1,4 @@
-#ifndef GROUPBOX_POSITIONALAUDIO_STATUS_H
-#define GROUPBOX_POSITIONALAUDIO_STATUS_H
+#pragma once
 
 #include <QGroupBox>
 
@@ -26,5 +25,3 @@ private:
     QString m_Name;
     QString m_Game;
 };
-
-#endif // GROUPBOX_POSITIONALAUDIO_STATUS_H

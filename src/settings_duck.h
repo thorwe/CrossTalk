@@ -1,5 +1,4 @@
-#ifndef SETTINGS_DUCK_H
-#define SETTINGS_DUCK_H
+#pragma once
 
 #include <QObject>
 #include <QtCore>
@@ -71,5 +70,3 @@ private:
     QPointer<Ducker_Global> mP_ducker_G;
     QPointer<Ducker_Channel> mP_ducker_C;
 };
-
-#endif // SETTINGS_DUCK_H
