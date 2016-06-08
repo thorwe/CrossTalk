@@ -536,8 +536,8 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                 else
                 {
                     // Doesn't work with ClientSelf
-                    int myDbId;
-                    if ((error = ts3Functions.getClientVariableAsInt(targetServer,myID,CLIENT_DATABASE_ID,&myDbId)) != ERROR_ok)
+                    uint64 myDbId;
+                    if ((error = ts3Functions.getClientVariableAsUInt64(targetServer, myID, CLIENT_DATABASE_ID, &myDbId)) != ERROR_ok)
                     {
                         TSLogging::Error("(SET_SELF_CHANNEL_GROUP) Could not get self client db id", targetServer, error, true);
                         ret = 1;
