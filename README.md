@@ -17,12 +17,7 @@ The [Positional Audio](https://github.com/thorwe/CrossTalk/wiki/Positional-Audio
 
 ### Stereo Position Spread  
 ![Stereo Position Spread](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_ps.png "Stereo Position Spread")
-### Ducking
-Global Ducking: Reduce the volume of musicbots when someone talks.
 
-Channel Ducking: Reduce the volume of home or foreing tabs when someone talks on the other one or you receive a whisper.
-
-![Channel Ducking](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_duck.png "Channel Ducking")
 ### Radio FX
 Walkie Talkie? Walkie Talkie.
 
@@ -31,9 +26,11 @@ Walkie Talkie? Walkie Talkie.
 You want to listen only to a few selected people in a crowded channel? Meet the ChannelMuter.
 ### Cross-Server Push-to-Talk & Whispering
 
-## Installation
+### Deprectad: Ducking
+![Ducking has its own plugin now](https://github.com/thorwe/teamspeak-plugin-ducker)
 
-Head over to the official download site at Teamspeak for an [installer package](http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html).
+## Installation
+It is recommended to install the plugin directly from within the client, so that it gets automatically updated. In you TeamSpeak client, go to Tools->Options->Addons->Browse, search for the "Ducker" plugin and install.
 
 ## Support
 
