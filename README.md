@@ -26,7 +26,7 @@ Walkie Talkie? Walkie Talkie.
 You want to listen only to a few selected people in a crowded channel? Meet the ChannelMuter.
 ### Cross-Server Push-to-Talk & Whispering
 
-### Deprectad: Ducking
+### Deprecated: Ducking
 ![Ducking has its own plugin now](https://github.com/thorwe/teamspeak-plugin-ducker)
 
 ## Installation
