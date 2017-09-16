@@ -26,7 +26,7 @@ You want to listen only to a few selected people in a crowded channel? Meet the 
 ![Ducking has its own plugin now](https://github.com/thorwe/teamspeak-plugin-ducker)
 
 ## Installation
-It is recommended to install the plugin directly from within the client, so that it gets automatically updated. In you TeamSpeak client, go to Tools->Options->Addons->Browse, search for the "Ducker" plugin and install.
+It is recommended to install the plugin directly from within the client, so that it gets automatically updated. In you TeamSpeak client, go to Tools->Options->Addons->Browse, search for the "CrossTalk" plugin and install.
 
 ## Support
 
