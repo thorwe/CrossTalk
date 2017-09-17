@@ -18,8 +18,8 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 #include "ServerThreaded.h"
-//#include <iostream>
-#include "ts_logging_qt.h"
+
+#include "core/ts_logging_qt.h"
 
 ServerThreaded::ServerThreaded() :
     m_isEnabled(false),

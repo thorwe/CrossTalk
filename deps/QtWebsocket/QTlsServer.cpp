@@ -19,10 +19,10 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "QTlsServer.h"
 
-#include <QStringList>
-#include <QByteArray>
-#include <QCryptographicHash>
-#include <QDateTime>
+#include <QtCore/QStringList>
+#include <QtCore/QByteArray>
+#include <QtCore/QCryptographicHash>
+#include <QtCore/QDateTime>
 
 namespace QtWebsocket
 {

@@ -20,14 +20,14 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef QWSSOCKET_H
 #define QWSSOCKET_H
 
-#include <QRegExp>
-#include <QTcpSocket>
+#include <QtCore/QRegExp>
+#include <QtNetwork/QTcpSocket>
 //#include <QSslSocket>
 //#include <QSsl>
 //#include <QSslKey>
-#include <QHostAddress>
-#include <QTime>
-#include <QStringList>
+#include <QtNetwork/QHostAddress>
+#include <QtCore/QTime>
+#include <QtCore/QStringList>
 
 #include "WsEnums.h"
 #include "QWsHandshake.h"

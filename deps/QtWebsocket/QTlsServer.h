@@ -20,18 +20,18 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef QTLSSERVER_H
 #define QTLSSERVER_H
 
-#include <QTcpServer>
-#include <QTcpSocket>
-#include <QSsl>
-#include <QSslSocket>
-#include <QSslCertificate>
-#include <QSslKey>
-#include <QNetworkProxy>
-#include <QString>
-#include <QStringList>
-#include <QMap>
-#include <QQueue>
-#include <QFile>
+#include <QtNetwork/QTcpServer>
+#include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QSsl>
+#include <QtNetwork/QSslSocket>
+#include <QtNetwork/QSslCertificate>
+#include <QtNetwork/QSslKey>
+#include <QtNetwork/QNetworkProxy>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QMap>
+#include <QtCore/QQueue>
+#include <QtCore/QFile>
 
 #include "QWsSocket.h"
 

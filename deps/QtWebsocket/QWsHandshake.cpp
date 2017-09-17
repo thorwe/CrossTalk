@@ -19,10 +19,10 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "QWsHandshake.h"
 
-#include <QCryptographicHash>
-#include <QtEndian>
-#include <QHostInfo>
-#include <QDataStream>
+#include <QtCore/QCryptographicHash>
+#include <QtCore/QtEndian>
+#include <QtNetwork/QHostInfo>
+#include <QtCore/QDataStream>
 
 #include "QWsSocket.h"
 

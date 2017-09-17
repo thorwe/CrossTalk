@@ -20,12 +20,12 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SERVERTHREADED_H
 #define SERVERTHREADED_H
 
-#include <QtCore>
-#include <QtNetwork>
+#include <QtCore/QtCore>
+#include <QtNetwork/QtNetwork>
 
-#include "QWsServer.h"
-#include "QWsSocket.h"
-#include "SocketThread.h"
+#include "QtWebSocket/QWsServer.h"
+#include "QtWebSocket/QWsSocket.h"
+#include "QtWebSocket/ServerThreaded/SocketThread.h"
 
 class ServerThreaded : public QObject
 {

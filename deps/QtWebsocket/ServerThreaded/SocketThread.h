@@ -20,9 +20,9 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef SOCKETTHREAD_H
 #define SOCKETTHREAD_H
 
-#include <QThread>
+#include <QtCore/QThread>
 
-#include "QWsSocket.h"
+#include "QtWebSocket/QWsSocket.h"
 
 class SocketThread : public QThread
 {

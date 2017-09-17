@@ -20,7 +20,7 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef QWSHANDSHAKE_H
 #define QWSHANDSHAKE_H
 
-#include <QTcpSocket>
+#include <QtNetwork/QTcpSocket>
 
 #include "WsEnums.h"
 
