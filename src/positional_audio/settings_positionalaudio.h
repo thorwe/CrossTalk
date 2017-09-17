@@ -1,12 +1,14 @@
 #pragma once
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtWidgets/QMessageBox>
 
-#include "ts_context_menu_qt.h"
+#include "core/ts_context_menu_qt.h"
+#include "core/ts_serversinfo.h"
+
 #include "config_positionalaudio.h"
 #include "mod_positionalaudio.h"
 
-#include <QMessageBox>
 
 class SettingsPositionalAudio : public QObject, public ContextMenuInterface
 {
@@ -14,31 +16,10 @@ class SettingsPositionalAudio : public QObject, public ContextMenuInterface
     Q_INTERFACES(ContextMenuInterface)
 
 public:
-    static SettingsPositionalAudio* instance()
-    {
-        static QMutex mutex;
-        if(!m_Instance)
-        {
-            mutex.lock();
-
-            if(!m_Instance)
-                m_Instance = new SettingsPositionalAudio;
-
-            mutex.unlock();
-        }
-        return m_Instance;
-    }
-
-    static void drop()
-    {
-        static QMutex mutex;
-        mutex.lock();
-        delete m_Instance;
-        m_Instance = 0;
-        mutex.unlock();
-    }
+    explicit SettingsPositionalAudio(TSServersInfo& servers_info, QObject* parent = nullptr);
 
     void Init(PositionalAudio *positionalAudio);
+    void shutdown();
 
 signals:
     void EnabledSet(bool);
@@ -95,11 +76,7 @@ private slots:
     void serverBlockMsgBoxClosed(QAbstractButton* button);
 
 private:
-    explicit SettingsPositionalAudio();
-    ~SettingsPositionalAudio();
-    static SettingsPositionalAudio* m_Instance;
-    SettingsPositionalAudio(const SettingsPositionalAudio &);
-    SettingsPositionalAudio& operator=(const SettingsPositionalAudio &);
+    TSServersInfo& m_servers_info;
 
     int m_ContextMenuUi;
 #ifdef Q_OS_WIN
