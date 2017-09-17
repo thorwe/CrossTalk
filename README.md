@@ -35,3 +35,19 @@ known issues][troubleshoot].
 [troubleshoot]: https://github.com/thorwe/CrossTalk/wiki/Troubleshoot
 
 If you think you found a bug in CrossTalk, you can [submit an issue](https://github.com/thorwe/CrossTalk/issues/new).
+
+## Compiling yourself
+After cloning, you'll have to manually initialize the submodules:
+```
+git submodule update --init --recursive
+```
+
+Qt in the minor version of the client is required, e.g.
+
+```
+mkdir build32 & pushd build32
+cmake -G "Visual Studio 15 2017" -DCMAKE_PREFIX_PATH="path_to/Qt/5.6/msvc2015" ..
+popd
+mkdir build64 & pushd build64
+cmake -G "Visual Studio 15 2017 Win64"  -DCMAKE_PREFIX_PATH="path_to/Qt/5.6/msvc2015_64" ..
+```
