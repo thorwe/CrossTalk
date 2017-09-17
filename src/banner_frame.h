@@ -1,7 +1,6 @@
 #pragma once
 
-#include <QFrame>
-#include <QtNetwork/QtNetwork>
+#include <QtWidgets/QFrame>
 
 namespace Ui {
 class BannerFrame;
@@ -16,11 +15,8 @@ public:
     ~BannerFrame();
 
 private slots:
-    void onNetwManagerFinished(QNetworkReply *reply);
-    void onPledgieClicked();
     void onCrossTalkClicked();
-
+    void onJianjiClicked();
 private:
     Ui::BannerFrame *ui;
-    QNetworkAccessManager *m_netwManager;
 };

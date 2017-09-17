@@ -5,21 +5,16 @@
 #include "teamspeak/public_definitions.h"
 #include "teamspeak/public_rare_definitions.h"
 #include "ts3_functions.h"
-
 #include "plugin.h"
 
-#include "ts_helpers_qt.h"
+#include "core/ts_helpers_qt.h"
 
-#include "talkers.h"
-
-ChannelMuter::ChannelMuter(QObject *parent)
+ChannelMuter::ChannelMuter(Plugin_Base& plugin)
+    : vols(new Volumes(this, Volumes::Volume_Type::MANUAL))
 {
     m_isPrintEnabled = false;
-    this->setParent(parent);
+    this->setParent(&plugin);
     this->setObjectName(QStringLiteral("ChannelMuter"));
-    vols = new Volumes(this, Volumes::Volume_Type::MANUAL);
-//    MutedChannels = new QSet<QPair<uint64,uint64> >;
-//    ClientWhiteList = new QSet<QPair<uint64,anyID> >;
 }
 
 // User Setting interaction
@@ -29,19 +24,24 @@ void ChannelMuter::onRunningStateChanged(bool value)
     if (!value)  // this module is always active, used solely as init function
         return;
 
+    auto plugin = qobject_cast<Plugin_Base*>(parent());
+    auto& context_menu = plugin->context_menu();
     if (m_ContextMenuIdToggleChannelMute == -1)
     {
-        m_ContextMenuIdToggleChannelMute = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CHANNEL,"Toggle Channel Mute [temp]","");
-        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &ChannelMuter::onContextMenuEvent, Qt::AutoConnection);
+        m_ContextMenuIdToggleChannelMute = context_menu.Register(this, PLUGIN_MENU_TYPE_CHANNEL, "Toggle Channel Mute [temp]", "");
+        connect(&context_menu, &TSContextMenu::FireContextMenuEvent, this, &ChannelMuter::onContextMenuEvent, Qt::AutoConnection);
     }
 
     if (m_ContextMenuToggleClientWhitelisted == -1)
-        m_ContextMenuToggleClientWhitelisted = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_CLIENT,"Toggle ChannelMuter Whitelisting [temp]","");
+        m_ContextMenuToggleClientWhitelisted = context_menu.Register(this, PLUGIN_MENU_TYPE_CLIENT, "Toggle ChannelMuter Whitelisting [temp]", "");
 
-    TSInfoData::instance()->Register(this,value,1);
-    connect(Talkers::instance(), &Talkers::ConnectStatusChanged, vols, &Volumes::onConnectStatusChanged, Qt::UniqueConnection);
+    auto& info_data = plugin->info_data();
+    info_data.Register(this, value, 1);
 
-    Log(QString("enabled: %1").arg((value)?QStringLiteral("true"):QStringLiteral("false")));
+    auto& talkers = plugin->talkers();
+    connect(&talkers, &Talkers::ConnectStatusChanged, vols, &Volumes::onConnectStatusChanged, Qt::UniqueConnection);
+
+    Log(QString("enabled: %1").arg((value) ? QStringLiteral("true") : QStringLiteral("false")));
 }
 
 //! Toggles a channels mute status on a server tab
@@ -104,8 +104,12 @@ bool ChannelMuter::toggleChannelMute(uint64 serverConnectionHandlerID, uint64 ch
                     }
 
                     // for info update on hotkey
-                    if (channelID == (uint64)NULL)
-                        TSInfoData::instance()->RequestUpdate(serverConnectionHandlerID, targetChannelId, PLUGIN_CHANNEL);
+                    if (!channelID)
+                    {
+                        auto plugin = qobject_cast<Plugin_Base*>(parent());
+                        auto& info_data = plugin->info_data();
+                        info_data.RequestUpdate(serverConnectionHandlerID, targetChannelId, PLUGIN_CHANNEL);
+                    }
                 }
             }
             return (MutedChannels.contains(newPair));
@@ -271,7 +275,10 @@ bool ChannelMuter::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id
     if (type == PLUGIN_CLIENT)
     {
         if (m_ContextMenuToggleClientWhitelisted != -1)
-            ts3Functions.setPluginMenuEnabled(pluginID,m_ContextMenuToggleClientWhitelisted,(id != mine)?1:0);
+        {
+            auto plugin = qobject_cast<Plugin_Base*>(parent());
+            ts3Functions.setPluginMenuEnabled(plugin->id().c_str(), m_ContextMenuToggleClientWhitelisted, (id != mine) ? 1 : 0);
+        }
 
         if ((id != mine) && isClientWhitelisted(serverConnectionHandlerID,(anyID)id))
         {

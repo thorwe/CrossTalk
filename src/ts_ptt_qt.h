@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QObject>
-#include <QtCore>
+#include <QtCore/QObject>
+#include <QtCore/QtCore>
 //#include <QMutex>
 
 #include "teamspeak/public_definitions.h"

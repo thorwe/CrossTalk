@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QLabel>
-#include <QObject>
-#include <QMouseEvent>
+#include <QtWidgetS/QLabel>
+#include <QtCore/QObject>
+#include <QtGui/QMouseEvent>
 
 class Banner : public QLabel
 {

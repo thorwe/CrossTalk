@@ -1,8 +1,8 @@
 #include "tsvr_obj_other.h"
 
 #include "teamspeak/public_errors.h"
-#include "ts_helpers_qt.h"
-#include "ts_logging_qt.h"
+#include "core/ts_helpers_qt.h"
+#include "core/ts_logging_qt.h"
 
 TsVrObjOther::TsVrObjOther(QObject *parent, uint64 serverConnectionHandlerID, anyID clientID) :
     m_serverConnectionHandlerID(serverConnectionHandlerID),

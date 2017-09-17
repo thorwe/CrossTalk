@@ -1,25 +1,28 @@
 #include "settings_position_spread.h"
 
-#include "ts_helpers_qt.h"
-#include "ts_logging_qt.h"
+#include <QtCore/QSettings>
 
-#include <QVBoxLayout>
+#include "core/ts_helpers_qt.h"
+#include "core/ts_logging_qt.h"
+
+#include <QtWidgets/QVBoxLayout>
 #include "groupbox_position_spread.h"
 
-SettingsPositionSpread* SettingsPositionSpread::m_Instance = 0;
-
-SettingsPositionSpread::SettingsPositionSpread()
+SettingsPositionSpread::SettingsPositionSpread(QObject* parent)
+    : QObject(parent)
 {
-    this->setObjectName(QStringLiteral("SettingsPositionSpread"));
+    setObjectName(QStringLiteral("SettingsPositionSpread"));
 }
 
 void SettingsPositionSpread::Init(PositionSpread *positionSpread)
 {
-    if(m_ContextMenuUi == -1)
+    if (m_ContextMenuUi == -1)
     {
-        m_ContextMenuUi = TSContextMenu::instance()->Register(this,PLUGIN_MENU_TYPE_GLOBAL,"Position Spread","radar_16.png");
-        connect(TSContextMenu::instance(), &TSContextMenu::MenusInitialized, this, &SettingsPositionSpread::onMenusInitialized, Qt::AutoConnection);
-        connect(TSContextMenu::instance(), &TSContextMenu::FireContextMenuEvent, this, &SettingsPositionSpread::onContextMenuEvent, Qt::AutoConnection);
+        auto plugin = qobject_cast<Plugin_Base*>(parent());
+        auto& context_menu = plugin->context_menu();
+        m_ContextMenuUi = context_menu.Register(this, PLUGIN_MENU_TYPE_GLOBAL, "Position Spread", "radar_16.png");
+        connect(&context_menu, &TSContextMenu::MenusInitialized, this, &SettingsPositionSpread::onMenusInitialized, Qt::AutoConnection);
+        connect(&context_menu, &TSContextMenu::FireContextMenuEvent, this, &SettingsPositionSpread::onContextMenuEvent, Qt::AutoConnection);
     }
 
     connect(this, &SettingsPositionSpread::EnabledSet, positionSpread, &PositionSpread::setEnabled);
@@ -39,6 +42,16 @@ void SettingsPositionSpread::Init(PositionSpread *positionSpread)
     positionSpread->setRegionOther(cfg.value("stereo_position_spread_region_other",0).toInt());
 
     mP_positionSpread = positionSpread;
+}
+
+
+void SettingsPositionSpread::shutdown()
+{
+    if (config)
+    {
+        config->done(QDialog::Rejected);  // will save anyways
+        delete config;
+    }
 }
 
 void SettingsPositionSpread::onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID)
@@ -62,8 +75,6 @@ void SettingsPositionSpread::onContextMenuEvent(uint64 serverConnectionHandlerID
                 auto layout = new QVBoxLayout;
                 layout->addWidget(groupBox);
                 p_config->setLayout(layout);
-
-                //ConfigPositionSpread* p_config = new ConfigPositionSpread(TSHelpers::GetMainWindow());  //has delete on close attribute
 
                 QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
                 groupBox->UpdateEnabledSet(cfg.value("stereo_position_spread_enabled",true).toBool());

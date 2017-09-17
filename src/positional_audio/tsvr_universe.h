@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QObject>
-#include <QMap>
+#include <QtCore/QObject>
+#include <QtCore/QMap>
 
 #include "tsvr_obj_other.h"
 

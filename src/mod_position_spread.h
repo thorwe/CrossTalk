@@ -1,11 +1,10 @@
 #pragma once
 
-#include <QObject>
-#include <stdint.h>
+#include <QtCore/QObject>
 #include "teamspeak/public_definitions.h"
-#include "module.h"
-#include "talkers.h"
+#include "core/module.h"
 #include "simplepanner.h"
+#include "core/plugin_base.h"
 
 enum TALKERS_REGION
 {
@@ -41,7 +40,7 @@ class PositionSpread : public Module, public TalkInterface
                WRITE setRegionOther
                NOTIFY regionOtherSet)
 public:
-    explicit PositionSpread(QObject *parent = 0);
+    PositionSpread(Plugin_Base& plugin);
 
     void onEditPostProcessVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short* samples, int sampleCount, int channels, const unsigned int* channelSpeakerArray, unsigned int* channelFillMask);
 
@@ -76,7 +75,7 @@ public slots:
 private:
     float m_spreadWidth = 0.0f;
 
-    Talkers* talkers;
+    Talkers& m_talkers;
 
     QMap<TALKERS_REGION,QList< QPair<uint64,anyID> >* >* TalkerSequences;
     QMap<uint64,QMap<anyID,SimplePanner*>* >* TalkersPanners;

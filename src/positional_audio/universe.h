@@ -1,9 +1,8 @@
-#ifndef UNIVERSE_H
-#define UNIVERSE_H
+#pragma once
 
-#include <QObject>
-#include <QMap>
-#include "public_definitions.h"
+#include <QtCore/QObject>
+#include <QtCore/QMap>
+#include "teamspeak/public_definitions.h"
 
 struct TsVR {
     QString vr;
@@ -35,5 +34,3 @@ public slots:
 private:
     QMap<uint64,QMap<anyID,TsVR*>* > UniverseMap;
 };
-
-#endif // UNIVERSE_H

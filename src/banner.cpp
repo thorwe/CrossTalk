@@ -1,7 +1,7 @@
 #include "banner.h"
 
-#include <QPixmap>
-#include <QMouseEvent>
+#include <QtGui/QPixmap>
+#include <QtGui/QMouseEvent>
 
 //! Constructor
 /*!

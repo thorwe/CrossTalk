@@ -1,12 +1,11 @@
 #pragma once
 
-#include <QGroupBox>
-#include <QMap>
+#include <QtWidgets/QGroupBox>
 #include "definitions_positionalaudio.h"
 
-namespace Ui {
-class GroupBoxPositionalAudio;
-}
+class QPushButton;
+class QSpinBox;
+class QDoubleSpinBox;
 
 class GroupBoxPositionalAudio : public QGroupBox
 {
@@ -14,7 +13,6 @@ class GroupBoxPositionalAudio : public QGroupBox
     
 public:
     explicit GroupBoxPositionalAudio(QWidget *parent = 0);
-    ~GroupBoxPositionalAudio();
 
 public slots:
     void UpdateUIUseCameraSet(bool val);
@@ -43,15 +41,23 @@ signals:
     void ServerRemoveButtonClicked(QString serverUniqueId);
 
     // to UI
-    void UpdateUIServerAdd(QString,QString);
-    void UpdateUIServerRemove(QString,QString);
-    void UpdateUIServerEnabled(QString,bool);
-    void UpdateUIServerBlocked(QString,bool);
-    void UpdateUIServerSendInterval(QString,float);
-    void UpdateUIServerSendIntervalSilentInc(QString,float);
+    void UpdateUIServerAdd(QString, QString);
+    void UpdateUIServerRemove(QString, QString);
+    void UpdateUIServerEnabled(QString, bool);
+    void UpdateUIServerBlocked(QString, bool);
+    void UpdateUIServerSendInterval(QString, float);
+    void UpdateUIServerSendIntervalSilentInc(QString, float);
 
     void UpdateUIServerSelect(QString);
 
 private:
-    Ui::GroupBoxPositionalAudio *ui;
+    QPushButton* m_avatar;
+    QPushButton* m_camera;
+
+    QGroupBox* m_volume;
+    QSpinBox* m_distance_min;
+    QSpinBox* m_distance_max;
+
+    QDoubleSpinBox* m_rolloff;
+    QDoubleSpinBox* m_rolloff_max;
 };
