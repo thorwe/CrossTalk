@@ -14,16 +14,15 @@ The [Positional Audio](https://github.com/thorwe/CrossTalk/wiki/Positional-Audio
 ### Stereo Position Spread  
 ![Stereo Position Spread](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_ps.png "Stereo Position Spread")
 
-### Radio FX
-Walkie Talkie? Walkie Talkie.
-
-![Radio FX](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_radio.png "Radio FX")
 ### ChannelMuter
 You want to listen only to a few selected people in a crowded channel? Meet the ChannelMuter.
 ### Cross-Server Push-to-Talk & Whispering
 
 ### Deprecated: Ducking
 ![Ducking has its own plugin now](https://github.com/thorwe/teamspeak-plugin-ducker)
+
+### Radio FX
+![Radio FX has its own plugin now](https://github.com/thorwe/teamspeak-plugin-radiofx)
 
 ## Installation
 It is recommended to install the plugin directly from within the client, so that it gets automatically updated. In you TeamSpeak client, go to Tools->Options->Addons->Browse, search for the "CrossTalk" plugin and install.
