@@ -21,7 +21,7 @@ You want to listen only to a few selected people in a crowded channel? Meet the 
 ### Deprecated: Ducking
 ![Ducking has its own plugin now](https://github.com/thorwe/teamspeak-plugin-ducker)
 
-### Radio FX
+### Deprecated: Radio FX
 ![Radio FX has its own plugin now](https://github.com/thorwe/teamspeak-plugin-radiofx)
 
 ## Installation
