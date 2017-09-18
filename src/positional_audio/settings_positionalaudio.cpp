@@ -116,19 +116,7 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
 
     if (type == PLUGIN_MENU_TYPE_GLOBAL)
     {
-        if (menuItemID == m_ContextMenuGW2Map)
-        {
-            QUrl gwUrl("http://thorwe.github.io/CrossTalk/misc/site/gw2/html/gw2maps-leaflet.html");
-
-            auto plugin = qobject_cast<Plugin*>(parent());
-            auto& websocket_server = plugin->websocket_server();
-            const auto kPort = websocket_server.getPort();
-            gwUrl.setQuery(QString("websocket_port=%1").arg(kPort));
-
-            //port = PluginQt::instance()->getServerPort(); //todo add query
-            QDesktopServices::openUrl(gwUrl);
-        }
-        else if (menuItemID == m_ContextMenuUi)
+        if (menuItemID == m_ContextMenuUi)
         {
             if (config)
                 config.data()->activateWindow();
@@ -232,6 +220,20 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
                 config = p_config;
             }
         }
+#ifdef Q_OS_WIN
+        else if (menuItemID == m_ContextMenuGW2Map)
+        {
+            QUrl gwUrl("http://thorwe.github.io/CrossTalk/misc/site/gw2/html/gw2maps-leaflet.html");
+
+            auto plugin = qobject_cast<Plugin*>(parent());
+            auto& websocket_server = plugin->websocket_server();
+            const auto kPort = websocket_server.getPort();
+            gwUrl.setQuery(QString("websocket_port=%1").arg(kPort));
+
+            //port = PluginQt::instance()->getServerPort(); //todo add query
+            QDesktopServices::openUrl(gwUrl);
+        }
+#endif
     }
 }
 

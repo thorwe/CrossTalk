@@ -23,9 +23,9 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 #include <QtCore/QtCore>
 #include <QtNetwork/QtNetwork>
 
-#include "QtWebSocket/QWsServer.h"
-#include "QtWebSocket/QWsSocket.h"
-#include "QtWebSocket/ServerThreaded/SocketThread.h"
+#include "QtWebsocket/QWsServer.h"
+#include "QtWebsocket/QWsSocket.h"
+#include "QtWebsocket/ServerThreaded/SocketThread.h"
 
 class ServerThreaded : public QObject
 {

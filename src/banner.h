@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtWidgetS/QLabel>
+#include <QtWidgets/QLabel>
 #include <QtCore/QObject>
 #include <QtGui/QMouseEvent>
 

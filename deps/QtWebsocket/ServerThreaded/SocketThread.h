@@ -22,7 +22,7 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <QtCore/QThread>
 
-#include "QtWebSocket/QWsSocket.h"
+#include "QtWebsocket/QWsSocket.h"
 
 class SocketThread : public QThread
 {

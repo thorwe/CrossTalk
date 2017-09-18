@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/plugin_base.h"
-#include "QtWebSocket/ServerThreaded/ServerThreaded.h"
+#include "QtWebsocket/ServerThreaded/ServerThreaded.h"
 
 class ChannelMuter;
 class PositionSpread;
