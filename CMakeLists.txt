@@ -122,8 +122,8 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 #add_subdirectory (math)
 set(WITH_VOLUME true)
 set(WITH_VOLUME_WIDGETS true)
-#add_subdirectory(../teamspeak-plugin-qt-common common_out)
-include(../teamspeak-plugin-qt-common/CMakeLists.txt)
+#add_subdirectory(./deps/teamspeak-plugin-qt-common common_out)
+include(./deps/teamspeak-plugin-qt-common/CMakeLists.txt)
 
 add_library(CrossTalk SHARED
     ${PLUGIN_SRC} ${TS_QT_CORE} ${TS_QT_VOLUME} ${QT_WEBSOCKET} ${POSITIONAL_AUDIO})
