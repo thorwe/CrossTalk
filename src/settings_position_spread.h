@@ -1,8 +1,9 @@
 #pragma once
 
-#include <QObject>
-#include <QDialog>
-#include "ts_context_menu_qt.h"
+#include <QtCore/QObject>
+#include <QtCore/QPointer>
+#include <QtWidgets/QDialog>
+#include "core/ts_context_menu_qt.h"
 #include "mod_position_spread.h"
 
 class SettingsPositionSpread : public QObject, public ContextMenuInterface
@@ -11,31 +12,10 @@ class SettingsPositionSpread : public QObject, public ContextMenuInterface
     Q_INTERFACES(ContextMenuInterface)
 
 public:
-    static SettingsPositionSpread* instance()
-    {
-        static QMutex mutex;
-        if(!m_Instance)
-        {
-            mutex.lock();
-
-            if(!m_Instance)
-                m_Instance = new SettingsPositionSpread;
-
-            mutex.unlock();
-        }
-        return m_Instance;
-    }
-
-    static void drop()
-    {
-        static QMutex mutex;
-        mutex.lock();
-        delete m_Instance;
-        m_Instance = 0;
-        mutex.unlock();
-    }
+    explicit SettingsPositionSpread(QObject* parent = nullptr);
 
     void Init(PositionSpread *positionSpread);
+    void shutdown();
 
 signals:
     void EnabledSet(bool);
@@ -56,15 +36,8 @@ private slots:
     void saveSettings(int r);
 
 private:
-    explicit SettingsPositionSpread();
-    ~SettingsPositionSpread() = default;
-    static SettingsPositionSpread* m_Instance;
-    SettingsPositionSpread(const SettingsPositionSpread &);
-    SettingsPositionSpread& operator=(const SettingsPositionSpread &);
-
     int m_ContextMenuUi = -1;
     QPointer<QDialog> config;
 
     QPointer<PositionSpread> mP_positionSpread;
-
 };

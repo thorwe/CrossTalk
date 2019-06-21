@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QGroupBox>
-#include <QMap>
+#include <QtWidgets/QGroupBox>
+#include <QtCore/QMap>
 #include "definitions_positionalaudio.h"
 
-namespace Ui {
-class GroupBoxPositionalAudioServers;
-}
+class QListWidget;
+class QDoubleSpinBox;
+class QPushButton;
 
 class GroupBoxPositionalAudioServers : public QGroupBox
 {
@@ -14,7 +14,6 @@ class GroupBoxPositionalAudioServers : public QGroupBox
     
 public:
     explicit GroupBoxPositionalAudioServers(QWidget *parent = 0);
-    ~GroupBoxPositionalAudioServers();
 
 public slots:
     // to UI
@@ -28,9 +27,9 @@ public slots:
     void UpdateUIServerSelect(QString serverUniqueId);
 
 signals:
-    void enabledSet(QString,bool);
-    void sendIntervalChange(QString,float);
-    void sendIntervalSilentIncChange(QString,float);
+    void enabledSet(QString, bool);
+    void sendIntervalChange(QString, float);
+    void sendIntervalSilentIncChange(QString, float);
     void blockedSet(QString serverUniqueId, bool);
     void addButtonClicked();
     void removeButtonClicked(QString serverUniqueId);
@@ -46,7 +45,14 @@ private slots:
     void onUnblockButtonClicked();
 
 private:
-    Ui::GroupBoxPositionalAudioServers *ui;
-    QMap<QString,PositionalAudio_ServerSettings> m_ServerSettingsMap;
-    QMap<QString,QString> m_Name2sUId;
+    QListWidget* m_servers;
+    QGroupBox* m_settings;
+
+    QDoubleSpinBox* m_send_interval;
+    QDoubleSpinBox* m_send_interval_silent_inc;
+    QPushButton* m_unblock;
+    QPushButton* m_remove;
+
+    QMap<QString, PositionalAudio_ServerSettings> m_ServerSettingsMap;
+    QMap<QString, QString> m_Name2sUId;
 };

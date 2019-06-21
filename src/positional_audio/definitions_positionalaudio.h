@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QString>
+#include <QtCore/QString>
 struct PositionalAudio_ServerSettings {
     QString serverUniqueId;
     QString serverName;

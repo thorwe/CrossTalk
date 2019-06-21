@@ -1,13 +1,12 @@
 #pragma once
 
-#include <QObject>
-#include <QtCore>
-#include "../module.h"
+#include <QtCore/QObject>
+#include <QtCore/QtCore>
+#include "core/module.h"
 #include "tsvr_universe.h"
 #include "tsvr_obj_self.h"
-#include "../ts_infodata_qt.h"
-//#include "../ts_context_menu_qt.h"
 #include "definitions_positionalaudio.h"
+#include "plugin_qt.h"
 
 #ifndef RETURNCODE_BUFSIZE
 #define RETURNCODE_BUFSIZE 128
@@ -34,7 +33,7 @@ class PositionalAudio : public Module, public InfoDataInterface//, public Contex
     Q_PROPERTY(float rollOffMax READ getRollOffMax WRITE setRollOffMax NOTIFY rollOffMaxChanged)
 
 public:
-    explicit PositionalAudio(QObject *parent = 0);
+    PositionalAudio(Plugin& plugin);
 
     // events forwarded from plugin.cpp
     bool onPluginCommand(uint64 serverConnectionHandlerID, anyID clientID, bool isMe, QString cmd, QTextStream &args);
@@ -157,6 +156,11 @@ private:
 
     QMap<QString,PositionalAudio_ServerSettings> m_ServerSettings;
     QHash<uint64,int> m_SendCounters;
+
+    Talkers& m_talkers;
+    TSInfoData& m_info_data;
+    TSServersInfo& m_servers_info;
+    ServerThreaded& m_websockets_server;
 };
 QTextStream &operator<<(QTextStream &out, const TS3_VECTOR &ts3Vector);
 QTextStream &operator>>(QTextStream &in, TS3_VECTOR &ts3Vector);

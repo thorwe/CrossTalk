@@ -41,7 +41,7 @@
     <string/>
    </property>
    <property name="pixmap">
-    <pixmap resource="../CrossTalkRes.qrc">:/banners/logo_320</pixmap>
+    <pixmap resource="../crosstalk.qrc">:/banners/logo_320</pixmap>
    </property>
    <property name="alignment">
     <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -50,13 +50,13 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="Banner" name="banner_pledgie">
+  <widget class="Banner" name="banner_jianji">
    <property name="geometry">
     <rect>
      <x>310</x>
      <y>10</y>
-     <width>149</width>
-     <height>37</height>
+     <width>151</width>
+     <height>41</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -65,8 +65,11 @@
      <verstretch>0</verstretch>
     </sizepolicy>
    </property>
-   <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;a href=&quot;http://www.pledgie.com/campaigns/18898&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;Support the author!&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   <property name="pixmap">
+    <pixmap resource="../crosstalk.qrc">:/banners/jianji</pixmap>
+   </property>
+   <property name="scaledContents">
+    <bool>true</bool>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -84,7 +87,8 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../CrossTalkRes.qrc"/>
+  <include location="../crosstalk.qrc"/>
+  <include location="../crosstalk.qrc"/>
  </resources>
  <connections/>
 </ui>

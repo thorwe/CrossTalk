@@ -11,18 +11,20 @@ const QList<float> SPREAD_LEFT = QList<float>() << -0.75f << -1.0f << -0.5f << -
 
 const QPair<uint64,anyID> SEAT_HOLDER = qMakePair((uint64)0,(anyID)0);
 
-PositionSpread::PositionSpread(QObject *parent)
+PositionSpread::PositionSpread(Plugin_Base& plugin)
+	: m_talkers(plugin.talkers())
+	, TalkersPanners(new QMap<uint64, QMap<anyID, SimplePanner*>* >)
+	, TalkerSequences(new QMap<TALKERS_REGION, QList< QPair<uint64, anyID> >* >)
 {
-    this->setParent(parent);
-    this->setObjectName(QStringLiteral("Position Spread"));
+	m_isPrintEnabled = false;
+    setParent(&plugin);
+    setObjectName(QStringLiteral("Position Spread"));
     m_isPrintEnabled = false;
-    talkers = Talkers::instance();
-    TalkersPanners = new QMap<uint64,QMap<anyID,SimplePanner*>* >;
-    TalkerSequences = new QMap<TALKERS_REGION,QList< QPair<uint64,anyID> >* >;
+    
     for (int i = 0; i < TALKERS_REGION_END; ++i)
     {
-        QList< QPair<uint64,anyID> >* list = new QList< QPair<uint64,anyID> >;
-        TalkerSequences->insert((TALKERS_REGION)i,list);
+        auto list = new QList< QPair<uint64,anyID> >;
+        TalkerSequences->insert((TALKERS_REGION)i, list);
     }
 }
 
@@ -57,11 +59,14 @@ void PositionSpread::setHomeId(uint64 serverConnectionHandlerID)
 {
     if (serverConnectionHandlerID == m_homeId)
         return;
+
     m_homeId = serverConnectionHandlerID;
+
     if (m_homeId == 0)
         return;
+
     if ((isRunning()) && (m_ExpertModeEnabled))
-        talkers->DumpTalkStatusChanges(this,true);
+        m_talkers.DumpTalkStatusChanges(this, true);
 }
 
 void PositionSpread::onRunningStateChanged(bool value)
@@ -71,7 +76,7 @@ void PositionSpread::onRunningStateChanged(bool value)
 //    else
 //        disconnect(talkers,SIGNAL(TalkStatusChanged(uint64,int,bool,anyID)),this,SLOT(onTalkStatusChanged(uint64,int,bool,anyID)));
 //    talkers->RegisterEventTalkStatusChange(this,value);
-    talkers->DumpTalkStatusChanges(this,((value)?STATUS_TALKING:STATUS_NOT_TALKING));
+    m_talkers.DumpTalkStatusChanges(this,((value)?STATUS_TALKING:STATUS_NOT_TALKING));
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }
 
@@ -79,9 +84,11 @@ void PositionSpread::setSpreadWidth(float value)
 {
     if (m_spreadWidth == value)
         return;
+
     m_spreadWidth = value;
+
     if (isRunning())
-        talkers->DumpTalkStatusChanges(this,true);
+        m_talkers.DumpTalkStatusChanges(this, true);
 
     Log(QString("setSpreadWidth: %1").arg(m_spreadWidth));
     emit spreadWidthSet(value);
@@ -91,9 +98,11 @@ void PositionSpread::setExpertModeEnabled(bool value)
 {
     if (m_ExpertModeEnabled == value)
         return;
+
     m_ExpertModeEnabled = value;
+
     if (isRunning())
-        talkers->DumpTalkStatusChanges(this,true);
+        m_talkers.DumpTalkStatusChanges(this, true);
 
     Log(QString("setExpertModeEnabled: %1").arg((m_ExpertModeEnabled)?"true":"false"));
     emit expertModeEnabledSet(value);
@@ -103,9 +112,11 @@ void PositionSpread::setRegionHomeTab(int talkersRegion)
 {
     if (m_RegionHomeTab == (TALKERS_REGION)talkersRegion)
         return;
+
     m_RegionHomeTab = (TALKERS_REGION)talkersRegion;
+
     if ((isRunning()) && (m_ExpertModeEnabled))
-        talkers->DumpTalkStatusChanges(this,true);
+        m_talkers.DumpTalkStatusChanges(this, true);
 
     Log(QString("setRegionHomeTab: %1").arg(talkersRegion));
     emit regionHomeTabSet(m_RegionHomeTab);
@@ -115,9 +126,11 @@ void PositionSpread::setRegionWhisper(int talkersRegion)
 {
     if (m_RegionWhisper == (TALKERS_REGION)talkersRegion)
         return;
+
     m_RegionWhisper = (TALKERS_REGION)talkersRegion;
+
     if ((isRunning()) && (m_ExpertModeEnabled))
-        talkers->DumpTalkStatusChanges(this,true);
+        m_talkers.DumpTalkStatusChanges(this, true);
 
     Log(QString("setRegionWhisper: %1").arg(talkersRegion));
     emit regionWhisperSet(m_RegionWhisper);
@@ -125,11 +138,12 @@ void PositionSpread::setRegionWhisper(int talkersRegion)
 
 void PositionSpread::setRegionOther(int talkersRegion)
 {
-    if (m_RegionOther ==  (TALKERS_REGION)talkersRegion)
+    if (m_RegionOther == (TALKERS_REGION)talkersRegion)
         return;
+
     m_RegionOther = (TALKERS_REGION)talkersRegion;
     if ((isRunning()) && (m_ExpertModeEnabled))
-        talkers->DumpTalkStatusChanges(this,true);
+        m_talkers.DumpTalkStatusChanges(this, true);
 
     Log(QString("setRegionOther: %1").arg(talkersRegion));
     emit regionOtherSet(m_RegionOther);

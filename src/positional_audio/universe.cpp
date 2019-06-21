@@ -1,6 +1,7 @@
 #include "universe.h"
 
-#include "../ts_logging_qt.h"
+#include "core/ts_logging_qt.h"
+#include "teamspeak/clientlib_publicdefinitions.h"
 
 Universe::Universe(QObject *parent) :
     QObject(parent)
@@ -41,9 +42,9 @@ TsVR* Universe::Add(uint64 serverConnectionHandlerID,anyID clientID)
 void Universe::onConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber)
 {
     Q_UNUSED(errorNumber);
-    if (newStatus==STATUS_DISCONNECTED)
+    if (newStatus == STATUS_DISCONNECTED)
             Remove(serverConnectionHandlerID);
-    else if ((newStatus==STATUS_CONNECTION_ESTABLISHED) && !(UniverseMap.contains(serverConnectionHandlerID)))
+    else if ((newStatus == STATUS_CONNECTION_ESTABLISHED) && !(UniverseMap.contains(serverConnectionHandlerID)))
         UniverseMap.insert(serverConnectionHandlerID, new QMap<anyID,TsVR*>);
 }
 

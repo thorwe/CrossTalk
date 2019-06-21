@@ -1,15 +1,13 @@
 #include "mod_agmu.h"
 #include "teamspeak/public_errors.h"
-#include "ts_helpers_qt.h"
-#include "ts3_functions.h"  //currently only used in a debug output
-#include "plugin.h"  //currently only used in a debug output
+#include "core/ts_helpers_qt.h"
 
-Agmu::Agmu(QObject *parent)
+Agmu::Agmu(Plugin_Base& plugin)
+	: m_talkers(plugin.talkers())
 {
-    this->setParent(parent);
-    this->setObjectName(QStringLiteral("Agmu"));
+    setParent(&plugin);
+    setObjectName(QStringLiteral("Agmu"));
     m_isPrintEnabled = false;
-    talkers = Talkers::instance();
     m_TalkersDSPs = new QMap<uint64,QMap<anyID,DspVolumeAGMU*>* >;
     m_PeakCache = new QHash<QString,short>;
 }
@@ -74,18 +72,11 @@ bool Agmu::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, boo
             QString clientUID;
             unsigned int error;
             if ((error = TSHelpers::GetClientUID(serverConnectionHandlerID, clientID, clientUID)) != ERROR_ok)
-                Error("(onTalkStatusChanged)",serverConnectionHandlerID,error);
+                Error("(onTalkStatusChanged)", serverConnectionHandlerID, error);
             else
             {
                 dspObj->setPeak(m_PeakCache->value(clientUID));
                 dspObj->setGainCurrent(dspObj->computeGainDesired());
-                char name[512];
-                if((error = ts3Functions.getClientDisplayName(serverConnectionHandlerID, clientID, name, 512)) != ERROR_ok)
-                {
-                    Error("(onTalkStatusChanged) Error getting client display name",serverConnectionHandlerID,error);
-                    return true;
-                }
-                //Print(QString("Setting dspObj from cache: %1 %2 %3").arg(name).arg(dspObj->GetPeak()).arg(dspObj->getGainCurrent()));
             }
         }
 
@@ -129,6 +120,6 @@ void Agmu::setNextTalkStatusChangeForceProcessing(bool val)
 // This module is currently always on, the setting switches bypassing (since it's also used for post-RadioFX makeup gain)
 void Agmu::onRunningStateChanged(bool value)
 {
-    talkers->DumpTalkStatusChanges(this,((value)?STATUS_TALKING:STATUS_NOT_TALKING));
+    m_talkers.DumpTalkStatusChanges(this, ((value) ? STATUS_TALKING:STATUS_NOT_TALKING));
     Log(QString("enabled: %1").arg((value)?"true":"false"));
 }

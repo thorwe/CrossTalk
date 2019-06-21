@@ -1,4 +1,7 @@
 #include "minecraft.h"
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonArray>
+#include "core/ts_logging_qt.h"
 
 Minecraft::Minecraft(QObject *parent) :
     QObject(parent)
@@ -22,7 +25,7 @@ bool Minecraft::onIdentityRawDirty(QString rawIdentity)
     {
 
         m_meObj.remove("name");
-        m_meObj["worldSpawn"] = { 0, 0, 0 };
+        m_meObj["worldSpawn"] = QJsonArray{ 0, 0, 0 };
         m_meObj["dimension"] = 0;
 
         emit identityChanged(QString::null);
@@ -59,10 +62,10 @@ bool Minecraft::onInfoData(QTextStream &data)
     data << "\n";
 
     QJsonArray worldSpawn = m_meObj.value("worldSpawn").toArray();
-    if (!worldSpawn.isEmpty())
+    /*if (!worldSpawn.isEmpty())
     {
         data << worldSpawn.at(0) << ", " << worldSpawn.at(1) << ", " << worldSpawn.at(2) << "\n";
-    }
+    }*/
     data << "Dimension: " << m_meObj.value("dimension").toInt();
 
     data << " )\n";

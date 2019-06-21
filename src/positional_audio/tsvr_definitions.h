@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QString>
-#include <QTextStream>
+#include <QtCore/QString>
+#include <QtCore/QTextStream>
 
 class CustomEnvironmentSupportInterface
 {

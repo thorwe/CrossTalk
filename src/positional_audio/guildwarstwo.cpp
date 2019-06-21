@@ -1,9 +1,9 @@
 #include "guildwarstwo.h"
 
-#include "ts_helpers_qt.h"
+#include "core/ts_helpers_qt.h"
 #include "tsvr_obj.h"
 
-#include "ts_logging_qt.h"
+#include "core/ts_logging_qt.h"
 
 const QUrl GW2_BUILD("https://api.guildwars2.com/v1/build.json");
 const QUrl GW2_WORLD_NAMES("https://api.guildwars2.com/v2/worlds?ids=all");

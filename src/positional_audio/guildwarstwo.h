@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QObject>
-#include <QtNetwork>
+#include <QtCore/QObject>
+#include <QtNetwork/QtNetwork>
 #include "tsvr_definitions.h"
 
 class GuildWarsTwo : public QObject, public CustomEnvironmentSupportInterface

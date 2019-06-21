@@ -3,9 +3,6 @@
  * @ https://sourceforge.net/p/mumble/code/ci/master/tree/plugins/link/
  * which is under what appears to be a 3-clause BSD licence also operating under the alias of modified BSD license
  *
- * ToDo: Is this considered a modification, a derivation now?
- * Do I need to put his copyright above this, and/or does this need to be BSD too?
- * It's not like reading a struct is the invention of the wheel or sth.?!?
  */
 #include "mod_positionalaudio.h"
 
@@ -13,15 +10,13 @@
 #include "teamspeak/public_errors.h"
 
 #include "ts3_functions.h"
-#include "../plugin.h"
-#include "../plugin_qt.h"
+#include "plugin.h"
 
-#include "../talkers.h"
-#include "../ts_helpers_qt.h"
+#include "core/ts_helpers_qt.h"
 
-#include "ts_serversinfo.h"
+#include "core/ts_serversinfo.h"
 
-#include <db.h>
+#include "volume/db.h"
 
 #ifndef M_PI
 #define M_PI    3.14159265358979323846f
@@ -56,13 +51,18 @@ struct LinkedMem {
 
 static LinkedMem *lm = NULL;
 
-PositionalAudio::PositionalAudio(QObject *parent)
+PositionalAudio::PositionalAudio(Plugin& plugin)
+    : m_talkers(plugin.talkers())
+    , m_info_data(plugin.info_data())
+    , m_servers_info(plugin.servers_info())
+    , universe(new TsVrUniverse(this))
+    , meObj(new TsVrObjSelf(this))
+    , m_websockets_server(plugin.websocket_server())
 {
-    this->setParent(parent);
-    this->setObjectName("PositionalAudio");
+    setParent(&plugin);
+    setObjectName("PositionalAudio");
     m_isPrintEnabled = false;
-    universe = new TsVrUniverse(this);
-    meObj = new TsVrObjSelf(this);
+    
     NULL_VECTOR.x = 0.0f;
     NULL_VECTOR.y = 0.0f;
     NULL_VECTOR.z = 0.0f;
@@ -217,7 +217,7 @@ void PositionalAudio::RemoveServerSetting(QString serverUniqueId, QString server
     }
 
     m_ServerSettings.remove(serverUniqueId);
-    Log(QString("(RemoveServerSetting) %1").arg(serverName),LogLevel_INFO);
+    Log(QString("(RemoveServerSetting) %1").arg(serverName), LogLevel_INFO);
 }
 
 void PositionalAudio::setServerSettingEnabled(QString serverUniqueId, bool val)
@@ -373,17 +373,17 @@ bool PositionalAudio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64
     if (!isRunning())
         return false;
 
-    bool isDirty = false;
+    auto is_dirty = false;
     if (type == PLUGIN_CLIENT)
     {
         if (id == mine)
-            isDirty |= meObj->onInfoDataChanged(data);
+            is_dirty |= meObj->onInfoDataChanged(data);
         else if (universe->Contains(serverConnectionHandlerID,(anyID)id))
-            isDirty |= universe->Get(serverConnectionHandlerID,(anyID)id)->onInfoDataChanged(data);
+            is_dirty |= universe->Get(serverConnectionHandlerID,(anyID)id)->onInfoDataChanged(data);
         else
-            return isDirty;
+            return is_dirty;
 
-        if (isDirty && (id != mine))
+        if (is_dirty && (id != mine))
         {
             if (m_PlayersInMyContext.contains(serverConnectionHandlerID,(anyID)id))
             {
@@ -395,7 +395,7 @@ bool PositionalAudio::onInfoDataChanged(uint64 serverConnectionHandlerID, uint64
         }
 
     }
-    return isDirty;
+    return is_dirty;
 }
 
 /*int PositionalAudio::onServerErrorEvent(uint64 serverConnectionHandlerID, const char *errorMessage, unsigned int error, const char *returnCode, const char *extraMessage)
@@ -419,7 +419,7 @@ void PositionalAudio::onRunningStateChanged(bool value)
     m_Context_Dirty = false;
     m_Avatar_Dirty = false;
 
-    TSInfoData::instance()->Register(this,value,1);
+    m_info_data.Register(this, value, 1);
 
     if (value)
     {
@@ -430,15 +430,13 @@ void PositionalAudio::onRunningStateChanged(bool value)
 //            m_SendReturnCode = QString::fromLatin1(m_SendReturnCodeC);
 //            Log("Got returnCode: " + m_SendReturnCode);
 //        }
-        connect(Talkers::instance(),SIGNAL(ConnectStatusChanged(uint64,int,uint)),this,SLOT(onConnectStatusChanged(uint64,int,uint)),Qt::UniqueConnection);
-        connect(universe,SIGNAL(removed(QString)),this,SLOT(onUniverseRemoved(QString)),Qt::UniqueConnection);
-        connect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)),Qt::UniqueConnection);
-        connect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)),Qt::UniqueConnection);
-        connect(this,&PositionalAudio::BroadcastJSON, (PluginQt::instance()->m_PipeServer), &PipeServer::Send, Qt::UniqueConnection);
-#ifdef USE_WEBSOCKET
-        connect(this, SIGNAL(BroadcastJSON(QString)),PluginQt::instance()->m_WebSocketServer,SIGNAL(broadcastMessage(QString)), Qt::UniqueConnection);
-#endif
-        connect(this,SIGNAL(BroadcastJSON(QString)),PluginQt::instance(),SLOT(LocalServerSend(QString)),Qt::UniqueConnection);
+        connect(&m_talkers, &Talkers::ConnectStatusChanged, this, &PositionalAudio::onConnectStatusChanged, Qt::UniqueConnection);
+        connect(universe, &TsVrUniverse::removed, this, &PositionalAudio::onUniverseRemoved, Qt::UniqueConnection);
+        connect(meObj, &TsVrObjSelf::vrChanged, this, &PositionalAudio::onMyVrChanged, Qt::UniqueConnection);
+        connect(meObj, &TsVrObjSelf::identityChanged, this, &PositionalAudio::onMyIdentityChanged, Qt::UniqueConnection);
+
+        connect(this, &PositionalAudio::BroadcastJSON, &m_websockets_server, &ServerThreaded::broadcastMessage, Qt::UniqueConnection);
+
         m_sharedMemory = new QSharedMemory(this);
         m_sharedMemory->setNativeKey("MumbleLink");
         if (!m_sharedMemory->create(sizeof(LinkedMem),QSharedMemory::ReadWrite))
@@ -471,10 +469,10 @@ void PositionalAudio::onRunningStateChanged(bool value)
     }
     else
     {
-        disconnect(Talkers::instance(),SIGNAL(ConnectStatusChanged(uint64,int,uint)),this,SLOT(onConnectStatusChanged(uint64,int,uint)));
-        disconnect(universe,SIGNAL(removed(QString)),this,SLOT(onUniverseRemoved(QString)));
-        disconnect(meObj,SIGNAL(vrChanged(TsVrObj*,QString)),this,SLOT(onMyVrChanged(TsVrObj*,QString)));
-        disconnect(meObj,SIGNAL(identityChanged(TsVrObj*,QString)),this,SLOT(onMyIdentityChanged(TsVrObj*,QString)));
+        disconnect(&m_talkers, &Talkers::ConnectStatusChanged, this, &PositionalAudio::onConnectStatusChanged);
+        disconnect(universe, &TsVrUniverse::removed, this, &PositionalAudio::onUniverseRemoved);
+        disconnect(meObj, &TsVrObjSelf::vrChanged, this, &PositionalAudio::onMyVrChanged);
+        disconnect(meObj, &TsVrObjSelf::identityChanged, this, &PositionalAudio::onMyIdentityChanged);
         unlock();
         this->killTimer(m_tryTimerId);
         lm = NULL;
@@ -498,7 +496,7 @@ void PositionalAudio::timerEvent(QTimerEvent *event)
             m_sendCounter++;
             Send();
             if (m_isDirty_IdentityUncleaned)
-                TSInfoData::instance()->RequestSelfUpdate();
+                m_info_data.RequestSelfUpdate();
         }
         else
             unlock();
@@ -512,12 +510,12 @@ void PositionalAudio::timerEvent(QTimerEvent *event)
             {
                 if (lm->description[0])
                 {
-                    QString vr_desc = QString::fromWCharArray(lm->description,2048);
-                    int nullPos = vr_desc.indexOf(QChar::Null,0);
-                    if (nullPos == -1)
+                    auto vr_desc = QString::fromWCharArray(lm->description, 2048);
+                    const auto kNullPos = vr_desc.indexOf(QChar::Null, 0);
+                    if (kNullPos == -1)
                         Error("(UpdateMyGame) game description Null Terminator not found.");
-                    else if (nullPos != 256)
-                        vr_desc.truncate(nullPos);
+                    else if (kNullPos != 256)
+                        vr_desc.truncate(kNullPos);
 
                     meObj->setVrDescription(vr_desc);
                 }
@@ -526,16 +524,16 @@ void PositionalAudio::timerEvent(QTimerEvent *event)
 
                 if (lm->name[0])
                 {
-                    QString myVr = QString::fromWCharArray(lm->name,256);
-                    int nullPos = myVr.indexOf(QChar::Null,0);
-                    if (nullPos == -1)
+                    auto my_vr = QString::fromWCharArray(lm->name, 256);
+                    const auto kNullPos = my_vr.indexOf(QChar::Null, 0);
+                    if (kNullPos == -1)
                         Error("(UpdateMyGame) game Null Terminator not found.");
-                    else if (nullPos != 256)
-                        myVr.truncate(nullPos);
+                    else if (kNullPos != 256)
+                        my_vr.truncate(kNullPos);
 
-                    meObj->setVr(myVr);
+                    meObj->setVr(my_vr);
 
-                    if (!myVr.isEmpty())
+                    if (!my_vr.isEmpty())
                     {
                         // Log("Found " + meObj->getVr());
                         if (m_tryTimerId != 0)
@@ -571,7 +569,8 @@ void PositionalAudio::unlock()
         lm->description[0] = 0;
         m_sharedMemory->unlock();
     }
-    if (m_fetchTimerId != 0)
+    
+    if (m_fetchTimerId)
     {
         killTimer(m_fetchTimerId);
         m_fetchTimerId = 0;
@@ -590,7 +589,7 @@ void PositionalAudio::unlock()
     meObj->setVr(QString::null);
     meObj->setVrDescription(QString::null);
 
-    Send(QString::null,PluginCommandTarget_CURRENT_CHANNEL);
+    Send(QString::null, PluginCommandTarget_CURRENT_CHANNEL);
     Log("Unlocked.");
 }
 
@@ -623,25 +622,25 @@ bool PositionalAudio::fetch()
             lm->context_len = 255;
 
         //*** Context
-        QByteArray newContext = QByteArray(reinterpret_cast<const char *>(lm->context),lm->context_len);
+        auto newContext = QByteArray(reinterpret_cast<const char *>(lm->context), lm->context_len);
         m_Context_Dirty = (m_Context != newContext);
         m_Context = newContext;
         if (m_Context_Dirty)
             meObj->setContext(m_Context.toHex().data());    //m_ContextHex = m_Context.toHex().data();
 
         //*** Identity
-        QString newIdentity = QString::fromWCharArray(lm->identity,256);
-        m_isDirty_IdentityUncleaned = (m_IdentityUncleaned != newIdentity);
+        auto new_identity = QString::fromWCharArray(lm->identity, 256);
+        m_isDirty_IdentityUncleaned = (m_IdentityUncleaned != new_identity);
         if (m_isDirty_IdentityUncleaned)
         {
-            m_IdentityUncleaned = newIdentity;
-            int nullPos = newIdentity.indexOf(QChar::Null,0);
-            if (nullPos == -1)
+            m_IdentityUncleaned = new_identity;
+            const auto kNullPos = new_identity.indexOf(QChar::Null, 0);
+            if (kNullPos == -1)
                 Error("identity Null Terminator not found.");
-            else if (nullPos != 256)
-                newIdentity.truncate(nullPos);
+            else if (kNullPos != 256)
+                new_identity.truncate(kNullPos);
 
-            meObj->setIdentityRaw(newIdentity);
+            meObj->setIdentityRaw(new_identity);
         }
     }
     else if (lm->uiVersion == 1)    //legacy
@@ -784,7 +783,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
         }
 
         if (isDirtyName || isDirtyContext || isDirtyId)
-            TSInfoData::instance()->RequestUpdate(serverConnectionHandlerID,clientID);
+            m_info_data.RequestUpdate(serverConnectionHandlerID,clientID);
     }
 
     if (m_PlayersInMyContext.contains(serverConnectionHandlerID,clientID))
@@ -915,7 +914,8 @@ void PositionalAudio::Send(uint64 serverConnectionHandlerID, QString args, int t
 
 //    Log(QString("Sending: %1").arg(cmd),serverConnectionHandlerID,LogLevel_DEBUG);
 //    returnCode = m_SendReturnCodeC;
-    ts3Functions.sendPluginCommand(serverConnectionHandlerID,pluginID,cmd.toLatin1().constData(),targetMode,targetIDs,returnCode);
+    auto plugin = qobject_cast<Plugin_Base*>(parent());
+    ts3Functions.sendPluginCommand(serverConnectionHandlerID, plugin->id().c_str(), cmd.toLatin1().constData(), targetMode, targetIDs, returnCode);
 }
 
 void PositionalAudio::Send(QString args, int targetMode)
@@ -925,17 +925,16 @@ void PositionalAudio::Send(QString args, int targetMode)
 
     // Get clients in my context
     uint64* servers;
-    if(ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
+    if (ts3Functions.getServerConnectionHandlerList(&servers) == ERROR_ok)
     {
 //        m_silentSendCounter++;
 
-        auto myTalkingScHandler = Talkers::instance()->isMeTalking();
+        auto myTalkingScHandler = m_talkers.isMeTalking();
 
-        uint64* server;
-        for(server = servers; *server != (uint64)NULL; ++server)
+        for (auto server = servers; *server; ++server)
         {
-            auto serverInfo = TSServersInfo::instance()->GetServerInfo(*server);
-            if (serverInfo == (TSServerInfo*)NULL)
+            auto server_info = m_servers_info.get_server_info(*server);
+            if (!server_info)
                 continue;
 
 //            unsigned int error;
@@ -951,7 +950,7 @@ void PositionalAudio::Send(QString args, int targetMode)
 //                continue;
 //            }
 
-            auto sUId = serverInfo->getUniqueId();
+            auto sUId = server_info->getUniqueId();
             const auto s_settings = (m_ServerSettings.contains(sUId)?m_ServerSettings.value(sUId):m_ServerSettings.value("default"));
             if (!s_settings.enabled)
                 continue;
@@ -1013,9 +1012,9 @@ void PositionalAudio::Send()
             m_Avatar_Dirty = false;
             m_Context_Dirty = false;
             m_isDirty_IdentityUncleaned = false;
-            Send(args,PluginCommandTarget_CURRENT_CHANNEL);
+            Send(args, PluginCommandTarget_CURRENT_CHANNEL);
 
-            args = GetSendStringJson(true,true,NULL);
+            args = GetSendStringJson(true, true, NULL);
             if (!args.isEmpty())
                 emit BroadcastJSON(args);
         }
@@ -1032,7 +1031,7 @@ void PositionalAudio::Send()
             {
                 m_Avatar_Dirty = false;
                 Send(args,PluginCommandTarget_CLIENT);
-                args = GetSendStringJson(true,true,NULL);
+                args = GetSendStringJson(true,true, NULL);
                 if (!args.isEmpty())
                     emit BroadcastJSON(args);
             }
@@ -1091,9 +1090,9 @@ void PositionalAudio::Update3DListenerAttributes()
                             {
                                 if (universe->Contains(*server,clients[i]))
                                 {
-                                    TsVrObj* obj = universe->Get(*server,clients[i]);
+                                    auto obj = universe->Get(*server, clients[i]);
                                     if ((myVr == obj->getVr()) && (myContext == obj->getContext()))
-                                        m_PlayersInMyContext.insert(*server,clients[i]);
+                                        m_PlayersInMyContext.insert(*server, clients[i]);
                                 }
                             }
 

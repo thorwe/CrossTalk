@@ -5,10 +5,6 @@ CrossTalk is a Teamspeak 3 plugin that enhances the general audio experience and
 
 [pledgie]: https://www.pledgie.com/campaigns/18898
 
-## Announcements
-
-[Official download](http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html)
-
 ## Features
 
 ### Positional Audio
@@ -17,23 +13,19 @@ The [Positional Audio](https://github.com/thorwe/CrossTalk/wiki/Positional-Audio
 
 ### Stereo Position Spread  
 ![Stereo Position Spread](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_ps.png "Stereo Position Spread")
-### Ducking
-Global Ducking: Reduce the volume of musicbots when someone talks.
 
-Channel Ducking: Reduce the volume of home or foreing tabs when someone talks on the other one or you receive a whisper.
-
-![Channel Ducking](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_duck.png "Channel Ducking")
-### Radio FX
-Walkie Talkie? Walkie Talkie.
-
-![Radio FX](https://github.com/thorwe/CrossTalk/raw/master/misc/ct_screenie_radio.png "Radio FX")
 ### ChannelMuter
 You want to listen only to a few selected people in a crowded channel? Meet the ChannelMuter.
 ### Cross-Server Push-to-Talk & Whispering
 
-## Installation
+### Deprecated: Ducking
+![Ducking has its own plugin now](https://github.com/thorwe/teamspeak-plugin-ducker)
 
-Head over to the official download site at Teamspeak for an [installer package](http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html).
+### Deprecated: Radio FX
+![Radio FX has its own plugin now](https://github.com/thorwe/teamspeak-plugin-radiofx)
+
+## Installation
+It is recommended to install the plugin directly from within the client, so that it gets automatically updated. In you TeamSpeak client, go to Tools->Options->Addons->Browse, search for the "CrossTalk" plugin and install.
 
 ## Support
 
@@ -43,3 +35,19 @@ known issues][troubleshoot].
 [troubleshoot]: https://github.com/thorwe/CrossTalk/wiki/Troubleshoot
 
 If you think you found a bug in CrossTalk, you can [submit an issue](https://github.com/thorwe/CrossTalk/issues/new).
+
+## Compiling yourself
+After cloning, you'll have to manually initialize the submodules:
+```
+git submodule update --init --recursive
+```
+
+Qt in the minor version of the client is required, e.g.
+
+```
+mkdir build32 & pushd build32
+cmake -G "Visual Studio 15 2017" -DCMAKE_PREFIX_PATH="path_to/Qt/5.6/msvc2015" ..
+popd
+mkdir build64 & pushd build64
+cmake -G "Visual Studio 15 2017 Win64"  -DCMAKE_PREFIX_PATH="path_to/Qt/5.6/msvc2015_64" ..
+```

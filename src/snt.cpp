@@ -6,12 +6,13 @@
 #include "ts3_functions.h"
 
 #include "plugin.h"
-#include "ts_logging_qt.h"
+#include "core/ts_logging_qt.h"
 #include "ts_ptt_qt.h"
-#include "ts_helpers_qt.h"
+#include "core/ts_helpers_qt.h"
 
-#include "ts_serversinfo.h"
-#include "ts_serverinfo_qt.h"
+#include "core/ts_serverinfo_qt.h"
+
+#include "plugin_qt.h"
 
 #ifndef RETURNCODE_BUFSIZE
 #define RETURNCODE_BUFSIZE 128
@@ -22,10 +23,10 @@
  * \brief SnT::SnT Creates an instance of this class
  * \param parent optional Qt Object
  */
-SnT::SnT(QObject *parent) :
-    QObject(parent)
-{
-}
+SnT::SnT(TSServersInfo& servers_info, QObject* parent)
+    : QObject(parent)
+    , m_servers_info(servers_info)
+{}
 
 //! When the input hardware gets activated, check if there's a Ptt activation scheduled and if so, turn Ptt on
 /*!
@@ -108,7 +109,8 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
     if (m_returnCode.isEmpty())
     {
         char returnCode[RETURNCODE_BUFSIZE];
-        ts3Functions.createReturnCode(pluginID,returnCode,RETURNCODE_BUFSIZE);
+        auto plugin = qobject_cast<Plugin_Base*>(parent());
+        ts3Functions.createReturnCode(plugin->id().c_str(), returnCode, RETURNCODE_BUFSIZE);
         m_returnCode = returnCode;
         //TSLogging::Log(QString("Created SnT Return Code: %1").arg(m_returnCode), LogLevel_DEBUG);
     }
@@ -263,28 +265,27 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         }
         else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
         {
-            auto serversInfo = TSServersInfo::instance();
-            if (serversInfo != NULL)
+            if (args.count() == 4)
             {
-                if (args.count() == 4)
-                {
-                    auto serverInfo = serversInfo->GetServerInfo(targetServer);
-                    if ((arg = serverInfo->GetChannelGroupId(args.at(3))) == (uint64)NULL)
-                    {
-                        TSLogging::Error("Could not find channel group.");
-                        return;
-                    }
-                }
-                else    // Get My Channel Group
-                {
-                    if ((error = TSHelpers::GetClientChannelGroup(targetServer,&arg)) != ERROR_ok)
-                        return;
+                auto server_info = m_servers_info.get_server_info(targetServer);
+                if (!server_info)
+                    return;
 
-                    // Blacklist default channel group only with no arg
-                    auto serverInfo = serversInfo->GetServerInfo(targetServer);
-                    if (serverInfo->getDefaultChannelGroup() == arg)
-                        return;
+                if ((arg = server_info->GetChannelGroupId(args.at(3))) == (uint64)NULL)
+                {
+                    TSLogging::Error("Could not find channel group.");
+                    return;
                 }
+            }
+            else    // Get My Channel Group
+            {
+                if ((error = TSHelpers::GetClientChannelGroup(targetServer,&arg)) != ERROR_ok)
+                    return;
+
+                // Blacklist default channel group only with no arg
+                auto server_info = m_servers_info.get_server_info(targetServer);
+                if (!server_info || server_info->getDefaultChannelGroup() == arg)
+                    return;
             }
         }
         else if (groupWhisperType == GROUPWHISPERTYPE_SERVERGROUP)
@@ -295,15 +296,14 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
                 return;
             }
 
-            auto serversInfo = TSServersInfo::instance();
-            if (serversInfo != NULL)
+            auto server_info = m_servers_info.get_server_info(targetServer);
+            if (!server_info)
+                return;
+
+            if ((arg = server_info->GetServerGroupId(args.at(3))) == (uint64)NULL)
             {
-                auto serverInfo = serversInfo->GetServerInfo(targetServer);
-                if ((arg = serverInfo->GetServerGroupId(args.at(3))) == (uint64)NULL)
-                {
-                    TSLogging::Error("Could not find server group.");
-                    return;
-                }
+                TSLogging::Error("Could not find server group.");
+                return;
             }
         }
 
@@ -364,18 +364,14 @@ void SnT::ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringLis
         }
         else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
         {
-            TSServersInfo* serversInfo = TSServersInfo::instance();
-            if (serversInfo != NULL)
-            {
-                // Get My Channel Group
-                uint64 myChannelGroup;
-                if ((error = TSHelpers::GetClientChannelGroup(nextServer,&myChannelGroup)) != ERROR_ok)
-                    return;
+            // Get My Channel Group
+            uint64 myChannelGroup;
+            if ((error = TSHelpers::GetClientChannelGroup(nextServer, &myChannelGroup)) != ERROR_ok)
+                return;
 
-                TSServerInfo* serverInfo = serversInfo->GetServerInfo(nextServer);
-                if (serverInfo->getDefaultChannelGroup() == myChannelGroup)
-                    return;
-            }
+            auto server_info = m_servers_info.get_server_info(nextServer);
+            if (!server_info || server_info->getDefaultChannelGroup() == myChannelGroup)
+                return;
         }
 
         arg_qs = args.at(1);

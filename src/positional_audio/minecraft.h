@@ -1,7 +1,7 @@
-#ifndef MINECRAFT_H
-#define MINECRAFT_H
+#pragma once
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QJsonObject>
 #include "tsvr_definitions.h"
 
 class Minecraft : public QObject, public CustomEnvironmentSupportInterface
@@ -27,5 +27,3 @@ private:
     QJsonObject m_meObj;
 
 };
-
-#endif // MINECRAFT_H

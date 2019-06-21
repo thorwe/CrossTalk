@@ -5,9 +5,10 @@
 
 #include "plugin.h"
 
-#include "ts_settings_qt.h"
-#include "ts_logging_qt.h"
-#include "ts_helpers_qt.h"
+#include "core/ts_settings_qt.h"
+#include "core/ts_logging_qt.h"
+#include "core/ts_helpers_qt.h"
+#include "ts3_functions.h"
 
 #define PLUGIN_THREAD_TIMEOUT 1000
 

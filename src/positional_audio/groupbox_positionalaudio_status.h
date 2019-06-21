@@ -1,18 +1,15 @@
 #pragma once
 
-#include <QGroupBox>
+#include <QtWidgets/QGroupBox>
 
-namespace Ui {
-class GroupBoxPositionalAudioStatus;
-}
+class QLabel;
 
 class GroupBoxPositionalAudioStatus : public QGroupBox
 {
     Q_OBJECT
     
 public:
-    explicit GroupBoxPositionalAudioStatus(QWidget *parent = 0);
-    ~GroupBoxPositionalAudioStatus();
+    explicit GroupBoxPositionalAudioStatus(QWidget *parent = nullptr);
 
 public slots:
     void UpdateUIStatusSelfName(QString val);
@@ -21,7 +18,9 @@ public slots:
     void onRefreshStatus();
     
 private:
-    Ui::GroupBoxPositionalAudioStatus *ui;
-    QString m_Name;
-    QString m_Game;
+    QString m_name;
+    QString m_game;
+
+    QLabel* m_status_settings_threedee;
+    QLabel* m_status_self;
 };

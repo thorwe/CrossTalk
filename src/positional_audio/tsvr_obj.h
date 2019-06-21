@@ -1,7 +1,7 @@
 #pragma once
 
-#include <QObject>
-#include <QTextStream>
+#include <QtCore/QObject>
+#include <QtCore/QTextStream>
 #include "teamspeak/public_definitions.h"
 
 #include "tsvr_definitions.h"

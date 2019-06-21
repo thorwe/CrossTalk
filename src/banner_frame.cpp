@@ -1,63 +1,34 @@
 #include "banner_frame.h"
 #include "ui_banner_frame.h"
 
-#include <QDesktopServices>
+#include <QtGui/QDesktopServices>
 
-#include "ts_logging_qt.h"
+#include "core/ts_helpers_qt.h"
+#include "core/ts_logging_qt.h"
 
-const QUrl PLEDGIE_IMAGE("https://pledgie.com/campaigns/18898.png");
-const QUrl PLEDGIE_CAMPAIGN("http://www.pledgie.com/campaigns/18898");
-const QUrl CROSSTALK_CAMPAING("http://addons.teamspeak.com/directory/plugins/miscellaneous/CrossTalk.html");
+const QUrl CROSSTALK_CAMPAING("http://thorwe.github.io/CrossTalk/");
+const QUrl JIANJI_CAMPAIGN(QStringLiteral("http://www.jianji.de"));
 
 BannerFrame::BannerFrame(QWidget *parent) :
     QFrame(parent),
     ui(new Ui::BannerFrame)
 {
     ui->setupUi(this);
-    m_netwManager = new QNetworkAccessManager(this);
 
     // load image
-    connect(ui->banner_pledgie, &Banner::onClick, this, &BannerFrame::onPledgieClicked);
     connect(ui->banner_logo, &Banner::onClick, this, &BannerFrame::onCrossTalkClicked);
 
-    connect(m_netwManager, &QNetworkAccessManager::finished, this, &BannerFrame::onNetwManagerFinished);
-    QNetworkRequest request(PLEDGIE_IMAGE);
-    m_netwManager->get(request);
+    // load image
+    connect(ui->banner_jianji, &Banner::onClick, this, &BannerFrame::onJianjiClicked);
+
+    auto lang = TSHelpers::GetLanguage();
+    if (lang != QStringLiteral("de_DE")) // outside of german locale, hide jianji banner
+        ui->banner_jianji->setVisible(false);
 }
 
 BannerFrame::~BannerFrame()
 {
     delete ui;
-}
-
-void BannerFrame::onNetwManagerFinished(QNetworkReply *reply)
-{
-    if (reply->error() != QNetworkReply::NoError)
-    {
-        TSLogging::Log(reply->errorString(),LogLevel_WARNING);
-        return;
-    }
-
-    QByteArray jpegData = reply->readAll();
-    QPixmap pixmap;
-    if (!(pixmap.loadFromData(jpegData)))
-    {
-        // until I figure sth. out regarding the image (https not supported issue) suppress error
-        //TSLogging::Log("Error loading pledgie image.",LogLevel_WARNING);
-    }
-    else if ((reply->url()) == PLEDGIE_IMAGE)
-        ui->banner_pledgie->setPixmap(pixmap);
-
-    reply->deleteLater();
-}
-
-//! Receives the click of the pledgie banner
-/*!
- * \brief BannerFrame::onPledgieClicked Qt slot to receive the click of the pledgie banner
- */
-void BannerFrame::onPledgieClicked()
-{
-    QDesktopServices::openUrl(PLEDGIE_CAMPAIGN);
 }
 
 //! Receives the click of the crosstalk banner
@@ -67,4 +38,14 @@ void BannerFrame::onPledgieClicked()
 void BannerFrame::onCrossTalkClicked()
 {
     QDesktopServices::openUrl(CROSSTALK_CAMPAING);
+}
+
+//! Receives the click of the jianji banner
+/*!
+* \brief Config::onJianjiClicked Qt slot to receive the click of the jianji banner
+*/
+void BannerFrame::onJianjiClicked()
+{
+    QUrl url(JIANJI_CAMPAIGN);
+    QDesktopServices::openUrl(url);
 }

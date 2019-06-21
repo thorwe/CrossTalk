@@ -1,21 +1,22 @@
 #pragma once
 
-#include <QObject>
+#include <QtCore/QObject>
+#include <QtCore/QSet>
 #include "teamspeak/public_definitions.h"
-#include "module.h"
-#include "volumes.h"
-//#include "simple_volume.h"
-#include "ts_infodata_qt.h"
-#include "ts_context_menu_qt.h"
+#include "core/module.h"
+#include "volume/volumes.h"
+#include "core/plugin_base.h"
 
 class ChannelMuter : public Module, public InfoDataInterface, public ContextMenuInterface
 {
     Q_OBJECT
     Q_INTERFACES(InfoDataInterface ContextMenuInterface)
+
 protected:
     void onRunningStateChanged(bool value);
+
 public:
-    explicit ChannelMuter(QObject *parent = 0);
+    ChannelMuter(Plugin_Base& plugin);
 
     // user interaction
     bool toggleChannelMute(uint64 serverConnectionHandlerID,uint64 channelID);
@@ -33,8 +34,6 @@ public:
 
     int ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
 
-signals:
-    
 public slots:
     void onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID);
 
