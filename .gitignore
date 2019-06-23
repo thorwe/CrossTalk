@@ -2,6 +2,7 @@ build*/
 CMakeSettings.json
 cmake*.bat
 lupdate.bat
+*.ts3_plugin
 
 #################
 ## Eclipse

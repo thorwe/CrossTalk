@@ -21,7 +21,7 @@ public:
 
     static const char* kPluginName;
     static const char* kPluginVersion;
-    static const int kPluginApiVersion = 22;
+    static const int kPluginApiVersion = 23;
     static const char* kPluginAuthor;
     static const char* kPluginDescription;
 
@@ -56,8 +56,8 @@ public:
     void on_channel_group_list(uint64 sch_id, uint64 channel_group_id, const char* name, int type, int icon_id, int save_db) override;
     void on_channel_group_list_finished(uint64 sch_id) override;
 
-    void on_plugin_command(uint64 sch_id, const char* plugin_name, const char* plugin_command) override;
-
+    void on_plugin_command(uint64 sch_id, const char* plugin_name, const char* plugin_command, anyID invoker_client_id, const char* invoker_name, const char* invoker_uid) override;
+    
     TSServersInfo& servers_info() { return *m_servers_info; }
     ServerThreaded& websocket_server() { return *m_websocket_server; };
 

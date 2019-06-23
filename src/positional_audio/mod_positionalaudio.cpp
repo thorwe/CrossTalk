@@ -685,7 +685,7 @@ bool PositionalAudio::onPluginCommand(uint64 serverConnectionHandlerID, anyID cl
             //identity
             auto args_stri = args.readAll().trimmed();
             auto list = args_stri.split("[Ct_Delimiter]",QString::KeepEmptyParts,Qt::CaseSensitive);    // keep empty parts?
-            auto name = list.at(0);
+            const auto& name = list.at(0);
             if (list.size() > 1)
             {
                 auto rest = list.at(1);
@@ -886,31 +886,12 @@ QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj* obj)
 //! Non-throttled DoSend
 void PositionalAudio::Send(uint64 serverConnectionHandlerID, QString args, int targetMode, const anyID *targetIDs, const char *returnCode)
 {
-    unsigned int error;
-
-    // needed to be check beforehand
-//    int status;
-//    if ((error = ts3Functions.getConnectionStatus(serverConnectionHandlerID,&status)) != ERROR_ok)
-//    {
-//        Error("(Send)",serverConnectionHandlerID,error);
-//        return;
-//    }
-//    if (status != STATUS_CONNECTION_ESTABLISHED)
-//        return;
-
-    anyID myID;
-    if ((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
-    {
-        Error("(Send)",serverConnectionHandlerID,error);
-        return;
-    }
-
     QString cmd;
     QTextStream str(&cmd);
     if (args.isEmpty())
-        str << myID << " 3D";   // left game (unlocked)
+        str << "3D";   // left game (unlocked)
     else
-        str << myID << " 3D " << args;
+        str << "3D " << args;
 
 //    Log(QString("Sending: %1").arg(cmd),serverConnectionHandlerID,LogLevel_DEBUG);
 //    returnCode = m_SendReturnCodeC;

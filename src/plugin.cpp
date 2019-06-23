@@ -536,9 +536,9 @@ void ts3plugin_onMenuItemEvent(uint64 serverConnectionHandlerID, enum PluginMenu
     plugin->onMenuItemEvent(serverConnectionHandlerID, type, menuItemID, selectedItemID);
 }
 
-void ts3plugin_onPluginCommandEvent(uint64 serverConnectionHandlerID, const char* pluginName, const char* pluginCommand)
+void ts3plugin_onPluginCommandEvent(uint64 serverConnectionHandlerID, const char* pluginName, const char* pluginCommand, anyID invokerClientID, const char* invokerName, const char* invokerUniqueIdentity)
 {
-    plugin->on_plugin_command(serverConnectionHandlerID, pluginName, pluginCommand);
+    plugin->on_plugin_command(serverConnectionHandlerID, pluginName, pluginCommand, invokerClientID, invokerName, invokerUniqueIdentity);
 }
 
 /* This function is called if a plugin hotkey was pressed. Omit if hotkeys are unused. */

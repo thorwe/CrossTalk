@@ -19,7 +19,7 @@
 #include "snt.h"
 
 const char* Plugin::kPluginName = "CrossTalk";
-const char* Plugin::kPluginVersion = "1.7.0";
+const char* Plugin::kPluginVersion = "1.8.0";
 const char* Plugin::kPluginAuthor = "Thorsten Weinz";
 const char* Plugin::kPluginDescription = "Features:\n\nPositional Audio, Stereo Position Spread, Switch\'n\'Talk (Cross Server Tab PTT)\nFor information on the modules, use the \'?\' button on the topper right of the plugin settings window or visit the Github wiki by clicking on the banner.";
 
@@ -223,7 +223,7 @@ void Plugin::on_channel_group_list_finished(uint64 sch_id)
     m_servers_info->onChannelGroupListFinishedEvent(sch_id);
 }
 
-void Plugin::on_plugin_command(uint64 sch_id, const char * plugin_name, const char * plugin_command)
+void Plugin::on_plugin_command(uint64 sch_id, const char* plugin_name, const char* plugin_command, anyID invoker_client_id, const char* invoker_name, const char* invoker_uid)
 {
     // pluginName is the dll name minus _someOS, not ts3plugin_name();
     // if the user for whatever reason renames the dll, this breaks the code
@@ -245,13 +245,10 @@ void Plugin::on_plugin_command(uint64 sch_id, const char * plugin_name, const ch
     QString cmd_qs(plugin_command);
     QTextStream args_qs(&cmd_qs);
 
-    anyID client_id;
-    args_qs >> client_id;
-
     QString cmd;
     args_qs >> cmd;
 
     // note: args_qs leading white space if streaming to QByteArray or using readAll()
-    if (!m_positional_audio->onPluginCommand(sch_id, client_id, (client_id == my_id), cmd, args_qs))
+    if (!m_positional_audio->onPluginCommand(sch_id, invoker_client_id, (invoker_client_id == my_id), cmd, args_qs))
         TSLogging::Error("Error on plugin command", sch_id, NULL, true);
 }
