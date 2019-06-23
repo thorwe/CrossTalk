@@ -45,7 +45,7 @@ Qt in the minor version of the client is required, e.g.
 
 ```
 mkdir build32 & pushd build32
-cmake -G -G "Visual Studio 16 2019" -A Win32 -DCMAKE_PREFIX_PATH="path_to/Qt/5.12.3/msvc2017" ..
+cmake -G "Visual Studio 16 2019" -A Win32 -DCMAKE_PREFIX_PATH="path_to/Qt/5.12.3/msvc2017" ..
 popd
 mkdir build64 & pushd build64
 cmake -G "Visual Studio 16 2019" -A x64  -DCMAKE_PREFIX_PATH="path_to/Qt/5.12.3/msvc2017_64" ..
