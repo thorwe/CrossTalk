@@ -1,13 +1,22 @@
 #pragma once
 
-#include <QtCore/QObject>
-#include <QtCore/QSet>
-#include "teamspeak/public_definitions.h"
-#include "core/module.h"
 #include "volume/volumes.h"
+
+#include "core/definitions.h"
+#include "core/module_qt.h"
 #include "core/plugin_base.h"
 
-class ChannelMuter : public Module, public InfoDataInterface, public ContextMenuInterface
+#include "teamspeak/public_definitions.h"
+
+#include <QtCore/QObject>
+#include <QtCore/QSet>
+
+namespace thorwe
+{
+
+using namespace com::teamspeak;
+
+class ChannelMuter : public Module_Qt, public InfoDataInterface, public ContextMenuInterface
 {
     Q_OBJECT
     Q_INTERFACES(InfoDataInterface ContextMenuInterface)
@@ -32,17 +41,24 @@ public:
 
     bool onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, uint64 mine, QTextStream &data);
 
-    int ParseCommand(uint64 serverConnectionHandlerID, QString cmd, QStringList args);
+    int ParseCommand(uint64 serverConnectionHandlerID, const QString &cmd, const QStringList &args);
 
-public slots:
-    void onContextMenuEvent(uint64 serverConnectionHandlerID, PluginMenuType type, int menuItemID, uint64 selectedItemID);
+    void on_connect_status_changed(connection_id_t, int new_status, uint32_t error_number);
 
-private:
-    Volumes* vols;
+  public slots:
+    void onContextMenuEvent(uint64 serverConnectionHandlerID,
+                            PluginMenuType type,
+                            int menuItemID,
+                            uint64 selectedItemID);
 
-    QSet<QPair<uint64,uint64> > MutedChannels;
-    QSet<QPair<uint64,anyID> > ClientWhiteList;
+  private:
+    thorwe::volume::Volumes<> m_volumes;
+
+    QSet<QPair<uint64, uint64>> MutedChannels;
+    QSet<QPair<uint64, anyID>> ClientWhiteList;
 
     int m_ContextMenuIdToggleChannelMute = -1;
     int m_ContextMenuToggleClientWhitelisted = -1;
 };
+
+}  // namespace thorwe

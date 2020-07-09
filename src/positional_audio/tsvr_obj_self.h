@@ -1,35 +1,23 @@
 #pragma once
 
-#include <QtCore/QObject>
 #include "tsvr_obj.h"
+
+#include <QtCore/QObject>
 
 class TsVrObjSelf : public TsVrObj
 {
     Q_OBJECT
-    Q_PROPERTY(TS3_VECTOR cameraPosition
-               READ getCameraPosition)
-    Q_PROPERTY(TS3_VECTOR cameraFront
-               READ getCameraFront)
-    Q_PROPERTY(TS3_VECTOR cameraTop
-               READ getCameraTop)
-public:
+
+  public:
     explicit TsVrObjSelf(QObject *parent = 0);
-    
-    TS3_VECTOR getCameraPosition() const;
-    TS3_VECTOR getCameraFront() const;
-    TS3_VECTOR getCameraTop() const;
 
-    bool setCamera(const float* position, const float* front, const float* top);
-    bool setAvatar(const float* position, const float* front, const float* top);
+    thorwe::Three_Dee_Info get_camera() const;
 
-signals:
-    void cameraChanged(bool,bool,bool);
+    void set_camera(const thorwe::Three_Dee_Info &);
+    void set_avatar(const thorwe::Three_Dee_Info &);
 
-public slots:
-    void resetCamera();
+    void reset_camera();
 
-private:
-    TS3_VECTOR m_Camera_Pos;
-    TS3_VECTOR m_Camera_Front;
-    TS3_VECTOR m_Camera_Top;
+  private:
+    thorwe::Three_Dee_Info m_camera;
 };

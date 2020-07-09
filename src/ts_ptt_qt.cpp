@@ -5,20 +5,22 @@
 
 #include "plugin.h"
 
-#include "core/ts_settings_qt.h"
-#include "core/ts_logging_qt.h"
+#include "core/ts_functions.h"
 #include "core/ts_helpers_qt.h"
-#include "ts3_functions.h"
+#include "core/ts_logging_qt.h"
+#include "core/ts_settings_qt.h"
 
-#define PLUGIN_THREAD_TIMEOUT 1000
+constexpr const int32_t kPluginThreadTimeout = 1000;
 
-TSPtt* TSPtt::m_Instance = 0;
+using namespace com::teamspeak::pluginsdk;
 
-TSPtt::TSPtt(){}
+TSPtt *TSPtt::m_Instance = nullptr;
+
+TSPtt::TSPtt() = default;
 
 TSPtt::~TSPtt()
 {
-    if(timer)
+    if (timer)
         timer->stop();
 
     delete timer;
@@ -33,14 +35,14 @@ void TSPtt::Init(QMutex *mutex_cmd)
     this->setObjectName("TSPtt");
 }
 
-int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS action)
+int TSPtt::SetPushToTalk(uint64 connection_id, PTT_CHANGE_STATUS action)
 {
     if (action == PTT_ACTIVATE)
     {
         if (timer->isActive())
             timer->stop();
 
-        return SetPushToTalk(serverConnectionHandlerID, true);
+        return SetPushToTalk(connection_id, true);
     }
     else if (action == PTT_DEACTIVATE)
     {
@@ -48,68 +50,70 @@ int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS act
         if (pttDelayEnabled)
             timer->start(pttDelayMsec);
         else
-            return SetPushToTalk(serverConnectionHandlerID, false);
+            return SetPushToTalk(connection_id, false);
     }
     else if (action == PTT_TOGGLE)  // Toggling is always instant
     {
         if (pttActive && timer->isActive())
             timer->stop();
 
-        return SetPushToTalk(serverConnectionHandlerID, !pttActive);
+        return SetPushToTalk(connection_id, !pttActive);
     }
-    else    //use NULL for Toggle?
+    else  // use NULL for Toggle?
     {
-        TSLogging::Error("Ptt Status Error",serverConnectionHandlerID,NULL);
+        TSLogging::Error("Ptt Status Error", connection_id);
     }
 
     return 1;
 }
 
-int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, bool shouldTalk)
+int TSPtt::SetPushToTalk(uint64 connection_id, bool shouldTalk)
 {
-    unsigned int error;
-
     // If PTT is inactive, store the current settings
-    if(!pttActive)
+    if (!pttActive)
     {
         // Get the current VAD setting
-        char* vad;
-        if((error = ts3Functions.getPreProcessorConfigValue(serverConnectionHandlerID, "vad", &vad)) != ERROR_ok)
+        const auto [error_vad, vad] = funcs::sound::get_preprocessor_config_value(connection_id, "vad");
+        if (error_vad)
         {
-            TSLogging::Error("Error retrieving vad setting",serverConnectionHandlerID,error);
+            TSLogging::Error("Error retrieving vad setting", connection_id, error_vad);
             return 1;
         }
-        vadActive = !strcmp(vad, "true");
-        ts3Functions.freeMemory(vad);
+        vadActive = vad == "true";
 
         // Get the current input setting, this will indicate whether VAD is being used in combination with PTT
-        int input;
-        if((error = ts3Functions.getClientSelfVariableAsInt(serverConnectionHandlerID, CLIENT_INPUT_DEACTIVATED, &input)) != ERROR_ok)
+
+        const auto [error_input_deactivated, input_deactivated] =
+        funcs::get_client_self_property_as_int(connection_id, CLIENT_INPUT_DEACTIVATED);
+        if (error_input_deactivated)
         {
-            TSLogging::Error("Error retrieving input setting",serverConnectionHandlerID,error);
+            TSLogging::Error("Error retrieving input setting", connection_id, error_input_deactivated);
             return 1;
         }
-        inputActive = !input; // We want to know when it is active, not when it is inactive
+        inputActive = !input_deactivated;  // We want to know when it is active, not when it is inactive
     }
 
     // If VAD is active and the input is active, disable VAD, restore VAD setting afterwards
-    if((error = ts3Functions.setPreProcessorConfigValue(serverConnectionHandlerID, "vad",
-        (shouldTalk && (vadActive && inputActive)) ? "false" : (vadActive)?"true":"false")) != ERROR_ok)
+    const auto error_set_vad = funcs::sound::set_preprocessor_config_value(
+    connection_id, "vad",
+    (shouldTalk && (vadActive && inputActive)) ? "false" : (vadActive) ? "true" : "false");
+    if (error_set_vad)
     {
-        TSLogging::Error("Error toggling vad",serverConnectionHandlerID,error);
+        TSLogging::Error("Error toggling vad", connection_id, error_set_vad);
         return 1;
     }
 
     // Activate the input, restore the input setting afterwards
-    if((error = ts3Functions.setClientSelfVariableAsInt(serverConnectionHandlerID, CLIENT_INPUT_DEACTIVATED,
-        (shouldTalk || inputActive) ? INPUT_ACTIVE : INPUT_DEACTIVATED)) != ERROR_ok)
+    const auto error_activate_input = funcs::set_client_self_property_as_int(
+    connection_id, CLIENT_INPUT_DEACTIVATED, (shouldTalk || inputActive) ? INPUT_ACTIVE : INPUT_DEACTIVATED);
+    if (error_activate_input)
     {
-        TSLogging::Error("Error toggling input",serverConnectionHandlerID,error);
+        TSLogging::Error("Error toggling input", connection_id, error_activate_input);
         return 1;
     }
 
     // Update the client
-    ts3Functions.flushClientSelfUpdates(serverConnectionHandlerID, NULL);
+    funcs::flush_client_self_updates(connection_id);
 
     // Commit the change
     pttActive = shouldTalk;
@@ -120,25 +124,25 @@ int TSPtt::SetPushToTalk(uint64 serverConnectionHandlerID, bool shouldTalk)
 void TSPtt::UpdatePttDelayInfo()
 {
     // Get default capture profile and preprocessor data
-    char** profiles;
-    int defaultProfile;
-    unsigned int error;
-    if((error = ts3Functions.getProfileList(PLUGIN_GUI_SOUND_CAPTURE, &defaultProfile, &profiles)) != ERROR_ok)
+    const auto [error_profiles, default_profile, profiles] =
+    funcs::get_profile_list(PLUGIN_GUI_SOUND_CAPTURE);
+    if (error_profiles)
     {
-        TSLogging::Error("Error retrieving capture profiles",error);
+        TSLogging::Error("Error retrieving capture profiles", error_profiles);
         return;
     }
-    QString profile = profiles[defaultProfile];
-    ts3Functions.freeMemory(profiles);
+    const auto &profile = profiles[default_profile];
 
     QString preProcessorData;
-    if (!(TSSettings::instance()->GetPreProcessorData(profile,preProcessorData)))
+    QString profile_q = QString::fromUtf8(profile.data());
+    if (!(TSSettings::instance()->GetPreProcessorData(profile_q, preProcessorData)))
     {
-        TSLogging::Error("(TSPtt::UpdatePttDelayInfo()) (GetPreProcessorData) (" + profile + ")" + TSSettings::instance()->GetLastError().text());
+        TSLogging::Error("(TSPtt::UpdatePttDelayInfo()) (GetPreProcessorData) (" + profile_q + ")" +
+                         TSSettings::instance()->GetLastError().text());
         return;
     }
 
-    auto lines = preProcessorData.split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
+    auto lines = preProcessorData.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
     QStringListIterator iterator(lines);
     while (iterator.hasNext())
     {
@@ -166,7 +170,7 @@ void TSPtt::UpdatePttDelayInfo()
  */
 void TSPtt::onPttDelayFinished()
 {
-    command_mutex->tryLock(PLUGIN_THREAD_TIMEOUT);
+    command_mutex->tryLock(kPluginThreadTimeout);
     emit PttDelayFinished();
     command_mutex->unlock();
 }

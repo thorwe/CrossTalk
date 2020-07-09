@@ -1,5 +1,6 @@
 #include "mod_agmu.h"
-#include "teamspeak/public_errors.h"
+
+#include "core/ts_functions.h"
 #include "core/ts_helpers_qt.h"
 
 Agmu::Agmu(Plugin_Base& plugin)
@@ -8,75 +9,54 @@ Agmu::Agmu(Plugin_Base& plugin)
     setParent(&plugin);
     setObjectName(QStringLiteral("Agmu"));
     m_isPrintEnabled = false;
-    m_TalkersDSPs = new QMap<uint64,QMap<anyID,DspVolumeAGMU*>* >;
-    m_PeakCache = new QHash<QString,short>;
 }
 
-bool Agmu::onEditPlaybackVoiceDataEvent(uint64 serverConnectionHandlerID, anyID clientID, short *samples, int sampleCount, int channels)
+bool Agmu::onEditPlaybackVoiceDataEvent(
+uint64 connection_id, anyID client_id, short *samples, int sampleCount, int channels)
 {
-//    if (!(isForceProcessing || isRunning()))
-//        return false;
+    //    if (!(isForceProcessing || isRunning()))
+    //        return false;
 
-    if (!(m_TalkersDSPs->contains(serverConnectionHandlerID)))
-        return false;
+    return m_volumes.do_for(
+    [samples, sampleCount, channels](DspVolumeAGMU *volume) -> bool {
+        if (!volume)
+            return false;
 
-    auto sDspVolumeAGMUs = m_TalkersDSPs->value(serverConnectionHandlerID);
-    if (!(sDspVolumeAGMUs->contains(clientID)))
-        return false;
-
-    auto dspObj = sDspVolumeAGMUs->value(clientID);
-    dspObj->process(samples,sampleCount,channels);
-    return true;
+        volume->process(gsl::span<int16_t>{samples, static_cast<size_t>(sampleCount * channels)}, channels);
+        return true;
+    },
+    connection_id, client_id);
 }
 
-bool Agmu::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, bool isReceivedWhisper, anyID clientID, bool isMe)
+bool Agmu::onTalkStatusChanged(
+uint64 connection_id, int status, bool is_received_whisper, anyID client_id, bool is_me)
 {
-    Q_UNUSED(isReceivedWhisper);
+    Q_UNUSED(is_received_whisper);
 
-    if ( isMe || (!(isRunning() || m_isForceProcessing)) )
+    if (is_me || (!(running() || m_is_force_processing)))
         return false;
 
-    m_isForceProcessing = false;
+    m_is_force_processing = false;
 
     if (status == STATUS_TALKING)
     {   // Robust against multiple STATUS_TALKING in a row to be able to use it when the user changes settings
-        DspVolumeAGMU* dspObj;
-        auto isNewDspObj = true;
-        if (!(m_TalkersDSPs->contains(serverConnectionHandlerID)))
-        {
-            dspObj = new DspVolumeAGMU(this);
-            auto sDspVolumeAGMUs = new QMap<anyID,DspVolumeAGMU*>;
-            sDspVolumeAGMUs->insert(clientID,dspObj);
-            m_TalkersDSPs->insert(serverConnectionHandlerID,sDspVolumeAGMUs);
-        }
-        else
-        {
-            auto sDspVolumeAGMUs = m_TalkersDSPs->value(serverConnectionHandlerID);
-            if (sDspVolumeAGMUs->contains(clientID))
-            {
-                dspObj = sDspVolumeAGMUs->value(clientID);
-                isNewDspObj = false;
-            }
-            else
-            {
-                dspObj = new DspVolumeAGMU(this);
-                sDspVolumeAGMUs->insert(clientID,dspObj);
-            }
-        }
+        auto [dsp_obj, added] = m_volumes.add_volume(connection_id, client_id);
 
-        if (!isNewDspObj)
-            this->disconnect(dspObj);
-        else
+        if (added)
         {
             //todo: move this out at a later point when cache is saved (outside of settings, with date and cleanup)
-            QString clientUID;
-            unsigned int error;
-            if ((error = TSHelpers::GetClientUID(serverConnectionHandlerID, clientID, clientUID)) != ERROR_ok)
-                Error("(onTalkStatusChanged)", serverConnectionHandlerID, error);
+            const auto [error_client_uid, client_uid] =
+            com::teamspeak::pluginsdk::funcs::get_client_property_as_string(connection_id, client_id,
+                                                                            CLIENT_UNIQUE_IDENTIFIER);
+            if (error_client_uid)
+                Error("(onTalkStatusChanged)", connection_id, error_client_uid);
             else
             {
-                dspObj->setPeak(m_PeakCache->value(clientUID));
-                dspObj->setGainCurrent(dspObj->computeGainDesired());
+                if (auto it = m_peak_cache.find(client_uid); it != m_peak_cache.end())
+                {
+                    dsp_obj->set_peak(it->second);
+                }
+                dsp_obj->set_gain_current(dsp_obj->gain_desired());
             }
         }
 
@@ -89,32 +69,30 @@ bool Agmu::onTalkStatusChanged(uint64 serverConnectionHandlerID, int status, boo
     else if (status == STATUS_NOT_TALKING)
     {
         // Removing does not need to be robust against multiple STATUS_NOT_TALKING in a row, since that doesn't happen on user setting change
-        if (!m_TalkersDSPs->contains(serverConnectionHandlerID))
-            return false;   // return silent bec. of ChannelMuter implementation
-
-        auto sDspVolumeAGMUs = m_TalkersDSPs->value(serverConnectionHandlerID);
-        if (!(sDspVolumeAGMUs->contains(clientID)))
-            return false;
-
-        auto dspObj = sDspVolumeAGMUs->value(clientID);
-        QString clientUID;
-        unsigned int error;
-        if ((error = TSHelpers::GetClientUID(serverConnectionHandlerID,clientID, clientUID)) != ERROR_ok)
+        const auto [error_client_uid, client_uid] =
+        com::teamspeak::pluginsdk::funcs::get_client_property_as_string(connection_id, client_id,
+                                                                        CLIENT_UNIQUE_IDENTIFIER);
+        if (error_client_uid)
         {
-            Error("(onTalkStatusChanged)",serverConnectionHandlerID,error);
+            Error("(onTalkStatusChanged)", connection_id, error_client_uid);
+            m_volumes.delete_item(connection_id, client_id);
             return false;
         }
-        m_PeakCache->insert(clientUID,dspObj->GetPeak());
-        dspObj->blockSignals(true);
-        dspObj->deleteLater();
-        sDspVolumeAGMUs->remove(clientID);
+
+        m_volumes.do_for(
+        [this, client_uid = client_uid](DspVolumeAGMU *volume) {
+            if (volume)
+                m_peak_cache.insert_or_assign(client_uid, volume->peak());
+        },
+        connection_id, client_id);
+        m_volumes.delete_item(connection_id, client_id);
     }
     return false;
 }
 
 void Agmu::setNextTalkStatusChangeForceProcessing(bool val)
 {
-    m_isForceProcessing = val;
+    m_is_force_processing = val;
 }
 
 // This module is currently always on, the setting switches bypassing (since it's also used for post-RadioFX makeup gain)

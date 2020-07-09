@@ -15,7 +15,7 @@
 #include "teamspeak/public_definitions.h"
 #include "plugin_definitions.h"
 
-extern struct TS3Functions ts3Functions;
+// extern struct TS3Functions ts3Functions;
 
 #ifdef __cplusplus
 extern "C" {

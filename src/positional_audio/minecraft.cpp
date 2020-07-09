@@ -1,31 +1,31 @@
 #include "minecraft.h"
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
 #include "core/ts_logging_qt.h"
+#include <QtCore/QJsonArray>
+#include <QtCore/QJsonDocument>
 
-Minecraft::Minecraft(QObject *parent) :
-    QObject(parent)
+Minecraft::Minecraft(QObject *parent)
+    : QObject(parent)
 {
     this->setObjectName("Minecraft");
 }
 
-QString Minecraft::getIdentity() const
+std::wstring Minecraft::get_identity() const
 {
     if (m_meObj.value("name") != QJsonValue::Undefined)
-        return m_meObj.value("name").toString(QString::null);
+        return m_meObj.value("name").toString(QString::null).toStdWString();
 
-    return QString::null;
+    return {};
 }
 
-bool Minecraft::onIdentityRawDirty(QString rawIdentity)
+bool Minecraft::on_identity_raw_dirty(std::wstring_view raw_identity)
 {
     QJsonObject oldObj = m_meObj;
 
-    if (rawIdentity.isEmpty())
+    if (raw_identity.empty())
     {
 
         m_meObj.remove("name");
-        m_meObj["worldSpawn"] = QJsonArray{ 0, 0, 0 };
+        m_meObj["worldSpawn"] = QJsonArray{0, 0, 0};
         m_meObj["dimension"] = 0;
 
         emit identityChanged(QString::null);
@@ -33,16 +33,18 @@ bool Minecraft::onIdentityRawDirty(QString rawIdentity)
         return true;
     }
 
-    QJsonParseError jsonError;
-    QJsonDocument meDoc = QJsonDocument::fromJson(rawIdentity.toUtf8(),&jsonError);
+    const auto raw_w = std::wstring(raw_identity.data(), raw_identity.size());
+    QJsonParseError jsonError{};
+    QJsonDocument meDoc = QJsonDocument::fromJson(QString::fromStdWString(raw_w).toUtf8(), &jsonError);
     if (jsonError.error != QJsonParseError::ParseError::NoError)
     {
-        TSLogging::Error(QString("%1: Json error: %2").arg(this->objectName()).arg(jsonError.errorString()),true);
+        TSLogging::Error(QString("%1: Json error: %2").arg(this->objectName(), jsonError.errorString()),
+                         true);
         return false;
     }
     if (!meDoc.isObject())
     {
-        TSLogging::Error(QString("%1: QJsonDocument is not an object.").arg(this->objectName()),true);
+        TSLogging::Error(QString("%1: QJsonDocument is not an object.").arg(this->objectName()), true);
         return false;
     }
     m_meObj = meDoc.object();
@@ -72,5 +74,3 @@ bool Minecraft::onInfoData(QTextStream &data)
 
     return true;
 }
-
-

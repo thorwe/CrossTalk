@@ -1,10 +1,14 @@
 #pragma once
 
-#include "core/module.h"
 #include "volume/dsp_volume_agmu.h"
+#include "volume/volumes.h"
+
+#include "core/module_qt.h"
 #include "core/plugin_base.h"
 
-class Agmu : public Module, public TalkInterface
+#include <map>
+
+class Agmu : public Module_Qt, public TalkInterface
 {
     Q_OBJECT
     Q_INTERFACES(TalkInterface)
@@ -20,9 +24,11 @@ public:
 private:
     void onRunningStateChanged(bool value);
 
-    Talkers& m_talkers;
+    Talkers &m_talkers;
 
-    QMap<uint64,QMap<anyID,DspVolumeAGMU*>* >* m_TalkersDSPs;   //QMap is reportedly faster on small (<10)
-    QHash<QString,short>* m_PeakCache;
-    bool m_isForceProcessing = false;
+    thorwe::volume::Volumes<DspVolumeAGMU> m_volumes;
+
+    // TODO not thread safe
+    std::map<std::string, int16_t> m_peak_cache;
+    bool m_is_force_processing = false;
 };

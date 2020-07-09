@@ -8,6 +8,9 @@
 #include <QtWidgets/QVBoxLayout>
 #include "groupbox_position_spread.h"
 
+namespace thorwe
+{
+
 SettingsPositionSpread::SettingsPositionSpread(QObject* parent)
     : QObject(parent)
 {
@@ -32,7 +35,7 @@ void SettingsPositionSpread::Init(PositionSpread *positionSpread)
     connect(this, &SettingsPositionSpread::RegionWhisperSet, positionSpread, &PositionSpread::setRegionWhisper);
     connect(this, &SettingsPositionSpread::RegionOtherSet, positionSpread, &PositionSpread::setRegionOther);
 
-    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+    QSettings cfg(TSHelpers::GetPath(teamspeak::plugin::Path::PluginIni), QSettings::IniFormat);
 
     positionSpread->setEnabled(cfg.value("stereo_position_spread_enabled",true).toBool());
     positionSpread->setSpreadWidth(cfg.value("stereo_position_spread_value",0.5f).toFloat());
@@ -76,7 +79,7 @@ void SettingsPositionSpread::onContextMenuEvent(uint64 serverConnectionHandlerID
                 layout->addWidget(groupBox);
                 p_config->setLayout(layout);
 
-                QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
+                QSettings cfg(TSHelpers::GetPath(teamspeak::plugin::Path::PluginIni), QSettings::IniFormat);
                 groupBox->UpdateEnabledSet(cfg.value("stereo_position_spread_enabled",true).toBool());
                 groupBox->UpdateSpreadWidth(cfg.value("stereo_position_spread_value",0.5f).toFloat());
                 groupBox->UpdateExpertEnabledSet(cfg.value("stereo_position_spread_expert_enabled",false).toBool());
@@ -109,8 +112,8 @@ void SettingsPositionSpread::onMenusInitialized()
 void SettingsPositionSpread::saveSettings(int r)
 {
     Q_UNUSED(r);
-    QSettings cfg(TSHelpers::GetFullConfigPath(), QSettings::IniFormat);
-    cfg.setValue("stereo_position_spread_enabled",mP_positionSpread.data()->isEnabled());
+    QSettings cfg(TSHelpers::GetPath(teamspeak::plugin::Path::PluginIni), QSettings::IniFormat);
+    cfg.setValue("stereo_position_spread_enabled", mP_positionSpread.data()->enabled());
     cfg.setValue("stereo_position_spread_value",mP_positionSpread.data()->getSpreadWidth());
 
     cfg.setValue("stereo_position_spread_expert_enabled",mP_positionSpread.data()->isExpertModeEnabled());
@@ -118,3 +121,5 @@ void SettingsPositionSpread::saveSettings(int r)
     cfg.setValue("stereo_position_spread_region_whisper",(int)(mP_positionSpread.data()->getRegionWhisper()));
     cfg.setValue("stereo_position_spread_region_other",(int)(mP_positionSpread.data()->getRegionOther()));
 }
+
+}  // namespace thorwe

@@ -21,13 +21,7 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "core/ts_logging_qt.h"
 
-ServerThreaded::ServerThreaded() :
-    m_isEnabled(false),
-    m_Port(0),
-    m_Server(NULL)
-{}
-ServerThreaded::~ServerThreaded(){}
-
+ServerThreaded::ServerThreaded() {}
 
 bool ServerThreaded::isEnabled() const
 {

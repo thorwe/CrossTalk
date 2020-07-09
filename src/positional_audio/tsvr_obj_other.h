@@ -1,30 +1,28 @@
 #pragma once
 
-#include <QtCore/QObject>
 #include "tsvr_obj.h"
+
+#include "core/definitions.h"
+
+#include <QtCore/QObject>
+
+#include <string>
 
 class TsVrObjOther : public TsVrObj
 {
     Q_OBJECT
-    Q_PROPERTY(uint64 serverConnectionHandlerID
-               READ getServerConnectionHandlerID)
-    Q_PROPERTY(anyID clientID
-               READ getClientID)
-public:
-    explicit TsVrObjOther(QObject *parent = 0, uint64 serverConnectionHandlerID = 0, anyID clientID = 0);
 
-    uint64 getServerConnectionHandlerID() const;
-    anyID getClientID() const;
-    QString getClientUID() const {return m_clientUID;}
+  public:
+    explicit TsVrObjOther(QObject *parent = 0, uint64 connection_id = 0, anyID client_id = 0);
 
-    bool setAvatar(TS3_VECTOR position, TS3_VECTOR front, TS3_VECTOR top);
+    uint64 get_connection_id() const { return m_connection_id; };
+    anyID get_client_id() const { return m_client_id; }
+    std::string get_client_uid() const { return m_client_uid; }
 
-signals:
-    
-public slots:
+    void set_avatar(const thorwe::Three_Dee_Info &);
 
-private:
-    uint64 m_serverConnectionHandlerID;
-    anyID m_clientID;
-    QString m_clientUID;
+  private:
+    const uint64 m_connection_id;
+    const anyID m_client_id;
+    std::string m_client_uid;
 };

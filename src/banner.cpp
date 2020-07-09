@@ -1,7 +1,7 @@
 #include "banner.h"
 
-#include <QtGui/QPixmap>
 #include <QtGui/QMouseEvent>
+#include <QtGui/QPixmap>
 
 //! Constructor
 /*!
@@ -10,7 +10,7 @@
  */
 Banner::Banner(QWidget *parent)
 {
-    //MouseTracking must be set to true to make Image clickable
+    // MouseTracking must be set to true to make Image clickable
     this->setMouseTracking(true);
     this->setParent(parent);
     this->setVisible(true);
@@ -20,7 +20,7 @@ Banner::Banner(QWidget *parent)
 /*!
  * \brief Banner::mousePressEvent called by the Qt Event System
  */
-void Banner::mousePressEvent( QMouseEvent *)
+void Banner::mousePressEvent(QMouseEvent *)
 {
-  emit onClick();
+    emit onClick();
 }

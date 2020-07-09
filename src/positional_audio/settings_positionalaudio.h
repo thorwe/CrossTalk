@@ -3,12 +3,17 @@
 #include <QtCore/QObject>
 #include <QtWidgets/QMessageBox>
 
+#include "core/definitions.h"
 #include "core/ts_context_menu_qt.h"
 #include "core/ts_serversinfo.h"
 
 #include "config_positionalaudio.h"
 #include "mod_positionalaudio.h"
 
+namespace thorwe
+{
+
+using namespace com::teamspeak;
 
 class SettingsPositionalAudio : public QObject, public ContextMenuInterface
 {
@@ -80,7 +85,7 @@ private:
 
     int m_ContextMenuUi;
 #ifdef Q_OS_WIN
-    int m_ContextMenuGW2Map;
+    int m_ContextMenuGW2Map{0};
 #endif
     QPointer<ConfigPositionalAudio> config;
 
@@ -88,3 +93,5 @@ private:
 
     QPointer<QMessageBox> mP_serverBlockMsgBox;
 };
+
+}  // namespace thorwe

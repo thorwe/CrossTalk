@@ -61,8 +61,9 @@ set (POSITIONAL_AUDIO
     "src/positional_audio/tsvr_obj_other.cpp"
     "src/positional_audio/tsvr_universe.h"
     "src/positional_audio/tsvr_universe.cpp"
-    "src/positional_audio/universe.h"
-    "src/positional_audio/universe.cpp"
+    "src/positional_audio/shared_mem_reader.h"
+    "src/positional_audio/shared_mem_reader.cpp"
+    "src/positional_audio/linked_mem.h"
 )
 source_group("positional_audio" FILES ${POSITIONAL_AUDIO})
 
@@ -126,4 +127,7 @@ set(WITH_VOLUME_WIDGETS true)
 include(./deps/teamspeak-plugin-qt-common/CMakeLists.txt)
 
 add_library(CrossTalk SHARED
-    ${PLUGIN_SRC} ${TS_QT_CORE} ${TS_QT_VOLUME} ${QT_WEBSOCKET} ${POSITIONAL_AUDIO})
+    ${PLUGIN_SRC} ${TS_XX} ${TS_CORE} ${TS_QT_CORE} ${TS_QT_VOLUME} ${QT_WEBSOCKET} ${POSITIONAL_AUDIO})
+
+set_property(TARGET CrossTalk PROPERTY CXX_STANDARD 17)
+set_property(TARGET CrossTalk PROPERTY CXX_STANDARD_REQUIRED ON)

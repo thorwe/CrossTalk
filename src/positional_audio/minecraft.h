@@ -8,19 +8,16 @@ class Minecraft : public QObject, public CustomEnvironmentSupportInterface
 {
     Q_OBJECT
     Q_INTERFACES(CustomEnvironmentSupportInterface)
-    Q_PROPERTY(QString identity
-               READ getIdentity
-               NOTIFY identityChanged)
 
-public:
+  public:
     explicit Minecraft(QObject *parent = 0);
 
-    QString getIdentity() const;
+    std::wstring get_identity() const;
 
-    bool onIdentityRawDirty(QString rawIdentity);
+    bool on_identity_raw_dirty(std::wstring_view raw_identity);
     bool onInfoData(QTextStream &data);
 
-signals:
+  signals:
     void identityChanged(QString);
 
 private:

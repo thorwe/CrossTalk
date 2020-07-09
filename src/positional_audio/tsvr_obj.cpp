@@ -2,77 +2,70 @@
 
 #include "guildwarstwo.h"
 
-TsVrObj::TsVrObj(QObject *parent) :
-    QObject(parent)
-{
-}
-
 // Getters
 
-QString TsVrObj::getVr() const
+std::wstring TsVrObj::get_vr() const
 {
     return m_vr;
 }
 
-QString TsVrObj::getVrDescription() const
+std::wstring TsVrObj::get_vr_description() const
 {
     return m_vr_desc;
 }
 
-QString TsVrObj::getContext() const
+std::vector<std::byte> TsVrObj::get_context() const
 {
     return m_context;
 }
 
-QString TsVrObj::getIdentity() const
+std::string TsVrObj::get_context_as_string() const
 {
-    if (m_CustomEnvironmentSupport != NULL)
+    return std::string{reinterpret_cast<const char *>(m_context.data()), m_context.size()};
+}
+
+std::wstring TsVrObj::getIdentity() const
+{
+    if (m_CustomEnvironmentSupport)
     {
-        CustomEnvironmentSupportInterface *iCustomEnvironmentSupport = qobject_cast<CustomEnvironmentSupportInterface *>(m_CustomEnvironmentSupport);
-        return iCustomEnvironmentSupport->getIdentity();
+        CustomEnvironmentSupportInterface *iCustomEnvironmentSupport =
+        qobject_cast<CustomEnvironmentSupportInterface *>(m_CustomEnvironmentSupport);
+        return iCustomEnvironmentSupport->get_identity();
     }
     else
         return m_identityRaw;
 }
 
-QString TsVrObj::getIdentityRaw() const
+std::wstring TsVrObj::getIdentityRaw() const
 {
     return m_identityRaw;
 }
 
-TS3_VECTOR TsVrObj::getAvatarPosition() const
+thorwe::Three_Dee_Info TsVrObj::get_avatar() const
 {
-    return m_Avatar_Pos;
+    return m_avatar;
 }
 
-TS3_VECTOR TsVrObj::getAvatarFront() const
-{
-    return m_Avatar_Front;
-}
-
-TS3_VECTOR TsVrObj::getAvatarTop() const
-{
-    return m_Avatar_Top;
-}
 
 //! Handles the ts_infodata_qt event for this client
 bool TsVrObj::onInfoDataChanged(QTextStream &data)
 {
     bool isDirty = false;
-    if (!m_vr.isEmpty())
+    if (!m_vr.empty())
     {
         data << "Positional Audio: ";
         isDirty = true;
 
-        data << "\nPlaying " << getVr();
-        QString ident = getIdentity();
-        if (!ident.isEmpty())
+        data << "\nPlaying " << QString::fromStdWString(get_vr());
+        const auto ident = getIdentity();
+        if (!ident.empty())
         {
-            data << " as " << ident;
+            data << " as " << QString::fromStdWString(ident);
 
-            if (m_CustomEnvironmentSupport != NULL)
+            if (m_CustomEnvironmentSupport)
             {
-                CustomEnvironmentSupportInterface *iCustomEnvironmentSupport = qobject_cast<CustomEnvironmentSupportInterface *>(m_CustomEnvironmentSupport);
+                CustomEnvironmentSupportInterface *iCustomEnvironmentSupport =
+                qobject_cast<CustomEnvironmentSupportInterface *>(m_CustomEnvironmentSupport);
                 isDirty |= iCustomEnvironmentSupport->onInfoData(data);
             }
         }
@@ -87,79 +80,62 @@ void TsVrObj::setCustomEnvironmentSupport(QObject *val)
     m_CustomEnvironmentSupport = val;
 }
 
-void TsVrObj::setVr(QString val)
+void TsVrObj::set_vr(std::wstring_view val)
 {
     if (m_vr == val)
         return;
 
     m_vr = val;
 
-    if (m_CustomEnvironmentSupport != NULL)
+    if (m_CustomEnvironmentSupport)
         m_CustomEnvironmentSupport->deleteLater();
 
-    if (m_vr.isEmpty())
-        m_CustomEnvironmentSupport = NULL;
-    else if (m_vr == "Guild Wars 2")
+    if (m_vr.empty())
+        m_CustomEnvironmentSupport = nullptr;
+    else if (m_vr == L"Guild Wars 2")
         m_CustomEnvironmentSupport = new GuildWarsTwo(this);
 
-    emit vrChanged(this, m_vr);
 }
 
-void TsVrObj::setVrDescription(QString val)
+void TsVrObj::set_vr_description(std::wstring_view val)
 {
     if (m_vr_desc == val)
         return;
 
     m_vr_desc = val;
-    emit vrDescriptionChanged(this,m_vr_desc);
 }
 
-void TsVrObj::setContext(QString val)
+void TsVrObj::set_context(const std::vector<std::byte> &val)
 {
     if (m_context == val)
         return;
 
     m_context = val;
-    emit contextChanged(this,m_context);
 }
 
-void TsVrObj::setIdentityRaw(QString val)
+void TsVrObj::setIdentityRaw(std::wstring_view val)
 {
     if (m_identityRaw == val)
         return;
 
     m_identityRaw = val;
-    emit identityRawChanged(this,m_identityRaw);
 
-    if (m_CustomEnvironmentSupport != NULL)
+    if (m_CustomEnvironmentSupport)
     {
-        CustomEnvironmentSupportInterface *iCustomEnvironmentSupport = qobject_cast<CustomEnvironmentSupportInterface *>(m_CustomEnvironmentSupport);
-        if (iCustomEnvironmentSupport->onIdentityRawDirty(m_identityRaw))
-            emit identityChanged(this,iCustomEnvironmentSupport->getIdentity());
+        CustomEnvironmentSupportInterface *iCustomEnvironmentSupport =
+        qobject_cast<CustomEnvironmentSupportInterface *>(m_CustomEnvironmentSupport);
+        iCustomEnvironmentSupport->on_identity_raw_dirty(m_identityRaw);
     }
 }
 
-void TsVrObj::resetAvatar()
+void TsVrObj::reset_avatar()
 {
-    m_Avatar_Pos.x = 0.0f;
-    m_Avatar_Pos.y = 0.0f;
-    m_Avatar_Pos.z = 0.0f;
-
-    m_Avatar_Front.x = 0.0f;
-    m_Avatar_Front.y = 0.0f;
-    m_Avatar_Front.z = 0.0f;
-
-    m_Avatar_Top.x = 0.0f;
-    m_Avatar_Top.y = 0.0f;
-    m_Avatar_Top.z = 0.0f;
+    m_avatar.position = {0.f, 0.f, 0.f};
+    m_avatar.front = {0.f, 0.f, 0.f};
+    m_avatar.top = {0.f, 0.f, 0.f};
 }
 
 bool operator==(const TS3_VECTOR &veca, const TS3_VECTOR &vecb)
 {
     return ((veca.x == vecb.x) && (veca.y == vecb.y) && (veca.z == vecb.z));
-}
-
-bool operator==(const TS3_VECTOR &vec, const float *arr)
-{
-    return ((vec.x == arr[0]) && (vec.y == arr[1]) && (vec.z == arr[2]));
 }

@@ -1,47 +1,35 @@
 #include "simplepanner.h"
 
-#include <math.h>
+#include <algorithm>
+#include <cmath>
+#include <cstdint>
+#include <limits>
+#include <vector>
 
-#ifndef M_PI
-#define M_PI    3.14159265358979323846f
-#endif
+constexpr const float kPi = 3.14159265358979323846f;
+constexpr const float kPanFadeTime = 400.F;  // Rate to fade at (dB per second)
+constexpr const float kApaAttackRate = 20.0f;
+constexpr const float kApaDecayRate = 1.0f;
 
-// clipping for float to integer style
-//#define _SIGN(N) ((N)>>31L)
-//#define _ABS(N) ((N)^_SIGN(N))
-//#define _CLIPR(N,R) ((_ABS((N)+(R))-_ABS((N)-((R)+1L)))/2L)
-//long out = (long)(myfloat * 32767.0f);
-//short outs = (short)(_CLIPR(out, 32767L));
-
-const float PAN_FADE_RATE = (400.0f);	// Rate to fade at (dB per second)
-
-SimplePanner::SimplePanner(QObject *parent) :
-    QObject(parent)
-{
-}
-
-// Properties
+constexpr const std::int32_t kSampleRate = 48000;
 
 //! Sets the current pan (-1-+1) either set by user interaction or Pan adjustment
 /*!
   Intended for internal use
   \param value the current pan (-1-+1)
 */
-void SimplePanner::setPanCurrent(float value)
+void SimplePanner::set_current(float value)
 {
-    if (panCurrent == value)
-        return;
-
-    panCurrent = value;
+    m_current.store(value);
 }
 
 //! Gets the current pan (-1-+1) either set by user interaction or Pan adjustment
 /*!
   \return the current pan (-1-+1)
 */
-float SimplePanner::getPanCurrent() const
+float SimplePanner::get_current() const
 {
-    return panCurrent;
+    return m_current.load();
 }
 
 //! Sets the desired pan (-1-+1) either set by user interaction or Pan adjustment
@@ -49,21 +37,18 @@ float SimplePanner::getPanCurrent() const
   Intended for internal use
   \param value the desired pan (-1-+1)
 */
-void SimplePanner::setPanDesired(float value)
+void SimplePanner::set_desired(float value)
 {
-    if (panDesired == value)
-        return;
-
-    panDesired = value;
+    m_desired.store(value);
 }
 
 //! Gets the desired pan (-1-+1) either set by user interaction or Pan adjustment
 /*!
   \return the desired pan (-1-+1)
 */
-float SimplePanner::getPanDesired() const
+float SimplePanner::get_desired() const
 {
-    return panDesired;
+    return m_desired.load();
 }
 
 //! Sets the desired pan (-1-+1) of a user interaction
@@ -71,22 +56,19 @@ float SimplePanner::getPanDesired() const
   Intended for internal use
   \param value the desired Pan of a user interaction (dB)
 */
-void SimplePanner::setPanDesiredByManual(float value)
+void SimplePanner::set_desired_by_manual(float value)
 {
-    if (panDesiredByManual == value)
-        return;
-
-    panDesiredByManual = value;
-    setPanDesired(value);
+    m_desired_by_manual.store(value);
+    set_desired(value);
 }
 
 //! Gets the desired pan (-1-+1) set by the last user interaction
 /*!
   \return the desired pan (-1-+1) of the last user interaction
 */
-float SimplePanner::getPanDesiredByManual() const
+float SimplePanner::get_desired_by_manual() const
 {
-    return panDesiredByManual;
+    return m_desired_by_manual.load();
 }
 
 //! Sets the desired pan (-1-+1) of an automatic Pan adjustment
@@ -94,71 +76,35 @@ float SimplePanner::getPanDesiredByManual() const
   Intended for internal use
   \param value the desired Pan of an automatic Pan adjustment (dB)
 */
-void SimplePanner::setPanDesiredByPanAdjuster(float value)
+void SimplePanner::set_desired_by_pan_adjuster(float value)
 {
-    if (panDesiredByPanAdjuster == value)
-        return;
-
-    panDesiredByPanAdjuster = value;
-    setPanDesired(value);
+    m_desired_by_pan_adjuster.store(value);
+    set_desired(value);
 }
 
 //! Gets the desired pan (-1-+1) set by the last automatic Pan adjustment
 /*!
   \return the desired pan (-1-+1) of the automatic Pan adjustment
 */
-float SimplePanner::getPanDesiredByPanAdjuster() const
+float SimplePanner::get_desired_by_pan_adjuster() const
 {
-    return panDesiredByPanAdjuster;
+    return m_desired_by_pan_adjuster.load();
 }
 
-float SimplePanner::getApaAttackRate() const
+bool SimplePanner::get_adjust() const
 {
-    return apaAttackRate;
+    return m_adjust.load();
 }
 
-float SimplePanner::getApaDecayRate() const
+void SimplePanner::set_adjust(bool value)
 {
-    return apaDecayRate;
+    m_adjust.store(value);
 }
-
-bool SimplePanner::getPanAdjustment() const
-{
-    return panAdjustment;
-}
-
-// Slots
-
-void SimplePanner::setApaAttackRate(float value)
-{
-    if (apaAttackRate == value)
-        return;
-
-    apaAttackRate = value;
-    emit ApaAttackRateChanged(value);
-}
-
-void SimplePanner::setApaDecayRate(float value)
-{
-    if (apaDecayRate != value) {
-        apaDecayRate = value;
-        emit ApaDecayRateChanged(value);
-    }
-}
-
-void SimplePanner::setPanAdjustment(bool value)
-{
-    if (panAdjustment == value)
-        return;
-
-    panAdjustment = value;
-}
-
 
 
 // process
 
-//void SimplePanner::process(int nSamples,
+// void SimplePanner::process(int nSamples,
 //                      float *pleft,
 //                      float *pright,
 //                      float balance // -1...+1
@@ -177,112 +123,118 @@ void SimplePanner::setPanAdjustment(bool value)
 //    }
 //}
 
-void SimplePanner::process(int nSamples,
-                      QList<float> *pleft,
-                      QList<float> *pright,
-                      float balance // -1...+1
-                      )
+namespace
+{
+void do_process(gsl::span<float> left,
+                gsl::span<float> right,
+                float balance  // -1...+1
+)
 {
     balance = balance < -1 ? -1 : balance;
     balance = balance > 1 ? 1 : balance;
 
-    float p, gl, gr;
+    const float p = kPi * (balance + 1) / 4;
+    const auto gl = ::cos(p);
+    const auto gr = ::sin(p);
 
-    p=M_PI*(balance+1)/4;
-    gl=::cos(p);
-    gr=::sin(p);
-
-    for (int i = 0; i<nSamples;++i)
-    {
-        pleft->replace(i, (pleft->at(i) * gl));
-        pright->replace(i, (pright->at(i) * gr));
-    }
+    for (auto &sample : left)
+        sample *= gl;
+    for (auto &sample : right)
+        sample *= gr;
 }
+}  // namespace
 
-void SimplePanner::process(short *samples, int sampleCount, int channels,int leftChannelNr, int rightChannelNr)
+void SimplePanner::process(gsl::span<int16_t> samples, int channels, int leftChannelNr, int rightChannelNr)
 {
+    const auto frame_count = samples.size() / channels;
     // Determine Pan for current buffer
-    auto currentPan = getPanCurrent();
-    auto desiredPan = getPanDesired();
-    auto desiredPanByManual = getPanDesiredByManual();
-    auto desiredPanByPanAdjuster = getPanDesiredByPanAdjuster();
+    auto current = get_current();
+    auto desired = get_desired();
+    auto desired_by_manual = get_desired_by_manual();
+    auto desired_by_pan_adjuster = get_desired_by_pan_adjuster();
 
-    if (desiredPan != desiredPanByManual) {
-        if (getPanAdjustment() == true) {
+    if (desired != desired_by_manual)
+    {
+        if (get_adjust())
+        {
             // is attacking
-            float fade_step_down = (apaAttackRate / sampleRate) * sampleCount;
-            float fade_step_up = (apaDecayRate / sampleRate) * sampleCount;
-            if (currentPan < desiredPanByPanAdjuster - fade_step_up) {
-                currentPan += fade_step_up;
+            float fade_step_down = (kApaAttackRate / kSampleRate) * frame_count;
+            float fade_step_up = (kApaDecayRate / kSampleRate) * frame_count;
+            if (current < desired_by_pan_adjuster - fade_step_up)
+            {
+                current += fade_step_up;
             }
-            else if (currentPan > desiredPanByPanAdjuster + fade_step_down) {
-                currentPan -= fade_step_down;
+            else if (current > desired_by_pan_adjuster + fade_step_down)
+            {
+                current -= fade_step_down;
             }
-            else {
-                currentPan = desiredPanByPanAdjuster;
+            else
+            {
+                current = desired_by_pan_adjuster;
             }
         }
-        else {
+        else
+        {
             // is releasing
-            float fade_step_gainAdjust = (apaDecayRate / sampleRate) * sampleCount;
-            if (currentPan < desiredPanByManual - fade_step_gainAdjust) {
-                currentPan += fade_step_gainAdjust;
+            float fade_step_gainAdjust = (kApaDecayRate / kSampleRate) * frame_count;
+            if (current < desired_by_manual - fade_step_gainAdjust)
+            {
+                current += fade_step_gainAdjust;
             }
-            else if (currentPan > desiredPanByManual + fade_step_gainAdjust) {
-                currentPan -= fade_step_gainAdjust;
+            else if (current > desired_by_manual + fade_step_gainAdjust)
+            {
+                current -= fade_step_gainAdjust;
             }
-            else {
-                currentPan = desiredPanByManual;
+            else
+            {
+                current = desired_by_manual;
             }
-        }
-        emit ChannelPanAdjusted(currentPan);
-    }
-    else if (currentPan != desiredPanByManual) {
-        float fade_step = (PAN_FADE_RATE / sampleRate) * sampleCount;
-        if (currentPan < desiredPanByManual - fade_step) {
-            currentPan += fade_step;
-        }
-        else if (currentPan > desiredPanByManual + fade_step) {
-            currentPan -= fade_step;
-        }
-        else {
-            currentPan = desiredPanByManual;
         }
     }
-    setPanCurrent(currentPan);
+    else if (current != desired_by_manual)
+    {
+        float fade_step = (kPanFadeTime / kSampleRate) * frame_count;
+        if (current < desired_by_manual - fade_step)
+        {
+            current += fade_step;
+        }
+        else if (current > desired_by_manual + fade_step)
+        {
+            current -= fade_step;
+        }
+        else
+        {
+            current = desired_by_manual;
+        }
+    }
+    set_current(current);
 
     // End Determine Pan for current buffer
 
     // Extract from interleaved and convert to QList<float>
-    QList<float> float_data_left;
-    QList<float> float_data_right;
-    for(int i=0; i < sampleCount; ++i)
+    std::vector<float> float_data_left;
+    std::vector<float> float_data_right;
+    for (auto i = decltype(frame_count){0}; i < frame_count; ++i)
     {
-        float_data_left.insert(i,samples[leftChannelNr + (i*channels) ]);
-        float_data_right.insert(i,samples[rightChannelNr + (i*channels) ]);
+        float_data_left.push_back(samples[leftChannelNr + (i * channels)]);
+        float_data_right.push_back(samples[rightChannelNr + (i * channels)]);
     }
 
-    //don't need to adjust the range to -1 - +1 do we?
+    // don't need to adjust the range to -1 - +1 do we?
 
-    process(sampleCount,&float_data_left,&float_data_right,currentPan);
+    do_process(float_data_left, float_data_right, current);
 
     // put it back into interleaved and Clip
-    for (int i = 0; i < sampleCount; ++i)
+    for (auto i = decltype(frame_count){0}; i < frame_count; ++i)
     {
         auto left = float_data_left.at(i);
-        if (left > 32767.f)
-            samples[leftChannelNr + (i*channels) ] = 32767;
-        else if (left < -32768.f)
-            samples[leftChannelNr + (i*channels) ] = -32768;
-        else
-            samples[leftChannelNr + (i*channels) ] = (short)floor(.5+left);
+        samples[leftChannelNr + (i * channels)] = static_cast<int16_t>(
+        std::clamp<int32_t>(static_cast<int32_t>(floor(.5 + left)), std::numeric_limits<int16_t>::min(),
+                            std::numeric_limits<int16_t>::max()));
 
         float right = float_data_right.at(i);
-        if (right > 32767.f)
-            samples[rightChannelNr + (i*channels) ] = 32767;
-        else if (right < -32768.f)
-            samples[rightChannelNr + (i*channels) ] = -32768;
-        else
-            samples[rightChannelNr + (i*channels) ] = (short)floor(.5+right);
+        samples[rightChannelNr + (i * channels)] = static_cast<int16_t>(
+        std::clamp<int32_t>(static_cast<int32_t>(floor(.5 + right)), std::numeric_limits<int16_t>::min(),
+                            std::numeric_limits<int16_t>::max()));
     }
 }

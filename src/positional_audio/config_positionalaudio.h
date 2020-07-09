@@ -1,7 +1,8 @@
 #pragma once
 
-#include <QtWidgets/QDialog>
 #include "definitions_positionalaudio.h"
+
+#include <QtWidgets/QDialog>
 
 class ConfigPositionalAudio : public QDialog
 {

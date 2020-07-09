@@ -1,7 +1,10 @@
 #pragma once
 
-#include <QtWidgets/QGroupBox>
 #include "definitions_positionalaudio.h"
+
+#include "gsl/pointers"
+
+#include <QtWidgets/QGroupBox>
 
 class QPushButton;
 class QSpinBox;
@@ -50,14 +53,14 @@ signals:
 
     void UpdateUIServerSelect(QString);
 
-private:
-    QPushButton* m_avatar;
-    QPushButton* m_camera;
+  private:
+    gsl::owner<QPushButton *> m_avatar;
+    gsl::owner<QPushButton *> m_camera;
 
-    QGroupBox* m_volume;
-    QSpinBox* m_distance_min;
-    QSpinBox* m_distance_max;
+    gsl::owner<QGroupBox *> m_volume;
+    gsl::owner<QSpinBox *> m_distance_min;
+    gsl::owner<QSpinBox *> m_distance_max;
 
-    QDoubleSpinBox* m_rolloff;
-    QDoubleSpinBox* m_rolloff_max;
+    gsl::owner<QDoubleSpinBox *> m_rolloff;
+    gsl::owner<QDoubleSpinBox *> m_rolloff_max;
 };

@@ -1,33 +1,35 @@
 #include "groupbox_position_spread.h"
 
-#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QApplication>
 #include <QtWidgets/QDial>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QSlider>
-#include <QtWidgets/QApplication>
+#include <QtWidgets/QVBoxLayout>
 
-namespace {
+namespace
+{
 const auto kHome = QLatin1String("Home");
 const auto kWhisper = QLatin1String("Whisper");
 const auto kOther = QLatin1String("Other");
-}
+}  // namespace
 
 GroupBoxPositionSpread::GroupBoxPositionSpread(QWidget *parent)
     : QGroupBox(parent)
-    , m_dial(new QDial(this))
     , m_spinbox(new QDoubleSpinBox(this))
+    , m_dial(new QDial(this))
     , m_expert(new QGroupBox(this))
 {
     setCheckable(true);
     setTitle(tr("Enabled"));  // ToDo: get client translation
-    
+
     auto layout = new QVBoxLayout(this);
 
-    m_dial->setWhatsThis("<html><head /><body><p><span style = \"font-size:10pt; text-decoration: underline;\">" +
-        tr("Position Spread : Width") + "</span></p><p>" + 
-        tr("Use low values to keep speakers closer together, increase it to set them further apart.") + "</p></body></html>"
-    );
+    m_dial->setWhatsThis(
+    "<html><head /><body><p><span style = \"font-size:10pt; text-decoration: underline;\">" +
+    tr("Position Spread : Width") + "</span></p><p>" +
+    tr("Use low values to keep speakers closer together, increase it to set them further apart.") +
+    "</p></body></html>");
     m_dial->setNotchesVisible(true);
     layout->addWidget(m_dial);
 
@@ -41,19 +43,19 @@ GroupBoxPositionSpread::GroupBoxPositionSpread(QWidget *parent)
     m_expert->setTitle(qApp->translate("captureSoundSetupDialog", "&Advanced Options"));
     auto groupbox_expert_layout = new QVBoxLayout;
 
-    auto add_expert_widget = [this, groupbox_expert_layout](QString name, QString text, void (GroupBoxPositionSpread::*slot)(int val))
-    {
+    auto add_expert_widget = [this, groupbox_expert_layout](const QString &name, const QString &text,
+                                                            void (GroupBoxPositionSpread::*slot)(int val)) {
         auto expert_widget = new QWidget;
         expert_widget->setObjectName(QLatin1String("PositionSpread_ExpertWidget_") + name);
         auto expert_layout = new QVBoxLayout;
 
         auto label = new QLabel;
-        //label->setObjectName(expert_widget->objectName() + "_label");
+        // label->setObjectName(expert_widget->objectName() + "_label");
         label->setText(text);
         expert_layout->addWidget(label);
 
         auto slider = new QSlider;
-        //slider->setObjectName(expert_widget->objectName() + "_slider");
+        // slider->setObjectName(expert_widget->objectName() + "_slider");
         slider->setWhatsThis(tr("Audio Region : Left, Middle, Right"));
         slider->setMaximum(2);
         slider->setPageStep(1);
@@ -68,19 +70,24 @@ GroupBoxPositionSpread::GroupBoxPositionSpread(QWidget *parent)
         groupbox_expert_layout->addWidget(expert_widget);
     };
 
-    add_expert_widget(kHome, qApp->translate("HotkeyDialog", "Current Server"), &GroupBoxPositionSpread::ExpertHomeValueChanged);
-    add_expert_widget(kWhisper, qApp->translate("WhisperSetup", "Whisper"), &GroupBoxPositionSpread::ExpertWhisperValueChanged);
-    add_expert_widget(kOther, qApp->translate("NotificationsSetup", "Other"), &GroupBoxPositionSpread::ExpertOtherValueChanged);
+    add_expert_widget(kHome, qApp->translate("HotkeyDialog", "Current Server"),
+                      &GroupBoxPositionSpread::ExpertHomeValueChanged);
+    add_expert_widget(kWhisper, qApp->translate("WhisperSetup", "Whisper"),
+                      &GroupBoxPositionSpread::ExpertWhisperValueChanged);
+    add_expert_widget(kOther, qApp->translate("NotificationsSetup", "Other"),
+                      &GroupBoxPositionSpread::ExpertOtherValueChanged);
 
     m_expert->setLayout(groupbox_expert_layout);
     layout->addWidget(m_expert);
     setLayout(layout);
 
-    connect(this, &GroupBoxPositionSpread::toggled, this, &GroupBoxPositionSpread::EnabledSet); // remove this redundancy later?
+    connect(this, &GroupBoxPositionSpread::toggled, this,
+            &GroupBoxPositionSpread::EnabledSet);  // remove this redundancy later?
     connect(m_expert, &QGroupBox::toggled, this, &GroupBoxPositionSpread::ExpertEnabledSet);
 
     connect(m_dial, &QDial::valueChanged, this, &GroupBoxPositionSpread::onDialValueChanged);
-    connect(m_spinbox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &GroupBoxPositionSpread::onSpinBoxValueChanged);
+    connect(m_spinbox, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this,
+            &GroupBoxPositionSpread::onSpinBoxValueChanged);
 }
 
 void GroupBoxPositionSpread::UpdateEnabledSet(bool val)
@@ -93,8 +100,8 @@ void GroupBoxPositionSpread::UpdateEnabledSet(bool val)
 void GroupBoxPositionSpread::UpdateSpreadWidth(float val)
 {
     this->blockSignals(true);
-    m_spinbox->setValue(static_cast< double > (val*100));
-    m_dial->setValue(static_cast< int >(val*100));
+    m_spinbox->setValue(static_cast<double>(val * 100));
+    m_dial->setValue(static_cast<int>(val * 100));
     this->blockSignals(false);
 }
 
@@ -134,23 +141,24 @@ void GroupBoxPositionSpread::UpdateExpertOtherValueChanged(int val)
 
 //! Retrieves SPS value changed from dial and forwards it to spinbox
 /*!
- * \brief GroupBoxPositionSpread::onDialValueChanged Qt slot to retrieve SPS value changed from dial and forwards it to spinbox
- * \param val dial value
+ * \brief GroupBoxPositionSpread::onDialValueChanged Qt slot to retrieve SPS value changed from dial and
+ * forwards it to spinbox \param val dial value
  */
 void GroupBoxPositionSpread::onDialValueChanged(int val)
 {
-    m_spinbox->setValue(static_cast< double > (val));
+    m_spinbox->setValue(static_cast<double>(val));
 }
 
-//! Retrieves SPS value changed from spinbox, sets slider if it's not the initial sender, emits SetStereoPositionSpreadValue
+//! Retrieves SPS value changed from spinbox, sets slider if it's not the initial sender, emits
+//! SetStereoPositionSpreadValue
 /*!
  * \brief GroupBoxPositionSpread::onSliderValueChanged Qt slot to retrieve SPS value changed from spinbox
  * \param val spinbox value
  */
 void GroupBoxPositionSpread::onSpinBoxValueChanged(double val)
 {
-    if (!(m_dial->isSliderDown()))                // loop breaker
-        m_dial->setValue(static_cast< int >(val));
+    if (!(m_dial->isSliderDown()))  // loop breaker
+        m_dial->setValue(static_cast<int>(val));
 
-    emit ValueChanged(static_cast< float >(val * 0.01));
+    emit ValueChanged(static_cast<float>(val * 0.01));
 }

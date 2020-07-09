@@ -1,52 +1,58 @@
 #pragma once
 
+#include "plugin_qt.h"
+#include "shared_mem_reader.h"
+#include "tsvr_obj_self.h"
+#include "tsvr_universe.h"
+
+#include "core/definitions.h"
+#include "core/module_qt.h"
+
+#include "definitions_positionalaudio.h"
+
+#include "gsl/pointers"
+
 #include <QtCore/QObject>
 #include <QtCore/QtCore>
-#include "core/module.h"
-#include "tsvr_universe.h"
-#include "tsvr_obj_self.h"
-#include "definitions_positionalaudio.h"
-#include "plugin_qt.h"
 
-#ifndef RETURNCODE_BUFSIZE
-#define RETURNCODE_BUFSIZE 128
-#endif
+#include <string>
 
-class PositionalAudio : public Module, public InfoDataInterface//, public ContextMenuInterface
+using namespace com::teamspeak;
+
+namespace thorwe
+{
+
+class PositionalAudio : public Module_Qt, public InfoDataInterface
 {
     Q_OBJECT
-    Q_INTERFACES(InfoDataInterface)// ContextMenuInterface)
-    Q_PROPERTY(QString myVr
-               READ getMyVr
-               NOTIFY myVrChanged)
-    Q_PROPERTY(QString myIdentity
-               READ getMyIdentity
-               NOTIFY myIdentityChanged)
-    Q_PROPERTY(bool useCamera
-               READ isUseCamera
-               WRITE setUseCamera
-               NOTIFY useCameraChanged)
-    Q_PROPERTY(bool useAttenuation READ isUseAttenuation WRITE setUseAttenuation NOTIFY useAttenuationChanged)
-    Q_PROPERTY(int distanceMin READ getDistanceMin WRITE setDistanceMin NOTIFY distanceMinChanged)
-    Q_PROPERTY(int distanceMax READ getDistanceMax WRITE setDistanceMax NOTIFY distanceMaxChanged)
-    Q_PROPERTY(float rollOff READ getRollOff WRITE setRollOff NOTIFY rollOffChanged)
-    Q_PROPERTY(float rollOffMax READ getRollOffMax WRITE setRollOffMax NOTIFY rollOffMaxChanged)
+    Q_INTERFACES(InfoDataInterface)
 
-public:
+  public:
     PositionalAudio(Plugin& plugin);
 
     // events forwarded from plugin.cpp
-    bool onPluginCommand(uint64 serverConnectionHandlerID, anyID clientID, bool isMe, QString cmd, QTextStream &args);
-    void onClientMoveEvent(uint64 serverConnectionHandlerID, anyID clientID, uint64 oldChannelID, uint64 newChannelID, int visibility, anyID myID);
-    void onCustom3dRolloffCalculationClientEvent(uint64 serverConnectionHandlerID, anyID clientID, float distance, float* volume);
+    bool onPluginCommand(
+    connection_id_t connection_id, client_id_t clientID, bool isMe, QString cmd, QTextStream &args);
+    void onClientMoveEvent(connection_id_t connection_id,
+                           client_id_t clientID,
+                           uint64 oldChannelID,
+                           uint64 newChannelID,
+                           int visibility,
+                           client_id_t myID);
+    void onCustom3dRolloffCalculationClientEvent(connection_id_t connection_id,
+                                                 client_id_t clientID,
+                                                 float distance,
+                                                 float *volume);
 
     //Properties
-    QString getMyVr() const;
-    QString getMyIdentity() const;
+    std::wstring get_my_vr() const;
+    std::wstring getMyIdentity() const;
 
-    bool onInfoDataChanged(uint64 serverConnectionHandlerID, uint64 id, enum PluginItemType type, uint64 mine, QTextStream &data);
+    bool onInfoDataChanged(
+    connection_id_t connection_id, uint64 id, enum PluginItemType type, uint64 mine, QTextStream &data);
 
-//    int onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage);
+    //    int onServerErrorEvent(connection_id_t connection_id, const char* errorMessage, unsigned
+    //    int error, const char* returnCode, const char* extraMessage);
 
     bool isUseCamera() const;
     bool isUseAttenuation() const;
@@ -55,14 +61,15 @@ public:
     float getRollOff() const;
     float getRollOffMax() const;
 
-    bool isPositioned(anyID clientID) const;
+    bool isPositioned(client_id_t clientID) const;
 
     QMap<QString,PositionalAudio_ServerSettings> getServerSettings() const;
 
-    //bool RegisterCustomEnvironmentSupport(QObject *p);
-    TsVrObjSelf* meObj;
+    TsVrObjSelf meObj{};
 
-signals:
+    void on_connect_status_changed(connection_id_t connection_id, int new_status, unsigned int error_number);
+
+  signals:
     void myVrChanged(QString);
     void myIdentityChanged(QString);
     void useCameraChanged(bool);
@@ -75,8 +82,7 @@ signals:
 
     void BroadcastJSON(QString);
 
-public slots:
-    void onConnectStatusChanged(uint64 serverConnectionHandlerID, int newStatus, unsigned int errorNumber);
+  public slots:
     void setUseCamera(bool val);
     void setUseAttenuation(bool val);
     void setDistanceMin(int val);
@@ -91,12 +97,9 @@ public slots:
     void setServerSettingSendInterval(QString serverUniqueId, float val);
     void setServerSettingSendIntervalSilentInc(QString serverUniqueId, float val);
 
-    void onMyVrChanged(TsVrObj* obj, QString val);
-    void onMyIdentityChanged(TsVrObj* obj, QString val);
+    void onMyIdentityChanged(TsVrObj *obj, QString val);
 
-    void onUniverseRemoved(QString clientUID);
-
-protected:
+  protected:
     void onRunningStateChanged(bool value);
     void timerEvent(QTimerEvent *event);
 
@@ -108,26 +111,24 @@ private:
     int m_tryTimerId = 0;
 
     int m_fetchTimerId = 0;
-    static const int FETCH_TIMER_INTERVAL = 20; //Mumble fetches these values 50 times a second aka 20msec
-    static const int SEND_THROTTLE_GLOBAL = 5;  // Send(): 50times/sec; count to 5 -> 10times/sec; save some computation
-    static const int SEND_INTERVAL_MODIFIER = 50 / SEND_THROTTLE_GLOBAL;    // I...think.
+
     int m_fetchTimerElapsed = 0;
     int m_fetchTimerTimeoutMsec = 5000;
 
+    void set_my_vr(std::wstring_view = L"");
+    void set_my_identity(std::wstring_view = L"");
+    void remove_other(connection_id_t, client_id_t);
+
     // myself
-    //QString m_Identity;
-    QString m_IdentityUncleaned;
     bool m_isDirty_IdentityUncleaned = false;
-    QByteArray m_Context;
-    //QString m_ContextHex;
     bool m_Context_Dirty = false;
     bool m_Avatar_Dirty = false;
 
     ulong m_lastCount = 0;
 
-    QMultiMap<uint64,anyID> m_PlayersInMyContext;
+    QMultiMap<connection_id_t, client_id_t> m_PlayersInMyContext;
 
-    TsVrUniverse* universe;
+    thorwe::TsVrUniverse m_universe;
 
     void Update3DListenerAttributes();
 
@@ -142,26 +143,33 @@ private:
 
     QString GetSendString(bool isAll);
     QString GetSendStringJson(bool isAll, bool isMe, TsVrObj *obj);
-    void Send(uint64 serverConnectionHandlerID, QString args, int targetMode, const anyID *targetIDs, const char *returnCode);
+    void Send(connection_id_t connection_id,
+              const QString &args,
+              int targetMode,
+              const std::vector<client_id_t> &target_ids);
     void Send();
-    void Send(QString args, int targetMode);
+    void Send(const QString &args, int targetMode);
 
     bool m_IsSendAllOverride = true;
     int m_sendCounter = 0;
     int m_silentSendCounter = 2;
 
-    TS3_VECTOR NULL_VECTOR;
+    TS3_VECTOR NULL_VECTOR{0.f, 0.f, 0.f};
 
-    QSharedMemory* m_sharedMemory = nullptr;
+    gsl::owner<QSharedMemory *> m_shared_memory = nullptr;
 
-    QMap<QString,PositionalAudio_ServerSettings> m_ServerSettings;
-    QHash<uint64,int> m_SendCounters;
+    QMap<QString, PositionalAudio_ServerSettings> m_ServerSettings;
+    QHash<connection_id_t, int> m_SendCounters;
 
     Talkers& m_talkers;
     TSInfoData& m_info_data;
     TSServersInfo& m_servers_info;
-    ServerThreaded& m_websockets_server;
+    ServerThreaded &m_websockets_server;
+
+    thorwe::Shared_Mem_Reader m_shared_mem_reader;
 };
 QTextStream &operator<<(QTextStream &out, const TS3_VECTOR &ts3Vector);
 QTextStream &operator>>(QTextStream &in, TS3_VECTOR &ts3Vector);
 //bool operator==(const TS3_VECTOR &vec, const float *arr);
+
+}  // namespace thorwe

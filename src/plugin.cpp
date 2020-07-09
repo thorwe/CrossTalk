@@ -6,32 +6,32 @@
 #pragma warning (disable : 4100)  /* Disable Unreferenced parameter warning */
 #endif
 
-#include <memory>
-#include <assert.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <QtCore/qglobal.h>
-
-#include "teamspeak/public_errors.h"
-#include "teamspeak/public_errors_rare.h"
-#include "teamspeak/public_definitions.h"
-#include "teamspeak/public_rare_definitions.h"
-#include "ts3_functions.h"
 #include "plugin.h"
-
-#include "core/ts_logging_qt.h"
-#include "core/ts_helpers_qt.h"
-
-#include "core/ts_serversinfo.h"
-#include "plugin_qt.h"
 
 #include "ts_ptt_qt.h"
 
-struct TS3Functions ts3Functions;
+#include "core/ts_functions.h"
+#include "core/ts_serversinfo.h"
+#include "plugin_qt.h"
 
-std::unique_ptr<Plugin> plugin;
+#include "core/ts_helpers_qt.h"
+#include "core/ts_logging_qt.h"
+
+#include "teamspeak/public_definitions.h"
+#include "teamspeak/public_errors.h"
+#include "teamspeak/public_errors_rare.h"
+#include "teamspeak/public_rare_definitions.h"
+
+#include <QtCore/qglobal.h>
+
+#include <array>
+#include <cassert>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <memory>
+
+std::unique_ptr<thorwe::Plugin> plugin;
 
 #ifdef _WIN32
 #define _strcpy(dest, destSize, src) strcpy_s(dest, destSize, src)
@@ -75,7 +75,7 @@ const char* ts3plugin_author() { return plugin->kPluginAuthor; }
 const char* ts3plugin_description() { return plugin->kPluginDescription; }
 
 /* Set TeamSpeak 3 callback functions */
-void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) { ts3Functions = funcs; }
+/*void ts3plugin_setFunctionPointers(const struct TS3Functions funcs) { ts3Functions = funcs; }*/
 
 /*
  * Custom code called right after loading the plugin. Returns 0 on success, 1 on failure.
@@ -111,17 +111,22 @@ void ts3plugin_configure(void* handle, void* qParentWidget) { plugin->configure(
  * can be omitted.
  * Note the passed pluginID parameter is no longer valid after calling this function, so you must copy it and store it in the plugin.
  */
-void ts3plugin_registerPluginID(const char* id) { plugin = std::make_unique<Plugin>(id); }
+void ts3plugin_registerPluginID(const char *id)
+{
+    plugin = std::make_unique<thorwe::Plugin>(id);
+}
 
 /* Plugin command keyword. Return NULL or "" if not used. */
 const char* ts3plugin_commandKeyword() { return "ct"; }
 
 /* Plugin processes console command. Return 0 if plugin handled the command, 1 if not handled. */
-int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* command)
+int ts3plugin_processCommand(uint64 connection_id, const char *command)
 {
+    using namespace com::teamspeak::pluginsdk;
+
     if (!(command_mutex.tryLock(PLUGIN_THREAD_TIMEOUT)))
     {
-        TSLogging::Log("Timeout while waiting for mutex", serverConnectionHandlerID, LogLevel_WARNING);
+        TSLogging::Log("Timeout while waiting for mutex", connection_id, LogLevel_WARNING);
         return 1;
     }
 
@@ -164,51 +169,60 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
     }
     else if (cmd_qs == QLatin1String("PS_TOGGLE"))
     {
-        serverConnectionHandlerID = ts3Functions.getCurrentServerConnectionHandlerID();
-        unsigned int error;
+        connection_id = funcs::get_current_server_connection_handler_id();
+
         // Get My Id on this handler
-        anyID myID;
-        if((error = ts3Functions.getClientID(serverConnectionHandlerID,&myID)) != ERROR_ok)
+        const auto [error_my_id, my_id] = funcs::get_client_id(connection_id);
+        if (error_my_id)
         {
-            TSLogging::Error("(PS_TOGGLE)",serverConnectionHandlerID,error);
+            TSLogging::Error("(PS_TOGGLE)", connection_id, error_my_id);
             ret = 1;
         }
         else
         {
-            unsigned int permId;
-            if ((error = ts3Functions.getPermissionIDByName(serverConnectionHandlerID, "b_client_is_priority_speaker", &permId)) != ERROR_ok)
+            const auto [error_get_permission_id, permission_id] =
+            funcs::get_permission_id_by_name(connection_id, "b_client_is_priority_speaker");
+            if (error_get_permission_id)
             {
-                TSLogging::Error("(PS_TOGGLE)",serverConnectionHandlerID,error);
+                TSLogging::Error("(PS_TOGGLE)", connection_id, error_get_permission_id);
                 ret = 1;
             }
             else
             {
-                uint64 myDbId;
-                if ((error = ts3Functions.getClientVariableAsUInt64(serverConnectionHandlerID, myID, CLIENT_DATABASE_ID, &myDbId)) != ERROR_ok)
+                const auto [error_my_db_id, my_db_id] =
+                funcs::get_client_property_as_uint64(connection_id, my_id, CLIENT_DATABASE_ID);
+                if (error_my_db_id)
                 {
-                    TSLogging::Error("(PS_TOGGLE)",serverConnectionHandlerID,error);
+                    TSLogging::Error("(PS_TOGGLE)", connection_id, error_my_db_id);
                     ret = 1;
                 }
                 else
                 {
-                    int isPrioritySpeaker;
-                    if ((error = ts3Functions.getClientVariableAsInt(serverConnectionHandlerID, myID, CLIENT_IS_PRIORITY_SPEAKER, &isPrioritySpeaker)) != ERROR_ok)
+                    const auto [error_my_prio_speaker, my_prio_speaker] =
+                    funcs::get_client_property_as_int(connection_id, my_id, CLIENT_IS_PRIORITY_SPEAKER);
+                    if (error_my_prio_speaker)
                     {
-                        TSLogging::Error("(PS_TOGGLE)",serverConnectionHandlerID,error);
+                        TSLogging::Error("(PS_TOGGLE)", connection_id, error_my_prio_speaker);
                         ret = 1;
                     }
                     else
                     {
-                        const unsigned int permissionIDArray [1] = {permId};
-
-                        if (isPrioritySpeaker == 0)
+                        if (!my_prio_speaker)
                         {
-                            const int permissionValueArray [1] = {1};
-                            const int permissionSkipArray [1]  = {0};
-                            ts3Functions.requestClientAddPerm(serverConnectionHandlerID, myDbId, permissionIDArray, permissionValueArray, permissionSkipArray, 1, NULL);
+                            funcs::permissions::client::Permission_Entry entry;
+                            entry.id = permission_id;
+                            entry.value = 1;
+                            entry.skip = 0;
+                            auto entries = std::array<funcs::permissions::client::Permission_Entry, 1>{entry};
+                            funcs::permissions::client::request_add_perm(connection_id, my_db_id, entries);
                         }
                         else
-                            ts3Functions.requestClientDelPerm(serverConnectionHandlerID, myDbId, permissionIDArray, 1, NULL);
+                        {
+                            auto permission_ids =
+                            std::array<com::teamspeak::permission_id_t, 1>{permission_id};
+                            funcs::permissions::client::request_del_perm(connection_id, my_db_id,
+                                                                         permission_ids);
+                        }
                     }
                 }
             }
@@ -220,16 +234,17 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
             ret = 1;
         else
         {
-            unsigned int error;
             uint64 targetServer = 0;
             auto serverName = args_qs.takeFirst();
 
-            if ((error = TSHelpers::GetServerHandler(serverName,&targetServer)) != ERROR_ok)
+            auto error = TSHelpers::GetServerHandler(serverName, &targetServer);
+            if (error)
                 ret = 0;
             else
             {
                 QSet<uint64> myServerGroups;
-                if ((error = TSHelpers::GetClientSelfServerGroups(targetServer, &myServerGroups)) != ERROR_ok)
+                error = TSHelpers::GetClientSelfServerGroups(targetServer, &myServerGroups);
+                if (error)
                 {
                     TSLogging::Error("(TOGGLE_SELF_SERVER_GROUP) Could not get self server groups", targetServer, error, true);
                     ret = 1;
@@ -243,27 +258,28 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
                     else
                     {
                         // Get My Id on this handler
-                        anyID myID;
-                        if((error = ts3Functions.getClientID(targetServer,&myID)) != ERROR_ok)
+                        const auto [error_my_id, my_id] = funcs::get_client_id(targetServer);
+                        if (error_my_id)
                         {
-                            TSLogging::Error("(TOGGLE_SELF_SERVER_GROUP)",serverConnectionHandlerID,error);
+                            TSLogging::Error("(TOGGLE_SELF_SERVER_GROUP)", connection_id, error_my_id);
                             ret = 1;
                         }
                         else
                         {
                             // Doesn't work with ClientSelf
-                            int myDbId;
-                            if ((error = ts3Functions.getClientVariableAsInt(targetServer,myID,CLIENT_DATABASE_ID,&myDbId)) != ERROR_ok)
+                            const auto [error_my_db_id, my_db_id] =
+                            funcs::get_client_property_as_uint64(targetServer, my_id, CLIENT_DATABASE_ID);
+                            if (error_my_db_id)
                             {
-                                TSLogging::Error("(TOGGLE_SELF_SERVER_GROUP) Could not get self client db id", targetServer, error, true);
+                                TSLogging::Error("(TOGGLE_SELF_SERVER_GROUP) Could not get self client db id",
+                                                 targetServer, error_my_db_id, true);
                                 ret = 1;
                             }
                             else
                             {
-                                if (myServerGroups.contains(serverGroupId))
-                                    ts3Functions.requestServerGroupDelClient(targetServer,serverGroupId,myDbId,NULL);
-                                else
-                                    ts3Functions.requestServerGroupAddClient(targetServer,serverGroupId,myDbId,NULL);
+                                const bool add = !myServerGroups.contains(serverGroupId);
+                                funcs::permissions::server_group::request_change_client(
+                                targetServer, add, serverGroupId, my_db_id);
 
                                 ret = 0;
                             }
@@ -279,78 +295,104 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
             ret = 1;
         else
         {
-            unsigned int error;
             uint64 targetServer = 0;
             auto serverName = args_qs.takeFirst();
-
-            if ((error = TSHelpers::GetServerHandler(serverName,&targetServer)) != ERROR_ok)
+            auto error_connection_id = TSHelpers::GetServerHandler(serverName, &targetServer);
+            if (error_connection_id)
                 ret = 0;
             else
             {
-                anyID myID;
-                if((error = ts3Functions.getClientID(targetServer,&myID)) != ERROR_ok)
+                const auto [error_my_id, my_id] = funcs::get_client_id(targetServer);
+                if (error_my_id)
                 {
-                    TSLogging::Error("(SET_SELF_CHANNEL_GROUP)",targetServer,error,true);
+                    TSLogging::Error("(SET_SELF_CHANNEL_GROUP)", targetServer, error_my_id, true);
                     ret = 0;
                 }
                 else
                 {
                     // Doesn't work with ClientSelf
-                    uint64 myDbId;
-                    if ((error = ts3Functions.getClientVariableAsUInt64(targetServer, myID, CLIENT_DATABASE_ID, &myDbId)) != ERROR_ok)
+                    const auto [error_my_db_id, my_db_id] =
+                    funcs::get_client_property_as_uint64(targetServer, my_id, CLIENT_DATABASE_ID);
+                    if (error_my_db_id)
                     {
-                        TSLogging::Error("(SET_SELF_CHANNEL_GROUP) Could not get self client db id", targetServer, error, true);
+                        TSLogging::Error("(SET_SELF_CHANNEL_GROUP) Could not get self client db id",
+                                         targetServer, error_my_db_id, true);
                         ret = 1;
                     }
                     else
                     {
-                        uint64 myChannelGroupId;
-                        if ((error = ts3Functions.getClientVariableAsUInt64(targetServer, myID, CLIENT_CHANNEL_GROUP_ID, &myChannelGroupId)) != ERROR_ok)
+                        const auto [error_my_channel_group, my_channel_group_id] =
+                        funcs::get_client_property_as_uint64(targetServer, my_id, CLIENT_CHANNEL_GROUP_ID);
+                        if (error_my_channel_group)
                         {
-                            TSLogging::Error("(SET_SELF_CHANNEL_GROUP)",targetServer,error,true);
+                            TSLogging::Error("(SET_SELF_CHANNEL_GROUP)", targetServer, error_my_channel_group,
+                                             true);
                             ret = 0;
                         }
                         else
                         {
-                            uint64 channelGroupId;
-                            auto channelGroupName = args_qs.takeFirst();
-                            if (channelGroupName == QLatin1String("DEFAULT_CHANNEL_GROUP"))
-                                channelGroupId = plugin->servers_info().get_server_info(targetServer)->getDefaultChannelGroup();
+                            auto channel_group_id = com::teamspeak::permission_group_id_t{0};
+                            const auto channel_group_name = args_qs.takeFirst();
+                            if (channel_group_name == QLatin1String("DEFAULT_CHANNEL_GROUP"))
+                            {
+                                channel_group_id = plugin->servers_info()
+                                                   .get_server_info(targetServer)
+                                                   ->getDefaultChannelGroup();
+                            }
                             else
-                                channelGroupId = plugin->servers_info().get_server_info(targetServer)->GetChannelGroupId(channelGroupName);
+                            {
+                                channel_group_id = plugin->servers_info()
+                                                   .get_server_info(targetServer)
+                                                   ->GetChannelGroupId(channel_group_name);
+                            }
 
-                            if ((channelGroupId == (uint64)NULL) || (channelGroupId == myChannelGroupId))
+                            if ((channel_group_id == (uint64) NULL) ||
+                                (channel_group_id == my_channel_group_id))
                                 ret = 1;
                             else
                             {
-                                uint64 targetChannelId;
+                                std::error_code error_target_channel_id;
+                                auto target_channel_id = com::teamspeak::channel_id_t{0};
                                 if (cmd_qs == QLatin1String("SET_SELF_CHANNEL_GROUP"))
                                 {
-                                    if ((error = ts3Functions.getChannelOfClient(targetServer,myID,&targetChannelId)) != ERROR_ok)
+                                    const auto [error_my_channel, my_channel_id] =
+                                    funcs::get_channel_of_client(connection_id, my_id);
+                                    if (error_my_channel)
                                     {
-                                        TSLogging::Error("(SET_SELF_CHANNEL_GROUP)",targetServer,error,true);
+                                        TSLogging::Error("(SET_SELF_CHANNEL_GROUP)", targetServer,
+                                                         error_my_channel, true);
                                         ret = 0;
+                                        error_target_channel_id = error_my_channel;
                                     }
+                                    else
+                                        target_channel_id = my_channel_id;
                                 }
                                 else if (cmd_qs == QLatin1String("SET_SELF_CHANNEL_GROUP_INHERITED"))
                                 {
-                                    int inheritingChannelId;
-                                    if ((error = ts3Functions.getClientVariableAsInt(targetServer, myID, CLIENT_CHANNEL_GROUP_INHERITED_CHANNEL_ID, &inheritingChannelId)) != ERROR_ok)
+                                    const auto [error_inherited, inheriting_channel_id] =
+                                    funcs::get_client_property_as_uint64(
+                                    targetServer, my_id, CLIENT_CHANNEL_GROUP_INHERITED_CHANNEL_ID);
+                                    if (error_inherited)
                                     {
-                                        TSLogging::Error("(SET_SELF_CHANNEL_GROUP)",targetServer,error,true);
+                                        TSLogging::Error("(SET_SELF_CHANNEL_GROUP)", targetServer,
+                                                         error_inherited, true);
                                         ret = 0;
+                                        error_target_channel_id = error_inherited;
                                     }
                                     else
-                                        targetChannelId = (uint64)inheritingChannelId;
+                                        target_channel_id = inheriting_channel_id;
                                 }
-                                if (error == ERROR_ok)
+                                if (!error_target_channel_id)
                                 {
-                                    const int SIZE = 1;
-                                    uint64 channelGroupIdArray[SIZE] = { channelGroupId };
-                                    uint64 channelIdArray[SIZE] = { targetChannelId };
-                                    uint64 clientDbIdArray[SIZE] = { myDbId };
-//                                    TSLogging::Log(QString("SET_SELF_CHANNEL_GROUP: %1 %2 %3").arg(channelGroupIdArray[0]).arg(channelIdArray[0]).arg(clientDbIdArray[0]));
-                                    ts3Functions.requestSetClientChannelGroup(targetServer, &channelGroupIdArray[0], &channelIdArray[0], &clientDbIdArray[0], SIZE, NULL);
+                                    funcs::permissions::channel_group::Set_Client_Channel_Group_Entry entry;
+                                    entry.channel_group_id = channel_group_id;
+                                    entry.channel_id = target_channel_id;
+                                    entry.client_db_id = my_db_id;
+                                    auto entries = std::array<
+                                    funcs::permissions::channel_group::Set_Client_Channel_Group_Entry, 1>{};
+                                    entries[0] = entry;
+                                    funcs::permissions::channel_group::request_set_client(connection_id,
+                                                                                          entries);
                                 }
                             }
                         }
@@ -360,7 +402,7 @@ int ts3plugin_processCommand(uint64 serverConnectionHandlerID, const char* comma
         }
     }
     else
-        ret = plugin->process_command(serverConnectionHandlerID, cmd_qs, args_qs); // Dispatch
+        ret = plugin->process_command(connection_id, cmd_qs, args_qs);  // Dispatch
 
     command_mutex.unlock();
     return ret;
@@ -485,7 +527,9 @@ void ts3plugin_onClientMoveMovedEvent(uint64 serverConnectionHandlerID, anyID cl
 
 int ts3plugin_onServerErrorEvent(uint64 serverConnectionHandlerID, const char* errorMessage, unsigned int error, const char* returnCode, const char* extraMessage)
 {
-    return plugin->on_server_error(serverConnectionHandlerID, errorMessage, error, returnCode, extraMessage);  /* If no plugin return code was used, the return value of this function is ignored */
+    return plugin->onServerError(
+    serverConnectionHandlerID, errorMessage, error, returnCode,
+    extraMessage); /* If no plugin return code was used, the return value of this function is ignored */
 }
 
 void ts3plugin_onTalkStatusChangeEvent(uint64 serverConnectionHandlerID, int status, int isReceivedWhisper, anyID clientID)

@@ -6,8 +6,11 @@
 
 #include "teamspeak/public_definitions.h"
 
+#include "gsl/pointers"
+
 // Ptt Enum
-enum PTT_CHANGE_STATUS {
+enum PTT_CHANGE_STATUS
+{
     PTT_ACTIVATE = 0,
     PTT_DEACTIVATE,
     PTT_TOGGLE
@@ -16,13 +19,15 @@ enum PTT_CHANGE_STATUS {
 class TSPtt : public QObject
 {
     Q_OBJECT
-public:
-    static TSPtt* instance() {
+  public:
+    static TSPtt *instance()
+    {
         static QMutex mutex;
-        if(!m_Instance) {
+        if (!m_Instance)
+        {
             mutex.lock();
 
-            if(!m_Instance)
+            if (!m_Instance)
                 m_Instance = new TSPtt;
 
             mutex.unlock();
@@ -30,7 +35,8 @@ public:
         return m_Instance;
     }
 
-    static void drop() {
+    static void drop()
+    {
         static QMutex mutex;
         mutex.lock();
         delete m_Instance;
@@ -38,27 +44,27 @@ public:
         mutex.unlock();
     }
 
-    void Init(QMutex* mutex_cmd);
-    
+    void Init(QMutex *mutex_cmd);
+
     int SetPushToTalk(uint64 serverConnectionHandlerID, PTT_CHANGE_STATUS action);
     int SetPushToTalk(uint64 scHandlerID, bool shouldTalk);
 
-signals:
+  signals:
     void PttDelayFinished();
 
-public slots:
+  public slots:
     void onPttDelayFinished();
 
-private:
+  private:
     explicit TSPtt();
     ~TSPtt();
-    static TSPtt* m_Instance;
+    static TSPtt *m_Instance;
     TSPtt(const TSPtt &);
-    TSPtt& operator=(const TSPtt &);
+    TSPtt &operator=(const TSPtt &);
 
-    QMutex* command_mutex;
+    QMutex *command_mutex = nullptr;
 
-    QTimer* timer;
+    gsl::owner<QTimer *> timer = nullptr;
 
     bool pttActive = false;
     bool vadActive = false;

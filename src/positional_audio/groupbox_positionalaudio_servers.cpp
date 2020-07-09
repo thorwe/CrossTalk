@@ -1,35 +1,35 @@
 #include "groupbox_positionalaudio_servers.h"
 
-#include <QtWidgets/QMessageBox>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QListWidget>
 #include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QListWidget>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QPushButton>
 
 #include "core/ts_helpers_qt.h"
-#include "core/ts_serversinfo.h"
 #include "core/ts_logging_qt.h"
+#include "core/ts_serversinfo.h"
 
-GroupBoxPositionalAudioServers::GroupBoxPositionalAudioServers(QWidget *parent) :
-    QGroupBox(parent),
-    m_servers(new QListWidget),
-    m_settings(new QGroupBox(tr("Enabled"))),
-    m_send_interval(new QDoubleSpinBox),
-    m_send_interval_silent_inc(new QDoubleSpinBox),
-    m_unblock(new QPushButton(tr("Unblock"))),
-    m_remove(new QPushButton(QIcon(":/icons/delete.png"), QString::null))       //"gfx/default/16x16_delete.png"
+GroupBoxPositionalAudioServers::GroupBoxPositionalAudioServers(QWidget *parent)
+    : QGroupBox(parent)
+    , m_servers(new QListWidget)
+    , m_settings(new QGroupBox(tr("Enabled")))
+    , m_send_interval(new QDoubleSpinBox)
+    , m_send_interval_silent_inc(new QDoubleSpinBox)
+    , m_unblock(new QPushButton(tr("Unblock")))
+    , m_remove(new QPushButton(QIcon(":/icons/delete.png"), QString::null))  //"gfx/default/16x16_delete.png"
 {
     setTitle(tr("Server Settings"));
-    
-    auto layout = new QGridLayout;
+
+    auto layout = new QGridLayout();
 
     m_servers->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_servers->setResizeMode(QListView::Adjust);
     connect(m_servers, &QListWidget::currentTextChanged, this, &GroupBoxPositionalAudioServers::changePage);
     layout->addWidget(m_servers, 0, 0, 1, 2);
 
-    auto add_button = new QPushButton(QIcon(":/icons/add.png"), QString::null); //"gfx/default/16x16_add.png"
+    auto add_button = new QPushButton(QIcon(":/icons/add.png"), QString::null);  //"gfx/default/16x16_add.png"
     add_button->setFocusPolicy(Qt::FocusPolicy::NoFocus);
     add_button->setToolTip(tr("Add current server tab as custom server setting"));
     connect(add_button, &QPushButton::clicked, this, &GroupBoxPositionalAudioServers::addButtonClicked);
@@ -46,21 +46,26 @@ GroupBoxPositionalAudioServers::GroupBoxPositionalAudioServers(QWidget *parent) 
         m_settings->setChecked(false);
 
         auto settings_layout = new QVBoxLayout;
-        connect(m_settings, &QGroupBox::toggled, this, &GroupBoxPositionalAudioServers::onEnabledCheckToggled);
+        connect(m_settings, &QGroupBox::toggled, this,
+                &GroupBoxPositionalAudioServers::onEnabledCheckToggled);
 
         settings_layout->addWidget(new QLabel(tr("Send Interval")));
-        connect(m_send_interval, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &GroupBoxPositionalAudioServers::onSendIntervalSpinBoxValueChanged);
+        connect(m_send_interval, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+                this, &GroupBoxPositionalAudioServers::onSendIntervalSpinBoxValueChanged);
         settings_layout->addWidget(m_send_interval);
 
         settings_layout->addWidget(new QLabel(tr("Silent +")));
-        connect(m_send_interval_silent_inc, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &GroupBoxPositionalAudioServers::onSendIntervalSilentIncSpinBoxValueChanged);
+        connect(m_send_interval_silent_inc,
+                static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this,
+                &GroupBoxPositionalAudioServers::onSendIntervalSilentIncSpinBoxValueChanged);
         settings_layout->addWidget(m_send_interval_silent_inc);
 
         auto sp_retain = m_unblock->sizePolicy();
         sp_retain.setRetainSizeWhenHidden(true);
         m_unblock->setSizePolicy(sp_retain);
 
-        connect(m_unblock, &QPushButton::clicked, this, &GroupBoxPositionalAudioServers::onUnblockButtonClicked);
+        connect(m_unblock, &QPushButton::clicked, this,
+                &GroupBoxPositionalAudioServers::onUnblockButtonClicked);
         settings_layout->addWidget(m_unblock);
 
         m_settings->setLayout(settings_layout);
@@ -169,9 +174,9 @@ void GroupBoxPositionalAudioServers::UpdateUIServerSendInterval(QString serverUn
     const auto kRowName = selectedItems.at(0)->text();
     if (m_ServerSettingsMap.value(serverUniqueId).serverName == kRowName)
     {
-//        m_send_interval->blockSignals(true);
+        //        m_send_interval->blockSignals(true);
         m_send_interval->setValue(val);
-//        m_send_interval->blockSignals(false);
+        //        m_send_interval->blockSignals(false);
     }
 }
 
@@ -192,9 +197,9 @@ void GroupBoxPositionalAudioServers::UpdateUIServerSendIntervalSilentInc(QString
     const auto kRowName = selectedItems.at(0)->text();
     if (m_ServerSettingsMap.value(serverUniqueId).serverName == kRowName)
     {
-//        m_send_interval_silent_inc->blockSignals(true);
+        //        m_send_interval_silent_inc->blockSignals(true);
         m_send_interval_silent_inc->setValue(val);
-//        m_send_interval_silent_inc->blockSignals(false);
+        //        m_send_interval_silent_inc->blockSignals(false);
     }
 }
 
@@ -213,7 +218,8 @@ void GroupBoxPositionalAudioServers::UpdateUIServerSelect(QString serverUniqueId
     }
 }
 
-//void GroupBoxPositionalAudioServers::UpdateServerSettings(QMap<QString, PositionalAudio_ServerSettings> map)
+// void GroupBoxPositionalAudioServers::UpdateServerSettings(QMap<QString, PositionalAudio_ServerSettings>
+// map)
 //{
 //    m_ServerSettingsMap = map;
 //    m_servers->addItems(QStringList(map.keys()));

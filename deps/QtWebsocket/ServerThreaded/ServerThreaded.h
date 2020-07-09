@@ -29,44 +29,38 @@ along with QtWebsocket.  If not, see <http://www.gnu.org/licenses/>.
 
 class ServerThreaded : public QObject
 {
-	Q_OBJECT
+    Q_OBJECT
 
-    Q_PROPERTY(bool enabled
-               READ isEnabled
-               WRITE setEnabled
-               NOTIFY enabledToggled)
-    Q_PROPERTY(quint16 port
-               READ getPort
-               WRITE setPort
-               NOTIFY portChanged)
+    Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledToggled)
+    Q_PROPERTY(quint16 port READ getPort WRITE setPort NOTIFY portChanged)
 
-public:
-	ServerThreaded();
-	~ServerThreaded();
+  public:
+    ServerThreaded();
+    ~ServerThreaded() = default;
 
     bool isEnabled() const;
     quint16 getPort() const;
 
-public slots:
+  public slots:
     void setEnabled(bool val);
     void setPort(quint16 val);
 
-	void processNewConnection();
+    void processNewConnection();
 
-signals:
+  signals:
     void enabledToggled(bool);
     void portChanged(quint16);
-	void broadcastMessage(QString message);
+    void broadcastMessage(QString message);
     void messageReceived(QString message);
 
-private:
-    QtWebsocket::QWsServer* m_Server;
+  private:
+    QtWebsocket::QWsServer *m_Server = nullptr;
 
     void start();
     void stop();
 
-    bool m_isEnabled;
-    quint16 m_Port;
+    bool m_isEnabled{false};
+    quint16 m_Port{0};
 };
 
-#endif // SERVERTHREADED_H
+#endif  // SERVERTHREADED_H

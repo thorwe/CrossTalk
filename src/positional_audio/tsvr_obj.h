@@ -1,74 +1,50 @@
 #pragma once
 
+#include "teamspeak/public_definitions.h"
 #include <QtCore/QObject>
 #include <QtCore/QTextStream>
-#include "teamspeak/public_definitions.h"
 
+#include "definitions_positionalaudio.h"
 #include "tsvr_definitions.h"
+
+#include <string_view>
+
+#include <string>
+#include <vector>
 
 class TsVrObj : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QString vr
-               READ getVr
-               WRITE setVr)
-    Q_PROPERTY(QString vrDescription
-               READ getVrDescription
-               WRITE setVrDescription)
-    Q_PROPERTY(QString context
-               READ getContext
-               WRITE setContext)
-    Q_PROPERTY(QString identity
-               READ getIdentity)
-    Q_PROPERTY(QString identityRaw
-               READ getIdentityRaw
-               WRITE setIdentityRaw)
-
-public:
-    explicit TsVrObj(QObject *parent = 0);
-
-    QString getVr() const;
-    QString getVrDescription() const;
-    QString getContext() const;
-    QString getIdentity() const;
-    QString getIdentityRaw() const;
-    TS3_VECTOR getAvatarPosition() const;
-    TS3_VECTOR getAvatarFront() const;
-    TS3_VECTOR getAvatarTop() const;
+  public:
+    std::wstring get_vr() const;
+    std::wstring get_vr_description() const;
+    std::vector<std::byte> get_context() const;
+    std::string get_context_as_string() const;
+    std::wstring getIdentity() const;
+    std::wstring getIdentityRaw() const;
+    thorwe::Three_Dee_Info get_avatar() const;
 
     bool onInfoDataChanged(QTextStream &data);
 
-    void setCustomEnvironmentSupport(QObject* val);
+    void setCustomEnvironmentSupport(QObject *val);
 
-signals:
-    void vrChanged(TsVrObj*,QString);
-    void vrDescriptionChanged(TsVrObj*,QString);
-    void contextChanged(TsVrObj*,QString);
-    void identityChanged(TsVrObj*,QString);
-    void identityRawChanged(TsVrObj*,QString);
-    void avatarChanged(TsVrObj*,bool,bool,bool);
+    void set_vr(std::wstring_view val);
+    void set_vr_description(std::wstring_view val = L"");
+    void set_context(const std::vector<std::byte> &);
+    void setIdentityRaw(std::wstring_view val);
+    void reset_avatar();
 
-public slots:
-    void setVr(QString val);
-    void setVrDescription(QString val);
-    void setContext(QString val);
-    void setIdentityRaw(QString val);
-    void resetAvatar();
+  protected:
+    thorwe::Three_Dee_Info m_avatar;
 
-protected:
-    TS3_VECTOR m_Avatar_Pos;
-    TS3_VECTOR m_Avatar_Front;
-    TS3_VECTOR m_Avatar_Top;
+  private:
+    std::wstring m_vr;
+    std::wstring m_vr_desc;
+    std::vector<std::byte> m_context;
+    std::wstring m_identityRaw;
 
-private:
-    QString m_vr;
-    QString m_vr_desc;
-    QString m_context;
-    QString m_identityRaw;
-
-    QObject* m_CustomEnvironmentSupport = nullptr;
+    QObject *m_CustomEnvironmentSupport = nullptr;
 };
 
 bool operator==(const TS3_VECTOR &veca, const TS3_VECTOR &vecb);
-bool operator==(const TS3_VECTOR &vec, const float *arr);

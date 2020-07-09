@@ -1,10 +1,15 @@
 #pragma once
 
+#include "mod_position_spread.h"
+
+#include "core/ts_context_menu_qt.h"
+
 #include <QtCore/QObject>
 #include <QtCore/QPointer>
 #include <QtWidgets/QDialog>
-#include "core/ts_context_menu_qt.h"
-#include "mod_position_spread.h"
+
+namespace thorwe
+{
 
 class SettingsPositionSpread : public QObject, public ContextMenuInterface
 {
@@ -41,3 +46,5 @@ private:
 
     QPointer<PositionSpread> mP_positionSpread;
 };
+
+}  // namespace thorwe

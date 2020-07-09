@@ -3,102 +3,26 @@
 TsVrObjSelf::TsVrObjSelf(QObject *parent)
 {
     this->setParent(parent);
-    resetAvatar();
-    resetCamera();
 }
 
-TS3_VECTOR TsVrObjSelf::getCameraPosition() const
+thorwe::Three_Dee_Info TsVrObjSelf::get_camera() const
 {
-    return m_Camera_Pos;
+    return m_camera;
 }
 
-TS3_VECTOR TsVrObjSelf::getCameraFront() const
+void TsVrObjSelf::set_avatar(const thorwe::Three_Dee_Info &value)
 {
-    return m_Camera_Front;
+    m_avatar = value;
 }
 
-TS3_VECTOR TsVrObjSelf::getCameraTop() const
+void TsVrObjSelf::set_camera(const thorwe::Three_Dee_Info &value)
 {
-    return m_Camera_Top;
+    m_camera = value;
 }
 
-bool TsVrObjSelf::setAvatar(const float *position, const float *front, const float *top)
+void TsVrObjSelf::reset_camera()
 {
-    bool isDirtyPosition = !(m_Avatar_Pos == position);
-    if (isDirtyPosition)
-    {
-        m_Avatar_Pos.x = position[0];
-        m_Avatar_Pos.y = position[1];
-        m_Avatar_Pos.z = position[2];
-    }
-
-    bool isDirtyFront = !(m_Avatar_Front == front);
-    if (isDirtyFront)
-    {
-        m_Avatar_Front.x = front[0];
-        m_Avatar_Front.y = front[1];
-        m_Avatar_Front.z = front[2];
-    }
-
-    bool isDirtyTop = !(m_Avatar_Top == top);
-    if (isDirtyTop)
-    {
-        m_Avatar_Top.x = top[0];
-        m_Avatar_Top.y = top[1];
-        m_Avatar_Top.z = top[2];
-    }
-
-    bool isDirty = (isDirtyPosition || isDirtyFront || isDirtyTop);
-    if (isDirty)
-        emit avatarChanged(this,isDirtyPosition,isDirtyFront,isDirtyTop);
-
-    return isDirty;
-}
-
-bool TsVrObjSelf::setCamera(const float *position, const float *front, const float *top)
-{
-    bool isDirtyPosition = !(m_Camera_Pos == position);
-    if (isDirtyPosition)
-    {
-        m_Camera_Pos.x = position[0];
-        m_Camera_Pos.y = position[1];
-        m_Camera_Pos.z = position[2];
-    }
-
-    bool isDirtyFront = !(m_Camera_Front == front);
-    if (isDirtyFront)
-    {
-        m_Camera_Front.x = front[0];
-        m_Camera_Front.y = front[1];
-        m_Camera_Front.z = front[2];
-    }
-
-    bool isDirtyTop = !(m_Camera_Top == top);
-    if (isDirtyTop)
-    {
-        m_Camera_Top.x = top[0];
-        m_Camera_Top.y = top[1];
-        m_Camera_Top.z = top[2];
-    }
-
-    bool isDirty = (isDirtyPosition || isDirtyFront || isDirtyTop);
-    if (isDirty)
-        emit cameraChanged(isDirtyPosition,isDirtyFront,isDirtyTop);
-
-    return isDirty;
-}
-
-void TsVrObjSelf::resetCamera()
-{
-    m_Camera_Pos.x = 0.0f;
-    m_Camera_Pos.y = 0.0f;
-    m_Camera_Pos.z = 0.0f;
-
-    m_Camera_Front.x = 0.0f;
-    m_Camera_Front.y = 0.0f;
-    m_Camera_Front.z = 0.0f;
-
-    m_Camera_Top.x = 0.0f;
-    m_Camera_Top.y = 0.0f;
-    m_Camera_Top.z = 0.0f;
+    m_camera.position = {0.f, 0.f, 0.f};
+    m_camera.front = {0.f, 0.f, 0.f};
+    m_camera.top = {0.f, 0.f, 0.f};
 }

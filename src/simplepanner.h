@@ -1,61 +1,31 @@
 #pragma once
 
-#include <QtCore/QObject>
+#include <gsl/span>
 
-class SimplePanner : public QObject
+#include <atomic>
+
+class SimplePanner
 {
-    Q_OBJECT
+  public:
+    void set_current(float);
+    float get_current() const;
+    void set_desired(float);
+    float get_desired() const;
+    void set_desired_by_manual(float);
+    float get_desired_by_manual() const;
+    void set_desired_by_pan_adjuster(float);
+    float get_desired_by_pan_adjuster() const;
+    void set_adjust(bool);
+    bool get_adjust() const;
 
-    Q_PROPERTY(float panCurrent READ getPanCurrent WRITE setPanCurrent)
-    Q_PROPERTY(float panDesired READ getPanDesired WRITE setPanDesired)
-    Q_PROPERTY(float panDesiredByManual READ getPanDesiredByManual WRITE setPanDesiredByManual)
-    Q_PROPERTY(float panDesiredByPanAdjuster READ getPanDesiredByPanAdjuster WRITE setPanDesiredByPanAdjuster)
-    Q_PROPERTY(float apaAttackRate READ getApaAttackRate WRITE setApaAttackRate)
-    Q_PROPERTY(float apaDecayRate READ getApaDecayRate WRITE setApaDecayRate)
-    Q_PROPERTY(bool panAdjustment READ getPanAdjustment WRITE setPanAdjustment)
+    void process(gsl::span<int16_t> samples, int channels, int leftChannelNr, int rightChannelNr);
 
-public:
-    explicit SimplePanner(QObject *parent = 0);
-    
-    // Properties
-    void setPanCurrent(float);
-    float getPanCurrent() const;
-    void setPanDesired(float);
-    float getPanDesired() const;
-    void setPanDesiredByManual(float);
-    float getPanDesiredByManual() const;
-    float getPanDesiredByPanAdjuster() const;
-    float getApaAttackRate() const;
-    float getApaDecayRate() const;
-    bool getPanAdjustment() const;
-
-signals:
-    void ApaAttackRateChanged(float);
-    void ApaDecayRateChanged(float);
-    void ChannelPanAdjusted(float);
-
-public slots:
-    void setApaAttackRate(float);
-    void setApaDecayRate(float);
-    void setPanAdjustment(bool);
-    void setPanDesiredByPanAdjuster(float);
-
-
-    void process(short *samples, int sampleCount, int channels, int leftChannelNr, int rightChannelNr);
-
-private:
-    //void process(int sampleCount, short *pleft, short *pright);
-    static void process(int nSamples, QList<float> *pleft, QList<float> *pright, float balance);
-    unsigned short sampleRate = 48000;
-
-    bool panAdjustment = false;
+  private:
+    std::atomic_bool m_adjust = false;
 
     // Property Privates
-    float panCurrent = 0.0f;                // decibels
-    float panDesired = 0.0f;                // decibels
-    float panDesiredByManual = 0.0f;        // decibels
-    float panDesiredByPanAdjuster = 0.0f;   // decibels
-
-    float apaAttackRate = 20.0f;
-    float apaDecayRate = 1.0f;
+    std::atomic<float> m_current{0.0f};                   // decibels
+    std::atomic<float> m_desired = 0.0f;                  // decibels
+    std::atomic<float> m_desired_by_manual = 0.0f;        // decibels
+    std::atomic<float> m_desired_by_pan_adjuster = 0.0f;  // decibels
 };
