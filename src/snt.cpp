@@ -62,7 +62,7 @@ void SnT::onClientSelfVariableUpdateEvent(uint64 connection_id,
     }
 }
 
-std::string SnT::getReturnCode() const
+auto SnT::getReturnCode() const -> std::string
 {
     return m_return_code;
 }
@@ -118,11 +118,11 @@ void SnT::ParseCommand(uint64 connection_id, const QString &cmd, const QStringLi
 
     if (m_return_code.empty())
     {
-        auto plugin = qobject_cast<Plugin_Base *>(parent());
+        auto *plugin = qobject_cast<Plugin_Base *>(parent());
         m_return_code = funcs::create_return_code(plugin->id());
     }
 
-    auto ptt = TSPtt::instance();
+    auto *ptt = TSPtt::instance();
     connect(ptt, &TSPtt::PttDelayFinished, this, &SnT::PttDelayFinished,
             Qt::UniqueConnection);  // UniqueConnection saving init
 
@@ -179,7 +179,7 @@ void SnT::ParseCommand(uint64 connection_id, const QString &cmd, const QStringLi
     }
     else if (cmd == "TS3_NEXT_TAB_AND_WHISPER_ALL_CC_START")
     {
-        uint64 nextServer;
+        auto nextServer = uint64{0};
         if (const auto error = TSHelpers::GetActiveServerRelative(scHandlerID, true, &nextServer); error)
             TSLogging::Error("Could not get next server.", scHandlerID, error);
 
@@ -207,7 +207,7 @@ void SnT::ParseCommand(uint64 connection_id, const QString &cmd, const QStringLi
     }
     else if (cmd == QLatin1String("TS3_NEXT_TAB_AND_TALK_START"))
     {
-        uint64 nextServer;
+        auto nextServer = uint64{0};
         if (const auto error = TSHelpers::GetActiveServerRelative(scHandlerID, true, &nextServer); error)
             TSLogging::Error("Could not get next server.", scHandlerID, error);
 
@@ -287,7 +287,7 @@ void SnT::ParseCommand(uint64 connection_id, const QString &cmd, const QStringLi
         {
             if (args.count() == 4)
             {
-                auto server_info = m_servers_info.get_server_info(targetServer);
+                auto *server_info = m_servers_info.get_server_info(targetServer);
                 if (!server_info)
                     return;
 
@@ -303,7 +303,7 @@ void SnT::ParseCommand(uint64 connection_id, const QString &cmd, const QStringLi
                     return;
 
                 // Blacklist default channel group only with no arg
-                auto server_info = m_servers_info.get_server_info(targetServer);
+                auto *server_info = m_servers_info.get_server_info(targetServer);
                 if (!server_info || server_info->getDefaultChannelGroup() == arg)
                     return;
             }
@@ -316,7 +316,7 @@ void SnT::ParseCommand(uint64 connection_id, const QString &cmd, const QStringLi
                 return;
             }
 
-            auto server_info = m_servers_info.get_server_info(targetServer);
+            auto *server_info = m_servers_info.get_server_info(targetServer);
             if (!server_info)
                 return;
 
@@ -367,7 +367,7 @@ void SnT::ParseCommand(uint64 connection_id, const QString &cmd, const QStringLi
     }
     else if (cmd == QLatin1String("TS3_NEXT_TAB_AND_WHISPER_START"))
     {
-        uint64 nextServer;
+        auto nextServer = uint64{0};
         if (const auto error = TSHelpers::GetActiveServerRelative(scHandlerID, true, &nextServer); error)
             TSLogging::Error("Could not get next server.", scHandlerID, error);
 
@@ -392,11 +392,11 @@ void SnT::ParseCommand(uint64 connection_id, const QString &cmd, const QStringLi
         else if (groupWhisperType == GROUPWHISPERTYPE_CHANNELGROUP)
         {
             // Get My Channel Group
-            uint64 myChannelGroup;
+            auto myChannelGroup = uint64{0};
             if (const auto error = TSHelpers::GetClientChannelGroup(nextServer, &myChannelGroup); error)
                 return;
 
-            auto server_info = m_servers_info.get_server_info(nextServer);
+            auto *server_info = m_servers_info.get_server_info(nextServer);
             if (!server_info || server_info->getDefaultChannelGroup() == myChannelGroup)
                 return;
         }
@@ -447,7 +447,7 @@ void SnT::PttDelayFinished()
     TSPtt::instance()->SetPushToTalk(TSHelpers::GetActiveServerConnectionHandlerID(), false);
 }
 
-GroupWhisperTargetMode SnT::GetGroupWhisperTargetMode(const QString& val)
+auto SnT::GetGroupWhisperTargetMode(const QString &val) -> GroupWhisperTargetMode
 {
     GroupWhisperTargetMode groupWhisperTargetMode = GROUPWHISPERTARGETMODE_ENDMARKER;
 
@@ -469,7 +469,7 @@ GroupWhisperTargetMode SnT::GetGroupWhisperTargetMode(const QString& val)
     return groupWhisperTargetMode;
 }
 
-GroupWhisperType SnT::GetGroupWhisperType(const QString &val)
+auto SnT::GetGroupWhisperType(const QString &val) -> GroupWhisperType
 {
     GroupWhisperType groupWhisperType = GROUPWHISPERTYPE_ENDMARKER;
     if (val.contains(QLatin1String("COMMANDER"), Qt::CaseInsensitive))

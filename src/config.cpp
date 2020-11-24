@@ -29,12 +29,12 @@ Config::Config(QWidget *parent)
 
     // Create Settings UI
 
-    auto groupBoxWSS = new QGroupBox(tr("WebSockets Server"), this);
+    auto *groupBoxWSS = new QGroupBox(tr("WebSockets Server"), this);
     groupBoxWSS->setCheckable(true);
-    auto groupBoxWSSLayout = new QHBoxLayout;
-    auto wssLabel = new QLabel(tr("Port"), this);
+    auto *groupBoxWSSLayout = new QHBoxLayout;
+    auto *wssLabel = new QLabel(tr("Port"), this);
     groupBoxWSSLayout->addWidget(wssLabel, 0, Qt::AlignRight);
-    auto wssSpinBox = new QSpinBox(this);
+    auto *wssSpinBox = new QSpinBox(this);
     wssSpinBox->setMaximum(kWssSpinboxMaximum);
     wssSpinBox->setMinimumWidth(kWssSpinboxMinWidth);
     groupBoxWSSLayout->addWidget(wssSpinBox, 0, Qt::AlignLeft);
@@ -46,7 +46,7 @@ Config::Config(QWidget *parent)
     QSettings cfg(TSHelpers::GetPath(teamspeak::plugin::Path::PluginIni), QSettings::IniFormat);
 
     // WebSocket Server
-    bool ok;
+    auto ok = false;
     quint16 port = cfg.value("server_port", kDefaultPort).toUInt(&ok);
     if (!ok)
     {

@@ -5,7 +5,7 @@ TsVrObjSelf::TsVrObjSelf(QObject *parent)
     this->setParent(parent);
 }
 
-thorwe::Three_Dee_Info TsVrObjSelf::get_camera() const
+auto TsVrObjSelf::get_camera() const -> thorwe::Three_Dee_Info
 {
     return m_camera;
 }

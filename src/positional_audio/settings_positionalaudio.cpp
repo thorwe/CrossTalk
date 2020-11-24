@@ -33,7 +33,7 @@ void SettingsPositionalAudio::Init(PositionalAudio *positionalAudio)
 {
     if (m_ContextMenuUi == -1)
     {
-        auto plugin = qobject_cast<Plugin_Base *>(parent());
+        auto *plugin = qobject_cast<Plugin_Base *>(parent());
         auto &context_menu = plugin->context_menu();
         m_ContextMenuUi =
         context_menu.Register(this, PLUGIN_MENU_TYPE_GLOBAL, "Positional Audio", "radar_16.png");
@@ -227,7 +227,7 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
                 //                p_config->UpdateServerSettingsSet(map);
                 //                emit UpdateServerSettingsSet(map);
                 const auto connection_id = pluginsdk::funcs::get_current_server_connection_handler_id();
-                auto server_info = m_servers_info.get_server_info(connection_id);
+                auto *server_info = m_servers_info.get_server_info(connection_id);
                 emit UpdateUIServerSelect(server_info ? server_info->getUniqueId() : "default");
                 cfg.endGroup();
 
@@ -283,7 +283,7 @@ void SettingsPositionalAudio::onContextMenuEvent(uint64 serverConnectionHandlerI
         {
             QUrl gwUrl("http://thorwe.github.io/CrossTalk/misc/site/gw2/html/gw2maps-leaflet.html");
 
-            auto plugin = qobject_cast<Plugin *>(parent());
+            auto *plugin = qobject_cast<Plugin *>(parent());
             auto &websocket_server = plugin->websocket_server();
             const auto kPort = websocket_server.getPort();
             gwUrl.setQuery(QString("websocket_port=%1").arg(kPort));
@@ -311,7 +311,7 @@ void SettingsPositionalAudio::AddCustomServerSettingForCurrentTab()
 
 void SettingsPositionalAudio::AddCustomServerSetting(uint64 serverConnectionHandlerID)
 {
-    auto server_info = m_servers_info.get_server_info(serverConnectionHandlerID);
+    auto *server_info = m_servers_info.get_server_info(serverConnectionHandlerID);
     if (!server_info)
     {
         QMessageBox msgBoxNotConnected;
@@ -466,7 +466,7 @@ void SettingsPositionalAudio::SetServerBlock(QString serverUniqueId,
             const auto kSendIntervalSilentInc = cfg.value("send_interval_silentinc", 1.0f).toFloat();
             cfg.endGroup();
             cfg.beginGroup(serverUniqueId);
-            auto server_info = m_servers_info.get_server_info(serverConnectionHandlerID);
+            auto *server_info = m_servers_info.get_server_info(serverConnectionHandlerID);
             if (!server_info)
                 cfg.endGroup();
             else

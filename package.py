@@ -45,7 +45,7 @@ def compress(file_names, arch):
         zf.close()
 
 
-def updatePackageIni(packageIniPath, build_path):
+def updatePackageIni(packageIniPath, build_path, arch):
     copy_file(packageIniPath, build_path)
     f = open(os.path.join(build_path, "package.ini"), "a")
     try:
@@ -59,7 +59,7 @@ def updatePackageIni(packageIniPath, build_path):
 
 for arch in archs:
     build_path = os.path.join("..", BUILD_PATH_PRE + arch + BUILD_PATH_POST)
-    updatePackageIni(os.path.join("res", "package.ini"), build_path)
+    updatePackageIni(os.path.join("res", "package.ini"), build_path, arch)
     file_names = {
         os.path.join(build_path, "package.ini"): "package.ini",
         os.path.join("res", "ct_16x16.png"): os.path.join("plugins", "crosstalk_plugin", "ct_16x16.png"),

@@ -35,7 +35,7 @@ void TSPtt::Init(QMutex *mutex_cmd)
     this->setObjectName("TSPtt");
 }
 
-int TSPtt::SetPushToTalk(uint64 connection_id, PTT_CHANGE_STATUS action)
+auto TSPtt::SetPushToTalk(uint64 connection_id, PTT_CHANGE_STATUS action) -> int
 {
     if (action == PTT_ACTIVATE)
     {
@@ -67,7 +67,7 @@ int TSPtt::SetPushToTalk(uint64 connection_id, PTT_CHANGE_STATUS action)
     return 1;
 }
 
-int TSPtt::SetPushToTalk(uint64 connection_id, bool shouldTalk)
+auto TSPtt::SetPushToTalk(uint64 connection_id, bool shouldTalk) -> int
 {
     // If PTT is inactive, store the current settings
     if (!pttActive)
@@ -150,8 +150,8 @@ void TSPtt::UpdatePttDelayInfo()
         if (str_qstr.startsWith("delay_ptt_msecs"))
         {
             str_qstr.remove("delay_ptt_msecs=");
-            bool ok;
-            int msec = str_qstr.toInt(&ok);
+            auto ok = false;
+            auto msec = str_qstr.toInt(&ok);
             if (!ok)
                 TSLogging::Error("Error retrieving delay_ptt_msecs");
             else

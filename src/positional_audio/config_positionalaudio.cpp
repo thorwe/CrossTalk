@@ -12,8 +12,8 @@ ConfigPositionalAudio::ConfigPositionalAudio(QWidget *parent) :
     setWindowTitle(tr("Positional Audio"));
     //this->setFixedWidth(this->width());
 
-    auto layout = new QVBoxLayout(this);
-    auto groupbox_positionalaudio = new GroupBoxPositionalAudio(this);
+    auto *layout = new QVBoxLayout(this);
+    auto *groupbox_positionalaudio = new GroupBoxPositionalAudio(this);
     connect(groupbox_positionalaudio, &GroupBoxPositionalAudio::toggled, this, &ConfigPositionalAudio::EnabledSet);
     connect(groupbox_positionalaudio, &GroupBoxPositionalAudio::cameraSet, this, &ConfigPositionalAudio::CameraSet);
 
@@ -50,7 +50,7 @@ ConfigPositionalAudio::ConfigPositionalAudio(QWidget *parent) :
     connect(this, &ConfigPositionalAudio::UpdateUIServerSelect, groupbox_positionalaudio, &GroupBoxPositionalAudio::UpdateUIServerSelect);
     layout->addWidget(groupbox_positionalaudio);
 
-    auto groupbox_positionalaudio_status = new GroupBoxPositionalAudioStatus(this);
+    auto *groupbox_positionalaudio_status = new GroupBoxPositionalAudioStatus(this);
     connect(this, &ConfigPositionalAudio::UpdateUIStatusSelfName, groupbox_positionalaudio_status, &GroupBoxPositionalAudioStatus::UpdateUIStatusSelfName);
     connect(this, &ConfigPositionalAudio::UpdateUIStatusSelfGame, groupbox_positionalaudio_status, &GroupBoxPositionalAudioStatus::UpdateUIStatusSelfGame);
     layout->addWidget(groupbox_positionalaudio_status);

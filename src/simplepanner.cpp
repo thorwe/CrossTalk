@@ -27,7 +27,7 @@ void SimplePanner::set_current(float value)
 /*!
   \return the current pan (-1-+1)
 */
-float SimplePanner::get_current() const
+auto SimplePanner::get_current() const -> float
 {
     return m_current.load();
 }
@@ -46,7 +46,7 @@ void SimplePanner::set_desired(float value)
 /*!
   \return the desired pan (-1-+1)
 */
-float SimplePanner::get_desired() const
+auto SimplePanner::get_desired() const -> float
 {
     return m_desired.load();
 }
@@ -66,7 +66,7 @@ void SimplePanner::set_desired_by_manual(float value)
 /*!
   \return the desired pan (-1-+1) of the last user interaction
 */
-float SimplePanner::get_desired_by_manual() const
+auto SimplePanner::get_desired_by_manual() const -> float
 {
     return m_desired_by_manual.load();
 }
@@ -86,12 +86,12 @@ void SimplePanner::set_desired_by_pan_adjuster(float value)
 /*!
   \return the desired pan (-1-+1) of the automatic Pan adjustment
 */
-float SimplePanner::get_desired_by_pan_adjuster() const
+auto SimplePanner::get_desired_by_pan_adjuster() const -> float
 {
     return m_desired_by_pan_adjuster.load();
 }
 
-bool SimplePanner::get_adjust() const
+auto SimplePanner::get_adjust() const -> bool
 {
     return m_adjust.load();
 }

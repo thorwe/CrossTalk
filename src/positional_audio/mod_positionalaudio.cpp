@@ -54,52 +54,52 @@ PositionalAudio::PositionalAudio(Plugin &plugin)
 }
 
 // Properties
-std::wstring PositionalAudio::get_my_vr() const
+auto PositionalAudio::get_my_vr() const -> std::wstring
 {
     return meObj.get_vr();
 }
 
-std::wstring PositionalAudio::getMyIdentity() const
+auto PositionalAudio::getMyIdentity() const -> std::wstring
 {
     return meObj.getIdentity();
 }
 
-bool PositionalAudio::isUseCamera() const
+auto PositionalAudio::isUseCamera() const -> bool
 {
     return m_isUseCamera;
 }
 
-bool PositionalAudio::isUseAttenuation() const
+auto PositionalAudio::isUseAttenuation() const -> bool
 {
     return m_isUseAttenuation;
 }
 
-int PositionalAudio::getDistanceMin() const
+auto PositionalAudio::getDistanceMin() const -> int
 {
     return m_distanceMin;
 }
 
-int PositionalAudio::getDistanceMax() const
+auto PositionalAudio::getDistanceMax() const -> int
 {
     return m_distanceMax;
 }
 
-float PositionalAudio::getRollOff() const
+auto PositionalAudio::getRollOff() const -> float
 {
     return m_rollOff;
 }
 
-float PositionalAudio::getRollOffMax() const
+auto PositionalAudio::getRollOffMax() const -> float
 {
     return m_rollOffMax;
 }
 
-bool PositionalAudio::isPositioned(anyID client_id) const
+auto PositionalAudio::isPositioned(anyID client_id) const -> bool
 {
     return m_PlayersInMyContext.contains(client_id);
 }
 
-void PositionalAudio::setUseCamera(bool val)
+auto PositionalAudio::setUseCamera(bool val) -> void
 {
     if (m_isUseCamera == val)
         return;
@@ -264,7 +264,7 @@ void PositionalAudio::remove_other(connection_id_t connection_id, client_id_t cl
     emit BroadcastJSON(out_stri);
 }
 
-QMap<QString, PositionalAudio_ServerSettings> PositionalAudio::getServerSettings() const
+auto PositionalAudio::getServerSettings() const -> QMap<QString, PositionalAudio_ServerSettings>
 {
     return m_ServerSettings;
 }
@@ -353,8 +353,8 @@ void PositionalAudio::onCustom3dRolloffCalculationClientEvent(uint64 connection_
     }
 }
 
-bool PositionalAudio::onInfoDataChanged(
-uint64 connection_id, uint64 id, PluginItemType type, uint64 mine, QTextStream &data)
+auto PositionalAudio::onInfoDataChanged(
+uint64 connection_id, uint64 id, PluginItemType type, uint64 mine, QTextStream &data) -> bool
 {
     if (!running())
         return false;
@@ -556,7 +556,7 @@ void PositionalAudio::unlock()
     Log("Unlocked.");
 }
 
-bool PositionalAudio::fetch()
+auto PositionalAudio::fetch() -> bool
 {
     m_shared_memory->lock();
     const auto maybe_diff = m_shared_mem_reader.read_mem();
@@ -616,8 +616,8 @@ bool PositionalAudio::fetch()
     return true;
 }
 
-bool PositionalAudio::onPluginCommand(
-uint64 connection_id, anyID client_id, bool isMe, QString cmd, QTextStream &args)
+auto PositionalAudio::onPluginCommand(
+uint64 connection_id, anyID client_id, bool isMe, QString cmd, QTextStream &args) -> bool
 {
     if (cmd != "3D")
         return false;
@@ -769,7 +769,7 @@ uint64 connection_id, anyID client_id, bool isMe, QString cmd, QTextStream &args
     return true;
 }
 
-QString PositionalAudio::GetSendString(bool isAll)
+auto PositionalAudio::GetSendString(bool isAll) -> QString
 {
     // Bulk version
     if (meObj.get_vr().empty())
@@ -800,7 +800,7 @@ QString PositionalAudio::GetSendString(bool isAll)
     return out_stri;
 }
 
-QString PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj *obj)
+auto PositionalAudio::GetSendStringJson(bool isAll, bool isMe, TsVrObj *obj) -> QString
 {
     using namespace com::teamspeak::pluginsdk;
 

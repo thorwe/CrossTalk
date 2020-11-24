@@ -13,15 +13,15 @@ GroupBoxPositionalAudio::GroupBoxPositionalAudio(QWidget *parent)
 {
     setTitle(tr("Positional Audio"));
 
-    auto layout = new QGridLayout(this);
+    auto *layout = new QGridLayout(this);
 
-    auto groupbox_listener = new QGroupBox(this);
+    auto *groupbox_listener = new QGroupBox(this);
     {
         groupbox_listener->setTitle(tr("Listener"));
-        auto listener_layout = new QHBoxLayout;
+        auto *listener_layout = new QHBoxLayout;
 
         auto get_button = []() -> QPushButton * {
-            auto button = new QPushButton;
+            auto *button = new QPushButton;
             button->setFixedSize(66, 66);
             button->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
             button->setIconSize(QSize(64, 64));
@@ -53,7 +53,7 @@ GroupBoxPositionalAudio::GroupBoxPositionalAudio(QWidget *parent)
         m_volume->setChecked(false);
         connect(m_volume, &QGroupBox::toggled, this, &GroupBoxPositionalAudio::attenuationSet);
 
-        auto volume_layout = new QFormLayout;
+        auto *volume_layout = new QFormLayout;
 
         m_distance_min = new QSpinBox;
         m_distance_min->setSuffix(QStringLiteral(" m"));
@@ -90,7 +90,7 @@ GroupBoxPositionalAudio::GroupBoxPositionalAudio(QWidget *parent)
 
     // group box server settings
     {
-        auto groupbox_serversettings = new GroupBoxPositionalAudioServers;
+        auto *groupbox_serversettings = new GroupBoxPositionalAudioServers;
         connect(groupbox_serversettings, &GroupBoxPositionalAudioServers::enabledSet, this,
                 &GroupBoxPositionalAudio::ServerEnabledSet);
         connect(groupbox_serversettings, &GroupBoxPositionalAudioServers::sendIntervalChange, this,

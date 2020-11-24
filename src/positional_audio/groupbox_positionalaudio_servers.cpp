@@ -22,14 +22,15 @@ GroupBoxPositionalAudioServers::GroupBoxPositionalAudioServers(QWidget *parent)
 {
     setTitle(tr("Server Settings"));
 
-    auto layout = new QGridLayout();
+    auto *layout = new QGridLayout();
 
     m_servers->setEditTriggers(QAbstractItemView::NoEditTriggers);
     m_servers->setResizeMode(QListView::Adjust);
     connect(m_servers, &QListWidget::currentTextChanged, this, &GroupBoxPositionalAudioServers::changePage);
     layout->addWidget(m_servers, 0, 0, 1, 2);
 
-    auto add_button = new QPushButton(QIcon(":/icons/add.png"), QString::null);  //"gfx/default/16x16_add.png"
+    auto *add_button =
+    new QPushButton(QIcon(":/icons/add.png"), QString::null);  //"gfx/default/16x16_add.png"
     add_button->setFocusPolicy(Qt::FocusPolicy::NoFocus);
     add_button->setToolTip(tr("Add current server tab as custom server setting"));
     connect(add_button, &QPushButton::clicked, this, &GroupBoxPositionalAudioServers::addButtonClicked);
@@ -45,7 +46,7 @@ GroupBoxPositionalAudioServers::GroupBoxPositionalAudioServers(QWidget *parent)
         m_settings->setCheckable(true);
         m_settings->setChecked(false);
 
-        auto settings_layout = new QVBoxLayout;
+        auto *settings_layout = new QVBoxLayout;
         connect(m_settings, &QGroupBox::toggled, this,
                 &GroupBoxPositionalAudioServers::onEnabledCheckToggled);
 

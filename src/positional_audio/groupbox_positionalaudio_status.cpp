@@ -11,16 +11,16 @@ GroupBoxPositionalAudioStatus::GroupBoxPositionalAudioStatus(QWidget *parent)
 {
     setTitle(tr("Status"));
 
-    auto layout = new QGridLayout(this);
+    auto *layout = new QGridLayout(this);
 
     auto get_icon_label = []() -> QLabel * {
-        auto icon = new QLabel;
+        auto *icon = new QLabel;
         icon->setMinimumSize(24, 24);
         icon->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         icon->setAlignment(Qt::AlignCenter);
         return icon;
     };
-    auto icon = get_icon_label();
+    auto *icon = get_icon_label();
     QPixmap threedeepixmap(":/icons/3d_sound.png");  //"gfx/default/24x24_3d_sound.png" also 16x16
     icon->setPixmap(threedeepixmap);
     layout->addWidget(icon, 0, 0, Qt::AlignCenter);
@@ -29,7 +29,7 @@ GroupBoxPositionalAudioStatus::GroupBoxPositionalAudioStatus(QWidget *parent)
     m_status_settings_threedee->setWordWrap(true);
     layout->addWidget(m_status_settings_threedee, 0, 1, Qt::AlignLeft);
 
-    auto refresh = new QPushButton(this);
+    auto *refresh = new QPushButton(this);
     refresh->setMinimumSize(16, 16);
     refresh->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // 20x20_3d_sound_user
@@ -77,7 +77,7 @@ void GroupBoxPositionalAudioStatus::UpdateUIStatusSelfGame(QString val)
 
 void GroupBoxPositionalAudioStatus::onRefreshStatus()
 {
-    bool enabled;
+    auto enabled = false;
     bool isOk = TSSettings::instance()->Is3DSoundEnabled(enabled);
     if (!isOk)
         m_status_settings_threedee->setText(TSSettings::instance()->GetLastError().driverText());

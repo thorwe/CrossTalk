@@ -9,7 +9,7 @@ Minecraft::Minecraft(QObject *parent)
     this->setObjectName("Minecraft");
 }
 
-std::wstring Minecraft::get_identity() const
+auto Minecraft::get_identity() const -> std::wstring
 {
     if (m_meObj.value("name") != QJsonValue::Undefined)
         return m_meObj.value("name").toString(QString::null).toStdWString();
@@ -17,7 +17,7 @@ std::wstring Minecraft::get_identity() const
     return {};
 }
 
-bool Minecraft::on_identity_raw_dirty(std::wstring_view raw_identity)
+auto Minecraft::on_identity_raw_dirty(std::wstring_view raw_identity) -> bool
 {
     QJsonObject oldObj = m_meObj;
 
@@ -59,7 +59,7 @@ bool Minecraft::on_identity_raw_dirty(std::wstring_view raw_identity)
     return isIdentityDirty;
 }
 
-bool Minecraft::onInfoData(QTextStream &data)
+auto Minecraft::onInfoData(QTextStream &data) -> bool
 {
     data << "\n";
 

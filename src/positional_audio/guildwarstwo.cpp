@@ -25,7 +25,7 @@ GuildWarsTwo::GuildWarsTwo(QObject *parent)
     m_netwManager->get(request);
 }
 
-std::wstring GuildWarsTwo::get_identity() const
+auto GuildWarsTwo::get_identity() const -> std::wstring
 {
     if (m_meObj.value("name") != QJsonValue::Undefined)
         return m_meObj.value("name").toString(QString::null).toStdWString();
@@ -33,27 +33,27 @@ std::wstring GuildWarsTwo::get_identity() const
     return {};
 }
 
-quint32 GuildWarsTwo::getProfessionId() const
+auto GuildWarsTwo::getProfessionId() const -> quint32
 {
     return m_meObj.value("profession").toInt();
 }
 
-quint8 GuildWarsTwo::getMapId() const
+auto GuildWarsTwo::getMapId() const -> quint8
 {
     return m_meObj.value("map_id").toInt();
 }
 
-quint32 GuildWarsTwo::getWorldId() const
+auto GuildWarsTwo::getWorldId() const -> quint32
 {
     return m_meObj.value("world_id").toInt();
 }
 
-quint32 GuildWarsTwo::getTeamColorId() const
+auto GuildWarsTwo::getTeamColorId() const -> quint32
 {
     return m_meObj.value("team_color_id").toInt();
 }
 
-bool GuildWarsTwo::isCommander() const
+auto GuildWarsTwo::isCommander() const -> bool
 {
     return m_meObj.value("commander").toBool();
 }
@@ -221,7 +221,7 @@ void GuildWarsTwo::onSslErrors(QNetworkReply *reply, const QList<QSslError> &err
     }
 }
 
-bool GuildWarsTwo::on_identity_raw_dirty(std::wstring_view raw_identity)
+auto GuildWarsTwo::on_identity_raw_dirty(std::wstring_view raw_identity) -> bool
 {
     QJsonObject oldObj = m_meObj;
 
@@ -296,7 +296,7 @@ bool GuildWarsTwo::on_identity_raw_dirty(std::wstring_view raw_identity)
 }
 
 //! Add additional information for a specific game
-bool GuildWarsTwo::onInfoData(QTextStream &data)
+auto GuildWarsTwo::onInfoData(QTextStream &data) -> bool
 {
     data << "\n";
     data << "is commander: " << ((isCommander()) ? "y" : "n") << "\n";

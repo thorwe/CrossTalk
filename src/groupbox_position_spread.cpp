@@ -23,7 +23,7 @@ GroupBoxPositionSpread::GroupBoxPositionSpread(QWidget *parent)
     setCheckable(true);
     setTitle(tr("Enabled"));  // ToDo: get client translation
 
-    auto layout = new QVBoxLayout(this);
+    auto *layout = new QVBoxLayout(this);
 
     m_dial->setWhatsThis(
     "<html><head /><body><p><span style = \"font-size:10pt; text-decoration: underline;\">" +
@@ -41,20 +41,20 @@ GroupBoxPositionSpread::GroupBoxPositionSpread(QWidget *parent)
 
     m_expert->setCheckable(true);
     m_expert->setTitle(qApp->translate("captureSoundSetupDialog", "&Advanced Options"));
-    auto groupbox_expert_layout = new QVBoxLayout;
+    auto *groupbox_expert_layout = new QVBoxLayout;
 
     auto add_expert_widget = [this, groupbox_expert_layout](const QString &name, const QString &text,
                                                             void (GroupBoxPositionSpread::*slot)(int val)) {
-        auto expert_widget = new QWidget;
+        auto *expert_widget = new QWidget;
         expert_widget->setObjectName(QLatin1String("PositionSpread_ExpertWidget_") + name);
-        auto expert_layout = new QVBoxLayout;
+        auto *expert_layout = new QVBoxLayout;
 
-        auto label = new QLabel;
+        auto *label = new QLabel;
         // label->setObjectName(expert_widget->objectName() + "_label");
         label->setText(text);
         expert_layout->addWidget(label);
 
-        auto slider = new QSlider;
+        auto *slider = new QSlider;
         // slider->setObjectName(expert_widget->objectName() + "_slider");
         slider->setWhatsThis(tr("Audio Region : Left, Middle, Right"));
         slider->setMaximum(2);

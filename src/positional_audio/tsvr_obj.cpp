@@ -4,27 +4,27 @@
 
 // Getters
 
-std::wstring TsVrObj::get_vr() const
+auto TsVrObj::get_vr() const -> std::wstring
 {
     return m_vr;
 }
 
-std::wstring TsVrObj::get_vr_description() const
+auto TsVrObj::get_vr_description() const -> std::wstring
 {
     return m_vr_desc;
 }
 
-std::vector<std::byte> TsVrObj::get_context() const
+auto TsVrObj::get_context() const -> std::vector<std::byte>
 {
     return m_context;
 }
 
-std::string TsVrObj::get_context_as_string() const
+auto TsVrObj::get_context_as_string() const -> std::string
 {
     return std::string{reinterpret_cast<const char *>(m_context.data()), m_context.size()};
 }
 
-std::wstring TsVrObj::getIdentity() const
+auto TsVrObj::getIdentity() const -> std::wstring
 {
     if (m_CustomEnvironmentSupport)
     {
@@ -36,19 +36,19 @@ std::wstring TsVrObj::getIdentity() const
         return m_identityRaw;
 }
 
-std::wstring TsVrObj::getIdentityRaw() const
+auto TsVrObj::getIdentityRaw() const -> std::wstring
 {
     return m_identityRaw;
 }
 
-thorwe::Three_Dee_Info TsVrObj::get_avatar() const
+auto TsVrObj::get_avatar() const -> thorwe::Three_Dee_Info
 {
     return m_avatar;
 }
 
 
 //! Handles the ts_infodata_qt event for this client
-bool TsVrObj::onInfoDataChanged(QTextStream &data)
+auto TsVrObj::onInfoDataChanged(QTextStream &data) -> bool
 {
     bool isDirty = false;
     if (!m_vr.empty())

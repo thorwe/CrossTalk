@@ -13,7 +13,7 @@ void Shared_Mem_Reader::set_lm(LinkedMem *val)
     lm = val;
 }
 
-std::optional<Linked_Mem_Try> Shared_Mem_Reader::try_read()
+auto Shared_Mem_Reader::try_read() -> std::optional<Linked_Mem_Try>
 {
     auto lm_lock = std::lock_guard(m_lm_mutex);
     if (!lm)
@@ -78,7 +78,7 @@ std::optional<Linked_Mem_Try> Shared_Mem_Reader::try_read()
     return result;
 }
 
-std::optional<Linked_Mem_Diff> Shared_Mem_Reader::read_mem()
+auto Shared_Mem_Reader::read_mem() -> std::optional<Linked_Mem_Diff>
 {
     auto lm_lock = std::lock_guard(m_lm_mutex);
     if (!lm)
@@ -235,49 +235,49 @@ void Shared_Mem_Reader::zero_lm()
     }
 }
 
-uint32_t Shared_Mem_Reader::ui_version() const
+auto Shared_Mem_Reader::ui_version() const -> uint32_t
 {
     std::shared_lock<decltype(m_mutex)> lock(m_mutex);
     return m_last_lm.ui_version;
 }
 
-uint32_t Shared_Mem_Reader::dw_count() const
+auto Shared_Mem_Reader::dw_count() const -> uint32_t
 {
     std::shared_lock<decltype(m_mutex)> lock(m_mutex);
     return m_last_lm.dw_count;
 }
 
-std::array<TS3_VECTOR, 3> Shared_Mem_Reader::avatar() const
+auto Shared_Mem_Reader::avatar() const -> std::array<TS3_VECTOR, 3>
 {
     std::shared_lock<decltype(m_mutex)> lock(m_mutex);
     return {m_last_lm.avatar_position, m_last_lm.avatar_front, m_last_lm.avatar_top};
 }
 
-std::wstring Shared_Mem_Reader::name() const
+auto Shared_Mem_Reader::name() const -> std::wstring
 {
     std::shared_lock<decltype(m_mutex)> lock(m_mutex);
     return m_last_lm.name;
 }
 
-std::array<TS3_VECTOR, 3> Shared_Mem_Reader::camera() const
+auto Shared_Mem_Reader::camera() const -> std::array<TS3_VECTOR, 3>
 {
     std::shared_lock<decltype(m_mutex)> lock(m_mutex);
     return {m_last_lm.camera_position, m_last_lm.camera_front, m_last_lm.camera_top};
 }
 
-std::wstring Shared_Mem_Reader::identity() const
+auto Shared_Mem_Reader::identity() const -> std::wstring
 {
     std::shared_lock<decltype(m_mutex)> lock(m_mutex);
     return m_last_lm.identity;
 }
 
-std::vector<std::byte> Shared_Mem_Reader::context() const
+auto Shared_Mem_Reader::context() const -> std::vector<std::byte>
 {
     std::shared_lock<decltype(m_mutex)> lock(m_mutex);
     return m_last_lm.context;
 }
 
-std::wstring Shared_Mem_Reader::description() const
+auto Shared_Mem_Reader::description() const -> std::wstring
 {
     std::shared_lock<decltype(m_mutex)> lock(m_mutex);
     return m_last_lm.description;

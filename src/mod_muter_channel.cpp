@@ -25,7 +25,7 @@ void ChannelMuter::onRunningStateChanged(bool value)
     if (!value)  // this module is always active, used solely as init function
         return;
 
-    auto plugin = qobject_cast<Plugin_Base *>(parent());
+    auto *plugin = qobject_cast<Plugin_Base *>(parent());
     auto &context_menu = plugin->context_menu();
     if (m_ContextMenuIdToggleChannelMute == -1)
     {
@@ -52,7 +52,7 @@ void ChannelMuter::onRunningStateChanged(bool value)
  * \param channel_id the channel id
  * \return true if the toggling results in active muting, otherwise false
  */
-bool ChannelMuter::toggleChannelMute(uint64 connection_id, uint64 channel_id)
+auto ChannelMuter::toggleChannelMute(uint64 connection_id, uint64 channel_id) -> bool
 {
 
     if (!connection_id)
@@ -117,7 +117,7 @@ bool ChannelMuter::toggleChannelMute(uint64 connection_id, uint64 channel_id)
                     // for info update on hotkey
                     if (!channel_id)
                     {
-                        auto plugin = qobject_cast<Plugin_Base *>(parent());
+                        auto *plugin = qobject_cast<Plugin_Base *>(parent());
                         auto &info_data = plugin->info_data();
                         info_data.RequestUpdate(connection_id, target_channel_id, PLUGIN_CHANNEL);
                     }
@@ -136,7 +136,7 @@ bool ChannelMuter::toggleChannelMute(uint64 connection_id, uint64 channel_id)
  * \param channel_id the channel id
  * \return true if muted
  */
-bool ChannelMuter::isChannelMuted(uint64 connection_id, uint64 channel_id)
+auto ChannelMuter::isChannelMuted(uint64 connection_id, uint64 channel_id) -> bool
 {
     auto newPair = qMakePair(connection_id, channel_id);
     return (MutedChannels.contains(newPair));
@@ -148,7 +148,7 @@ bool ChannelMuter::isChannelMuted(uint64 connection_id, uint64 channel_id)
  * interaction \param connection_id ther server tab \param client_id the client id \return true if the action
  * results in whitelisting, otherwise false
  */
-bool ChannelMuter::toggleClientWhitelisted(uint64 connection_id, anyID client_id)
+auto ChannelMuter::toggleClientWhitelisted(uint64 connection_id, anyID client_id) -> bool
 {
     // Log(QString("(toggleClientWhitelisted) %1").arg(client_id),connection_id,LogLevel_DEBUG);
     QPair<uint64, anyID> newPair = qMakePair(connection_id, client_id);
@@ -159,7 +159,7 @@ bool ChannelMuter::toggleClientWhitelisted(uint64 connection_id, anyID client_id
 
     int talk_status = TalkStatus::STATUS_NOT_TALKING;
     ;
-    int is_received_whisper;
+    auto is_received_whisper = int{0};
     const auto error_talk_status =
     TSHelpers::GetTalkStatus(connection_id, client_id, talk_status, is_received_whisper);
     if (error_talk_status)
@@ -180,7 +180,7 @@ bool ChannelMuter::toggleClientWhitelisted(uint64 connection_id, anyID client_id
  * \param client_id the client id
  * \return true if whitelisted
  */
-bool ChannelMuter::isClientWhitelisted(uint64 connection_id, anyID client_id)
+auto ChannelMuter::isClientWhitelisted(uint64 connection_id, anyID client_id) -> bool
 {
     auto newPair = qMakePair(connection_id, client_id);
     return (ClientWhiteList.contains(newPair));
@@ -255,8 +255,8 @@ void ChannelMuter::onClientMoveEvent(uint64 connection_id,
  * \param is_received_whisper is it a whisper?
  * \param client_id the client changing its talk status
  */
-bool ChannelMuter::onTalkStatusChanged(
-uint64 connection_id, int status, bool is_received_whisper, anyID client_id, bool isMe)
+auto ChannelMuter::onTalkStatusChanged(
+uint64 connection_id, int status, bool is_received_whisper, anyID client_id, bool isMe) -> bool
 {
     if (!running())
         return false;
@@ -299,15 +299,15 @@ uint64 connection_id, int status, bool is_received_whisper, anyID client_id, boo
     return false;
 }
 
-bool ChannelMuter::onInfoDataChanged(
-uint64 connection_id, uint64 id, PluginItemType type, uint64 mine, QTextStream &data)
+auto ChannelMuter::onInfoDataChanged(
+uint64 connection_id, uint64 id, PluginItemType type, uint64 mine, QTextStream &data) -> bool
 {
     auto isDirty = false;
     if (type == PLUGIN_CLIENT)
     {
         if (m_ContextMenuToggleClientWhitelisted != -1)
         {
-            auto plugin = qobject_cast<Plugin_Base *>(parent());
+            auto *plugin = qobject_cast<Plugin_Base *>(parent());
             pluginsdk::funcs::set_plugin_menu_enabled(plugin->id(), m_ContextMenuToggleClientWhitelisted,
                                                       id != mine);
         }
@@ -353,8 +353,8 @@ void ChannelMuter::onContextMenuEvent(uint64 connection_id,
  * \param channels amount of channels
  * \return true if the stream is muted, so succeeding modules need not bother
  */
-bool ChannelMuter::onEditPlaybackVoiceDataEvent(
-uint64 connection_id, anyID client_id, short *samples, int sampleCount, int channels)
+auto ChannelMuter::onEditPlaybackVoiceDataEvent(
+uint64 connection_id, anyID client_id, short *samples, int sampleCount, int channels) -> bool
 {
     if (!running())
         return false;
@@ -370,7 +370,7 @@ uint64 connection_id, anyID client_id, short *samples, int sampleCount, int chan
     connection_id, client_id);
 }
 
-int ChannelMuter::ParseCommand(uint64 connection_id, const QString &cmd, const QStringList &args)
+auto ChannelMuter::ParseCommand(uint64 connection_id, const QString &cmd, const QStringList &args) -> int
 {
     if ((cmd.compare("CHANNEL_MUTER", Qt::CaseInsensitive)) != 0)
         return 1;

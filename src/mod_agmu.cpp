@@ -11,8 +11,8 @@ Agmu::Agmu(Plugin_Base& plugin)
     m_isPrintEnabled = false;
 }
 
-bool Agmu::onEditPlaybackVoiceDataEvent(
-uint64 connection_id, anyID client_id, short *samples, int sampleCount, int channels)
+auto Agmu::onEditPlaybackVoiceDataEvent(
+uint64 connection_id, anyID client_id, short *samples, int sampleCount, int channels) -> bool
 {
     //    if (!(isForceProcessing || isRunning()))
     //        return false;
@@ -28,8 +28,8 @@ uint64 connection_id, anyID client_id, short *samples, int sampleCount, int chan
     connection_id, client_id);
 }
 
-bool Agmu::onTalkStatusChanged(
-uint64 connection_id, int status, bool is_received_whisper, anyID client_id, bool is_me)
+auto Agmu::onTalkStatusChanged(
+uint64 connection_id, int status, bool is_received_whisper, anyID client_id, bool is_me) -> bool
 {
     Q_UNUSED(is_received_whisper);
 
