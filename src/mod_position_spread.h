@@ -22,7 +22,7 @@ enum TALKERS_REGION
     TALKERS_REGION_RIGHT,
     TALKERS_REGION_END
 };
-Q_DECLARE_METATYPE(TALKERS_REGION)
+Q_DECLARE_METATYPE(thorwe::TALKERS_REGION)
 
 class PositionSpread : public Module_Qt, public TalkInterface
 {

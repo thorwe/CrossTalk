@@ -8,6 +8,7 @@
 #include <gsl/span>
 
 #include <array>
+#include <vector>
 #include <mutex>
 #include <optional>
 #include <shared_mutex>

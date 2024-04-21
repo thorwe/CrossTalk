@@ -676,7 +676,8 @@ uint64 connection_id, anyID client_id, bool isMe, QString cmd, QTextStream &args
 
     if (args.atEnd())  // Player left vr (unlocked)
     {
-        Log(QString("%1 left %2 VR.").arg(obj->getIdentity()).arg(QString::fromStdWString(obj->get_vr())));
+        // FIXME error: no matching function for call to 'QString::arg(std::__cxx11::basic_string<wchar_t>&)'
+        // Log(QString("%1 left %2 VR.").arg(obj->getIdentity()).arg(QString::fromStdWString(obj->get_vr())));
         remove_other(connection_id, client_id);
         m_PlayersInMyContext.remove(connection_id, client_id);
         return true;
@@ -725,11 +726,12 @@ uint64 connection_id, anyID client_id, bool isMe, QString cmd, QTextStream &args
             isDirtyId = (identity != obj->getIdentityRaw());
             obj->setIdentityRaw(identity);
 
-            Log(QString("Received: VR: %2 CO: %3 ID: %4")
-                .arg(name)
-                .arg((context == meObj.get_context()) ? "match" : "no match")
-                .arg(identity),
-                connection_id, LogLevel_DEBUG);
+            // FIXME error: no matching function for call to 'QString::arg(std::__cxx11::basic_string<wchar_t>&)'
+            // Log(QString("Received: VR: %2 CO: %3 ID: %4")
+            //     .arg(name)
+            //     .arg((context == meObj.get_context()) ? "match" : "no match")
+            //     .arg(identity),
+            //     connection_id, LogLevel_DEBUG);
 
             if (isDirtyName || isDirtyContext)
             {
@@ -782,7 +784,7 @@ auto PositionalAudio::GetSendString(bool isAll) -> QString
     if (isAll)
     {
         //        out << " " << m_GameName;
-        out << " " << meObj.get_vr();
+        out << " " << QString::fromStdWString(meObj.get_vr());
 
         {
             const auto &my_context = meObj.get_context_as_string();
@@ -793,7 +795,7 @@ auto PositionalAudio::GetSendString(bool isAll) -> QString
                     << (my_context.empty() ? "[Ct_None]" : QString::fromStdString(my_context));
 
                 if (!my_ident.empty())
-                    out << " " << my_ident;
+                    out << " " << QString::fromStdWString(my_ident);
             }
         }
     }
