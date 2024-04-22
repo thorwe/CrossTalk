@@ -16,7 +16,7 @@
 #include "core/ts_logging_qt.h"
 #include "core/ts_serversinfo.h"
 
-#include "teamspeak/clientlib_publicdefinitions.h"
+#include "teamspeak/public_definitions.h"
 
 using namespace com::teamspeak;
 using namespace com::teamspeak::pluginsdk;
